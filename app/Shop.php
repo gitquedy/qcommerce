@@ -45,13 +45,11 @@ class Shop extends Model
         if($orders){
             $orders = array_map(function($order){
                 $status = $order['statuses'][0];
-                unset($order['created_at']);
-                unset($order['updated_at']);
                 unset($order['statuses']);
                 unset($order['address_billing']);
                 unset($order['address_shipping']);
                 unset($order['order_number']);  
-                $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'created_at' => Carbon::now()->toDateTimeString(), 'updated_at' => Carbon::now()->toDateTimeString()]);
+                $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id]);
                 unset($order['order_id']);     
                 $record = Order::updateOrCreate(
                 ['id' => $order['id']], $order);
