@@ -21,7 +21,7 @@ class Shop extends Model
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
     ];
     
-    public function syncOrders($date = '2018-01-01', $step = '+3 day'){
+    public function syncOrders($date = '2015-01-01', $step = '+3 day'){
         try {
         $this->update(['active' => 2]);
         $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
