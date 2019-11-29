@@ -36,7 +36,8 @@ class CreateOrderTable extends Migration
             $table->string('remarks');
             $table->string('delivery_info');
             $table->unsignedInteger('shop_id');
-            $table->timestamps();
+            $table->timestamp('created_at');
+            $table->timestamp('updated_at');
         });
     }
 
