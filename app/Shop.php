@@ -17,8 +17,6 @@ class Shop extends Model
 
     protected $fillable = ['user_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time'];
 
-    public $timestamps = false;
-
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
     ];

@@ -22,6 +22,8 @@ class Order extends Model
 		    	'status','extra_attributes','gift_message','remarks','shop_id',
 			];
 
+    public $timestamps = false;
+
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
     ];
