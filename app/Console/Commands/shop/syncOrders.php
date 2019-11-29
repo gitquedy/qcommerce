@@ -43,7 +43,7 @@ class syncOrders extends Command
         foreach($shops as $shop){
             $shop->syncOrders(Carbon::now()->subDays(7)->format('Y-m-d'), '+2 day');
             $shop->touch();
-            echo 'Synced Orders Successfully' . date('d-m-Y H:i:s') . PHP_EOL;
+            echo 'Synced Orders Successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
         }
     }
 }
