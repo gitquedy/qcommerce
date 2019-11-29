@@ -1,4 +1,4 @@
 deployment:
  tasks:
- - export DEPLOYPATH=/home/yuuki/public_html/lazada
+ - export DEPLOYPATH=/home/qcommerce/public_html/qcommerce
  - /bin/cp -r * $DEPLOYPATH
