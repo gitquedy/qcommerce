@@ -1,4 +1,4 @@
 deployment:
  tasks:
- - export DEPLOYPATH=/home/qcommerce/public_html/qcommerce
+ - export DEPLOYPATH=/home/qcommerce/public_html/
  - /bin/cp -r * $DEPLOYPATH
