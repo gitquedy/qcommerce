@@ -1,0 +1,4 @@
+deployment:
+ tasks:
+ - export DEPLOYPATH=/home/yuuki/public_html/lazada
+ - /bin/cp -r * $DEPLOYPATH

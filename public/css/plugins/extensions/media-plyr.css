@@ -1,0 +1,14 @@
+.audio-player:focus {
+  outline: 0;
+}
+
+.plyr__controls {
+  -webkit-box-pack: start;
+          justify-content: flex-start;
+}
+
+.plyr__progress {
+  -webkit-box-flex: 1;
+          flex-grow: 1;
+}
+
