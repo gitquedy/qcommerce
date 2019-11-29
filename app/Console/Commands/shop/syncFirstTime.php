@@ -44,6 +44,6 @@ class syncFirstTime extends Command
             $shop->touch();
             $shop->update(['is_first_time', false]);
         }
-         echo 'Synced orders for first time successfully' . PHP_EOL;
+         echo 'Synced orders for first time successfully' . PHP_EOL . date('d-m-Y H:i:s');
     }
 }

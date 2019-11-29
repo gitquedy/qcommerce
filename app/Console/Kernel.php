@@ -27,13 +27,13 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('shop:syncfirst')
                  ->everyFiveMinutes()
-                 ->appendOutputTo('storage/logs/cron.log');
+                 ->appendOutputTo('storage/logs/cron_syncfirst.log');
         $schedule->command('shop:syncOrders')
                  ->everyThirtyMinutes()
-                 ->appendOutputTo('storage/logs/cron.log');
+                 ->appendOutputTo('storage/logs/cron_syncorders.log');
         $schedule->command('shop:updateToken')
                  ->cron('0 0 */5 * *')
-                 ->appendOutputTo('storage/logs/cron.log');
+                 ->appendOutputTo('storage/logs/cron_updateToken.log');
     }
 
     /**

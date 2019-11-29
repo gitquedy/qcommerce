@@ -42,7 +42,7 @@ class updateToken extends Command
         foreach($shops as $shop){
             $shop->refreshToken();
             $shop->touch();
-            echo 'Token Updated Successfully' . PHP_EOL;
+            echo 'Token Updated Successfully' . PHP_EOL . date('d-m-Y H:i:s');
         }
     }
 }
