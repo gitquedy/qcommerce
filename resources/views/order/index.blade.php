@@ -84,6 +84,7 @@
             <th>Order Number</th>
             <th>Seller</th>
             <th>Creation Date</th>
+            <!-- <th>Creation Date</th> -->
             <th>Payment Method</th>
             <th>Price</th>
             <th>Item Count</th>
@@ -117,7 +118,8 @@
             { data: 'id', name: 'id', orderable : false},
             { data: 'id', name: 'id', orderable : false},
             { data: 'shop', name: 'shop.short_name'},
-            { data: 'created_at', name: 'created_at' },
+            { data: 'created_at_formatted', name: 'created_at' },
+            // { data: 'created_at', name: 'created_at' },
             { data: 'payment_method', name: 'payment_method' },
             { data: 'price', name: 'price' },
             { data: 'items_count', name: 'items_count' },

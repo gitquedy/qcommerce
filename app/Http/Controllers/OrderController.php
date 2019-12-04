@@ -35,7 +35,7 @@ class OrderController extends Controller
         // }
         
     if ( request()->ajax()) {
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc');
+           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
            if($request->get('shop', 'all') != 'all'){
                 $shops->where('id', $request->get('shop'));
            }
@@ -53,8 +53,8 @@ class OrderController extends Controller
                 ->addColumn('actions', function(Order $order) {
                             return $order->getActionsDropdown();
                                 })
-                ->addColumn('created_at', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M d, Y H:i');
+                ->addColumn('created_at_formatted', function(Order $order) {
+                            return Utilities::format_date($order->created_at, 'Y-m-d H:i');
                                 })
                 ->rawColumns(['actions'])
                 ->make(true);
