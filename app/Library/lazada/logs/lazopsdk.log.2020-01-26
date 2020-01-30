@@ -1,0 +1,1 @@
+2020-01-26 08:02:00^_^113941^_^CLI^_^Linux^_^lazop-sdk-php-20180422^_^https://api.lazada.com.ph/rest/auth/token/refresh?app_key=113941&sign_method=sha256&timestamp=1579996920000&partner_id=lazop-sdk-php-20180422&sign=1732B91F461B9AFECE9AEA0ECFE69655E959F864CE0180F0CD254885D522D8FA^_^IllegalRefreshToken^_^The specified refresh token is invalid or expired

@@ -23,10 +23,10 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}">Delete</a>
-            <a class="dropdown-item" href="#">Print</a>
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>
-            <a class="dropdown-item" href="#">Another Action</a>
+            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop">Delete</a>
+            <!--<a class="dropdown-item" href="#">Print</a>-->
+            <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
+            <!--<a class="dropdown-item" href="#">Another Action</a>-->
           </div>
         </div>
       </div>
@@ -36,16 +36,16 @@
       <table class="table data-list-view">
         <thead>
           <tr>
-            <th>For Checkbox</th>
+            <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
+                <input type="checkbox">
+            </th>
             <th>ID</th>
             <th>NAME</th>
-            <th>Short Name</th>
             <th>Status</th>
+            <th>Products</th>
             <th>Pending</th>
             <th>Ready to Ship</th>
             <th>Shipped</th>
-            <th>Delivered</th>
-            <th>CREATED AT</th>
             <th>UPDATED AT</th>
           </tr>
         </thead>
@@ -65,7 +65,7 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
-  <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>
+  <!--<script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>-->
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
 @section('myscript')
@@ -73,16 +73,21 @@
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
-            { data: 'id', name: 'id', orderable : false},
+            { data: 'id',
+            name: 'id' ,
+            "render": function (){
+                    return '<input type="checkbox" class="dt-checkboxes">';
+                },
+                className:'dt-checkboxes-cell'
+                
+            },
             { data: 'id', name: 'id' ,orderable : false},
             { data: 'name', name: 'name' },
-            { data: 'short_name', name: 'short_name' },
             { data: 'statusChip', name: 'statusChip' },
+            { data: 'products', name: 'products' },
             { data: 'pending_count', name: 'pending_count' },
             { data: 'ready_to_ship_count', name: 'ready_to_ship_count' },
             { data: 'shipped_count', name: 'shipped_count' },
-            { data: 'delivered_count', name: 'delivered_count' },
-            { data: 'created_at', name: 'created_at' },
             { data: 'updated_at', name: 'updated_at' },
         ];
   var table_route = '{{ route('shop.index') }}';

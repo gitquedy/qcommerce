@@ -16,7 +16,10 @@
 
 Route::group(['middleware' => 'auth'], function()
 {
-	Route::get('/', 'DashboardController@index');
+	Route::get('/', 'DashboardController@index')->name('dashboard');
+	
+	//Ajax
+	Route::post('ajax/get_notification', 'AjaxController@get_notification')->name('ajax_get_notification');
 
 	// simple crud
 	Route::get('/crud/listView', 'CrudController@listView')->name('crud.listView');
@@ -28,15 +31,69 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/lazop/receive', 'LazopController@receive')->name('lazop.receive');
 	Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 	Route::resource('/shop', 'ShopController');
+	
+	Route::resource('/barcode', 'BarcodeController');
+	Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
+	
+	Route::resource('/product', 'ProductController');
+	Route::get('/product/edit/{id}', 'ProductController@edit')->name('product.edit');
+	Route::post('/product/update', 'ProductController@update')->name('product.update');
+	Route::post('/product/upload_image', 'ProductController@upload_image')->name('product.upload_image');
+	Route::post('/product/ajax_duplicate_modal', 'ProductController@ajax_duplicate_modal')->name('product.ajax_duplicate_modal');
+	Route::post('/product/process_duplicate_product', 'ProductController@process_duplicate_product')->name('product.process_duplicate_product');
+	Route::post('/product/mass_copy', 'ProductController@mass_copy')->name('product.mass_copy');
+	Route::post('/product/bulkremove', 'ProductController@bulkremove')->name('product.bulkremove');
+	
+	
+	Route::resource('/sku', 'SkuController');
+	Route::get('/sku/create/', 'SkuController@create')->name('sku.create');
+	Route::post('/sku/add/', 'SkuController@add')->name('sku.add');
+	Route::get('/sku/edit/{id}', 'SkuController@edit')->name('sku.edit');
+	Route::post('/sku/update/', 'SkuController@update')->name('sku.update');
+	Route::get('/sku/delete/{id}', 'SkuController@delete')->name('sku.delete');
+	Route::post('/sku/bulkremove', 'SkuController@bulkremove')->name('sku.bulkremove');
+	
+	
+	Route::resource('/category', 'CategoryController');
+	Route::get('/category/create/', 'CategoryController@create')->name('category.create');
+	Route::post('/category/add/', 'CategoryController@add')->name('category.add');
+	Route::get('/category/edit/{id}', 'CategoryController@edit')->name('category.edit');
+	Route::post('/category/update/', 'CategoryController@update')->name('category.update');
+	Route::get('/category/delete/{id}', 'CategoryController@delete')->name('category.delete');
+	Route::post('/category/bulkremove', 'CategoryController@bulkremove')->name('category.bulkremove');
+	Route::post('/category/add_ajax/', 'CategoryController@add_ajax')->name('category.add_ajax');
+	
+	
+	Route::resource('/brand', 'BrandController');
+	Route::get('/brand/create/', 'BrandController@create')->name('brand.create');
+	Route::post('/brand/add/', 'BrandController@add')->name('brand.add');
+	Route::get('/brand/edit/{id}', 'BrandController@edit')->name('brand.edit');
+	Route::post('/brand/update/', 'BrandController@update')->name('brand.update');
+	Route::get('/brand/delete/{id}', 'BrandController@delete')->name('brand.delete');
+	Route::post('/brand/bulkremove', 'BrandController@bulkremove')->name('brand.bulkremove');
+	Route::post('/brand/add_ajax/', 'BrandController@add_ajax')->name('brand.add_ajax');
+	
+	
+	Route::get('/exp1', 'ExpController@exp1')->name('exp1');
 
 	Route::get('/order/readyToShip/{order}', 'OrderController@readyToShip')->name('order.readyToShip');
 	Route::get('/order/cancel/{order}', 'OrderController@cancel')->name('order.cancel');
 	Route::resource('/order', 'OrderController');
+	Route::get('/orders_pending', 'OrderController@orders_pending')->name('order.pending');
+	Route::get('/orders_printing', 'OrderController@orders_printing')->name('order.printing');
+	Route::get('/orders_ready_to_ship', 'OrderController@orders_ready_to_ship')->name('order.ready_to_ship');
+	Route::get('/orders_shipped', 'OrderController@orders_shipped')->name('order.shipped');
+	Route::get('/orders_delivered', 'OrderController@orders_delivered')->name('order.delivered');
+	Route::get('/order/print_shipping/{id}', 'OrderController@print_shipping')->name('order.print_shipping');
+	Route::post('/order/print_shipping_mass', 'OrderController@print_shipping_mass')->name('order.print_shipping_mass');
+	
+	
 
 
 	// Route Dashboards
 	Route::get('/dashboard-analytics', 'DashboardController@dashboardAnalytics');
 	Route::get('/dashboard-ecommerce', 'DashboardController@dashboardEcommerce');
+	Route::get('/testr', 'DashboardController@testr');
 
 	// Route Apps
 	Route::get('/app-email', 'EmailAppController@emailApp');

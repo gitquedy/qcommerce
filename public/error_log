@@ -1,0 +1,1 @@
+[08-Jan-2020 21:15:28 Asia/Manila] PHP Fatal error:  Cannot redeclare App\Http\Controllers\BrandController::add() in /home/qcommerce/public_html/app/app/Http/Controllers/BrandController.php on line 102

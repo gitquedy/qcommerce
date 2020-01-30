@@ -5,6 +5,8 @@ namespace App\Console\Commands\shop;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Shop;
+use App\Products;
+use App\Sku;
 
 class syncOrders extends Command
 {
@@ -45,5 +47,8 @@ class syncOrders extends Command
             $shop->touch();
             echo 'Synced Orders Successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
         }
+        
+        Products::syncProducts();
+        // Sku::syncSku();
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 use Config;
+use App\Order;
+use App\Shop;
+use App\Products;
 use Illuminate\Support\Str;
 
 class Helper
@@ -122,4 +125,106 @@ class Helper
             }
         }
     }
+    
+    
+    public static function dateRange( $first, $last, $step = '+1 day', $format = 'Y-m-d' ) {
+        $dates = array();
+        $first = (string) $first;
+        $last = (string) $last;
+        $current = strtotime( $first );
+        $last = strtotime( $last );
+    
+        while( $current <= $last ) {
+    
+            $dates[] = date( $format, $current );
+            $current = strtotime( $step, $current );
+        }
+    
+        return $dates;
+    }
+    
+    
+    public static function get_colours( ) {
+        
+        $colour = array();
+        
+        $colour[] = "7367F0";
+        $colour[] = "28C76F";
+
+        $colour[] = "FF9F43";
+        $colour[] = "00cfe8";
+        $colour[] = "EA5455";
+        
+        for($x = 0; $x <= 100; $x++) {
+            
+            $color = substr(md5(rand()), 0, 6);
+            $colour[] = $color;
+            
+        }
+        
+    
+        return $colour;
+    }
+    
+    public static function minifier($buffer) {
+
+    $search = array(
+        '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+        '/[^\S ]+\</s',     // strip whitespaces before tags, except space
+        '/(\s)+/s',         // shorten multiple whitespace sequences
+        '/<!--(.|\s)*?-->/' // Remove HTML comments
+    );
+
+    $replace = array(
+        '>',
+        '<',
+        '\\1',
+        ''
+    );
+
+    $buffer = preg_replace($search, $replace, $buffer);
+
+    return $buffer;
+    }
+    
+    
+    
+    public static function get_sidebar_data() {
+
+        
+        $shops = Shop::get_auth_shops();
+        
+        $shop_array = array();
+        
+        foreach($shops as $shopsVAL){
+            $shop_array[] = $shopsVAL->id;
+        }
+        
+        $order_all = Order::whereIn('shop_id',$shop_array)->get()->count();
+        $order_pending = Order::whereIn('shop_id',$shop_array)->where('status','=','pending')->get()->count();
+        $order_printing = Order::whereIn('shop_id',$shop_array)->where('printed','=','0')->get()->count();
+        $order_ready = Order::whereIn('shop_id',$shop_array)->where('status','=','ready_to_ship')->get()->count();
+        $order_shipped = Order::whereIn('shop_id',$shop_array)->where('status','=','shipped')->get()->count();
+        $order_delivered = Order::whereIn('shop_id',$shop_array)->where('status','=','delivered')->get()->count();
+        
+        $result['order_all'] = $order_all;
+        $result['order_pending'] = $order_pending;
+        $result['order_printing'] = $order_printing;
+        $result['order_ready'] = $order_ready;
+        $result['order_shipped'] = $order_shipped;
+        $result['order_delivered'] = $order_delivered;
+    
+        return $result;
+        
+        
+        
+        
+    }
+
+    
+    
+    
+    
+    
+    
 }

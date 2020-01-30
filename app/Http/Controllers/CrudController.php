@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Crud;
+use App\Shop;
 use App\Utilities;
 use Illuminate\Http\Request;
 use Validator;
@@ -189,21 +190,51 @@ class CrudController extends Controller
     }
 
     public function massDelete(Request $request){
-        try {
-            $ids = $request->get('ids');
-            DB::beginTransaction();
-            Crud::whereIn('id', $ids)->delete(); 
-            DB::commit();
+        
+        $table = $request->input('table');
+        $ids = $request->input('ids');
+        
+        $modal = "";
+        
+        if($table=='shop'){
+          $modal = new Shop();  
+        }
+        
+        $result_count = 0;
+        
+        if($modal!=''){
+            foreach($ids as $id){
+                $data = $modal::find($id);
+                $data->delete();
+                $result_count++;
+            }
+        }
+        
+        $output = ['success' => 0,
+                        'msg' => 'Somthing Wrong',
+                    ];
+        
+        if(count($ids)==$result_count){
             $output = ['success' => 1,
                         'msg' => 'Cruds successfully deleted!',
                     ];
-        } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
-            $output = ['success' => 0,
-                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
-                    ];
-             DB::rollBack();
         }
+        
+        // try {
+        //     $ids = $request->get('ids');
+        //     DB::beginTransaction();
+        //     Crud::whereIn('id', $ids)->delete(); 
+        //     DB::commit();
+        //     $output = ['success' => 1,
+        //                 'msg' => 'Cruds successfully deleted!',
+        //             ];
+        // } catch (\Exception $e) {
+        //     \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        //     $output = ['success' => 0,
+        //                 'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+        //             ];
+        //      DB::rollBack();
+        // }
         return response()->json($output);
     }
     public function massArchived(Request $request){

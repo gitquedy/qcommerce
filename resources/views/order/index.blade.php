@@ -54,6 +54,21 @@
               </select>
             </div>
         </div>
+        <div class="col-sm-4 col-12">
+            <div class="text-bold-600 font-medium-2">
+              Date Filter:
+            </div>
+            <div class="form-group">
+              <select name="timings[]" id="timings" class="select2 form-control selectFilter" >
+                <option value="All">All</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="Last_7_days">Last 7 days</option>
+                <option value="Last_30_days">Last 30 days</option>
+                <option value="This_Month">This Month</option>
+              </select>
+            </div>
+        </div>
       </div>
     </div>
   </section>
@@ -66,10 +81,10 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}">Delete</a>
-            <a class="dropdown-item" href="#">Print</a>
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>
-            <a class="dropdown-item" href="#">Another Action</a>
+            <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}">Delete</a>-->
+            <a class="dropdown-item" onclick="print_label()" >Print Shipping Label</a>
+            <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
+            <!--<a class="dropdown-item" href="#">Another Action</a>-->
           </div>
         </div>
       </div>
@@ -97,6 +112,13 @@
     {{-- DataTable ends --}}
   </section>
   {{-- Data list view end --}}
+  
+  
+  <form action="{{route('order.print_shipping_mass')}}" method="post" id="mass_print_form">
+      @csrf
+      <input type="hidden" id="mass_print_val" name="ids">
+  </form>
+  
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
@@ -131,6 +153,7 @@
           data: function (data) {
                 data.shop = $("#shop").val();
                 data.status = $("#status").val();
+                data.timings = $("#timings").val();
             }
         };
   var buttons = [
@@ -156,5 +179,32 @@
         width: '100%'
       });
   });  
+  
+  
+  
+  
+  
+  function print_label(){
+      var selected_ids = [];
+      
+    $(".dt-checkboxes").each(function(){
+       if($(this).prop('checked')==true){
+           selected_ids.push($(this).parent().parent().data('id'));
+       }
+    });
+    
+    if(selected_ids.length==0){
+          Swal.fire(
+          'Warning !',
+          'Please select a order !',
+          'warning'
+        );
+        return false;
+      }
+    
+    $('#mass_print_val').val(JSON.stringify(selected_ids));
+    $('#mass_print_form').submit();
+    
+  }
   </script>
 @endsection

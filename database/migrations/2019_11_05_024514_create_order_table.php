@@ -15,6 +15,7 @@ class CreateOrderTable extends Migration
     {
         Schema::create('order', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('tracking_no')->nullable();
             $table->string('voucher_platform');
             $table->string('voucher');
             $table->string('voucher_seller');
@@ -31,6 +32,7 @@ class CreateOrderTable extends Migration
             $table->string('tax_code');
             $table->string('items_count');
             $table->string('status');
+            $table->boolean('printed')->default(0);
             $table->string('extra_attributes');
             $table->string('gift_message');
             $table->string('remarks');

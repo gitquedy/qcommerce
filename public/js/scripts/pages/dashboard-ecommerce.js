@@ -8,6 +8,8 @@
     Author URL: http://www.themeforest.net/user/pixinvent
 ==========================================================================================*/
 
+
+
 $(window).on("load", function () {
 
   var $primary = '#7367F0';
@@ -27,6 +29,8 @@ $(window).on("load", function () {
 
   // Line Area Chart - 1
   // ----------------------------------
+  
+  
 
   var gainedlineChartoptions = {
     chart: {
@@ -64,27 +68,28 @@ $(window).on("load", function () {
       }
     },
     series: [{
-      name: 'Subscribers',
-      data: [28, 40, 36, 52, 38, 60, 55]
+      name: 'Monthly Sales',
+      data: line_chart_1_vals
     }],
 
     xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      }
+      categories: line_chart_1_cats
     },
     yaxis: [{
       y: 0,
       offsetX: 0,
       offsetY: 0,
       padding: { left: 0, right: 0 },
+      
+      
     }],
     tooltip: {
-      x: { show: false }
-    },
+      x: { show: true },
+      y: {formatter: function (val) {
+            return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+          
+        }}
+    }
   }
 
   var gainedlineChart = new ApexCharts(
@@ -135,18 +140,13 @@ $(window).on("load", function () {
       }
     },
     series: [{
-      name: 'Revenue',
-      data: [350, 275, 400, 300, 350, 300, 450]
+      name: 'Hourly sales',
+      data: hour_sales_val
     }],
 
-    xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      }
-    },
+     xaxis: {
+            categories: hour_sales_label,
+            },
     yaxis: [{
       y: 0,
       offsetX: 0,
@@ -154,7 +154,11 @@ $(window).on("load", function () {
       padding: { left: 0, right: 0 },
     }],
     tooltip: {
-      x: { show: false }
+      x: { show: true },
+      y: {formatter: function (val) {
+            return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+          
+        }}
     },
   }
 
@@ -164,6 +168,8 @@ $(window).on("load", function () {
   );
 
   revenuelineChart.render();
+  
+  
 
 
   // Line Area Chart - 3
@@ -205,18 +211,13 @@ $(window).on("load", function () {
       }
     },
     series: [{
-      name: 'Sales',
-      data: [10, 15, 7, 12, 3, 16]
+      name: 'Hourly Orders',
+      data: hour_order_val
     }],
 
     xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      }
-    },
+            categories: hour_order_label,
+            },
     yaxis: [{
       y: 0,
       offsetX: 0,
@@ -224,7 +225,7 @@ $(window).on("load", function () {
       padding: { left: 0, right: 0 },
     }],
     tooltip: {
-      x: { show: false }
+      x: { show: true }
     },
   }
 
@@ -274,18 +275,13 @@ $(window).on("load", function () {
       }
     },
     series: [{
-      name: 'Orders',
-      data: [10, 15, 8, 15, 7, 12, 8]
+      name: 'Hourly Orders',
+      data: hour_order_val
     }],
 
     xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      }
-    },
+            categories: hour_order_label,
+            },
     yaxis: [{
       y: 0,
       offsetX: 0,
@@ -306,7 +302,18 @@ $(window).on("load", function () {
 
   // revenue-chart Chart
   // -----------------------------
-
+  
+  if(chart_days.length==0){
+     chart_days = ['01', '05', '09', '13', '17', '21', '26', '31'];  
+  }
+  if(line1.length==0){
+     line1 = [80, 47000, 44800, 47500, 45500, 48000, 46500, 48600];  
+  }
+  if(line2.length==0){
+     line2 = [70, 48000, 45500, 46600, 44500, 46500, 45000, 47000]; 
+  }
+    
+    
   var revenueChartoptions = {
     chart: {
       height: 270,
@@ -354,7 +361,7 @@ $(window).on("load", function () {
       axisTicks: {
         show: false,
       },
-      categories: ['01', '05', '09', '13', '17', '21', '26', '31'],
+      categories: chart_days,
       axisBorder: {
         show: false,
       },
@@ -362,12 +369,16 @@ $(window).on("load", function () {
     },
     yaxis: {
       tickAmount: 5,
+      decimalsInFloat: false,
       labels: {
         style: {
           color: $strok_color,
         },
         formatter: function (val) {
-          return val > 999 ? (val / 1000).toFixed(1) + 'k' : val;
+            if(val!=undefined){
+            return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+          
         }
       }
     },
@@ -376,11 +387,11 @@ $(window).on("load", function () {
     },
     series: [{
       name: "This Month",
-      data: [45000, 47000, 44800, 47500, 45500, 48000, 46500, 48600]
+      data: line1
     },
     {
       name: "Last Month",
-      data: [46000, 48000, 45500, 46600, 44500, 46500, 45000, 47000]
+      data: line2
     }
     ],
 
@@ -579,7 +590,6 @@ $(window).on("load", function () {
   sessionChart.render();
 
   // Customer Chart
-  // -----------------------------
 
   var customerChartoptions = {
     chart: {
@@ -596,8 +606,8 @@ $(window).on("load", function () {
         show: false
       }
     },
-    labels: ['New', 'Returning', 'Referrals'],
-    series: [690, 258, 149],
+    labels: pie_chart_labels,
+    series: pie_chart_serize,
     dataLabels: {
       enabled: false
     },
@@ -605,12 +615,8 @@ $(window).on("load", function () {
     stroke: {
       width: 5
     },
-    colors: [$primary, $warning, $danger],
     fill: {
-      type: 'gradient',
-      gradient: {
-        gradientToColors: [$primary_light, $warning_light, $danger_light]
-      }
+      type: 'gradient'
     }
   }
 
@@ -619,7 +625,7 @@ $(window).on("load", function () {
     customerChartoptions
   );
 
-  customerChart.render();
+ // customerChart.render();
 
 });
 
@@ -633,4 +639,13 @@ $(window).on("load", function () {
   }
 
 })(jQuery);
+
+
+
+
+
+        
+
+        
+        
 

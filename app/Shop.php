@@ -5,11 +5,14 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\Order;
+use App\Products;
 use App\Utilities;
 use Carbon\Carbon;
 use App\Library\lazada\LazopRequest;
 use App\Library\lazada\LazopClient;
 use App\Library\lazada\UrlConstants;
+use Auth;
+use DB;
 
 class Shop extends Model
 {
@@ -20,6 +23,10 @@ class Shop extends Model
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
     ];
+    
+    public function products(){
+		return $this->belongsTo(Products::class, 'id','shop_id');
+	}
     
     public function syncOrders($date = '2018-01-01', $step = '+3 day'){
         try {
@@ -91,6 +98,16 @@ class Shop extends Model
             $orders->where('status', $status);
         }
         return $orders;
+    }
+    
+    public static function get_auth_shops(){
+        
+        $user_id = Auth::user()->id;
+        
+        $result = Shop::where('user_id','=',$user_id)->get();
+        
+        return $result;
+        
     }
 
     // public static function dummyOrder(){

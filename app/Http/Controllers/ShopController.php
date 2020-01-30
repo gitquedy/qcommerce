@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Shop;
+use App\Products;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -24,10 +25,17 @@ class ShopController extends Controller
      */
     public function index(Request $request)
     {
+        
+
+        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
         if ( request()->ajax()) {
+            
+            
+           
+            
            $shop = Shop::with('orders')->where('shop.user_id', $request->user()->id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
             ->addColumn('statusChip', function(Shop $shop) {
@@ -37,6 +45,13 @@ class ShopController extends Controller
                             }else if($shop->active == 2){
                                 $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">Syncing</div></div></div>';
                             }
+                           return $html;
+                        })
+            ->addColumn('orders', function(Shop $shop) {
+                            $html = $shop->orders()->whereDate('created_at','=',date('Y-m-d'))->count();
+                            
+                            $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$html.'</div></div></div>';
+                            
                            return $html;
                         })
             ->addColumn('pending_count', function(Shop $shop) {
@@ -55,13 +70,27 @@ class ShopController extends Controller
                            return '<div class="chip chip-success"><div class="chip-body"><div class="chip-text">'.
                         $shop->orders('delivered')->count().'</div></div></div>';
                         })
-            ->rawColumns(['shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip'])
+            ->addColumn('products', function(Shop $shop) {
+                           $product_count =  Products::where('shop_id','=',$shop->id)->get()->count();
+                           return '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$product_count.'</div></div></div>';
+                           
+                        })
+            ->rawColumns(['shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products'])
             ->make(true);
         }
 
         return view('shop.index', [
             'breadcrumbs' => $breadcrumbs,
         ]);
+    }
+    
+    
+    
+    
+    public function testmax(Request $request)
+    {
+       $x = base64_encode(time());
+       echo base64_decode($x);
     }
 
     /**

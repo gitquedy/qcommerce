@@ -103,6 +103,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.massAction', function(){
         var ids = [];
+        var table_name = $(this).data('tablename');
         if(confirm("Are you sure you want to " + $(this).html()  + " this data?"))
         {
             $('tr.selected').each(function(){
@@ -113,7 +114,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: $(this).data('action'),
                     method: "POST",
-                    data: {ids:ids},
+                    data: {ids:ids,table:table_name},
                     success:function(result)
                     {
                         if(result.success == true){
@@ -152,18 +153,39 @@ $(document).ready(function () {
   // });
 
   $(".dt-checkboxes").on("click", function () {
-    $(this).closest("tr").toggleClass("selected");
+      if($(this).prop('checked')==true){
+          $(this).closest("tr").addClass("selected");
+      }else{
+          $(this).closest("tr").removeClass("selected");
+      }
+    
   });
 
   $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {
     var dtCheckbox = $(this).parent("tr").find(".dt-checkboxes-cell .dt-checkboxes")
     $(this).closest("tr").toggleClass("selected");
-    dtCheckbox.prop("checked", !dtCheckbox.prop("checked"))
+    if($(this).closest("tr").hasClass("selected")==true){
+        dtCheckbox.prop("checked",true);
+    }else{
+        dtCheckbox.prop("checked",false);
+    }
+    
   });
   
   $(".dt-checkboxes-select-all input").on("click", function () {
-    $(".data-list-view").find("tbody tr").toggleClass("selected")
-    $(".data-thumb-view").find("tbody tr").toggleClass("selected")
+      if($(this).prop('checked')==true){
+          
+          $(".data-list-view").find("tbody tr").addClass("selected");
+          $(".data-thumb-view").find("tbody tr").addClass("selected");
+          $('.dt-checkboxes').prop('checked',true);
+          
+      }else{
+          $(".data-list-view").find("tbody tr").removeClass("selected");
+          $(".data-thumb-view").find("tbody tr").removeClass("selected");
+          $('.dt-checkboxes').prop('checked',false);
+          
+      }
+    
   });
   // Scrollbar
   if ($(".data-items").length > 0) {
@@ -182,4 +204,13 @@ $(document).ready(function () {
   if (navigator.userAgent.indexOf('Mac OS X') != -1) {
     $(".dt-checkboxes-cell input, .dt-checkboxes").addClass("mac-checkbox");
   }
+  
+  
+//   $(document).click(function(event){
+//  console.log(event);
+// });
+
+
+
+
 });
