@@ -696,27 +696,6 @@ class OrderController extends Controller
         }
         return response()->json($output);
     }
-
-
-    public function encode_all_tracking_code() {
-      $orders = Order::where('tracking_no','=', null)->where('status', '!=', 'pending')->with('shop')->get();
-      foreach ($orders as $order) {
-        echo "<br>--Query Order:".$order->id;
-        if($order->shop) {
-          $items = $order->getOrderItems();
-          $item_ids = $order->getItemIds($items);
-          $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
-          $o = Order::where('id', $order->id)->first();
-          $o->tracking_no = $tracking_code;
-          $o->save();
-          echo "<br>---Update Order:".$order->id." Tracking No:".$tracking_code;
-        }
-        else {
-          echo "<br>---Failed Shop not found";
-        }
-      }
-      echo "<br><br>----Done";
-    }
     
     
     

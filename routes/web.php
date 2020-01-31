@@ -86,8 +86,6 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/orders_delivered', 'OrderController@orders_delivered')->name('order.delivered');
 	Route::get('/order/print_shipping/{id}', 'OrderController@print_shipping')->name('order.print_shipping');
 	Route::post('/order/print_shipping_mass', 'OrderController@print_shipping_mass')->name('order.print_shipping_mass');
-
-	Route::get('/encode_all_tracking_code', 'OrderController@encode_all_tracking_code')->name('order.encode_all_tracking_code');
 	
 	
 
