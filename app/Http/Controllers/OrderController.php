@@ -674,8 +674,9 @@ class OrderController extends Controller
         $order_id = $request->get('order_id');
         try {
             $items = $order->getOrderItems();
-            $item_ids = $order->getItemIds($items);  
-            $result = $order->readyToShip($item_ids);
+            $item_ids = $order->getItemIds($items);
+            $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
+            $result = $order->readyToShip($item_ids, $tracking_code);
             if(isset($result['message'])){
                 $output = ['success' => 0,
                         'msg' => $result['message'],
@@ -694,6 +695,27 @@ class OrderController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+
+    public function encode_all_tracking_code() {
+      $orders = Order::where('tracking_no','=', null)->where('status', '!=', 'pending')->with('shop')->get();
+      foreach ($orders as $order) {
+        echo "<br>--Query Order:".$order->id;
+        if($order->shop) {
+          $items = $order->getOrderItems();
+          $item_ids = $order->getItemIds($items);
+          $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
+          $o = Order::where('id', $order->id)->first();
+          $o->tracking_no = $tracking_code;
+          $o->save();
+          echo "<br>---Update Order:".$order->id." Tracking No:".$tracking_code;
+        }
+        else {
+          echo "<br>---Failed Shop not found";
+        }
+      }
+      echo "<br><br>----Done";
     }
     
     

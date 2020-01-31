@@ -39,7 +39,17 @@ class BarcodeController extends Controller
 
     public function checkBarcode(Request $request)  {
         $result = array('error' => '', 'data' => array());
-        $order = Order::whereTrackingNo($request->data)->orWhere('id', $request->data)->get()->first();
+        $input = $request->data;
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $Shop_array = array();
+        foreach($all_shops as $all_shopsVAL){
+            $Shop_array[] = $all_shopsVAL->id;
+        }
+        $order = Order::whereIn('shop_id',$Shop_array)->where(function($query) use ($input)
+                {
+                    $query->where('tracking_no','=', $input)
+                    ->orWhere('id','=',$input);
+                })->get()->first();
         if($order) {
             $shop = Shop::whereId($order->shop_id)->get()->first();
             $code = $order->id;

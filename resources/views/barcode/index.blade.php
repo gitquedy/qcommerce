@@ -33,6 +33,7 @@
             </div>
             <div class="form-group">
               <input type="text" id="barcode" class="form-control" autofocus>
+              <p class="text-danger bolder clear_order" id="error_text"></p>
             </div>
         </div>
       </div>
@@ -123,7 +124,7 @@
       cache: false,
       success: function (result) {
         if(result.error) {
-          alert(result.error);
+          $("#error_text").html(result.error);
         }
         else {
           var order = result.data.order;

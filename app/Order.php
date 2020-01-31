@@ -74,6 +74,14 @@ class Order extends Model
         return $btn;
     }
 
+    public function getOrderDetails(){
+        $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+        $r = new LazopRequest('/order/get','GET');
+        $r->addApiParam('order_id', $this->id);
+        $result =  $c->execute($r, $this->shop->access_token);
+        return json_decode($result, true);
+    }
+
     public function getOrderItems(){
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/items/get','GET');
@@ -101,7 +109,7 @@ class Order extends Model
         return json_decode($result, true);
     }
 
-    public function readyToShip($item_ids){
+    public function readyToShip($item_ids, $tracking_number = null){
         $item_ids = '[' . implode(', ', $item_ids) . ']';
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/rts');
@@ -110,7 +118,7 @@ class Order extends Model
         $r->addApiParam('shipment_provider','Aramax');
         $r->addApiParam('tracking_number','12345678');
         $result = $c->execute($r, $this->shop->access_token);
-        $this->update(['status' => 'ready_to_ship']);
+        $this->update(['status' => 'ready_to_ship', 'tracking_no' => $tracking_number ]);
         return json_decode($result, true);
     }    
     
