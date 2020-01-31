@@ -229,17 +229,9 @@ class OrderController extends Controller
             $Shop_array[] = $all_shopsVAL->id;
         }
         
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
+        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('printed','=','0')->get();
         
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-            
-        }
-
-        if ( request()->ajax()) {
-        
+        if (request()->ajax()) {
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
            if($request->get('shop', 'all') != 'all'){
                 $shops->where('id', $request->get('shop'));
@@ -247,9 +239,7 @@ class OrderController extends Controller
            
            
            $shops_id = $shops->pluck('id')->toArray();
-           $statuses = array('pending');
            $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('printed', "=", "0")->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           
            if($request->get('timings')=="Today"){
                $orders->whereDate('created_at', '=', date('Y-m-d'));
            }

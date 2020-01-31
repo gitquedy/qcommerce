@@ -153,6 +153,13 @@
                 data.timings = $("#timings").val();
             }
         };
+  var buttons = [
+      // { text: "<i class='feather icon-plus'></i> Add New",
+      // action: function() {
+      //     window.location = '{{ route('order.create') }}';
+      // },
+      // className: "btn-outline-primary margin-r-10"}
+      ];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
