@@ -42,26 +42,29 @@
   <section class="card">
     <div class="card-content">
       <div class="card-body">
-        <h4 class="card-title">Order Details</h4>
+        <h4 class="card-title">Customer Name</h4>
         <div class="row">
           <div class="col-12">
             <table class="table">
               <thead>
                 <tr>
-                  <th>Order Number</th>
+                  {{-- 
+                  <th>Customer Name</th>
                   <th>Date</th>
                   <th>Payment</th>
                   <th>Price</th>
-                  <th>Item Count</th>
+                  <th>Item Count</th> --}}
                 </tr>
               </thead>
               <tbody>
                 <tr>
+                  <td id="customer_name" class="clear_order"></td>
+                  {{-- 
                   <td id="order_number" class="clear_order"></td>
                   <td id="date" class="clear_order"></td>
                   <td id="payment" class="clear_order"></td>
                   <td id="price" class="clear_order"></td>
-                  <td id="item_count" class="clear_order"></td>
+                  <td id="item_count" class="clear_order"></td> --}}
                 </tr>
               </tbody>
             </table>
@@ -79,7 +82,7 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>Model</th>
+                  {{-- <th>Model</th> --}}
                   <th>Image</th>
                   <th>Name</th>
                   <th>Quantity</th>
@@ -129,7 +132,8 @@
         else {
           var order = result.data.order;
           var items = result.data.items;
-          console.log(items);
+          console.log(order);
+          $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
           $("#order_number").html("<h5>"+order.id+"</h5>");
           $("#date").html("<h5>"+order.created_at+"</h5>");
           $("#payment").html("<h5>"+order.payment_method+"</h5>");
@@ -138,7 +142,7 @@
 
           $.each(items, function(index, item) {
             $("#items_list").append(
-              '<tr><td><h5>'+item.model+'</h5></td>'+
+              // '<tr><td><h5>'+item.model+'</h5></td>'+
               '<td><img src="'+item.pic+'" class="product_image"></td>'+
               '<td><h5>'+item.name+'</h5></td>'+
               '<td><h4>x'+item.qty+'</h4></td></tr>'
