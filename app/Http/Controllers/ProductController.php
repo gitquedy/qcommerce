@@ -327,6 +327,11 @@ class ProductController extends Controller
         
     }
     
+
+    public function ajaxlistproduct(Request $request) {
+        $output = Products::where('shop_id',$request->shop_id)->get();
+        echo json_encode($output);
+    }
     
     
     

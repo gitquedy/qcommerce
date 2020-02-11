@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Inventory')
+@section('title', 'List SKU Products')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -38,10 +38,8 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <!--<a class="dropdown-item" onclick="mass_copy()"  > Duplicate</a>-->
             <!--<a class="dropdown-item" href="#">Print</a>-->
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.bulkremove') }}"> Delete</a>
-            <!--<a class="dropdown-item" href="#">Another Action</a>-->
+            <a class="dropdown-item massAction" href="#" data-action="{{route('sku.removeskuproduct')}}"> Remove</a> {{-- {{ route('sku.bulkremove') }} --}}
           </div>
         </div>
       </div>
@@ -56,14 +54,11 @@
             <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                 <input type="checkbox">
             </th>
-            <th>Code</th>
+            <th>Shop</th>
+            <th>Model</th>
+            <th>Image</th>
             <th>Name</th>
-            <th>Brand</th>
-            <th>Category</th>
-            <th>Cost</th>
             <th>Price</th>
-            <th>Quantity</th>
-            <th>Alert Quantity</th>
             <th>Actions</th>
             
           </tr>
@@ -71,8 +66,6 @@
       </table>
     </div>
     {{-- DataTable ends --}}
-    
-
 
   </section>
   {{-- Data list view end --}}
@@ -102,28 +95,37 @@
                 className:'dt-checkboxes-cell'
                 
             },
-            { data: 'code', name: 'code'},
-            { data: 'name', name: 'name'},
-            { data: 'brand_name', name: 'brand_name'},
-            { data: 'category_name', name: 'category_name'},
-            { data: 'cost', name: 'cost'},
+            { data: 'shop', name: 'shop'},
+            { data: 'model', name: 'model'},
+            { data: 'image', name: 'image',
+            "render": function (data){
+                    return '<img src="'+data+'" class="product_image">';
+                },
+                
+            },
+            { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
-            { data: 'quantity', name: 'quantity'},
-            { data: 'alert_quantity', name: 'alert_quantity'},
             { data: 'action', name: 'action'}
         ];
   var table_route = {
-          url: '{{ route('sku.index') }}',
+          url: '{{ route('sku.skuproducts', $id) }}',
           data: function (data) {
-                data.shop = $("#shop").val();
-                data.status = $("#status").val();
-                data.timings = $("#timings").val();
+                // data.timings = $("#timings").val();
             }
         };
   var buttons = [
-            { text: "<i class='feather icon-plus'></i> Add New",
+            { text: "<i class='feather icon-plus'></i> Add Products",
             action: function() {
-                window.location = '{{ route('sku.create') }}';
+              $.ajax({
+                url :  "{{ route('sku.addproductmodal') }}",
+                type: "POST",
+                data: 'id={{$id}}',
+                success: function (response) {
+                  if(response) {
+                    $(".view_modal").html(response).modal('show');
+                  }
+                }
+              });
             },
             className: "btn-outline-primary margin-r-10"}
             ];
@@ -137,41 +139,20 @@
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
-    $(document).ready(function(){
-      $(".select2").select2({
-        dropdownAutoWidth: true,
-        width: '100%'
-      });
-  }); 
-  
-  
-  var city = [{id:1,name:'indb',value:5}];
-  var mains = [{id:1,city_id:1,namex:"plc"}];
-  
-  var rst = {};
-  
-  
-  var result = mains.map(function(data){
-      
-      var city_data ="";
-      $.each(city, function( index, value ) {
-          if(value.id==data.city_id){
-              city_data = value.name;
-          }
-        });
-     
+    var city = [{id:1,name:'indb',value:5}];
+    var mains = [{id:1,city_id:1,namex:"plc"}];
+    var rst = {};
+    var result = mains.map(function(data){
+        var city_data ="";
+        $.each(city, function( index, value ) {
+            if(value.id==data.city_id){
+                city_data = value.name;
+            }
+          });
+       data.city_data = city_data;
+       return data;
 
-     
-     data.city_data = city_data;
-     return data;
-     
-  });
-  
-  
-  console.log(result);
-
-  
-
+    });
  
   </script>
 @endsection

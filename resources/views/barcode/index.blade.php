@@ -19,7 +19,7 @@
 {{-- Data list view starts --}}
 <style>
     .product_image{
-        width:100px;
+        width:80px;
         height:auto;
     }
 </style>
@@ -142,9 +142,8 @@
 
           $.each(items, function(index, item) {
             $("#items_list").append(
-              // '<tr><td><h5>'+item.model+'</h5></td>'+
-              '<td><img src="'+item.pic+'" class="product_image"></td>'+
-              '<td><h5>'+item.name+'</h5></td>'+
+              '<tr><td><img src="'+item.pic+'" class="product_image"></td>'+
+              '<td><p>'+item.name+'</p></td>'+
               '<td><h4>x'+item.qty+'</h4></td></tr>'
               );
           });

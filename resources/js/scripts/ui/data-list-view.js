@@ -135,7 +135,7 @@ $(document).ready(function () {
             }
             else
             {
-                alert("Please select atleast one checkbox");
+              toastr.error("Please select atleast one checkbox");
             }
         }
   });

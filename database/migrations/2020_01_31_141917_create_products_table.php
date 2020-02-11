@@ -19,6 +19,7 @@ class CreateProductsTable extends Migration
             $table->string('primary_category')->nullable();
             $table->string('SellerSku');
             $table->string('SkuId');
+            $table->unsignedInteger('seller_sku_id')->nullable();
             $table->unsignedInteger('shop_id')->nullable();
             $table->text('name');
             $table->binary('short_description');

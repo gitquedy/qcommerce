@@ -43,6 +43,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/product/process_duplicate_product', 'ProductController@process_duplicate_product')->name('product.process_duplicate_product');
 	Route::post('/product/mass_copy', 'ProductController@mass_copy')->name('product.mass_copy');
 	Route::post('/product/bulkremove', 'ProductController@bulkremove')->name('product.bulkremove');
+	Route::post('/product/ajaxlistproduct', 'ProductController@ajaxlistproduct')->name('product.ajaxlistproduct');
 	
 	
 	Route::resource('/sku', 'SkuController');
@@ -52,7 +53,10 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/sku/update/', 'SkuController@update')->name('sku.update');
 	Route::get('/sku/delete/{id}', 'SkuController@delete')->name('sku.delete');
 	Route::post('/sku/bulkremove', 'SkuController@bulkremove')->name('sku.bulkremove');
-	
+	Route::get('/sku/skuproducts/{id}', 'SkuController@skuproducts')->name('sku.skuproducts');
+	Route::post('/sku/addproduct/', 'SkuController@addproduct')->name('sku.addproduct');
+	Route::post('/sku/addproductmodal/', 'SkuController@addproductmodal')->name('sku.addproductmodal');
+	Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 	
 	Route::resource('/category', 'CategoryController');
 	Route::get('/category/create/', 'CategoryController@create')->name('category.create');

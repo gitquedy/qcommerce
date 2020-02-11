@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Sku;
+use App\Products;
 use App\Category;
 use App\Brand;
 use App\Shop;
@@ -36,14 +37,11 @@ class SkuController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"list of SKU"]
         ];
         
-        
-
-        
-    if ( request()->ajax()) {
-        
-        $user_id = Auth::user()->id;
-        
-           
+        if ( request()->ajax()) {
+            
+            $user_id = Auth::user()->id;
+            
+               
            $Sku = Sku::where('user_id','=',$user_id)->orderBy('updated_at', 'desc');
            
            
@@ -53,24 +51,25 @@ class SkuController extends Controller
                             if($category){
                                return  $category->name;
                             }
-                                })
+                        })
             ->addColumn('brand_name', function(Sku $SKSU) {
                             $Brand = Brand::find($SKSU->brand);
                             if($Brand){
                                return  $Brand->name;
                             }
-                                })
+                        })
             ->addColumn('action', function(Sku $SKSU) {
                             return '<div class="btn-group dropup mr-1 mb-1">
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-                    Action<span class="sr-only">Toggle Dropdown</span></button>
-                    <div class="dropdown-menu">
-                    <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
-                    <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
-                    </div>
-                    </div>';
-                                })
-                ->make(true);
+                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                            Action<span class="sr-only">Toggle Dropdown</span></button>
+                            <div class="dropdown-menu">
+                            <a class="dropdown-item fa fa-list" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > List SKU Products</a>
+                            <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
+                            <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
+                            </div>
+                            </div>';
+                        })
+            ->make(true);
         }
         
         return view('sku.index', [
@@ -183,9 +182,89 @@ class SkuController extends Controller
         return redirect('/sku');
         
     }
+
+    public function skuproducts($id="",Request $request){
+        $user_id = Auth::user()->id;
+        $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        
+        if($Sku_check!=1){
+            $request->session()->flash('flash_error',"Invalid Request !");
+            return redirect('/sku');
+        }
+
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List Products"]
+        ];
+
+        if ( request()->ajax()) {
+            $user_id = Auth::user()->id;
+
+            $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+            $Shop_array = array();
+            foreach($all_shops as $all_shopsVAL){
+                $Shop_array[] = $all_shopsVAL->id;
+            }
+               
+           $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc');
+                        
+           
+            return Datatables::eloquent($Sku_prod)
+                        ->addColumn('shop', function(Products $product) {
+                            return $product->shop ? $product->shop->short_name : '';
+                                })
+                        ->addColumn('image', function(Products $product) {
+                            $image_url = '';
+                            $imagres = explode("|",$product->Images);
+                            if(isset($imagres[0])){
+                                $image_url = $imagres[0];
+                            }
+                            return $image_url;
+                        })
+                        ->addColumn('action', function(Products $product) {
+                            return '<div class="btn-group dropup mr-1 mb-1">
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                    Action<span class="sr-only">Toggle Dropdown</span></button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                        <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                    </div></div>';
+                                })
+                        ->make(true);
+        }
+        
+        return view('sku.listproducts', [
+            'id' => $id,
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+            'statuses' => array(),
+        ]);
+    }
+
+    public function addproductmodal(Request $request){
+        $user_id = Auth::user()->id;
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $id  = $request->id;
+        $title = "Test123";
+        return view('sku.modal.addskuproduct', compact('title', 'id', 'all_shops'));
+    }
+
+    public function addproduct(Request $request){
+        $product = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
+        $product->seller_sku_id = $request->sku_id;
+
+        print json_encode($product->save());
+    }
+
+    public function removeskuproduct(Request $request){
+        $ids = $request->ids;
+        array_push($ids, $request->id);
+        $update = Products::whereIn('id', $ids)->update(['seller_sku_id' => null]);
+
+    }
     
-    
-    public function delete($id="",Request $request){
+    public function delete(Request $request){
         
         $user_id = Auth::user()->id;
         
