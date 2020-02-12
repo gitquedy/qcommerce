@@ -75,7 +75,7 @@ class SkuController extends Controller
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                             Action<span class="sr-only">Toggle Dropdown</span></button>
                             <div class="dropdown-menu">
-                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > Linked SKU Products</a>
+                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > Link SKU Products</a>
                             <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
                             <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
                             </div>
@@ -275,7 +275,7 @@ class SkuController extends Controller
         $user_id = Auth::user()->id;
         $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
         $id  = $request->id;
-        $title = "Test123";
+        $title = "this SKU";
         return view('sku.modal.addskuproduct', compact('title', 'id', 'all_shops'));
     }
 

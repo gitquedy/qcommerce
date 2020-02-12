@@ -59,7 +59,7 @@ class AjaxController extends Controller
         }
         
         if($diff->i>0){
-            $last_product_time .= $diff->i." Minuts ";
+            $last_product_time .= $diff->i." Minutes ";
         }   
         
         $last_product_time .= 'Ago';
@@ -88,7 +88,7 @@ class AjaxController extends Controller
         }
         
         if($diff->i>0){
-            $order_last_time .= $diff->i." Minuts ";
+            $order_last_time .= $diff->i." Minutes ";
         }   
         
         $order_last_time .= 'Ago';
