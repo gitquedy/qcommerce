@@ -95,15 +95,16 @@ class BarcodeController extends Controller
     }
 
     public function packedItems(Request $request) {
+        $result = false;
         foreach ($request->items as $sku => $qty) {
             $prod = Products::where('SellerSku', $sku)->first();
             if($prod->seller_sku_id) {
                 $sku = Sku::whereId($prod->seller_sku_id)->first();
                 $sku->quantity -= $qty;
-                $sku->save();
+                $result = $sku->save();
             }
         }
-        return "true";
+        echo json_encode($result);
         
     }
     

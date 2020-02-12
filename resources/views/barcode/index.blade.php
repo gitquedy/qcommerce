@@ -168,15 +168,6 @@
             }  
           });
           
-        } else if (
-          /* Read more about handling dismissals below */
-          result.dismiss === Swal.DismissReason.cancel
-        ) {
-          packed_alert.fire(
-            'Cancelled',
-            'Your imaginary file is safe :)',
-            'error'
-          )
         }
       })
       

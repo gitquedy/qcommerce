@@ -51,18 +51,27 @@ class AjaxController extends Controller
         $last_product_time = '';
         
         if($diff->d>0){
-            $last_product_time .= $diff->d." Days ";
+            $last_product_time .= $diff->d." Day";
+            if($diff->d>1){
+                $last_product_time.="s";
+            }
         }
    
         if($diff->h>0){
-            $last_product_time .= $diff->h." Hours ";
+            $last_product_time .= $diff->h." Hour";
+            if($diff->h>1){
+                $last_product_time.="s";
+            }
         }
         
         if($diff->i>0){
-            $last_product_time .= $diff->i." Minutes ";
+            $last_product_time .= $diff->i." Minute";
+            if($diff->i>1){
+                $last_product_time.="s";
+            }
         }   
         
-        $last_product_time .= 'Ago';
+        $last_product_time .= ' Ago';
         
         
         
@@ -80,18 +89,27 @@ class AjaxController extends Controller
         
         $order_last_time = '';
         if($diff->d>0){
-            $order_last_time .= $diff->d." Days ";
+            $order_last_time .= $diff->d." Day";
+            if($diff->d>1){
+                $order_last_time.="s";
+            }
         }
    
         if($diff->h>0){
-            $order_last_time .= $diff->h." Hours ";
+            $order_last_time .= $diff->h." Hour";
+            if($diff->h>1){
+                $order_last_time.="s";
+            }
         }
         
         if($diff->i>0){
-            $order_last_time .= $diff->i." Minutes ";
+            $order_last_time .= $diff->i." Minute";
+            if($diff->i>1){
+                $order_last_time.="s";
+            }
         }   
         
-        $order_last_time .= 'Ago';
+        $order_last_time .= ' Ago';
 
         $orders_count = $orders->count();
         
