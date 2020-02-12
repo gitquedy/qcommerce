@@ -47,13 +47,13 @@ class SkuController extends Controller
            
             return Datatables::eloquent($Sku)
             ->editColumn('cost', function(Sku $SKSU) {
-                            return "<p>".$SKSU->cost.'</p><input type="number" class="form-control" data-defval="'.$SKSU->cost.'" data-name="cost" value="'.$SKSU->cost.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                            return "<p>".$SKSU->cost.'</p><input type="number" min="0" class="form-control" data-defval="'.$SKSU->cost.'" data-name="cost" value="'.$SKSU->cost.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('price', function(Sku $SKSU) {
-                            return "<p>".$SKSU->price.'</p><input type="number" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                            return "<p>".$SKSU->price.'</p><input type="number" min="1" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('quantity', function(Sku $SKSU) {
-                            return "<p>".$SKSU->quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->quantity.'" data-name="quantity" value="'.$SKSU->quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                            return "<p>".$SKSU->quantity.'</p><input type="number" min="0" class="form-control" data-defval="'.$SKSU->quantity.'" data-name="quantity" value="'.$SKSU->quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('alert_quantity', function(Sku $SKSU) {
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
@@ -166,16 +166,12 @@ class SkuController extends Controller
     
     
     public function update(Request $request){
-        
         $user_id = Auth::user()->id;
-        
         $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$request->id)->get()->count();
-        
         if($Sku_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/sku');
         }
-        
         $sku = Sku::find($request->id);
         $sku->code = $request->code;
         $sku->name = $request->name;
@@ -187,29 +183,78 @@ class SkuController extends Controller
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
-                    $request->session()->flash('flash_success', 'Success !');
-                }else{
-                    $request->session()->flash('flash_error',"something Went wrong !");
-                }
-        
+            $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
+            foreach ($Sku_prod as $prod) {
+                $shop_id = $prod->shop_id;
+                $access_token = Shop::find($shop_id)->access_token;
+                $prod = Products::where('id', $prod->id)->first();
+                $prod->price = $sku->price;
+                $prod->quantity = $sku->quantity;
+                $prod->save();
+                    $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                    <Request>
+                        <Product>
+                            <Skus>
+                                <Sku>
+                                    <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                    <price>'.$prod->price.'</price>
+                                    <quantity>'.$prod->quantity.'</quantity>
+                                </Sku>
+                            </Skus>
+                        </Product>
+                    </Request>';
+                $response = Products::product_update($access_token,$xml);
+            }
+            $request->session()->flash('flash_success', 'Success !');
+        }else{
+            $request->session()->flash('flash_error',"something Went wrong !");
+        }
         return redirect('/sku');
         
     }
     
     public function quickUpdate(Request $request){
         $user_id = Auth::user()->id;
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $Shop_array = array();
+        foreach($all_shops as $all_shopsVAL){
+            $Shop_array[] = $all_shopsVAL->id;
+        }
+        $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$request->sku)->orderBy('updated_at', 'desc')->get();
         $column = $request->name;
         $sku = Sku::where('user_id','=', $user_id)->where('id','=',$request->sku)->first();
         if($sku){
             $sku->$column = $request->val;
             $result = $sku->save();
+
+            if(in_array($column, array('quantity', 'price'))) {
+                
+                foreach ($Sku_prod as $prod) {
+                    $shop_id = $prod->shop_id;
+                    $access_token = Shop::find($shop_id)->access_token;
+
+                    $prod = Products::where('id', $prod->id)->first();
+                    $prod->$column = $request->val;
+                    $prod->save();
+                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                        <Request>
+                            <Product>
+                                <Skus>
+                                    <Sku>
+                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                        <'.$column.'>'.$prod->$column.'</'.$column.'>
+                                    </Sku>
+                                </Skus>
+                            </Product>
+                        </Request>';
+                    $response = Products::product_update($access_token,$xml);
+                }
+            }
         }
         else {
             $result = false;
         }
         echo json_encode($result);
-        
-
     }
 
     public function skuproducts($id="",Request $request){
@@ -224,7 +269,7 @@ class SkuController extends Controller
         $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
         
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List Products"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Link Products"]
         ];
 
         if ( request()->ajax()) {
@@ -280,10 +325,28 @@ class SkuController extends Controller
     }
 
     public function addproduct(Request $request){
-        $product = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
-        $product->seller_sku_id = $request->sku_id;
-
-        print json_encode($product->save());
+        $user_id = Auth::user()->id;
+        $prod = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
+        $access_token = Shop::find($prod->shop_id)->access_token;
+        $sku = Sku::where('user_id','=', $user_id)->where('id','=',$request->sku_id)->first();
+        $prod->seller_sku_id = $request->sku_id;
+        $prod->price = $sku->price;
+        $prod->quantity = $sku->quantity;
+        $result = $prod->save();
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+        <Request>
+            <Product>
+                <Skus>
+                    <Sku>
+                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                        <price>'.$prod->price.'</price>
+                        <quantity>'.$prod->quantity.'</quantity>
+                    </Sku>
+                </Skus>
+            </Product>
+        </Request>';
+        $response = Products::product_update($access_token,$xml);
+        print json_encode($result);
     }
 
     public function removeskuproduct(Request $request){

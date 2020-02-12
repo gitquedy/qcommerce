@@ -17,8 +17,8 @@ class CreateSkuTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
             $table->string('code');
-            $table->string('brand');
-            $table->string('category');
+            $table->string('brand')->nullable();
+            $table->string('category')->nullable();
             $table->float('cost', 15, 2);
             $table->float('price', 15, 2);
             $table->integer('quantity');

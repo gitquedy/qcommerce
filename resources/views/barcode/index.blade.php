@@ -42,6 +42,7 @@
   <form id="packed_form" method="POST" class="form" enctype='multipart/form-data'>
     @method('POST')
     @csrf
+    <input type="hidden" name="shop_id" id="shop_id">
   <section class="card">
     <div class="card-content">
       <div class="card-body">
@@ -230,8 +231,8 @@
         else {
           var order = result.data.order;
           var items = result.data.items;
-          console.log(items);
           $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
+          $("#shop_id").val(order.shop_id);
           // $("#order_number").html("<h5>"+order.id+"</h5>");
           // $("#date").html("<h5>"+order.created_at+"</h5>");
           // $("#payment").html("<h5>"+order.payment_method+"</h5>");

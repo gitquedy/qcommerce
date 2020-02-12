@@ -153,10 +153,6 @@
 
       $(document).on('click', '.quick_update_box', function() {
           var td = $(this);
-          var defval = $(this).find("input").data('defval');
-          var name = $(this).find("input").data('name');
-          var val = $(this).find("input").val();
-          var sku_id = $(this).find("input").data('sku_id');
           td.find("p").hide();
           td.find('input').show().focus().on('keypress',function(e) {
               if(e.which == 13) {
@@ -164,7 +160,11 @@
               }
           });
           td.find('input').show().focus().on('focusout', function() {
-            if($(this).val() != defval) {
+            if($(this).val() != $(this).data('defval')) {
+              var name = $(this).data('name');
+              var defval = $(this).data('defval');
+              var val = $(this).val();
+              var sku_id = $(this).data('sku_id');
               Swal.fire({
                 title: 'Update '+name+' ?',
                 text: "Change value from "+defval+" to "+$(this).val()+" ?",
@@ -181,7 +181,7 @@
                     cache: false,
                     success: function (res) {
                       if (res) {
-                        td.find('input').attr('data-defval', td.find("input").val()).data('defval', td.find("input").val()).hide();
+                        td.find('input').attr('data-defval', val).data('defval', val).hide();
                         td.find("p").html(td.find("input").val()).show();
                       }
                       else {
@@ -195,7 +195,6 @@
                       }
                     } 
                   });
-                  
                 }
                 else {
                   td.find('input').val(defval).hide();

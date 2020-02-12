@@ -44,7 +44,7 @@
           width: '100%'
         });
 
-       $(".view_modal").one('change', '#ap_shop', function() {
+       $(".view_modal").on('change', '#ap_shop', function() {
           $("#ap_product").html('').trigger('change');
           $.ajax({
             url :  "{{ route('product.ajaxlistproduct') }}",
@@ -53,6 +53,7 @@
             data: 'shop_id='+$(this).val(),
             success: function (response) {
               if(response) {
+                $("#ap_product").html('').trigger('change');
                 $.each(response, function(k, prod) {
                     var disabled = (prod['seller_sku_id'])?'disabled':'';
                     var newOption = '<option value="'+prod['id']+'" '+disabled+'>'+prod['name']+'</option>';

@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'List SKU Products')
+@section('title', 'Link SKU Products')
 
 @section('vendor-style')
         {{-- vednor files --}}

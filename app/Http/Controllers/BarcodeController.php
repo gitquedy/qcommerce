@@ -97,11 +97,35 @@ class BarcodeController extends Controller
     public function packedItems(Request $request) {
         $result = false;
         foreach ($request->items as $sku => $qty) {
+
+            $shop_id = $request->shop_id;
+            $access_token = Shop::find($shop_id)->access_token;
             $prod = Products::where('SellerSku', $sku)->first();
+            
             if($prod->seller_sku_id) {
                 $sku = Sku::whereId($prod->seller_sku_id)->first();
                 $sku->quantity -= $qty;
                 $result = $sku->save();
+                $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
+                foreach ($Sku_prod as $prod) {
+                    $shop_id = $prod->shop_id;
+                    $access_token = Shop::find($shop_id)->access_token;
+                    $prod = Products::where('id', $prod->id)->first();
+                    $prod->quantity = $sku->quantity;
+                    $prod->save();
+                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                        <Request>
+                            <Product>
+                                <Skus>
+                                    <Sku>
+                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                        <quantity>'.$prod->quantity.'</quantity>
+                                    </Sku>
+                                </Skus>
+                            </Product>
+                        </Request>';
+                    $response = Products::product_update($access_token,$xml);
+                }
             }
         }
         echo json_encode($result);
