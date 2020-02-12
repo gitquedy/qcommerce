@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth'], function()
 	
 	Route::resource('/barcode', 'BarcodeController');
 	Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
+	Route::post('/barcode/packed_items', 'BarcodeController@packedItems')->name('barcode.packedItems');
 	
 	Route::resource('/product', 'ProductController');
 	Route::get('/product/edit/{id}', 'ProductController@edit')->name('product.edit');
@@ -57,6 +58,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/sku/addproduct/', 'SkuController@addproduct')->name('sku.addproduct');
 	Route::post('/sku/addproductmodal/', 'SkuController@addproductmodal')->name('sku.addproductmodal');
 	Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
+	Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 	
 	Route::resource('/category', 'CategoryController');
 	Route::get('/category/create/', 'CategoryController@create')->name('category.create');

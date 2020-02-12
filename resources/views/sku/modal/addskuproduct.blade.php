@@ -4,7 +4,7 @@
 		@csrf
   <div class="modal-content">
   	<div class="modal-header">
-		<h4 class="modal-title" id="modal-title">Add Product to {{ ucfirst($title) }}
+		<h4 class="modal-title" id="modal-title">Link Product to {{ ucfirst($title) }}
 		</h4>
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
@@ -30,7 +30,7 @@
       </div>
 	</div>
     <div class="modal-footer">
-      <button type="submit" class="btn btn-primary no-print btn_save"><i class="fa fa-plus"></i> Add
+      <button type="submit" class="btn btn-primary no-print btn_save"><i class="fa fa-link"></i> Link
       </button>
       </form>
       <button type="button" class="btn btn-default no-print" data-dismiss="modal">Close</button>
@@ -44,8 +44,8 @@
           width: '100%'
         });
 
-       $(".view_modal").on('change', '#ap_shop', function() {
-          $(".modal #ap_product").html('');
+       $(".view_modal").one('change', '#ap_shop', function() {
+          $("#ap_product").html('').trigger('change');
           $.ajax({
             url :  "{{ route('product.ajaxlistproduct') }}",
             type: "POST",

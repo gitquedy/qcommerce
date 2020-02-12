@@ -98,6 +98,7 @@ $(document).ready(function () {
     });
 
     $('.view_modal').on('hidden.bs.modal', function () {
+        $(this).html('');
         table.ajax.reload();
       });
 

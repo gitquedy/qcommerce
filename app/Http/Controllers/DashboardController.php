@@ -285,9 +285,7 @@ class DashboardController extends Controller
         $pageConfigs = [
             'pageHeader' => false
         ];
-
         return view('/pages/dashboard_new', [
-            'pageConfigs' => $pageConfigs,
             'monthly_sales' => number_format($monthly_sales),
             'today_sales' =>number_format($today_sales),
             'today_order_count' =>number_format($today_order_count),

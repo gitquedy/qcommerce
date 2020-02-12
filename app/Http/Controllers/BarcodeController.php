@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Api;
 use App\Order;
 use App\Shop;
+use App\Products;
+use App\Sku;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -68,7 +70,7 @@ class BarcodeController extends Controller
                 if(!in_array($sku, $items_sku)) {
                     array_push($items_sku, $sku);
                     $items[$sku] = array(
-                        'model' => $sku,
+                        'sku' => $sku,
                         'pic' => $item['product_main_image'],
                         'name' => $item['name'],
                         'qty' => 1,
@@ -90,6 +92,19 @@ class BarcodeController extends Controller
         
         // return $order;
         // return json_encode($order);
+    }
+
+    public function packedItems(Request $request) {
+        foreach ($request->items as $sku => $qty) {
+            $prod = Products::where('SellerSku', $sku)->first();
+            if($prod->seller_sku_id) {
+                $sku = Sku::whereId($prod->seller_sku_id)->first();
+                $sku->quantity -= $qty;
+                $sku->save();
+            }
+        }
+        return "true";
+        
     }
     
 

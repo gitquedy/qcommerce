@@ -39,6 +39,9 @@
       </div>
     </div>
   </section>
+  <form id="packed_form" method="POST" class="form" enctype='multipart/form-data'>
+    @method('POST')
+    @csrf
   <section class="card">
     <div class="card-content">
       <div class="card-body">
@@ -82,7 +85,6 @@
             <table class="table">
               <thead>
                 <tr>
-                  {{-- <th>Model</th> --}}
                   <th>Image</th>
                   <th>Name</th>
                   <th>Quantity</th>
@@ -96,6 +98,14 @@
       </div>
     </div>
   </section>
+  <section id="packed_div" class="card" style="display: none;">
+    <div class="card-content">
+      <div class="card-body">
+        <button type="submit" id="packed_button" class="btn btn-lg btn-primary btn-block">Packed</button>
+      </div>
+    </div>
+  </section>
+</form>
   {{-- Data list view end --}}
 @endsection
 @section('vendor-script')
@@ -116,7 +126,104 @@
     $(this).focus();
   });
 
+  $("#packed_button").on('click', function(e) {
+      e.preventDefault();
+      const packed_alert = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-lg btn-primary',
+          cancelButton: 'btn btn-lg btn-danger'
+        },
+        buttonsStyling: true
+      })
+
+      packed_alert.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, items are Packed!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+            type: "POST",
+            url: '{{ route('barcode.packedItems') }}',
+            data: $("#packed_form").serialize(),
+            dataType: "JSON",
+            cache: false,
+            success: function (result) {
+                packed_alert.fire(
+                  'Packed!',
+                  'Item(s) have beed deducted on SKU Quantity.',
+                  'success'
+                )
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                packed_alert.fire(
+                  'Warning',
+                  'Something went wrong :(',
+                  'error'
+                )
+            }  
+          });
+          
+        } else if (
+          /* Read more about handling dismissals below */
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          packed_alert.fire(
+            'Cancelled',
+            'Your imaginary file is safe :)',
+            'error'
+          )
+        }
+      })
+      
+
+  });
+
+  // $("#packed_button").on('click', function() {
+  //   var order_id = $(this).data('id');
+  //     const packed_alert = Swal.mixin({
+  //       customClass: {
+  //         confirmButton: 'btn btn-lg btn-primary',
+  //         cancelButton: 'btn btn-lg btn-danger'
+  //       },
+  //       buttonsStyling: true
+  //     })
+
+  //     packed_alert.fire({
+  //       title: 'Are you sure?',
+  //       text: "You won't be able to revert this!",
+  //       icon: 'warning',
+  //       showCancelButton: true,
+  //       confirmButtonText: 'Yes, items are Packed!',
+  //       cancelButtonText: 'No, cancel!',
+  //       reverseButtons: true
+  //     }).then((result) => {
+  //       if (result.value) {
+  //         packed_alert.fire(
+  //           'Packed!',
+  //           'Item(s) have beed deducted on SKU Quantity.',
+  //           'success'
+  //         )
+  //       } else if (
+  //         /* Read more about handling dismissals below */
+  //         result.dismiss === Swal.DismissReason.cancel
+  //       ) {
+  //         packed_alert.fire(
+  //           'Cancelled',
+  //           'Your imaginary file is safe :)',
+  //           'error'
+  //         )
+  //       }
+  //     })
+  // });
+
   $("#barcode").on('change', function() {
+    $("#packed_button").attr('data-id', '');
+    $("#packed_div").hide();
     var val = $(this).val();
     $(".clear_order").html('');
     $(this).val('');
@@ -132,19 +239,20 @@
         else {
           var order = result.data.order;
           var items = result.data.items;
-          console.log(order);
+          console.log(items);
           $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
-          $("#order_number").html("<h5>"+order.id+"</h5>");
-          $("#date").html("<h5>"+order.created_at+"</h5>");
-          $("#payment").html("<h5>"+order.payment_method+"</h5>");
-          $("#price").html("<h5>"+order.price+"</h5>");
-          $("#item_count").html("<h5>"+order.items_count+"</h5>");
-
+          // $("#order_number").html("<h5>"+order.id+"</h5>");
+          // $("#date").html("<h5>"+order.created_at+"</h5>");
+          // $("#payment").html("<h5>"+order.payment_method+"</h5>");
+          // $("#price").html("<h5>"+order.price+"</h5>");
+          // $("#item_count").html("<h5>"+order.items_count+"</h5>");
+          $("#packed_button").attr('data-id', order.id);
+          $("#packed_div").show();
           $.each(items, function(index, item) {
             $("#items_list").append(
               '<tr><td><img src="'+item.pic+'" class="product_image"></td>'+
               '<td><p>'+item.name+'</p></td>'+
-              '<td><h4>x'+item.qty+'</h4></td></tr>'
+              '<td><h4><input type="hidden" name="items['+item.sku+']" value="'+item.qty+'" />x'+item.qty+'</h4></td></tr>'
               );
           });
         }

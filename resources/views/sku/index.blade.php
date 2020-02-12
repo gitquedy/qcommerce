@@ -100,16 +100,15 @@
                     return '<input type="checkbox" class="dt-checkboxes">';
                 },
                 className:'dt-checkboxes-cell'
-                
             },
             { data: 'code', name: 'code'},
             { data: 'name', name: 'name'},
             { data: 'brand_name', name: 'brand_name'},
             { data: 'category_name', name: 'category_name'},
-            { data: 'cost', name: 'cost'},
-            { data: 'price', name: 'price'},
-            { data: 'quantity', name: 'quantity'},
-            { data: 'alert_quantity', name: 'alert_quantity'},
+            { data: 'cost', name: 'cost', className: 'quick_update_box'},
+            { data: 'price', name: 'price', className: 'quick_update_box'},
+            { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
+            { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'action', name: 'action'}
         ];
   var table_route = {
@@ -137,11 +136,86 @@
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
-    $(document).ready(function(){
+  $(document).ready(function(){
       $(".select2").select2({
         dropdownAutoWidth: true,
         width: '100%'
       });
+
+      const swal2 = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+
+
+      $(document).on('click', '.quick_update_box', function() {
+          var td = $(this);
+          var defval = $(this).find("input").data('defval');
+          var name = $(this).find("input").data('name');
+          var val = $(this).find("input").val();
+          var sku_id = $(this).find("input").data('sku_id');
+          td.find("p").hide();
+          td.find('input').show().focus().on('keypress',function(e) {
+              if(e.which == 13) {
+                  $(this).trigger('focusout');
+              }
+          });
+          td.find('input').show().focus().on('focusout', function() {
+            if($(this).val() != defval) {
+              Swal.fire({
+                title: 'Update '+name+' ?',
+                text: "Change value from "+defval+" to "+$(this).val()+" ?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Change it!'
+              }).then((result) => {
+                if (result.value) {
+                  $.ajax({
+                    type: "POST",
+                    url: '{{ route('sku.quickUpdate') }}',
+                    data: {'sku': sku_id, 'name': name, 'val': td.find("input").val()},
+                    dataType: "JSON",
+                    cache: false,
+                    success: function (res) {
+                      if (res) {
+                        td.find('input').attr('data-defval', td.find("input").val()).data('defval', td.find("input").val()).hide();
+                        td.find("p").html(td.find("input").val()).show();
+                      }
+                      else {
+                         swal2.fire(
+                          'Warning',
+                          'Something went wrong :(',
+                          'error'
+                        );
+                        td.find('input').val(defval).hide();
+                        td.find("p").show();
+                      }
+                    } 
+                  });
+                  
+                }
+                else {
+                  td.find('input').val(defval).hide();
+                  td.find("p").show();
+                }
+              })
+            }
+            else {
+              td.find('input').hide();
+              td.find("p").show();
+            }
+          });
+
+      });
+      
+
+
+
+
+
   }); 
   
   

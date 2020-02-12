@@ -70,8 +70,9 @@ class Helper
       }
 
         // sidebar Collapsed
-        if($layoutClasses['sidebarCollapsed'] == 'true')
-            $layoutClasses['sidebarClass'] = "menu-collapsed";
+        $layoutClasses['sidebarClass'] = "menu-collapsed";
+        if($layoutClasses['sidebarCollapsed'] == 'false')
+            $layoutClasses['sidebarClass'] = "";
 
         // sidebar Collapsed
         if($layoutClasses['blankPage'] == 'true')

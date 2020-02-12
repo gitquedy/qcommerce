@@ -39,7 +39,7 @@
           </button>
           <div class="dropdown-menu">
             <!--<a class="dropdown-item" href="#">Print</a>-->
-            <a class="dropdown-item massAction" href="#" data-action="{{route('sku.removeskuproduct')}}"> Remove</a> {{-- {{ route('sku.bulkremove') }} --}}
+            <a class="dropdown-item massAction" href="#" data-action="{{route('sku.removeskuproduct')}}"> Unlink</a> {{-- {{ route('sku.bulkremove') }} --}}
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
             }
         };
   var buttons = [
-            { text: "<i class='feather icon-plus'></i> Add Products",
+            { text: "<i class='feather icon-link'></i> Link Products",
             action: function() {
               $.ajax({
                 url :  "{{ route('sku.addproductmodal') }}",

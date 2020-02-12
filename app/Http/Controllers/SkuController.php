@@ -46,6 +46,18 @@ class SkuController extends Controller
            
            
             return Datatables::eloquent($Sku)
+            ->editColumn('cost', function(Sku $SKSU) {
+                            return "<p>".$SKSU->cost.'</p><input type="number" class="form-control" data-defval="'.$SKSU->cost.'" data-name="cost" value="'.$SKSU->cost.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('price', function(Sku $SKSU) {
+                            return "<p>".$SKSU->price.'</p><input type="number" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('quantity', function(Sku $SKSU) {
+                            return "<p>".$SKSU->quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->quantity.'" data-name="quantity" value="'.$SKSU->quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('alert_quantity', function(Sku $SKSU) {
+                            return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
             ->addColumn('category_name', function(Sku $SKSU) {
                             $category = Category::find($SKSU->category);
                             if($category){
@@ -63,12 +75,13 @@ class SkuController extends Controller
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                             Action<span class="sr-only">Toggle Dropdown</span></button>
                             <div class="dropdown-menu">
-                            <a class="dropdown-item fa fa-list" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > List SKU Products</a>
+                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > Linked SKU Products</a>
                             <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
                             <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
                             </div>
                             </div>';
                         })
+            ->rawColumns(['cost','price','quantity','alert_quantity','action'])
             ->make(true);
         }
         
@@ -117,7 +130,7 @@ class SkuController extends Controller
                     $request->session()->flash('flash_error',"something Went wrong !");
                 }
         
-        return redirect('/sku');
+        return redirect('/sku/skuproducts/'.$sku->id);
         
     }
     
@@ -181,6 +194,22 @@ class SkuController extends Controller
         
         return redirect('/sku');
         
+    }
+    
+    public function quickUpdate(Request $request){
+        $user_id = Auth::user()->id;
+        $column = $request->name;
+        $sku = Sku::where('user_id','=', $user_id)->where('id','=',$request->sku)->first();
+        if($sku){
+            $sku->$column = $request->val;
+            $result = $sku->save();
+        }
+        else {
+            $result = false;
+        }
+        echo json_encode($result);
+        
+
     }
 
     public function skuproducts($id="",Request $request){
@@ -264,8 +293,7 @@ class SkuController extends Controller
 
     }
     
-    public function delete(Request $request){
-        
+    public function delete($id, Request $request){
         $user_id = Auth::user()->id;
         
         $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
@@ -274,13 +302,13 @@ class SkuController extends Controller
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/sku');
         }
-        
+        $link_prod = Products::where('seller_sku_id', $id)->update(['seller_sku_id' => null]);
         $Sku = Sku::find($id);
         
         if($Sku->delete()){
             
             $output = ['success' => 1,
-                    'msg' => 'success',
+                    'msg' => 'Success',
                 ];
             
         }else{
@@ -297,7 +325,7 @@ class SkuController extends Controller
         $ids = $request->ids;
         
         foreach($ids as $id){
-            
+            $link_prod = Products::where('seller_sku_id', $id)->update(['seller_sku_id' => null]);
             $Brand = Sku::find($id);
             $Brand->delete();
             
