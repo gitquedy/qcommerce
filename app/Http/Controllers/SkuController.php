@@ -476,7 +476,7 @@ class SkuController extends Controller
     public function lazada_sync() {
         //true for production 
         //false for development
-        return FALSE;
+        return true;
     }
 
 }
