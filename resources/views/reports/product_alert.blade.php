@@ -29,11 +29,14 @@
       <table class="table data-list-view">
         <thead>
           <tr>
-            <th>Shop</th>
-            <th>Model</th>
             <th>Image</th>
             <th>Name</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Cost</th>
+            <th>Price</th>
             <th>Quantity</th>
+            <th>Alert Quantity</th>
           </tr>
         </thead>
       </table>
@@ -60,18 +63,26 @@
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
-            { data: 'shop', name: 'shop'},
-            { data: 'model', name: 'model'},
             { data: 'image', name: 'image',
-            "render": function (data){
-                    return '<img src="'+data+'" class="product_image">';
-                },
+              "render": function (data){
+                    if(data){
+                      return '<img src="'+data+'" class="product_image">';
+                    }
+                    else {
+                      return "--No Available--";
+                    }
+              },
             },
-            { data: 'name', name: 'name' },
+            { data: 'name', name: 'name'},
+            { data: 'brand_name', name: 'brand_name'},
+            { data: 'category_name', name: 'category_name'},
+            { data: 'cost', name: 'cost'},
+            { data: 'price', name: 'price'},
             { data: 'quantity', name: 'quantity'},
+            { data: 'alert_quantity', name: 'alert_quantity'}
         ];
   var table_route = {url: '{{ route('reports.productAlert') }}'};
-  var buttons = [];
+  var buttons = ['excel', 'pdf'];
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
   }

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Api;
-use App\Order;
-use App\Shop;
-use App\Products;
 use App\Sku;
+use App\Products;
+use App\Category;
+use App\Brand;
+use App\Shop;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -18,6 +18,8 @@ use App\Utilities;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use Helper;
+use Auth;
 
 class ReportsController extends Controller
 {
@@ -46,25 +48,36 @@ class ReportsController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@index'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
         ];
 
+
             if ( request()->ajax()) {
-               $Products = Products::with('shop')->where('quantity', '=', 0)->orderBy('updated_at', 'desc');
-               
-                return Datatables::eloquent($Products)
-                ->addColumn('shop', function(Products $product) {
-                                return $product->shop ? $product->shop->short_name : '';
-                })
-                ->addColumn('image', function(Products $product) {
-                    $image_url = '';
-                    $imagres = explode("|",$product->Images);
-                    if(isset($imagres[0])){
-                        $image_url = $imagres[0];
-                    }
-                    return $image_url;
-                })
-                ->editColumn('updated_at', function(Products $product) {
-                    return date('F d, Y h:i:s a', strtotime($product->updated_at));
-                }) 
-                ->make(true);
+                $user_id = Auth::user()->id;
+                $Sku = Sku::where('user_id','=',$user_id)->where('quantity', 0)->orderBy('updated_at', 'desc');
+                return Datatables::eloquent($Sku)
+                    ->addColumn('category_name', function(Sku $SKSU) {
+                                    $category = Category::find($SKSU->category);
+                                    if($category){
+                                       return  $category->name;
+                                    }
+                                })
+                    ->addColumn('image', function(Sku $SKSU) {
+                                    $products = Products::where('seller_sku_id', $SKSU->id)->first();
+                                    if($products){
+                                       return  $products->Images;
+                                    }
+                                    else {
+                                        return "https://place-hold.it/100&text=No_Image";
+                                    }
+                                })
+                    ->addColumn('brand_name', function(Sku $SKSU) {
+                                    $Brand = Brand::find($SKSU->brand);
+                                    if($Brand){
+                                       return  $Brand->name;
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                })
+                    ->make(true);
             }
         return view('reports.out_of_stock', [
             'breadcrumbs' => $breadcrumbs,
@@ -79,28 +92,33 @@ class ReportsController extends Controller
         ];
 
             if ( request()->ajax()) {
-               $Sku = Sku::whereRaw('quantity <= alert_quantity')->orderBy('updated_at', 'desc')->get();
-               $Sku_ids = array();
-               foreach($Sku as $s) {
-                    $Sku_ids[] = $s->id;
-               }
-               $Products = Products::with('shop')->whereIn('seller_sku_id', $Sku_ids)->orderBy('updated_at', 'desc');
-               
-                return Datatables::eloquent($Products)
-                ->addColumn('shop', function(Products $product) {
-                    return $product->shop ? $product->shop->short_name : '';
-                })
-                ->addColumn('image', function(Products $product) {
-                    $image_url = '';
-                    $imagres = explode("|",$product->Images);
-                    if(isset($imagres[0])){
-                        $image_url = $imagres[0];
-                    }
-                    return $image_url;
-                })
-                ->editColumn('updated_at', function(Products $product) {
-                    return date('F d, Y h:i:s a', strtotime($product->updated_at));
-                }) 
+                $user_id = Auth::user()->id;
+                $Sku = Sku::where('user_id','=',$user_id)->whereRaw('quantity <= alert_quantity')->where('quantity','>', 0)->orderBy('updated_at', 'desc');
+                return Datatables::eloquent($Sku)
+                ->addColumn('category_name', function(Sku $SKSU) {
+                                $category = Category::find($SKSU->category);
+                                if($category){
+                                   return  $category->name;
+                                }
+                            })
+                ->addColumn('image', function(Sku $SKSU) {
+                                $products = Products::where('seller_sku_id', $SKSU->id)->first();
+                                if($products){
+                                   return  $products->Images;
+                                }
+                                else {
+                                    return "https://place-hold.it/100&text=No_Image";
+                                }
+                            })
+                ->addColumn('brand_name', function(Sku $SKSU) {
+                                $Brand = Brand::find($SKSU->brand);
+                                if($Brand){
+                                   return  $Brand->name;
+                                }
+                                else {
+                                    return "";
+                                }
+                            })
                 ->make(true);
             }
         return view('reports.product_alert', [
