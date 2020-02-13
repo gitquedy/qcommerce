@@ -33,6 +33,7 @@ class CreateOrderTable extends Migration
             $table->string('items_count');
             $table->string('status');
             $table->boolean('printed')->default(0);
+            $table->boolean('packed')->default(0);
             $table->string('extra_attributes');
             $table->string('gift_message');
             $table->string('remarks');

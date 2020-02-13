@@ -43,6 +43,7 @@
     @method('POST')
     @csrf
     <input type="hidden" name="shop_id" id="shop_id">
+    <input type="hidden" name="order_id" id="order_id">
   <section class="card">
     <div class="card-content">
       <div class="card-body">
@@ -154,9 +155,10 @@
             dataType: "JSON",
             cache: false,
             success: function (result) {
+                $("#packed_div").hide();
                 packed_alert.fire(
                   'Packed!',
-                  'Item(s) have beed deducted on SKU Quantity.',
+                  'Items are now packed.',
                   'success'
                 )
             },
@@ -233,13 +235,16 @@
           var items = result.data.items;
           $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
           $("#shop_id").val(order.shop_id);
+          $("#order_id").val(order.id);
           // $("#order_number").html("<h5>"+order.id+"</h5>");
           // $("#date").html("<h5>"+order.created_at+"</h5>");
           // $("#payment").html("<h5>"+order.payment_method+"</h5>");
           // $("#price").html("<h5>"+order.price+"</h5>");
           // $("#item_count").html("<h5>"+order.items_count+"</h5>");
           $("#packed_button").attr('data-id', order.id);
-          $("#packed_div").show();
+          if(order.packed == 0) {
+            $("#packed_div").show();
+          }
           $.each(items, function(index, item) {
             $("#items_list").append(
               '<tr><td><img src="'+item.pic+'" class="product_image"></td>'+

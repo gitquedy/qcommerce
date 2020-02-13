@@ -41,7 +41,7 @@
             <!--<a class="dropdown-item" onclick="mass_copy()"  > Duplicate</a>-->
             <!--<a class="dropdown-item" href="#">Print</a>-->
             <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.bulkremove') }}"> Delete</a>
-            <!--<a class="dropdown-item" href="#">Another Action</a>-->
+            <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.syncSkuProducts') }}">Sync Products</a>
           </div>
         </div>
       </div>

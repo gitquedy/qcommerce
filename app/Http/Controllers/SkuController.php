@@ -28,13 +28,15 @@ class SkuController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
     public function index(Request $request)
     {
         
         
         
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"list of SKU"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
         ];
         
         if ( request()->ajax()) {
@@ -125,10 +127,10 @@ class SkuController extends Controller
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
-                    $request->session()->flash('flash_success', 'Success !');
-                }else{
-                    $request->session()->flash('flash_error',"something Went wrong !");
-                }
+            $request->session()->flash('flash_success', 'Success !');
+        }else{
+            $request->session()->flash('flash_error',"something Went wrong !");
+        }
         
         return redirect('/sku/skuproducts/'.$sku->id);
         
@@ -203,7 +205,9 @@ class SkuController extends Controller
                             </Skus>
                         </Product>
                     </Request>';
-                $response = Products::product_update($access_token,$xml);
+                if($this->lazada_sync()){
+                    $response = Products::product_update($access_token,$xml);
+                }
             }
             $request->session()->flash('flash_success', 'Success !');
         }else{
@@ -247,7 +251,9 @@ class SkuController extends Controller
                                 </Skus>
                             </Product>
                         </Request>';
-                    $response = Products::product_update($access_token,$xml);
+                    if($this->lazada_sync()){
+                        $response = Products::product_update($access_token,$xml);
+                    }
                 }
             }
         }
@@ -255,6 +261,45 @@ class SkuController extends Controller
             $result = false;
         }
         echo json_encode($result);
+    }
+
+    public function syncSkuProducts(Request $request) {
+        $user_id = Auth::user()->id;
+        $sku = Sku::where('user_id','=',$user_id)->whereIn('id', $request->ids)->get();
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $Shop_array = array();
+        foreach($all_shops as $all_shopsVAL){
+            $Shop_array[] = $all_shopsVAL->id;
+        }
+
+        foreach($sku as $s) {
+            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$s->id)->orderBy('updated_at', 'desc')->get();
+            foreach ($Sku_prod as $prod) {
+                $shop_id = $prod->shop_id;
+                $access_token = Shop::find($shop_id)->access_token;
+                $prod = Products::where('id', $prod->id)->first();
+                $prod->price = $s->price;
+                $prod->quantity = $s->quantity;
+                $prod->save();
+                    $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                    <Request>
+                        <Product>
+                            <Skus>
+                                <Sku>
+                                    <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                    <price>'.$prod->price.'</price>
+                                    <quantity>'.$prod->quantity.'</quantity>
+                                </Sku>
+                            </Skus>
+                        </Product>
+                    </Request>';
+                if($this->lazada_sync()){
+                    $response = Products::product_update($access_token,$xml);
+                }
+            }
+        }
+        $result = array('success' => true, 'msg' => 'Product Syncs Successfully.');
+        return $result;
     }
 
     public function skuproducts($id="",Request $request){
@@ -345,7 +390,9 @@ class SkuController extends Controller
                 </Skus>
             </Product>
         </Request>';
-        $response = Products::product_update($access_token,$xml);
+        if($this->lazada_sync()){
+            $response = Products::product_update($access_token,$xml);
+        }
         print json_encode($result);
     }
 
@@ -414,6 +461,10 @@ class SkuController extends Controller
     
     
 
-
+    public function lazada_sync() {
+        //true for production 
+        //false for development
+        return true;
+    }
 
 }

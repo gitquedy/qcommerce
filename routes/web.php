@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/sku/addproductmodal/', 'SkuController@addproductmodal')->name('sku.addproductmodal');
 	Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 	Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
+	Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
 	
 	Route::resource('/category', 'CategoryController');
 	Route::get('/category/create/', 'CategoryController@create')->name('category.create');

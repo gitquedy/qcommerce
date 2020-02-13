@@ -105,7 +105,7 @@ $(document).ready(function () {
     $(document).on('click', '.massAction', function(){
         var ids = [];
         var table_name = $(this).data('tablename');
-        if(confirm("Are you sure you want to " + $(this).html()  + " this data?"))
+        if(confirm("Are you sure you want to " + $(this).html()  + " ?"))
         {
             $('tr.selected').each(function(){
                 ids.push($(this).data('id'));
