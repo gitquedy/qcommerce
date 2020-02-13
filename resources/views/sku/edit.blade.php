@@ -46,7 +46,7 @@
                   <lable>Brand</lable>
                   <div class="form-group">
                       <div class="input-group mb-3">
-                        <select class="form-control s280" id="brand" name="brand" required style="width:80% !important">
+                        <select class="form-control s280" id="brand" name="brand" style="width:80% !important">
                               <option value="">select</option>
                               @foreach($Brand as $BrandVAL)
                               <option @if($Sku->brand==$BrandVAL->id) {{'selected'}} @endif  value="{{$BrandVAL->id}}">{{$BrandVAL->code." - ".$BrandVAL->name}}</option>
@@ -62,7 +62,7 @@
                   <lable>Category</lable>
                   <div class="form-group">
                       <div class="input-group mb-3">
-                        <select class="form-control s280" name="category" id="category" required>
+                        <select class="form-control s280" name="category" id="category">
                               <option value="">select</option>
                               @foreach($Category as $CategoryVAL)
                               <option @if($Sku->category==$CategoryVAL->id) {{'selected'}} @endif  value="{{$CategoryVAL->id}}">{{$CategoryVAL->code." - ".$CategoryVAL->name}}</option>

@@ -123,74 +123,75 @@
           </div>
           <br/>
           <div classs="form-group">
-              <label>short_description</label>
+              <label>Short Description</label>
               <textarea type="text" class="form-control" id="short_description" name="short_description" rows="4" >{!! $product->short_description!!}</textarea>
           </div>
           <br/>
           <div classs="form-group">
-              <label>description</label>
+              <label>Description</label>
               <textarea type="text" id="description" class="form-control"  name="description"  rows="4" >{!! $product->description!!}</textarea>
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>brand</label>
+              <label>Brand</label>
               <input type="text" class="form-control" name="brand" value="{!! $product->brand!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>model</label>
+              <label>Model</label>
               <input type="text" class="form-control" name="model" value="{!! $product->model!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>quantity</label>
+              <label>Quantity</label>
               <input type="text" class="form-control" name="quantity" value="{!! $product->quantity!!}">
           </div>
           <br/>
           <div classs="form-group">
-              <label>min_delivery_time</label>
+              <label>Minimum Delivery Time</label>
               <input type="text" class="form-control" name="min_delivery_time" value="{!! $product->min_delivery_time!!}">
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>package_width</label>
-              <input type="text" class="form-control" name="package_width" value="{!! $product->package_width!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>color_family</label>
+              <label>Color Family</label>
               <input type="text" class="form-control" name="color_family" value="{!! $product->color_family!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>package_length</label>
+              <label>Package Width</label>
+              <input type="text" class="form-control" name="package_width" value="{!! $product->package_width!!}">
+          </div>
+          
+          <br/>
+          <div classs="form-group">
+              <label>Package Length</label>
               <input type="package_length" class="form-control" name="package_length" value="{!! $product->package_length!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>package_height</label>
+              <label>Package Height</label>
               <input type="text" class="form-control" name="package_height" value="{!! $product->package_height!!}">
           </div>
           <br/>
           <div classs="form-group">
-              <label>special_price</label>
+              <label>Special Price</label>
               <input type="text" class="form-control" name="special_price" value="{!! $product->special_price!!}">
           </div>
           <br/>
           <div classs="form-group">
-              <label>price</label>
+              <label>Price</label>
               <input type="text" class="form-control" name="price" value="{!! $product->price!!}">
           </div>
           
           <br/>
           <div classs="form-group">
-              <label>package_weight</label>
+              <label>Package Weight</label>
               <input type="text" class="form-control" name="package_weight" value="{!! $product->package_weight!!}">
           </div>
           
@@ -206,7 +207,7 @@
          
           <br/>
           <div classs="form-group">
-              <label>Images</label>
+              {{-- <label>Images</label> --}}
               <?php
               
               $exp = array();

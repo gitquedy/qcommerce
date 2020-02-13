@@ -80,6 +80,15 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/brand/bulkremove', 'BrandController@bulkremove')->name('brand.bulkremove');
 	Route::post('/brand/add_ajax/', 'BrandController@add_ajax')->name('brand.add_ajax');
 	
+	// Route::resource('/barcode', 'BarcodeController');
+	// Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
+	// Route::post('/barcode/packed_items', 'BarcodeController@packedItems')->name('barcode.packedItems');
+	
+	// Route::resource('/reports', 'ReportsController');
+	Route::get('/reports/', 'ReportsController@index')->name('reports.index');
+	Route::get('/reports/outofstock', 'ReportsController@outOfStock')->name('reports.outOfStock');
+	Route::get('/reports/productalert', 'ReportsController@productAlert')->name('reports.productAlert');
+	
 	
 	Route::get('/exp1', 'ExpController@exp1')->name('exp1');
 

@@ -57,6 +57,7 @@
                 <input type="checkbox">
             </th>
             <th>Code</th>
+            <th>Image</th>
             <th>Name</th>
             <th>Brand</th>
             <th>Category</th>
@@ -65,7 +66,7 @@
             <th>Quantity</th>
             <th>Alert Quantity</th>
             <th>Actions</th>
-            
+            <th>Products Count</th>
           </tr>
         </thead>
       </table>
@@ -102,6 +103,16 @@
                 className:'dt-checkboxes-cell'
             },
             { data: 'code', name: 'code'},
+            { data: 'image', name: 'image',
+              "render": function (data){
+                    if(data){
+                      return '<img src="'+data+'" class="product_image">';
+                    }
+                    else {
+                      return "--No Available--";
+                    }
+              },
+            },
             { data: 'name', name: 'name'},
             { data: 'brand_name', name: 'brand_name'},
             { data: 'category_name', name: 'category_name'},
@@ -109,7 +120,8 @@
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
-            { data: 'action', name: 'action'}
+            { data: 'action', name: 'action'},
+            { data: 'products_count', name: 'products_count', searchable: false, visible: false }
         ];
   var table_route = {
           url: '{{ route('sku.index') }}',
@@ -130,6 +142,10 @@
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
+    if(data['products_count'] < 1){
+        $(row).addClass('text-danger bold font-weight-bold');
+    }
+
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;

@@ -205,6 +205,28 @@
                 </ul>
             </li>
             
+            <li class="nav-item  ">
+                <a href="">
+                    <i class="feather icon-file-text"></i>
+                    <span class="menu-title" data-i18n="">Reports</span>
+                    
+                </a>
+                <ul class="menu-content">
+                    <li class="">
+                        <a href="{{route('reports.outOfStock')}}">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">Out of Stock</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{route('reports.productAlert')}}">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">Product Alert</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
             
             <li class="nav-item  ">
                 <a href="">

@@ -19,6 +19,7 @@ class CreateShopTable extends Migration
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('name');
             $table->string('short_name');
+            $table->string('site')->nullable();
             $table->string('email');
             $table->string('refresh_token');
             $table->string('access_token');

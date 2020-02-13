@@ -50,7 +50,7 @@ class ProductController extends Controller
         
         
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"list of Products"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
         ];
         
         
@@ -59,68 +59,61 @@ class ProductController extends Controller
         $statuses = array();
 
         
-    if ( request()->ajax()) {
-        
-           
-           $Products = Products::with('shop')->orderBy('updated_at', 'desc');
-           
-           if($request->get('shop', 'all') != 'all'){
-                $Products->where('shop_id', $request->get('shop'));
-           }else{
-               $Products->whereIn('shop_id', $Shop_array);
-           }
-           
-            return Datatables::eloquent($Products)
-            ->addColumn('shop', function(Products $product) {
-                            return $product->shop ? $product->shop->short_name : '';
-                                })
-            ->addColumn('image', function(Products $product) {
-                $image_url = '';
-                $imagres = explode("|",$product->Images);
-                if(isset($imagres[0])){
-                    $image_url = $imagres[0];
-                }
-                return $image_url;
-                                })
-            ->addColumn('action', function(Products $product) {
-                            return '<div class="btn-group dropup mr-1 mb-1">
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-                    Action<span class="sr-only">Toggle Dropdown</span></button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
-                        <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                        <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
-                        
-                    </div></div>';
-                                })
-                ->make(true);
+        if ( request()->ajax()) {
+            
+               
+               $Products = Products::with('shop')->orderBy('updated_at', 'desc');
+               
+               if($request->get('shop', 'all') != 'all'){
+                    $Products->where('shop_id', $request->get('shop'));
+               }else{
+                   $Products->whereIn('shop_id', $Shop_array);
+               }
+               
+                return Datatables::eloquent($Products)
+                ->addColumn('shop', function(Products $product) {
+                                return $product->shop ? $product->shop->short_name : '';
+                                    })
+                ->addColumn('image', function(Products $product) {
+                    $image_url = '';
+                    $imagres = explode("|",$product->Images);
+                    if(isset($imagres[0])){
+                        $image_url = $imagres[0];
+                    }
+                    return $image_url;
+                                    })
+                ->addColumn('action', function(Products $product) {
+                                return '<div class="btn-group dropup mr-1 mb-1">
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        Action<span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                            <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                            <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                            
+                        </div></div>';
+                                    })
+                    ->make(true);
+            }
+            
+            return view('product.index', [
+                'breadcrumbs' => $breadcrumbs,
+                'all_shops' => $all_shops,
+                'statuses' => $statuses,
+            ]);
         }
-        
-        return view('product.index', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }
     
     
     public function edit($id=""){
-        
         Products::sync_single_product($id);
-
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Product"], ['name'=>"Product Edit"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Product"], ['name'=>"Edit Product"]
         ];
-        
         $product = Products::find($id);
-        
         return view('product.edit', [
             'breadcrumbs' => $breadcrumbs,
             'product' => $product,
         ]);
-        
-        
-        
     }
     
     

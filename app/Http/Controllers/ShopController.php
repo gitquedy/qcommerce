@@ -38,6 +38,19 @@ class ShopController extends Controller
             
            $shop = Shop::with('orders')->where('shop.user_id', $request->user()->id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
+            ->editColumn('site', function(Shop $shop) {
+                            switch ($shop->site) {
+                                case 'lazada':
+                                        return '<img src="https://laz-img-cdn.alicdn.com/images/ims-web/TB19SB7aMFY.1VjSZFnXXcFHXXa.png" style="display:block; width:100%; height:auto;">';
+                                    break;
+                                case 'shopee':
+                                        return '<img src="" style="display:block; width:100%; height:auto;">';
+                                    break;
+                                default:
+                                        return '--';
+                                    break;
+                            }
+                        })
             ->addColumn('statusChip', function(Shop $shop) {
                             $html = '';
                             if($shop->active == 1){
@@ -75,7 +88,7 @@ class ShopController extends Controller
                            return '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$product_count.'</div></div></div>';
                            
                         })
-            ->rawColumns(['shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products'])
+            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products'])
             ->make(true);
         }
 

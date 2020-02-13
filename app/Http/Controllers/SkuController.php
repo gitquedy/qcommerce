@@ -66,10 +66,22 @@ class SkuController extends Controller
                                return  $category->name;
                             }
                         })
+            ->addColumn('image', function(Sku $SKSU) {
+                            $products = Products::where('seller_sku_id', $SKSU->id)->first();
+                            if($products){
+                               return  $products->Images;
+                            }
+                        })
+            ->addColumn('products_count', function(Sku $SKSU) {
+                            return Products::where('seller_sku_id', $SKSU->id)->get()->count();
+                        })
             ->addColumn('brand_name', function(Sku $SKSU) {
                             $Brand = Brand::find($SKSU->brand);
                             if($Brand){
                                return  $Brand->name;
+                            }
+                            else {
+                                return "";
                             }
                         })
             ->addColumn('action', function(Sku $SKSU) {
@@ -464,7 +476,7 @@ class SkuController extends Controller
     public function lazada_sync() {
         //true for production 
         //false for development
-        return true;
+        return false;
     }
 
 }
