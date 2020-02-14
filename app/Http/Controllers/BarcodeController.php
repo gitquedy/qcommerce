@@ -127,7 +127,9 @@ class BarcodeController extends Controller
                                     </Skus>
                                 </Product>
                             </Request>';
-                        $response = Products::product_update($access_token,$xml);
+                        if(env('lazada_sku_sync', true)){
+                            $response = Products::product_update($access_token,$xml);
+                        }
                     }
                 }
             }

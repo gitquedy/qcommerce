@@ -1353,31 +1353,30 @@ DataTable.ext.buttons.pdfHtml5 = {
 			pageOrientation: config.orientation,
 			content: [
 				{
-
 					table: {
 						headerRows: 1,
 						body: rows
 					},
-					// layout: 'border'
+					layout: 'noBorders'
 				}
 			],
 			styles: {
 				tableHeader: {
 					bold: true,
 					fontSize: 11,
-					// color: 'white',
-					// fillColor: '#2d4154',
+					color: 'white',
+					fillColor: '#2d4154',
 					alignment: 'center'
 				},
 				tableBodyEven: {},
 				tableBodyOdd: {
-					// fillColor: '#f3f3f3'
+					fillColor: '#f3f3f3'
 				},
 				tableFooter: {
 					bold: true,
 					fontSize: 11,
-					// color: 'white',
-					// fillColor: '#2d4154'
+					color: 'white',
+					fillColor: '#2d4154'
 				},
 				title: {
 					alignment: 'center',

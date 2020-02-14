@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Inventory')
+@section('title', 'Out of Stock')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -9,6 +9,9 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.0.3/css/buttons.dataTables.min.css">
+    
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
@@ -61,15 +64,22 @@
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
+
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
-  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
   <!--<script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>-->
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
+  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script> --}}
 @endsection
 @section('myscript')
   {{-- Page js files --}}
@@ -84,7 +94,7 @@
                     else {
                       return "--No Available--";
                     }
-              },
+              }
             },
             { data: 'name', name: 'name'},
             { data: 'brand_name', name: 'brand_name'},
@@ -100,7 +110,35 @@
                 data.timings = $("#timings").val();
             }
         };
-  var buttons = ['copy', 'excel', 'pdf'];
+  var buttons = [{ extend: 'copy',
+                   text: "<i class='feather icon-copy'></i> Copy",
+                   className: "btn-outline-primary"
+                 },
+                 { extend: 'csv',
+                   text: "<i class='feather icon-file-plus'></i> CSV",
+                   className: "btn-outline-primary"
+                 },
+                 { extend:'pdfHtml5',
+                    text: "<i class='feather icon-file-text'></i> PDF",
+                    orientation:'portrait',
+                    customize : function(doc){
+                        var colCount = new Array();
+                        $(".table").find('tbody tr:first-child td').each(function(){
+                            if($(this).attr('colspan')){
+                                for(var i=1;i<=$(this).attr('colspan');$i++){
+                                    colCount.push('*');
+                                }
+                            }else{ colCount.push('*'); }
+                        });
+                        doc.content[1].table.widths = colCount;
+                    },
+                    className: "btn-outline-primary"
+                 },
+                 { extend: 'print',
+                   text: "<i class='feather icon-printer'></i> Print",
+                   className: "btn-outline-primary"
+                 }
+                ];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){

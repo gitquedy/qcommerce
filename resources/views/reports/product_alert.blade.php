@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Inventory')
+@section('title', 'Product Alert')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -74,6 +74,11 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
+  <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
@@ -106,7 +111,35 @@
                 data.timings = $("#timings").val();
             }
         };
-  var buttons = ['copy', 'excel', 'pdf'];
+  var buttons = [{ extend: 'copy',
+                   text: "<i class='feather icon-copy'></i> Copy",
+                   className: "btn-outline-primary"
+                 },
+                 { extend: 'csv',
+                   text: "<i class='feather icon-file-plus'></i> CSV",
+                   className: "btn-outline-primary"
+                 },
+                 { extend:'pdfHtml5',
+                    text: "<i class='feather icon-file-text'></i> PDF",
+                    orientation:'portrait',
+                    customize : function(doc){
+                        var colCount = new Array();
+                        $(".table").find('tbody tr:first-child td').each(function(){
+                            if($(this).attr('colspan')){
+                                for(var i=1;i<=$(this).attr('colspan');$i++){
+                                    colCount.push('*');
+                                }
+                            }else{ colCount.push('*'); }
+                        });
+                        doc.content[1].table.widths = colCount;
+                    },
+                    className: "btn-outline-primary"
+                 },
+                 { extend: 'print',
+                   text: "<i class='feather icon-printer'></i> Print",
+                   className: "btn-outline-primary"
+                 }
+                ];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){

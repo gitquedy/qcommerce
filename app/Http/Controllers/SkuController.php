@@ -31,10 +31,7 @@ class SkuController extends Controller
 
 
     public function index(Request $request)
-    {
-        
-        
-        
+    {        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
         ];
@@ -217,7 +214,7 @@ class SkuController extends Controller
                             </Skus>
                         </Product>
                     </Request>';
-                if($this->lazada_sync()){
+                if(env('lazada_sku_sync', true)){
                     $response = Products::product_update($access_token,$xml);
                 }
             }
@@ -263,7 +260,7 @@ class SkuController extends Controller
                                 </Skus>
                             </Product>
                         </Request>';
-                    if($this->lazada_sync()){
+                    if(env('lazada_sku_sync', true)){
                         $response = Products::product_update($access_token,$xml);
                     }
                 }
@@ -305,7 +302,7 @@ class SkuController extends Controller
                             </Skus>
                         </Product>
                     </Request>';
-                if($this->lazada_sync()){
+                if(env('lazada_sku_sync', true)){
                     $response = Products::product_update($access_token,$xml);
                 }
             }
@@ -402,7 +399,7 @@ class SkuController extends Controller
                 </Skus>
             </Product>
         </Request>';
-        if($this->lazada_sync()){
+        if(env('lazada_sku_sync', true)){
             $response = Products::product_update($access_token,$xml);
         }
         print json_encode($result);
@@ -459,24 +456,6 @@ class SkuController extends Controller
                     ];
         echo json_encode($output);
         
-    }
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    public function lazada_sync() {
-        //true for production 
-        //false for development
-        return true;
     }
 
 }

@@ -45,7 +45,7 @@ class ReportsController extends Controller
     public function outOfStock(){
         
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@index'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@outOfStock'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
         ];
 
 
@@ -88,7 +88,7 @@ class ReportsController extends Controller
 
     public function productAlert(){
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@index'), 'name'=>"Reports"], ['name'=>"Product Alert"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@productAlert'), 'name'=>"Reports"], ['name'=>"Product Alert"]
         ];
 
             if ( request()->ajax()) {
