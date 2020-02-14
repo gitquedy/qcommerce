@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'id', 'voucher_platform', 'voucher', 'voucher_seller', 'voucher_code', 'delivery_info',
+		    	'id', 'tracking_no', 'voucher_platform', 'voucher', 'voucher_seller', 'voucher_code', 'delivery_info',
 		    	'gift_option', 'customer_last_name', 'promised_shipping_times', 'price', 'national_registration_number',
 		    	'payment_method','customer_first_name','shipping_fee','branch_number','tax_code','items_count',
 		    	'status','extra_attributes','gift_message','remarks','shop_id', 'created_at', 'updated_at'

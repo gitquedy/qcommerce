@@ -64,7 +64,6 @@
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
-
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
@@ -74,17 +73,41 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
-
   <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.html5.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.print.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/pdfmake.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/vfs_fonts.js')) }}"></script>
-  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script> --}}
 @endsection
 @section('myscript')
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
+    function getBase64Image(img) {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        return canvas.toDataURL("image/png");
+    }
+    // imageToBase64 = (URL) => {
+    //     let image;
+    //     image = new Image();
+    //     image.crossOrigin = 'Anonymous';
+    //     image.addEventListener('load', function() {
+    //         let canvas = document.createElement('canvas');
+    //         let context = canvas.getContext('2d');
+    //         canvas.width = image.width;
+    //         canvas.height = image.height;
+    //         context.drawImage(image, 0, 0);
+    //         try {
+    //             localStorage.setItem('saved-image-example', canvas.toDataURL('image/png'));
+    //         } catch (err) {
+    //             console.error(err)
+    //         }
+    //     });
+    //     image.src = URL;
+    // };
   var columnns = [
             { data: 'image', name: 'image',
               "render": function (data){
@@ -131,7 +154,34 @@
                             }else{ colCount.push('*'); }
                         });
                         doc.content[1].table.widths = colCount;
+
+                        // for (var i = 1; i < doc.content[1].table.body.length; i++) {
+                        //   if (doc.content[1].table.body[i][0].text.indexOf('<img src=') !== -1) {
+                        //       html = doc.content[1].table.body[i][0].text;
+
+                        //       var regex = /<img.*?src=['"](.*?)['"]/;
+                        //       var src = regex.exec(html)[1];
+
+                        //       var tempImage = new Image();
+                        //       tempImage.src = src;
+                        //       doc.images[src] = getBase64Image(tempImage)
+
+                        //       delete doc.content[1].table.body[i][0].text;
+                        //       doc.content[1].table.body[i][0].image = src;
+                        //       doc.content[1].table.body[i][0].fit = [50, 50];
+                        //   }
+
+                        //   //here i am removing the html links so that i can use stripHtml: true,
+                        //   if (doc.content[1].table.body[i][2].text.indexOf('<a href="details.php?') !== -1) {
+                        //       html = $.parseHTML(doc.content[1].table.body[i][2].text);
+                        //       delete doc.content[1].table.body[i][0].text;
+                        //       doc.content[1].table.body[i][2].text = html[0].innerHTML;
+                        //   }
+                        // }
                     },
+                    // exportOptions : {
+                    //     stripHtml: false
+                    // },
                     className: "btn-outline-primary"
                  },
                  { extend: 'print',

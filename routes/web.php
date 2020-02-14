@@ -240,3 +240,4 @@ Route::group(['middleware' => 'auth'], function()
 Auth::routes();
 
 Route::post('/login/validate', 'Auth\LoginController@validate_api');
+Route::get('/encode_all_tracking_code', 'OrderController@encode_all_tracking_code')->name('order.encode_all_tracking_code');

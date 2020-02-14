@@ -675,7 +675,7 @@ class OrderController extends Controller
         try {
             $items = $order->getOrderItems();
             $item_ids = $order->getItemIds($items);
-            $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
+            $tracking_code = $items['data'][0]['tracking_code'];
             $result = $order->readyToShip($item_ids, $tracking_code);
             if(isset($result['message'])){
                 $output = ['success' => 0,
@@ -751,6 +751,40 @@ class OrderController extends Controller
         
 
         
+    }
+
+
+
+    public function encode_all_tracking_code() {
+      $orders = Order::where('tracking_no','=', null)->where('status', '!=', 'pending')->with('shop')->get();
+      $total_count = 0;
+      $total_success = 0;
+      $total_blank = 0;
+      $total_failed = 0;
+      foreach ($orders as $order) {
+        echo "<br>--Updatting Order:".$order->id;
+        if($order->shop) {
+          $items = $order->getOrderItems();
+          $item_ids = $order->getItemIds($items);
+          $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
+          $o = Order::where('id', $order->id)->first();
+          $o->tracking_no = $tracking_code;
+          $o->save();
+          echo "  --   Tracking No:".$tracking_code;
+          if($tracking_code){
+            $total_success++;
+          }
+          else {
+            $total_blank++;
+          }
+        }
+        else {
+          echo "  --   Failed Shop not found";
+          $total_failed++
+        }
+        $total_count
+      }
+      echo "<br><br>----Done <h1>Total Count: $total_count</h1><h3>With Tracking No: $total_success</h3><h3>Blank: $total_blank</h3><h3>Failed: $total_failed</h3>";
     }
     
     
