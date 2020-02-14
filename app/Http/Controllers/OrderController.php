@@ -780,9 +780,9 @@ class OrderController extends Controller
         }
         else {
           echo "  --   Failed Shop not found";
-          $total_failed++
+          $total_failed++;
         }
-        $total_count
+        $total_count++;
       }
       echo "<br><br>----Done <h1>Total Count: $total_count</h1><h3>With Tracking No: $total_success</h3><h3>Blank: $total_blank</h3><h3>Failed: $total_failed</h3>";
     }
