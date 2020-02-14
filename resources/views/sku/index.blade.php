@@ -103,7 +103,7 @@
                 className:'dt-checkboxes-cell'
             },
             { data: 'code', name: 'code'},
-            { data: 'image', name: 'image',
+            { data: 'image', name: 'image', orderable : false,
               "render": function (data){
                     if(data){
                       return '<img src="'+data+'" class="product_image">';
@@ -120,7 +120,7 @@
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
-            { data: 'action', name: 'action'},
+            { data: 'action', name: 'action', orderable : false},
             { data: 'products_count', name: 'products_count', searchable: false, visible: false }
         ];
   var table_route = {

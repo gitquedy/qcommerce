@@ -196,6 +196,7 @@ Route::group(['middleware' => 'auth'], function()
 
 	// Route Pages
 	Route::get('/page-user-profile', 'PagesController@user_profile');
+	Route::get('/page-edit-profile', 'PagesController@edit_profile');
 	Route::get('/page-faq', 'PagesController@faq');
 	Route::get('/page-knowledge-base', 'PagesController@knowledge_base');
 	Route::get('/page-kb-category', 'PagesController@kb_category');

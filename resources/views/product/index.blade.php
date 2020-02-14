@@ -239,7 +239,7 @@
             },
             { data: 'shop', name: 'shop'},
             { data: 'model', name: 'model'},
-            { data: 'image', name: 'image',
+            { data: 'image', name: 'image', orderable : false,
             "render": function (data){
                     return '<img src="'+data+'" class="product_image">';
                 },
@@ -247,7 +247,7 @@
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
-            { data: 'action', name: 'action'}
+            { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {
           url: '{{ route('product.index') }}',

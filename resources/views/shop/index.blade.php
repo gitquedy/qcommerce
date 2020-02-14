@@ -75,15 +75,17 @@
   <script type="text/javascript">
   var columnns = [
             { data: 'id',
-            name: 'id' ,
+            name: 'id' , 
+            orderable : false,
+
             "render": function (){
                     return '<input type="checkbox" class="dt-checkboxes">';
                 },
                 className:'dt-checkboxes-cell'
                 
             },
-            { data: 'id', name: 'id' ,orderable : false},
-            { data: 'site', name: 'site' },
+            { data: 'id', name: 'id'},
+            { data: 'site', name: 'site', orderable : false },
             { data: 'name', name: 'name' },
             { data: 'statusChip', name: 'statusChip' },
             { data: 'products', name: 'products' },

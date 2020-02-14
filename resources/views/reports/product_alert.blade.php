@@ -92,7 +92,7 @@
         return canvas.toDataURL("image/png");
     }
   var columnns = [
-            { data: 'image', name: 'image',
+            { data: 'image', name: 'image', orderable : false,
               "render": function (data){
                     if(data){
                       return '<img src="'+data+'" class="product_image">';

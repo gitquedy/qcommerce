@@ -8,9 +8,17 @@ class PagesController extends Controller
 {
     // User Profile
      public function user_profile(){
-        $pageConfigs = [
-          'sidebarCollapsed' => true
+
+      $breadcrumbs = [
+          ['link'=>"dashboard-analytics",'name'=>"Home"], ['link'=>"dashboard-analytics",'name'=>"Pages"], ['name'=>"Profile"]
       ];
+
+      return view('/pages/page-user-profile', [
+          'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs
+      ]);
+    }
+
+    public function edit_profile(){
 
       $breadcrumbs = [
           ['link'=>"dashboard-analytics",'name'=>"Home"], ['link'=>"dashboard-analytics",'name'=>"Pages"], ['name'=>"Profile"]

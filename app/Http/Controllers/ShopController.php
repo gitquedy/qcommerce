@@ -32,10 +32,6 @@ class ShopController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
         if ( request()->ajax()) {
-            
-            
-           
-            
            $shop = Shop::with('orders')->where('shop.user_id', $request->user()->id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
             ->editColumn('site', function(Shop $shop) {

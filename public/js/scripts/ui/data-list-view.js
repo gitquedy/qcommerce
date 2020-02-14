@@ -12,7 +12,7 @@ $(document).ready(function () {
   "use strict";
   var table = $(".data-list-view").DataTable({
         processing: true,
-        serverSide: true,
+        serverSide: false,
         ajax: table_route,
         columns: columnns,
         createdRow: created_row_function,

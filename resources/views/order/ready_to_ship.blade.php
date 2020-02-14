@@ -134,7 +134,7 @@
   <script type="text/javascript">
   var columnns = [
             { data: 'id', name: 'id', orderable : false},
-            { data: 'id', name: 'id', orderable : false},
+            { data: 'id', name: 'id'},
             { data: 'shop', name: 'shop.short_name'},
             { data: 'created_at_formatted', name: 'created_at' },
             // { data: 'created_at', name: 'created_at' },
@@ -142,7 +142,7 @@
             { data: 'price', name: 'price' },
             { data: 'items_count', name: 'items_count' },
             { data: 'statusDisplay', name: 'status' },
-            { data: 'actions', name: 'actions' },
+            { data: 'actions', name: 'actions', orderable : false},
         ];
   var table_route = {
           url: '{{ route('order.ready_to_ship') }}',
