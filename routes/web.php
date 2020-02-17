@@ -80,9 +80,9 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/brand/bulkremove', 'BrandController@bulkremove')->name('brand.bulkremove');
 	Route::post('/brand/add_ajax/', 'BrandController@add_ajax')->name('brand.add_ajax');
 	
-	// Route::resource('/barcode', 'BarcodeController');
-	// Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
-	// Route::post('/barcode/packed_items', 'BarcodeController@packedItems')->name('barcode.packedItems');
+	Route::get('/user/edit_profile/', 'UserController@editProfile')->name('user.editProfile');
+	Route::post('/user/update_profile/', 'UserController@updateProfile')->name('user.updateProfile');
+	Route::resource('/user', 'UserController');
 	
 	// Route::resource('/reports', 'ReportsController');
 	Route::get('/reports/', 'ReportsController@index')->name('reports.index');
@@ -196,7 +196,6 @@ Route::group(['middleware' => 'auth'], function()
 
 	// Route Pages
 	Route::get('/page-user-profile', 'PagesController@user_profile');
-	Route::get('/page-edit-profile', 'PagesController@edit_profile');
 	Route::get('/page-faq', 'PagesController@faq');
 	Route::get('/page-knowledge-base', 'PagesController@knowledge_base');
 	Route::get('/page-kb-category', 'PagesController@kb_category');

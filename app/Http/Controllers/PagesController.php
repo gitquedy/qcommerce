@@ -24,7 +24,7 @@ class PagesController extends Controller
           ['link'=>"dashboard-analytics",'name'=>"Home"], ['link'=>"dashboard-analytics",'name'=>"Pages"], ['name'=>"Profile"]
       ];
 
-      return view('/pages/page-user-profile', [
+      return view('/pages/page-edit-profile', [
           'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs
       ]);
     }
