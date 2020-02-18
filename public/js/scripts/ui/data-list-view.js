@@ -100,7 +100,7 @@ $(document).ready(function () {
     $('.view_modal').on('hidden.bs.modal', function () {
         $(this).html('');
         table.ajax.reload();
-      });
+    });
 
     $(document).on('click', '.massAction', function(){
         var ids = [];
@@ -142,6 +142,34 @@ $(document).ready(function () {
         }
   });
 
+
+  $(document).on('click', '.order_view_details', function() {
+    console.log($(this).data('order_id'));
+    console.log($(this).data('action'));
+      // $.ajax({
+      //     url: $(this).data('action'),
+      //     method: "POST",
+      //     data: {},
+      //     success:function(result)
+      //     {
+      //         if(result.success == true){
+      //             toastr.success(result.msg);
+      //         }
+      //         else{
+      //           if(result.msg){
+      //             toastr.error(result.msg);
+      //           }
+      //         }
+      //         table.ajax.reload();
+      //     },
+      //     error: function(jqXhr, json, errorThrown){
+      //       console.log(jqXhr);
+      //       console.log(json);
+      //       console.log(errorThrown);
+      //     }
+      // });
+  });
+
   // To append actions dropdown before add new button
   var actionDropdown = $(".actions-dropodown")
   actionDropdown.insertBefore($(".top .actions .dt-buttons"))
@@ -159,7 +187,6 @@ $(document).ready(function () {
       }else{
           $(this).closest("tr").removeClass("selected");
       }
-    
   });
 
   $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {
@@ -170,23 +197,18 @@ $(document).ready(function () {
     }else{
         dtCheckbox.prop("checked",false);
     }
-    
   });
   
   $(".dt-checkboxes-select-all input").on("click", function () {
       if($(this).prop('checked')==true){
-          
           $(".data-list-view").find("tbody tr").addClass("selected");
           $(".data-thumb-view").find("tbody tr").addClass("selected");
           $('.dt-checkboxes').prop('checked',true);
-          
       }else{
           $(".data-list-view").find("tbody tr").removeClass("selected");
           $(".data-thumb-view").find("tbody tr").removeClass("selected");
           $('.dt-checkboxes').prop('checked',false);
-          
       }
-    
   });
   // Scrollbar
   if ($(".data-items").length > 0) {

@@ -64,12 +64,11 @@ class Order extends Model
     public function getNextAction(){
         $status = $this->status;
         $order_id = $this->id;
+        $btn = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'.$order_id.'" data-action="'.route('barcode.checkBarcode').'" >View detail</button>';
         if($status == 'pending'){
-            $btn = '<button type="button" class="btn btn-primary confirm" data-href="'. action('OrderController@readyToShip', [$order_id]) .'" data-text="Are you sure to mark '. $order_id .' as ready to ship?" data-text="This Action is irreversible.">Ready to Ship</button>';
+            $btn .= '<button type="button" class="btn btn-primary confirm" data-href="'. action('OrderController@readyToShip', [$order_id]) .'" data-text="Are you sure to mark '. $order_id .' as ready to ship?" data-text="This Action is irreversible.">Ready to Ship</button>';
         }else if($status == 'ready_to_ship'){
-            $btn = '<button type="button" class="btn btn-primary">Print Shipping Label</button>';
-        }else{
-            $btn = '<button type="button" class="btn btn-primary">View detail</button>';
+            $btn .= '<button type="button" class="btn btn-primary">Print Shipping Label</button>';
         }
         return $btn;
     }
