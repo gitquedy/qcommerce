@@ -40,8 +40,7 @@
           <div class="dropdown-menu">
             <!--<a class="dropdown-item" onclick="mass_copy()"  > Duplicate</a>-->
             <!--<a class="dropdown-item" href="#">Print</a>-->
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.bulkremove') }}"> Delete</a>
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.syncSkuProducts') }}">Sync Products</a>
+            <a class="dropdown-item massAction" href="#" data-action="{{ route('supplier.bulkremove') }}"> Delete</a>
           </div>
         </div>
       </div>
@@ -56,18 +55,11 @@
             <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                 <input type="checkbox">
             </th>
-            <th>Code</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Category</th>
-            <th>Supplier</th>
-            <th>Cost</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Alert Quantity</th>
-            <th>Actions</th>
-            <th>Products Count</th>
+            <th>Company</th>
+            <th>Contact Person</th>
+            <th>Mobile Number</th>
+            <th>Email</th>
+            <th>Action</th>
           </tr>
         </thead>
       </table>
@@ -103,40 +95,21 @@
                 },
                 className:'dt-checkboxes-cell'
             },
-            { data: 'code', name: 'code'},
-            { data: 'image', name: 'image', orderable : false,
-              "render": function (data){
-                    if(data){
-                      return '<img src="'+data+'" class="product_image">';
-                    }
-                    else {
-                      return "--No Available--";
-                    }
-              },
-            },
-            { data: 'name', name: 'name'},
-            { data: 'brand_name', name: 'brand_name'},
-            { data: 'category_name', name: 'category_name'},
-            { data: 'supplier_company', name: 'supplier_company'},
-            { data: 'cost', name: 'cost', className: 'quick_update_box'},
-            { data: 'price', name: 'price', className: 'quick_update_box'},
-            { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
-            { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
+            { data: 'company', name: 'company'},
+            { data: 'contact_person', name: 'contact_person'},
+            { data: 'phone', name: 'phone'},
+            { data: 'email', name: 'email'},
             { data: 'action', name: 'action', orderable : false},
-            { data: 'products_count', name: 'products_count', searchable: false, visible: false }
         ];
   var table_route = {
-          url: '{{ route('sku.index') }}',
+          url: '{{ route('supplier.index') }}',
           data: function (data) {
-                data.shop = $("#shop").val();
-                data.status = $("#status").val();
-                data.timings = $("#timings").val();
             }
         };
   var buttons = [
             { text: "<i class='feather icon-plus'></i> Add New",
             action: function() {
-                window.location = '{{ route('sku.create') }}';
+                window.location = '{{ route('supplier.create') }}';
             },
             className: "btn-outline-primary margin-r-10"}
             ];
@@ -167,71 +140,6 @@
         },
         buttonsStyling: false
       })
-
-
-      $(document).on('click', '.quick_update_box', function() {
-          var td = $(this);
-          td.find("p").hide();
-          td.find('input').show().focus().on('keypress',function(e) {
-              if(e.which == 13) {
-                  $(this).trigger('focusout');
-              }
-          });
-          td.find('input').show().focus().on('focusout', function() {
-            if($(this).val() != $(this).data('defval')) {
-              var name = $(this).data('name');
-              var defval = $(this).data('defval');
-              var val = $(this).val();
-              var sku_id = $(this).data('sku_id');
-              Swal.fire({
-                title: 'Update '+name+' ?',
-                text: "Change value from "+defval+" to "+$(this).val()+" ?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Change it!'
-              }).then((result) => {
-                if (result.value) {
-                  $.ajax({
-                    type: "POST",
-                    url: '{{ route('sku.quickUpdate') }}',
-                    data: {'sku': sku_id, 'name': name, 'val': td.find("input").val()},
-                    dataType: "JSON",
-                    cache: false,
-                    success: function (res) {
-                      if (res) {
-                        td.find('input').attr('data-defval', val).data('defval', val).hide();
-                        td.find("p").html(td.find("input").val()).show();
-                      }
-                      else {
-                         swal2.fire(
-                          'Warning',
-                          'Something went wrong :(',
-                          'error'
-                        );
-                        td.find('input').val(defval).hide();
-                        td.find("p").show();
-                      }
-                    } 
-                  });
-                }
-                else {
-                  td.find('input').val(defval).hide();
-                  td.find("p").show();
-                }
-              })
-            }
-            else {
-              td.find('input').hide();
-              td.find("p").show();
-            }
-          });
-
-      });
-      
-
-
-
-
 
   }); 
   

@@ -7,6 +7,7 @@ use App\Products;
 use App\Category;
 use App\Brand;
 use App\Shop;
+use App\Supplier;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -63,6 +64,12 @@ class SkuController extends Controller
                                return  $category->name;
                             }
                         })
+            ->addColumn('supplier_company', function(Sku $SKSU) {
+                            $supplier = Supplier::find($SKSU->supplier);
+                            if($supplier){
+                               return  $supplier->company;
+                            }
+                        })
             ->addColumn('image', function(Sku $SKSU) {
                             $products = Products::where('seller_sku_id', $SKSU->id)->first();
                             if($products){
@@ -105,18 +112,20 @@ class SkuController extends Controller
     
     
     public function create(){
-        
+        $user = Auth::user();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"SKU  Create"]
         ];
         
         $Category = Category::auth_category();
         $Brand = Brand::auth_brand();
+        $Supplier = Supplier::auth_supplier();
         
         return view('sku.create', [
             'breadcrumbs' => $breadcrumbs,
-            'Category'=>$Category,
-            'Brand'=>$Brand
+            'Category'=> $Category,
+            'Brand'=> $Brand,
+            'Supplier' => $Supplier
             ]);
         
     }
@@ -130,6 +139,7 @@ class SkuController extends Controller
         $sku->name = $request->name;
         $sku->brand = $request->brand;
         $sku->category = $request->category;
+        $sku->suppler = $request->suppler;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
         $sku->quantity = $request->quantity;
@@ -165,12 +175,15 @@ class SkuController extends Controller
         
         $Category = Category::auth_category();
         $Brand = Brand::auth_brand();
+        $Supplier = Supplier::auth_supplier();
+
         
         return view('sku.edit', [
             'breadcrumbs' => $breadcrumbs,
-            'Sku'=>$Sku,
-            'Category'=>$Category,
-            'Brand'=>$Brand
+            'Sku'=> $Sku,
+            'Category'=> $Category,
+            'Brand'=> $Brand,
+            'Supplier' => $Supplier
             ]);
         
     }
@@ -188,6 +201,7 @@ class SkuController extends Controller
         $sku->name = $request->name;
         $sku->brand = $request->brand;
         $sku->category = $request->category;
+        $sku->supplier = $request->supplier;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
         $sku->quantity = $request->quantity;

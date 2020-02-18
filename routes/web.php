@@ -60,6 +60,12 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 	Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 	Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
+
+
+	Route::resource('/supplier', 'SupplierController');
+	Route::get('/supplier/delete/{id}', 'SupplierController@delete')->name('supplier.delete');
+	Route::post('/supplier/bulkremove', 'SupplierController@bulkremove')->name('supplier.bulkremove');
+	Route::post('/supplier/add_ajax', 'SupplierController@add_ajax')->name('supplier.add_ajax');
 	
 	Route::resource('/category', 'CategoryController');
 	Route::get('/category/create/', 'CategoryController@create')->name('category.create');

@@ -45,9 +45,9 @@
               <div class="col-md-6 form-group">
                   <lable>Brand</lable>
                   <div class="form-group">
-                      <div class="input-group mb-3">
+                      <div class="input-group">
                         <select class="form-control s280" id="brand" name="brand" style="width:80% !important">
-                              <option value="">select</option>
+                              <option value="" disabled selected></option>
                               @foreach($Brand as $BrandVAL)
                               <option @if($Sku->brand==$BrandVAL->id) {{'selected'}} @endif  value="{{$BrandVAL->id}}">{{$BrandVAL->code." - ".$BrandVAL->name}}</option>
                               @endforeach
@@ -61,9 +61,9 @@
               <div class="col-md-6 form-group">
                   <lable>Category</lable>
                   <div class="form-group">
-                      <div class="input-group mb-3">
+                      <div class="input-group">
                         <select class="form-control s280" name="category" id="category">
-                              <option value="">select</option>
+                              <option value="" disabled selected></option>
                               @foreach($Category as $CategoryVAL)
                               <option @if($Sku->category==$CategoryVAL->id) {{'selected'}} @endif  value="{{$CategoryVAL->id}}">{{$CategoryVAL->code." - ".$CategoryVAL->name}}</option>
                               @endforeach
@@ -74,6 +74,23 @@
                       </div>
                     </div>
               </div>
+              <div class="col-md-6 form-group">
+                  <lable>Supplier</lable>
+                  <div class="form-group">
+                      <div class="input-group">
+                        <select class="form-control s280" name="supplier" id="supplier">
+                              <option value="" disabled selected></option>
+                              @foreach($Supplier as $SupplierVAL)
+                              <option @if($Sku->supplier==$SupplierVAL->id) {{'selected'}} @endif  value="{{$SupplierVAL->id}}">{{$SupplierVAL->company}}</option>
+                              @endforeach
+                          </select>
+                        <div class="input-group-append">
+                          <button type="button" data-toggle="modal" data-target="#supplier_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+              <div class="col-md-6"></div>
               <div class="col-md-6 form-group">
                   <lable>Cost</lable>
                   <input type="number" step="any" class="form-control" value="{!!$Sku->cost!!}" name="cost" required>
@@ -159,16 +176,13 @@
 <div class="modal" id="category_modal">
   <div class="modal-dialog">
     <div class="modal-content">
-
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Add New Category</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-
       <!-- Modal body -->
       <div class="modal-body">
-         
          <form  onsubmit="process_add_category(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
@@ -189,16 +203,54 @@
                   </select>
               </div>
           </div>
-          
       </div>
-
       <!-- Modal footer -->
       <div class="modal-footer">
          <button class="btn btn-primary">Save</button>
          </form>
         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
       </div>
+    </div>
+  </div>
+</div>
 
+<!-- The Modal -->
+<div class="modal" id="supplier_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add New Supplier</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+         <form  onsubmit="process_add_supplier(event)" >
+          <div class="row">
+              <div class="col-md-12 form-group">
+                  <lable>Company</lable>
+                  <input class="form-control" id="company" required>
+              </div>
+              <div class="col-md-12 form-group">
+                  <lable>Contact Person</lable>
+                  <input class="form-control" id="contact_person" required>
+              </div>
+              <div class="col-md-12 form-group">
+                  <lable>Mobile Number</lable>
+                  <input class="form-control" id="phone">
+              </div>
+              <div class="col-md-12 form-group">
+                  <lable>Email</lable>
+                  <input class="form-control" id="email">
+              </div>
+          </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+         <button class="btn btn-primary">Save</button>
+         </form>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>
@@ -308,6 +360,51 @@ function process_add_category(eve){
     
     
 }
+
+
+function process_add_supplier(e){
+  e.preventDefault();
+  $('#supplier_modal').modal('hide');
+  
+  $.post("{{route('supplier.add_ajax')}}",
+    {
+      company: $('#company').val(),
+      contact_person: $('#contact_person').val(),
+      phone:$('#phone').val(),
+      email:$('#email').val()
+    },
+    function(data, status){
+       if(data.success==1){
+           var opstr = '<option selected value="'+data.id+'">'+$('#company').val()+'</option>';
+           $('#supplier').append(opstr);
+           $('#supplier2').append(opstr);
+           
+           $(".s280").select2({
+              dropdownAutoWidth: true,
+              width: '70%'
+            });
+            
+            $(".s2").select2({
+              dropdownAutoWidth: true,
+              width: '100%'
+            });
+            
+            Swal.fire(
+                'success !',
+                'Category Added!',
+                'success'
+              );
+           
+       }else{
+           Swal.fire(
+                'Error !',
+                'Category Not Added !',
+                'error'
+              );
+       }
+    });
+}
+
 
     
  </script>

@@ -19,6 +19,7 @@ class CreateSkuTable extends Migration
             $table->string('code');
             $table->string('brand')->nullable();
             $table->string('category')->nullable();
+            $table->string('supplier')->nullable();
             $table->float('cost', 15, 2);
             $table->float('price', 15, 2);
             $table->integer('quantity');
