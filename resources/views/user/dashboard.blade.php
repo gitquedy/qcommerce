@@ -15,6 +15,13 @@
 
 @section('content')
 <style>
+    .shop_logo {
+      width: 80px;
+    }
+    .shop_logo img {
+      width: 100%;
+    }
+
     <?php
     
     if(isset($colour)){
@@ -128,7 +135,7 @@
                               <table class="table">
                                 <thead>
                                   <tr>
-                                    <th>Shop Information</th>
+                                    <th colspan="2">Shop Information</th>
                                     <th>Today</th>
                                     <th>Yesterday</th>
                                     <th>This Week</th>
@@ -138,7 +145,8 @@
                                 <tbody>
                                     @foreach($Shop as $s)
                                       <tr>
-                                        <td>{{$s->name}}</td>
+                                        <td class="shop_logo" ><img src="{{ asset('images/shop/icon/'.$s->site.'.png') }}" alt=""></td>
+                                        <td><b>{{$s->name}}</b><br><small><span class="text-seccondary">{{$s->short_name}}</span> @if($s->active) <span class="text-success ml-1">Active</span> @else <span class="text-danger ml-1">Inactive</span> @endif</small></td>
                                         <td>{{$s->shop_info_data_today}}</td>
                                         <td>{{$s->shop_info_data_yesterday}}</td>
                                         <td>{{$s->shop_info_data_week}}</td>

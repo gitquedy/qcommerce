@@ -8,6 +8,14 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/extensions/dataTables.checkboxes.css')) }}">
 @endsection
 @section('mystyle')
+      <style>
+        .shop_logo {
+          width: 80px;
+        }
+        .shop_logo img {
+          width: 100%;
+        }
+      </style>
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
 @endsection
@@ -85,7 +93,7 @@
                 
             },
             { data: 'id', name: 'id'},
-            { data: 'site', name: 'site', orderable : false },
+            { data: 'site', name: 'site', orderable : false, className: 'shop_logo'},
             { data: 'name', name: 'name' },
             { data: 'statusChip', name: 'statusChip' },
             { data: 'products', name: 'products' },
