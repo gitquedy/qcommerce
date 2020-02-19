@@ -126,6 +126,34 @@
           <div class="col-lg-8 col-md-6 col-12">
               <div class="card">
                   <div class="card-header d-flex justify-content-between align-items-end">
+                      <h4 class="card-title">Sales Overview</h4>
+                      <p class="font-medium-5 mb-0"><i class="feather icon-settings text-muted cursor-pointer"></i></p>
+                  </div>
+                  <div class="card-content">
+                      <div class="card-body pb-0">
+                          <div class="d-flex justify-content-start">
+                              <div class="mr-2">
+                                  <p class="mb-50 text-bold-600">This Month</p>
+                                  <h2 class="text-bold-400">
+                                      <sup class="font-medium-1">₱</sup>
+                                      <span class="text-success"><?php echo number_format($current_month_sale); ?></span>
+                                  </h2>
+                              </div>
+                              <div>
+                                  <p class="mb-50 text-bold-600">Last Month</p>
+                                  <h2 class="text-bold-400">
+                                      <sup class="font-medium-1">₱</sup>
+                                      <span><?php echo number_format($pre_month_sale); ?></span>
+                                  </h2>
+                              </div>
+
+                          </div>
+                          <div id="revenue-chart"></div>
+                      </div>
+                  </div>
+              </div>
+              <div class="card">
+                  <div class="card-header d-flex justify-content-between align-items-end">
                       <h4 class="card-title">Shop Performance</h4>
                       <p class="font-medium-5 mb-0"><i class="feather icon-settings text-muted cursor-pointer"></i></p>
                   </div>
@@ -156,34 +184,6 @@
                                 </tbody>
                               </table>
                           </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="card">
-                  <div class="card-header d-flex justify-content-between align-items-end">
-                      <h4 class="card-title">Sales Overview</h4>
-                      <p class="font-medium-5 mb-0"><i class="feather icon-settings text-muted cursor-pointer"></i></p>
-                  </div>
-                  <div class="card-content">
-                      <div class="card-body pb-0">
-                          <div class="d-flex justify-content-start">
-                              <div class="mr-2">
-                                  <p class="mb-50 text-bold-600">This Month</p>
-                                  <h2 class="text-bold-400">
-                                      <sup class="font-medium-1">₱</sup>
-                                      <span class="text-success"><?php echo number_format($current_month_sale); ?></span>
-                                  </h2>
-                              </div>
-                              <div>
-                                  <p class="mb-50 text-bold-600">Last Month</p>
-                                  <h2 class="text-bold-400">
-                                      <sup class="font-medium-1">₱</sup>
-                                      <span><?php echo number_format($pre_month_sale); ?></span>
-                                  </h2>
-                              </div>
-
-                          </div>
-                          <div id="revenue-chart"></div>
                       </div>
                   </div>
               </div>
