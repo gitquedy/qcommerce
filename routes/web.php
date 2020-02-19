@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth'], function()
 	
 	Route::resource('/barcode', 'BarcodeController');
 	Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
+	Route::post('/barcode/view_barcode', 'BarcodeController@viewBarcode')->name('barcode.viewBarcode');
 	Route::post('/barcode/packed_items', 'BarcodeController@packedItems')->name('barcode.packedItems');
 	
 	Route::resource('/product', 'ProductController');

@@ -94,9 +94,16 @@ class BarcodeController extends Controller
         // return json_encode($order);
     }
 
+    public function viewBarcode(Request $request) {
+        $data = self::checkBarcode($request);
+        // return view('barcode.modal.viewdetails', [
+        //     'data' => $data,
+        // ]);
+    }
+
     public function packedItems(Request $request) {
         $result = false;
-        $order = Order::whereId('279326371154579')->first();
+        $order = Order::whereId($request->order_id)->first();
         if($order->packed == 0){
             $order->packed = 1;
             $order->save();

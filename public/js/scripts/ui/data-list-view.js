@@ -146,28 +146,15 @@ $(document).ready(function () {
   $(document).on('click', '.order_view_details', function() {
     console.log($(this).data('order_id'));
     console.log($(this).data('action'));
-      // $.ajax({
-      //     url: $(this).data('action'),
-      //     method: "POST",
-      //     data: {},
-      //     success:function(result)
-      //     {
-      //         if(result.success == true){
-      //             toastr.success(result.msg);
-      //         }
-      //         else{
-      //           if(result.msg){
-      //             toastr.error(result.msg);
-      //           }
-      //         }
-      //         table.ajax.reload();
-      //     },
-      //     error: function(jqXhr, json, errorThrown){
-      //       console.log(jqXhr);
-      //       console.log(json);
-      //       console.log(errorThrown);
-      //     }
-      // });
+      $.ajax({
+          url: $(this).data('action'),
+          method: "POST",
+          data: {data:$(this).data('order_id')},
+          success:function(result)
+          {
+              $('.view_modal').html(result).modal();
+          }
+      });
   });
 
   // To append actions dropdown before add new button
