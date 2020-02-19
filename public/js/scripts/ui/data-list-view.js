@@ -157,6 +157,19 @@ $(document).ready(function () {
       });
   });
 
+  $(".data-list-view").on("dblclick", "tbody tr", function () {
+    console.log($(this).data('id'));
+    $.ajax({
+        url: $(this).data('action'),
+        method: "POST",
+        data: {data:$(this).data('id')},
+        success:function(result)
+        {
+            $('.view_modal').html(result).modal();
+        }
+    });
+  });
+
   // To append actions dropdown before add new button
   var actionDropdown = $(".actions-dropodown")
   actionDropdown.insertBefore($(".top .actions .dt-buttons"))

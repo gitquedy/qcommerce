@@ -28,6 +28,13 @@ class DashboardController extends Controller
         
         
         $Shop = Shop::get_auth_shops();
+        foreach ($Shop as $shop) {
+            $shop->shop_info_data_today = Order::get_dashboard_shop_performance($shop->id,'today');
+            $shop->shop_info_data_yesterday = Order::get_dashboard_shop_performance($shop->id,'yesterday');
+            $shop->shop_info_data_week = Order::get_dashboard_shop_performance($shop->id,'week');
+            $shop->shop_info_data_month = Order::get_dashboard_shop_performance($shop->id,'month');
+        }
+        // print json_encode($Shop);die();
         $colour = Helper::get_colours();
         
         
@@ -285,7 +292,7 @@ class DashboardController extends Controller
         $pageConfigs = [
             'pageHeader' => false
         ];
-        return view('/pages/dashboard_new', [
+        return view('/user/dashboard', [
             'monthly_sales' => number_format($monthly_sales),
             'today_sales' =>number_format($today_sales),
             'today_order_count' =>number_format($today_order_count),

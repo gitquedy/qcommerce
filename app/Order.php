@@ -64,11 +64,14 @@ class Order extends Model
     public function getNextAction(){
         $status = $this->status;
         $order_id = $this->id;
-        $btn = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'.$order_id.'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>';
+        
         if($status == 'pending'){
             $btn = '<button type="button" class="btn btn-primary confirm" data-href="'. action('OrderController@readyToShip', [$order_id]) .'" data-text="Are you sure to mark '. $order_id .' as ready to ship?" data-text="This Action is irreversible.">Ready to Ship</button>';
         }else if($status == 'ready_to_ship'){
             $btn = '<button type="button" class="btn btn-primary">Print Shipping Label</button>';
+        }
+        else {
+            $btn = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'.$order_id.'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>';
         }
         return $btn;
     }
@@ -121,28 +124,85 @@ class Order extends Model
         return json_decode($result, true);
     }    
     
-    
+    public static function get_dashboard_shop_performance($shop, $type="") {
+        $query = DB::table('order');
+        $query->where('shop_id',$shop);
+        $query->where('status', '!=', 'canceled');
+        
+        
+        if($type=='today'){
+            $query->whereDate('created_at',"=",date('Y-m-d'));
+        }
+        if($type=='yesterday'){
+            $query->whereDate('created_at',"=", date('Y-m-d', strtotime("-1 day")));
+        }
+
+        if($type=='week'){
+            $date = date('Y-m-d');
+            $ts = strtotime($date);
+            $start_t = (date('w', $ts) == 0) ? $ts : strtotime('last sunday', $ts);
+            $end_t = strtotime('next saturday', $start_t);
+            $start = date("Y-m-d", $start_t);
+            $end = date("Y-m-d", $end_t);
+            $query->where('created_at', '>=', $start);
+            $query->where('created_at', '<=', $end);
+        }
+
+        if($type=='month'){
+            $start = date('Y-m-01');
+            
+            $date=date_create($start);
+            
+            date_modify($date,"+1 month");
+            
+            $end = date_format($date,"Y-m-d");
+            
+              $query->where('created_at', '>=', $start);
+              $query->where('created_at', '<=', $end);
+            
+        }
+
+        $result = $query->get();
+        $total = 0;
+        
+        foreach($result as $r) {
+            $total += self::tofloat($r->price);
+        }
+
+
+        return number_format($total, 2);
+    }
+
+    private static function tofloat($num) {
+        $dotPos = strrpos($num, '.');
+        $commaPos = strrpos($num, ',');
+        $sep = (($dotPos > $commaPos) && $dotPos) ? $dotPos :
+            ((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
+      
+        if (!$sep) {
+            return floatval(preg_replace("/[^0-9]/", "", $num));
+        }
+
+        return floatval(
+            preg_replace("/[^0-9]/", "", substr($num, 0, $sep)) . '.' .
+            preg_replace("/[^0-9]/", "", substr($num, $sep+1, strlen($num)))
+        );
+    }
+
+
     public static function get_dashboard_orders($status="",$type=""){
-        
-        
         $shops = Shop::get_auth_shops();
-        
-        $shops_array = array();
-        
+        $shops_array = array();  
         foreach($shops as $shopsVAL){
             $shops_array[] = $shopsVAL->id;
         }
         
-        
-
-        $query = DB::table('order');
-        
+        $query = DB::table('order'); 
         if(count($shops_array)>0){
             $query->whereIn('shop_id',$shops_array);
         }else{
             return array();
         }
-        
         
         if($status!=""){
            $query->where('status','=',$status); 
@@ -205,14 +265,7 @@ class Order extends Model
             $query->where('created_at', '<=', $end);
             
         }
-        
-
-        
-        
         return $query->get();
-        
-        
-        
     }
     
     
@@ -250,7 +303,6 @@ class Order extends Model
         $r->addApiParam('order_id',$order_id);
         $result = $c->execute($r, $access_token);
         
-        
         $JSOBJ = json_decode($result);
         
         if(isset($JSOBJ->data)){
@@ -259,10 +311,7 @@ class Order extends Model
             }
         }
         
-        return array('token'=>$access_token,'item'=>$item_ids);
-        
-        
-        
+        return array('token'=>$access_token,'item'=>$item_ids);  
     }
     
     
@@ -271,17 +320,11 @@ class Order extends Model
         
         $ati = $_COOKIE['_ati'];
         
-        
         $args = Order::get_order_items($order_id);
         
-
-        
-
             $access_token = $args['token'];
             $order_item_ids = json_encode($args['item']);
             
-        
-        
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/document/get','GET');
         $r->addApiParam('doc_type','shippingLabel');
@@ -289,11 +332,7 @@ class Order extends Model
         $r->addApiParam('order_item_ids',$order_item_ids);
         $result = $c->execute($r, $access_token);
         
-                
-        
         return $result;
-        
-        
         
     }
     
@@ -301,7 +340,6 @@ class Order extends Model
     public static function computer(){
         
         $ati = $_COOKIE['_ati'];
-        
         
         $c = new LazopClient('https://api.lazada.com/rest', Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/datamoat/compute_risk');
@@ -312,17 +350,12 @@ class Order extends Model
         $r->addApiParam('ati',$ati);
         var_dump($c->execute($r));
         
-        
-        
-        
-        
     }
     
     
     public static function login_mota(){
         
         $ati = $_COOKIE['_ati'];
-        
         
         $c = new LazopClient('https://api.lazada.com/rest', Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/datamoat/login');
@@ -335,12 +368,6 @@ class Order extends Model
         $r->addApiParam('loginResult','fail');
         $r->addApiParam('loginMessage','password is not corret');
         var_dump($c->execute($r));
-        
-
-        
-        
-        
-        
         
     }
     

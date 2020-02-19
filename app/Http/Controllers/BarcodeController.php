@@ -96,9 +96,13 @@ class BarcodeController extends Controller
 
     public function viewBarcode(Request $request) {
         $data = self::checkBarcode($request);
-        // return view('barcode.modal.viewdetails', [
-        //     'data' => $data,
-        // ]);
+        if($data['error'] != "") {
+            return array('error' => $data['error']);
+        }
+        return view('barcode.modal.viewdetails', [
+            'order' => $data['data']['order'],
+            'items' => $data['data']['items'],
+        ]);
     }
 
     public function packedItems(Request $request) {
