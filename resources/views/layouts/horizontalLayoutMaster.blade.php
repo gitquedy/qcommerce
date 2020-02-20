@@ -60,6 +60,13 @@
         <div class="sidenav-overlay"></div>
         <div class="drag-target"></div>
 
+        <script type="text/javascript">
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        </script>
         {{-- include footer --}}
         @include('panels/footer')
 

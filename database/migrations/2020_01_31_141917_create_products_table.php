@@ -23,7 +23,7 @@ class CreateProductsTable extends Migration
             $table->unsignedInteger('shop_id')->nullable();
             $table->text('name');
             $table->binary('short_description');
-            $table->binary('description');
+            $table->binary('description')->nullable();
             $table->string('brand')->nullable();
             $table->string('model')->nullable();
             $table->text('Images')->nullable();

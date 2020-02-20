@@ -8,8 +8,6 @@
         <script src="{{ asset(mix('js/core/app.js')) }}"></script>
         <script src="{{ asset(mix('js/scripts/components.js')) }}"></script>
         <script>
-        
-            
             function notification(){
              
                  $.post("{{route('ajax_get_notification')}}",
@@ -31,13 +29,9 @@
                     
                   });
                  
-            }
-            
+            }     
             
             function notification_refresh(main_data){
-                
-
-                
                 if(main_data.total>0){
                     $('#notification_count').html(main_data.total);
                     $('#notification_count_sub').html(main_data.total+" New");
@@ -72,31 +66,14 @@
                                             '<time class="media-meta" >'+main_data.last_product_time+'</time></small>'+
                                     '</div>'+
                                 '</a>';
-                }
-                                
+                }             
                 $('#notification_area').html(not_string);
-                
-                
-                
-                
-                
-                
-                
             }
+            $(document).ready(function(){
+              notification();
+              setInterval(function(){ notification() }, 10000);    
+            });
             
-            notification();
-            
-            
-            
-            
-            setInterval(function(){ notification() }, 10000);
-            
-            
-             
-             
-         
-         
-         
         </script>
 @if($configData['blankPage'] == false)
         <script src="{{ asset(mix('js/scripts/customizer.js')) }}"></script>
@@ -121,6 +98,20 @@
   '{{ session('flash_error') }}',
   'error'
 );
+</script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+  @if(Session::has('status'))
+ toastr.{{ Session::get('alert-class', 'success') }}('{{ Session::get('status') }}', '', {timeOut: 10000})
+  @endif
+  @if(Session::has('success'))
+ toastr.{{ Session::get('alert-class', 'success') }}('{{ Session::get('success') }}', '', {timeOut: 10000})
+  @endif
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+});
 </script>
 @endif
 <script>

@@ -15,6 +15,8 @@ use App\Utilities;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use App\Shopee;
+
 
 class ShopController extends Controller
 {
@@ -109,19 +111,31 @@ class ShopController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+    {  
+        $request = new Shopee('shop/get');
+        $request->addApiParam('shopid', 90958825);
+        $request = $request->execute();
+
+
         $breadcrumbs = [
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
+        // die(var_dump(request()->session()));
         return view('shop.create', [
           'breadcrumbs' => $breadcrumbs
         ]);
     }
 
-    public function form(){
+    public function form(Request $request){
         $breadcrumbs = [
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
+
+        if($request->input('code') == null && $request->input('shop_id') == null){
+            $request->session()->flash('alert-class', 'error');
+            $request->session()->flash('status', 'Invalid parameters.');
+            return redirect(action('ShopController@create'));
+        }
         return view('shop.form', [
           'breadcrumbs' => $breadcrumbs
         ]);
@@ -141,39 +155,47 @@ class ShopController extends Controller
             return response()->json(['error' => $validator->errors()]);
             }
         try {
-            DB::beginTransaction();
             $data = $request->all();
-            $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
-            $r = new LazopRequest("/auth/token/create");
-            $r->addApiParam("code", $data['code']);
-            $response = $client->execute($r);
+            die(var_dump($data));
+            DB::beginTransaction();
+            if($data['code'] != null){
+                $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
+                $r = new LazopRequest("/auth/token/create");
+                $r->addApiParam("code", $data['code']);
+                $response = $client->execute($r);
 
-            $responseData = json_decode($response, true);
-        
-            if(! array_key_exists('account', $responseData)){
-                $output = ['success' => 0,
-                    'msg' => 'Sorry something went wrong, please try again later. [ '. $responseData['message'] .' ]'
-                ];
-                return response()->json($output);
-            }
-            if(Shop::where('email', $responseData['account'])->count() >= 1){
-                $output = ['success' => 0,
-                        'msg' => 'Shop '. $responseData['account'] .' already exists!',
+                $responseData = json_decode($response, true);
+            
+                if(! array_key_exists('account', $responseData)){
+                    $output = ['success' => 0,
+                        'msg' => 'Sorry something went wrong, please try again later. [ '. $responseData['message'] .' ]'
+                    ];
+                    return response()->json($output);
+                }
+                if(Shop::where('email', $responseData['account'])->count() >= 1){
+                    $output = ['success' => 0,
+                            'msg' => 'Shop '. $responseData['account'] .' already exists!',
+                            'redirect' => action('ShopController@index')
+                        ];
+                    return response()->json($output);
+                }
+                $data['refresh_token'] = $responseData['refresh_token'];
+                $data['access_token'] = $responseData['access_token'];
+                $data['email'] = $responseData['account'];
+                $data['expires_in'] = Carbon::now()->addDays(6);
+                $data['user_id'] = $request->user()->id;
+                $shop = Shop::create($data);
+            }else if($data['shop_id'] != null){
+                $output = ['success' => 1,
+                        'msg' => 'Shop added successfully!1111',
                         'redirect' => action('ShopController@index')
                     ];
-                return response()->json($output);
             }
-            $data['refresh_token'] = $responseData['refresh_token'];
-            $data['access_token'] = $responseData['access_token'];
-            $data['email'] = $responseData['account'];
-            $data['expires_in'] = Carbon::now()->addDays(6);
-            $data['user_id'] = $request->user()->id;
-            $shop = Shop::create($data);
             DB::commit();
-            $output = ['success' => 1,
-                        'msg' => 'Shop added successfully!',
-                        'redirect' => action('ShopController@index')
-                    ];
+            // $output = ['success' => 1,
+            //             'msg' => 'Shop added successfully!',
+            //             'redirect' => action('ShopController@index')
+            //         ];
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,

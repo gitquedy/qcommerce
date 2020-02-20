@@ -392,14 +392,14 @@ function process_add_supplier(e){
             
             Swal.fire(
                 'success !',
-                'Category Added!',
+                'Supplier Added!',
                 'success'
               );
            
        }else{
            Swal.fire(
                 'Error !',
-                'Category Not Added !',
+                'Supplier Not Added !',
                 'error'
               );
        }
