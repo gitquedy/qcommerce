@@ -55,6 +55,7 @@ class AjaxController extends Controller
             if($diff->d>1){
                 $last_product_time.="s";
             }
+            $last_product_time .= ' ';
         }
    
         if($diff->h>0){
@@ -62,6 +63,7 @@ class AjaxController extends Controller
             if($diff->h>1){
                 $last_product_time.="s";
             }
+            $last_product_time .= ' ';
         }
         
         if($diff->i>0){
@@ -69,6 +71,7 @@ class AjaxController extends Controller
             if($diff->i>1){
                 $last_product_time.="s";
             }
+            $last_product_time .= ' ';
         }   
         
         $last_product_time .= ' Ago';
@@ -93,6 +96,7 @@ class AjaxController extends Controller
             if($diff->d>1){
                 $order_last_time.="s";
             }
+            $order_last_time.= ' ';
         }
    
         if($diff->h>0){
@@ -100,6 +104,7 @@ class AjaxController extends Controller
             if($diff->h>1){
                 $order_last_time.="s";
             }
+            $order_last_time.= ' ';
         }
         
         if($diff->i>0){
@@ -107,6 +112,7 @@ class AjaxController extends Controller
             if($diff->i>1){
                 $order_last_time.="s";
             }
+            $order_last_time.= ' ';
         }   
         
         $order_last_time .= ' Ago';

@@ -369,8 +369,8 @@ class SkuController extends Controller
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to Unlink '. $product->name .' ?" data-text="This Product will no longer sync to this SKU." data-method="POST" data-href="'.route('sku.removeskuproduct',['id'=>$product->id]).'" > Unlink</a>
                         <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
-                        <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                     </div></div>';
                                 })
                         ->make(true);
@@ -420,9 +420,19 @@ class SkuController extends Controller
     }
 
     public function removeskuproduct(Request $request){
-        $ids = $request->ids;
+        $ids = array();
+        if($request->ids){
+            $ids = $request->ids;
+        }
         array_push($ids, $request->id);
         $update = Products::whereIn('id', $ids)->update(['seller_sku_id' => null]);
+        if($update) {
+            $return = array('success' => true, 'msg' => "Product Unlink Successfully.");
+        }
+        print json_encode($return);
+    }
+
+    public function show() {
 
     }
     

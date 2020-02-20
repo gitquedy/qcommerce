@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\MatchOldPassword;
 use Auth;
 
 class UserController extends Controller
@@ -15,8 +17,8 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        print json_encode("User");
+    {   
+        // print json_encode("User");
     }
 
 
@@ -59,6 +61,31 @@ class UserController extends Controller
         $user->save();
 
         return back()->with('success','Profile updated successfully.');
+    }
+
+    public function changePassword() {
+        $user = Auth::user();
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=>"/",'name'=>"User"], ['name'=>"Change Password"]
+        ];
+
+        return view('/user/change_password', [
+            'breadcrumbs' => $breadcrumbs,
+            'user' => $user
+        ]);
+    }
+
+    public function updatePassword(Request $request) {
+        $request->validate([
+            'old_password' => ['required', new MatchOldPassword],
+            'password' => ['required', 'string', 'min:8'],
+            'confirm_password' => ['same:password'],
+        ]);
+        
+
+        User::find(auth()->user()->id)->update(['password'=> Hash::make($request->password)]);
+        return redirect()->back()->with('success', 'Password Changed successfully!');
+        // dd('Password change successfully.');
     }
 
     /**

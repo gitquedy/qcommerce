@@ -35,7 +35,14 @@
 <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
-        
+        <div class="btn-group dropdown column-filter">
+          <select class="column-select s2" data-column="7">
+            <option value="">All Supplier</option>
+            @foreach($suppliers as $supplier):
+              <option value="{{$supplier->id}}">{{$supplier->company}} <span class="text-secondary">({{$supplier->contact_person}})</span></option>
+            @endforeach;
+          </select>
+        </div>
       </div>
     </div>
 
@@ -48,9 +55,11 @@
             <th>Image</th>
             <th>Name</th>
             <th>Brand</th>
+            <th>Supplier</th>
             <th>Category</th>
             <th>Cost</th>
             <th>Price</th>
+            <th>SupplierID</th>
           </tr>
         </thead>
       </table>
@@ -121,9 +130,11 @@
             },
             { data: 'name', name: 'name'},
             { data: 'brand_name', name: 'brand_name'},
+            { data: 'supplier_name', name: 'supplier_name'},
             { data: 'category_name', name: 'category_name'},
             { data: 'cost', name: 'cost'},
-            { data: 'price', name: 'price'}
+            { data: 'price', name: 'price'},
+            { data: 'supplier', name: 'supplier', visible: false}
         ];
   var table_route = {
           url: '{{ route('reports.outOfStock') }}',
@@ -154,34 +165,7 @@
                             }else{ colCount.push('*'); }
                         });
                         doc.content[1].table.widths = colCount;
-
-                        // for (var i = 1; i < doc.content[1].table.body.length; i++) {
-                        //   if (doc.content[1].table.body[i][0].text.indexOf('<img src=') !== -1) {
-                        //       html = doc.content[1].table.body[i][0].text;
-
-                        //       var regex = /<img.*?src=['"](.*?)['"]/;
-                        //       var src = regex.exec(html)[1];
-
-                        //       var tempImage = new Image();
-                        //       tempImage.src = src;
-                        //       doc.images[src] = getBase64Image(tempImage)
-
-                        //       delete doc.content[1].table.body[i][0].text;
-                        //       doc.content[1].table.body[i][0].image = src;
-                        //       doc.content[1].table.body[i][0].fit = [50, 50];
-                        //   }
-
-                        //   //here i am removing the html links so that i can use stripHtml: true,
-                        //   if (doc.content[1].table.body[i][2].text.indexOf('<a href="details.php?') !== -1) {
-                        //       html = $.parseHTML(doc.content[1].table.body[i][2].text);
-                        //       delete doc.content[1].table.body[i][0].text;
-                        //       doc.content[1].table.body[i][2].text = html[0].innerHTML;
-                        //   }
-                        // }
                     },
-                    // exportOptions : {
-                    //     stripHtml: false
-                    // },
                     className: "btn-outline-primary"
                  },
                  { extend: 'print',
@@ -200,6 +184,7 @@
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
+ 
   });
   </script>
 @endsection

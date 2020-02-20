@@ -39,6 +39,14 @@
   left: 0;
 }
 
+.data-list-view-header .table-responsive .top .action-btns .column-filter,
+.data-thumb-view-header .table-responsive .top .action-btns .column-filter {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.14);
+  border-radius: 0.5rem;
+  margin-left: 0.75rem;
+  min-width: 200px;
+}
+
 .data-list-view-header .table-responsive .top .action-btns .dt-buttons .btn,
 .data-thumb-view-header .table-responsive .top .action-btns .dt-buttons .btn {
   padding: 0.9rem 0.938rem;

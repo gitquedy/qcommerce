@@ -7,6 +7,7 @@ use App\Products;
 use App\Category;
 use App\Brand;
 use App\Shop;
+use App\Supplier;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -43,11 +44,10 @@ class ReportsController extends Controller
 
 
     public function outOfStock(){
-        
+        $Suppliers = Supplier::auth_supplier();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@outOfStock'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
         ];
-
 
             if ( request()->ajax()) {
                 $user_id = Auth::user()->id;
@@ -77,16 +77,25 @@ class ReportsController extends Controller
                                         return "";
                                     }
                                 })
+                    ->addColumn('supplier_name', function(Sku $SKSU) {
+                                    $Supplier = Supplier::find($SKSU->supplier);
+                                    if($Supplier){
+                                       return  $Supplier->company;
+                                    }
+                                    else {
+                                        return "";
+                                    }
+                                })
                     ->make(true);
             }
         return view('reports.out_of_stock', [
             'breadcrumbs' => $breadcrumbs,
-            'all_shops' => array(),
-            'statuses' => array(),
+            'suppliers' => $Suppliers,
         ]);
     }
 
     public function productAlert(){
+        $Suppliers = Supplier::auth_supplier();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@productAlert'), 'name'=>"Reports"], ['name'=>"Product Alert"]
         ];
@@ -119,12 +128,20 @@ class ReportsController extends Controller
                                     return "";
                                 }
                             })
+                ->addColumn('supplier_name', function(Sku $SKSU) {
+                                $Supplier = Supplier::find($SKSU->supplier);
+                                if($Supplier){
+                                   return  $Supplier->company;
+                                }
+                                else {
+                                    return "";
+                                }
+                            })
                 ->make(true);
             }
         return view('reports.product_alert', [
             'breadcrumbs' => $breadcrumbs,
-            'all_shops' => array(),
-            'statuses' => array(),
+            'suppliers' => $Suppliers,
         ]);
     }
 }

@@ -164,10 +164,10 @@
                                 <thead>
                                   <tr>
                                     <th colspan="2">Shop Information</th>
-                                    <th>Today</th>
-                                    <th>Yesterday</th>
-                                    <th>This Week</th>
-                                    <th>This Month</th>
+                                    <th class="text-right">Today</th>
+                                    <th class="text-right">Yesterday</th>
+                                    <th class="text-right">This Week</th>
+                                    <th class="text-right">This Month</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -175,10 +175,10 @@
                                       <tr>
                                         <td class="shop_logo" ><img src="{{ asset('images/shop/icon/'.$s->site.'.png') }}" alt=""></td>
                                         <td><b>{{$s->name}}</b><br><small><span class="text-seccondary">{{$s->short_name}}</span> @if($s->active) <span class="text-success ml-1">Active</span> @else <span class="text-danger ml-1">Inactive</span> @endif</small></td>
-                                        <td>{{$s->shop_info_data_today}}</td>
-                                        <td>{{$s->shop_info_data_yesterday}}</td>
-                                        <td>{{$s->shop_info_data_week}}</td>
-                                        <td>{{$s->shop_info_data_month}}</td>
+                                        <td class="text-right pr-1">{{$s->shop_info_data_today}}</td>
+                                        <td class="text-right pr-1">{{$s->shop_info_data_yesterday}}</td>
+                                        <td class="text-right pr-1">{{$s->shop_info_data_week}}</td>
+                                        <td class="text-right pr-1">{{$s->shop_info_data_month}}</td>
                                       </tr>
                                     @endforeach
                                 </tbody>

@@ -13,9 +13,9 @@
         <div class="navbar-container content">
             <div class="navbar-collapse" id="navbar-mobile">
                 <div class="mr-auto float-left bookmark-wrapper d-flex align-items-center">
-                    <!--<ul class="nav navbar-nav">-->
-                    <!--    <li class="nav-item mobile-menu d-xl-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ficon feather icon-menu"></i></a></li>-->
-                    <!--</ul>-->
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item mobile-menu d-xl-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ficon feather icon-menu"></i></a></li>
+                    </ul>
                     <!--<ul class="nav navbar-nav bookmark-icons">-->
                     <!--    <li class="nav-item d-none d-lg-block"><a class="nav-link" href="/app-todo" data-toggle="tooltip" data-placement="top" title="Todo"><i class="ficon feather icon-check-square"></i></a></li>-->
                     <!--    <li class="nav-item d-none d-lg-block"><a class="nav-link" href="/app-chat" data-toggle="tooltip" data-placement="top" title="Chat"><i class="ficon feather icon-message-square"></i></a></li>-->
@@ -110,13 +110,11 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{{ route('user.editProfile') }}"><i class="feather icon-user"></i> Edit Profile</a>
-                            <!--<a class="dropdown-item" href="/app-email"><i class="feather icon-mail"></i> My Inbox</a>-->
-                            <!--<a class="dropdown-item" href="/app-todo"><i class="feather icon-check-square"></i> Task</a>-->
-                            <!--<a class="dropdown-item" href="/app-chat"><i class="feather icon-message-square"></i> Chats</a>-->
+                            <a class="dropdown-item" href="{{ route('user.changePassword') }}"><i class="feather icon-lock"></i>Change Password</a>
                             <div class="dropdown-divider"></div><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); 
                       document.getElementById('logout-form').submit();"><i class="feather icon-power"></i> Logout</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
+                                @csrf
                             </form>
                         </div>
                     </li>

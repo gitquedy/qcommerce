@@ -1,6 +1,6 @@
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'User Settings')
+@section('title', 'Change Password')
 
 @section('vendor-style')
         {{-- vednor css files --}}
@@ -65,53 +65,36 @@
                   </div>
               @endif
             </div>
-                <form class="form form-vertical" action="{{route('user.updateProfile')}}" method="post" enctype="multipart/form-data">
+                <form class="form form-vertical" action="{{route('user.updatePassword')}}" method="post" enctype="multipart/form-data">
                   @csrf
                   <div class="form-group">
-                    <label>First Name</label>
+                    <label>Old Password</label>
                     <div class="position-relative has-icon-left">
-                      <input type="text" class="form-control" name="first_name" value="{{ $user->first_name }}" placeholder="First Name">
+                      <input type="password" class="form-control" name="old_password" placeholder="Old Password">
                       <div class="form-control-position"> 
-                        <i class="feather icon-user"></i>
+                        <i class="feather icon-lock"></i>
                       </div>
                     </div>
                   </div>
+                  <br>
                   <div class="form-group">
-                    <label>Last Name</label>
+                    <label>New Password</label>
                     <div class="position-relative has-icon-left">
-                      <input type="text" class="form-control" name="last_name" value="{{ $user->last_name }}" placeholder="Last Name">
+                      <input type="password" class="form-control" name="password" placeholder="New Password">
                       <div class="form-control-position"> 
-                        <i class="feather icon-user"></i>
+                        <i class="feather icon-lock"></i>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
-                    <label>Email</label>
+                    <label>Confirm New Password</label>
                     <div class="position-relative has-icon-left">
-                      <input type="text" class="form-control" name="email" value="{{ $user->email }}" placeholder="Email">
-                      <div class="form-control-position">
-                        <i class="feather icon-mail"></i>
+                      <input type="password" class="form-control" name="password_confirm" placeholder="Confirm New Password">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-lock"></i>
                       </div>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label>Phone</label>
-                    <div class="position-relative has-icon-left">
-                      <input type="text" class="form-control" name="phone" value="{{ $user->phone }}" placeholder="Phone Number">
-                      <div class="form-control-position">
-                        <i class="feather icon-phone"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Profile picture</label>
-                    <input  id="profilePicUpload" class="form-control" type="file" name="picture"/>
-                  </div>
-                  {{-- <div class="form-group">
-                    <div action="#" class="dropzone dropzone-area">
-                      <div class="dz-message">Upload Profile Picture</div>
-                    </div>
-                  </div> --}}
                 <button type="submit" class="btn btn-primary mt-1 mb-1">Update</button>
              </form>
           </div>
@@ -123,12 +106,6 @@
 </section>
   <!-- Settings-end -->
 @endsection
-@section('vendor-script')
-{{-- vednor files --}}
-        {{-- <script src="{{ asset(mix('vendors/js/extensions/dropzone.min.js')) }}"></script> --}}
-@endsection
 @section('myscript')
-{{-- Page js files --}}
-        {{-- <script src="{{ asset(mix('js/scripts/extensions/dropzone.js')) }}"></script> --}}
-        {{-- <script src="{{ asset(mix('js/scripts/pages/user-settings.js')) }}"></script> --}}
+        <script src="{{ asset(mix('js/scripts/pages/user-settings.js')) }}"></script>
 @endsection

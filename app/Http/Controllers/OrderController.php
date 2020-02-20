@@ -696,6 +696,40 @@ class OrderController extends Controller
         }
         return response()->json($output);
     }
+
+    public function readyToShipMultiple(Request $request){
+        $order_ids = $request->ids;
+        $error = 0;
+        try {
+            $orders = Order::whereIn('id', $order_ids)->get();
+            foreach ($orders as &$order) {
+              $items = $order->getOrderItems();
+              $item_ids = $order->getItemIds($items);
+              $tracking_code = $items['data'][0]['tracking_code'];
+              $result = $order->readyToShip($item_ids, $tracking_code);
+              if(isset($result['message'])){
+                  $error++;
+                  $output = ['success' => 0,
+                          'msg' => $result['message'],
+                      ];
+              }else{
+                  if(!$error){
+                    $output = ['success' => 1,
+                        'msg' => 'Orders '. $order->id .' Ready to Ship',
+                    ];
+                  }
+              }
+            }
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
     
     
     

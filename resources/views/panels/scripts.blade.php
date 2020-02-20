@@ -50,7 +50,7 @@
                 
                 if(main_data.orders>0){
                 
-                   not_string += '<a class="d-flex justify-content-between" href="{{url("/order")}}">'+
+                   not_string += '<a class="d-flex justify-content-between" href="{{url("/orders_pending")}}">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><i class="feather icon-shopping-cart font-medium-5 primary"></i></div>'+
                                         '<div class="media-body">'+

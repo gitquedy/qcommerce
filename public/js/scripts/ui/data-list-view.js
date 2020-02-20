@@ -53,6 +53,12 @@ $(document).ready(function () {
       });
 
     $(document).on("click",".confirm",function() {
+      if($(this).data('method')){
+        var method = $(this).data('method');
+      }
+      else {
+        var method = "GET";
+      }
       Swal.fire({
       title: $(this).data('title'),
       text: $(this).data('text'),
@@ -72,7 +78,7 @@ $(document).ready(function () {
         }).then((result) => {
         if (result.value) {
           $.ajax({
-            method: "GET",
+            method: method,
             url: $(this).data('href'),
             data: {'input': result.value},
             dataType: "json",
@@ -157,7 +163,7 @@ $(document).ready(function () {
       });
   });
 
-  $(".data-list-view").on("dblclick", "tbody tr", function () {
+  $(".data-list-view").on("dblclick, touch", "tbody tr", function () {
     console.log($(this).data('id'));
     $.ajax({
         url: $(this).data('action'),
@@ -170,9 +176,17 @@ $(document).ready(function () {
     });
   });
 
+  $(".column-select").on('change', function () {
+    var value = $(this).find('option:selected').val();
+    var column = $(this).data('column');
+    table.column(column).search(value, false, false, false).draw();
+  });
+
   // To append actions dropdown before add new button
   var actionDropdown = $(".actions-dropodown")
   actionDropdown.insertBefore($(".top .actions .dt-buttons"))
+  var columnFilter = $(".column-filter")
+  columnFilter.insertAfter($(".top .actions .dt-buttons"))
 
   // to check and uncheck checkboxes on click of <td> tag
   // $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {

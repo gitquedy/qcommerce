@@ -83,6 +83,7 @@
             Actions
           </button>
           <div class="dropdown-menu">
+            <a class="dropdown-item massAction" href="#" data-method="POST" data-action="{{ route('order.readyToShipMultiple') }}"> Ready to Ship</a>
             <a class="dropdown-item" onclick="print_label()" >Print Shipping Label</a>
           </div>
         </div>

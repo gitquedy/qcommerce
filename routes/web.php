@@ -89,6 +89,8 @@ Route::group(['middleware' => 'auth'], function()
 	
 	Route::get('/user/edit_profile/', 'UserController@editProfile')->name('user.editProfile');
 	Route::post('/user/update_profile/', 'UserController@updateProfile')->name('user.updateProfile');
+	Route::get('/user/change_password/', 'UserController@changePassword')->name('user.changePassword');
+	Route::post('/user/update_password/', 'UserController@updatePassword')->name('user.updatePassword');
 	Route::resource('/user', 'UserController');
 	
 	// Route::resource('/reports', 'ReportsController');
@@ -100,6 +102,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/exp1', 'ExpController@exp1')->name('exp1');
 
 	Route::get('/order/readyToShip/{order}', 'OrderController@readyToShip')->name('order.readyToShip');
+	Route::post('/order/readyToShipMultiple/', 'OrderController@readyToShipMultiple')->name('order.readyToShipMultiple');
 	Route::get('/order/cancel/{order}', 'OrderController@cancel')->name('order.cancel');
 	Route::resource('/order', 'OrderController');
 	Route::get('/orders_pending', 'OrderController@orders_pending')->name('order.pending');
