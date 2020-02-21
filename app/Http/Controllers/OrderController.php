@@ -788,7 +788,7 @@ class OrderController extends Controller
 
 
     public function encode_all_tracking_code() {
-      $orders = Order::where('tracking_no','=', null)->where('status', '!=', 'pending')->with('shop')->get();
+      $orders = Order::where(function($query){$query->where('tracking_no','=', '')->orWhereNull('tracking_no');})->where('status', '!=', 'pending')->with('shop')->get();
       $total_count = 0;
       $total_success = 0;
       $total_blank = 0;
@@ -797,17 +797,19 @@ class OrderController extends Controller
         echo "<br>--Updatting Order:".$order->id;
         if($order->shop) {
           $items = $order->getOrderItems();
-          $item_ids = $order->getItemIds($items);
-          $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
-          $o = Order::where('id', $order->id)->first();
-          $o->tracking_no = $tracking_code;
-          $o->save();
-          echo "  --   Tracking No:".$tracking_code;
-          if($tracking_code){
-            $total_success++;
-          }
-          else {
-            $total_blank++;
+          if (isset($items['data'])) {
+            $item_ids = $order->getItemIds($items);
+            $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
+            $o = Order::where('id', $order->id)->first();
+            $o->tracking_no = $tracking_code;
+            $o->save();
+            echo "  --   Tracking No:".$tracking_code;
+            if($tracking_code){
+              $total_success++;
+            }
+            else {
+              $total_blank++;
+            }
           }
         }
         else {
