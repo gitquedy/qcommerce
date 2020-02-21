@@ -666,18 +666,16 @@ class OrderController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
-    }
-    
-    
+    }    
 
     public function readyToShip(Order $order,Request $request){
         $order_id = $request->get('order_id');
         try {
             $items = $order->getOrderItems();
             $item_ids = $order->getItemIds($items);
-            $tracking_code = $items['data'][0]['tracking_code'];
-            $result = $order->readyToShip($item_ids, $tracking_code);
+            $result = $order->readyToShip($item_ids);
             if(isset($result['message'])){
+                $order->updateTracking();
                 $output = ['success' => 0,
                         'msg' => $result['message'],
                     ];
