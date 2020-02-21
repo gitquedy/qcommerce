@@ -53,6 +53,12 @@ class SupplierController extends Controller
 
 
     public function add_ajax(Request $request){
+        $request->validate([
+            'company' => 'required',
+            'contact_person' => 'required',
+            'phone' => 'present',
+            'email' => 'present'
+        ]);
         $Supplier = new Supplier();
         $Supplier->user_id = Auth::user()->id;
         $Supplier->company = $request->company;
@@ -162,9 +168,7 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        $validator = Validator::make($request->all(), ['email' => 'unique']);
-
-        $validator = Validator::make($request->all(), ['email' => ['unique:suppliers,email,' . $supplier->email]]);
+        $validator = Validator::make($request->all(), ['company' => 'required','contact_person' => 'required','email' => ['unique:suppliers,email,' . $supplier->email]]);
 
         if ($validator->fails()) {
             $request->session()->flash('flash_error', $validator->errors());

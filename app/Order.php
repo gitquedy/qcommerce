@@ -116,7 +116,7 @@ class Order extends Model
         return json_decode($result, true);
     }
 
-    public function readyToShip($item_ids, $tracking_number = null){
+    public function readyToShip($item_ids){
         $item_ids = '[' . implode(', ', $item_ids) . ']';
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/rts');
@@ -125,7 +125,14 @@ class Order extends Model
         $r->addApiParam('shipment_provider','Aramax');
         $r->addApiParam('tracking_number','12345678');
         $result = $c->execute($r, $this->shop->access_token);
-        $this->update(['status' => 'ready_to_ship', 'tracking_no' => $tracking_number ]);
+        $this->update(['status' => 'ready_to_ship']);
+        return json_decode($result, true);
+    }    
+
+    public function updateTracking(){
+        $order = self::getOrderItems();
+        $tracking_code = $order['data'][0]['tracking_code'];
+        $this->update(['tracking_no' => $tracking_code]);
         return json_decode($result, true);
     }    
     

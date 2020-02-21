@@ -163,7 +163,7 @@ $(document).ready(function () {
       });
   });
 
-  $(".data-list-view").on("dblclick, touch", "tbody tr", function () {
+  $(".data-list-view").on("dblclick", "tbody tr", function () {
     console.log($(this).data('id'));
     $.ajax({
         url: $(this).data('action'),

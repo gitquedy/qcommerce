@@ -28,7 +28,15 @@
 <section class="card">
     <div class="card-content">
       <div class="card-body">
-          
+          @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+          @endif
           @if($Sku)
           <form action="{{route('sku.update')}}" method="post">
           @csrf
@@ -36,11 +44,11 @@
           <div class="row">
               <div class="col-md-6 form-group">
                   <lable>Code</lable>
-                  <input class="form-control" value="{!!$Sku->code!!}" name="code" required>
+                  <input class="form-control" value="{!!$Sku->code!!}" name="code">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Name</lable>
-                  <input class="form-control" value="{!!$Sku->name!!}" name="name" required>
+                  <input class="form-control" value="{!!$Sku->name!!}" name="name">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Brand</lable>
@@ -93,19 +101,19 @@
               <div class="col-md-6"></div>
               <div class="col-md-6 form-group">
                   <lable>Cost</lable>
-                  <input type="number" step="any" class="form-control" value="{!!$Sku->cost!!}" name="cost" required>
+                  <input type="number" step="any" class="form-control" value="{!!$Sku->cost!!}" name="cost">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Price</lable>
-                  <input type="number" step="any" class="form-control" value="{!!$Sku->price!!}" name="price" required>
+                  <input type="number" step="any" class="form-control" value="{!!$Sku->price!!}" name="price">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Quantity</lable>
-                  <input type="number" class="form-control"  name="quantity" value="{!!$Sku->quantity!!}" required>
+                  <input type="number" class="form-control"  name="quantity" value="{!!$Sku->quantity!!}">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Alert Quantity</lable>
-                  <input type="number" class="form-control"  name="alert_quantity" value="{!!$Sku->alert_quantity!!}" required>
+                  <input type="number" class="form-control"  name="alert_quantity" value="{!!$Sku->alert_quantity!!}">
               </div>
               <div class="col-md-12 text-right">
                   <br/>
