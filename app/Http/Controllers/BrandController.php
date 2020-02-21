@@ -91,6 +91,11 @@ class BrandController extends Controller
             return redirect('/brand');
         }
         
+        
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
         // validation End
         
         
@@ -122,7 +127,12 @@ class BrandController extends Controller
             return response()->json($output);
         }
         
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
         // validation End
+
         
         $Brand = new Brand();
         $Brand->code = $request->code;
@@ -195,6 +205,12 @@ class BrandController extends Controller
             }
         }
         
+        
+        $request->validate([
+            'id' => 'required',
+            'code' => 'required',
+            'name' => 'required',
+        ]);
         // validation end
         
         $Brand = Brand::find($request->id);

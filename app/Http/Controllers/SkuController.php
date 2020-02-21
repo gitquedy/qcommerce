@@ -132,7 +132,17 @@ class SkuController extends Controller
     
     
     public function add(Request $request){
-        
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+            'brand' => 'nullable',
+            'category' => 'nullable',
+            'supplier' => 'nullable',
+            'cost' => 'required|numeric',
+            'price' => 'required|numeric',
+            'quantity' => 'required|numeric',
+            'alert_quantity' => 'required|numeric',
+        ]);
         $sku = new Sku();
         $sku->user_id = Auth::user()->id;
         $sku->code = $request->code;
@@ -196,6 +206,17 @@ class SkuController extends Controller
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/sku');
         }
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+            'brand' => 'nullable',
+            'category' => 'nullable',
+            'supplier' => 'nullable',
+            'cost' => 'required|numeric',
+            'price' => 'required|numeric',
+            'quantity' => 'required|numeric',
+            'alert_quantity' => 'required|numeric',
+        ]);
         $sku = Sku::find($request->id);
         $sku->code = $request->code;
         $sku->name = $request->name;

@@ -29,17 +29,25 @@
     <div class="card-content">
       <div class="card-body">
           
-          
+          @if ($errors->any())
+              <div class="alert alert-danger">
+                  <ul>
+                      @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                      @endforeach
+                  </ul>
+              </div>
+          @endif
           <form action="{{route('sku.add')}}" method="post">
           @csrf
           <div class="row">
               <div class="col-md-6 form-group">
                   <lable>Code</lable>
-                  <input class="form-control" name="code" required>
+                  <input class="form-control" name="code">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Name</lable>
-                  <input class="form-control" name="name" required>
+                  <input class="form-control" name="name">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Brand</lable>
@@ -92,19 +100,19 @@
               <div class="col-sm-6"></div>
               <div class="col-md-6 form-group">
                   <lable>Cost</lable>
-                  <input type="number" step="any" class="form-control" name="cost" required>
+                  <input type="number" step="any" class="form-control" name="cost">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Price</lable>
-                  <input type="number" step="any" class="form-control" name="price" required>
+                  <input type="number" step="any" class="form-control" name="price">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Quantity</lable>
-                  <input type="number" class="form-control"  name="quantity" required>
+                  <input type="number" class="form-control"  name="quantity">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Alert Quantity</lable>
-                  <input type="number" class="form-control"  name="alert_quantity" required>
+                  <input type="number" class="form-control"  name="alert_quantity">
               </div>
               <div class="col-md-12 text-right">
                   <br/>
@@ -133,7 +141,15 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-         
+         @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
          <form  onsubmit="process_add_brand(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
@@ -175,7 +191,15 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-         
+         @if ($errors->any())
+              <div class="alert alert-danger">
+                  <ul>
+                      @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                      @endforeach
+                  </ul>
+              </div>
+          @endif
          <form  onsubmit="process_add_category(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
@@ -223,7 +247,15 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-         
+         @if ($errors->any())
+              <div class="alert alert-danger">
+                  <ul>
+                      @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                      @endforeach
+                  </ul>
+              </div>
+          @endif
          <form  onsubmit="process_add_supplier(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
