@@ -141,433 +141,6 @@ class OrderController extends Controller
             'selectedStatuses' => $selectedStatuses,
         ]);
     }
-    
-    
-    
-    
-    public function orders_pending(Request $request) {
-        $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders Pending"]
-        ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-            
-        }
-
-        if ( request()->ajax()) {
-        
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
-           }
-           
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $statuses = array('pending');
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses)->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           
-           if($request->get('timings')=="Today"){
-               $orders->whereDate('created_at', '=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Yesterday"){
-                $date=date_create();
-                date_modify($date,"-1 days");
-               $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-           }
-           
-           if($request->get('timings')=="Last_7_days"){
-                $date=date_create();
-                date_modify($date,"-7 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="This_Month"){
-                $orders->where('created_at', '>=', date("Y-m-01"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Last_30_days"){
-                $date=date_create();
-                date_modify($date,"-30 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-            return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
-                ->addColumn('statusDisplay', function(Order $order) {
-                            return ucwords(str_replace('_', ' ', $order->status));
-                                })
-                ->addColumn('actions', function(Order $order) {
-                            return $order->getActionsDropdown();
-                                })
-                ->addColumn('created_at_formatted', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                })
-                ->rawColumns(['actions'])
-                ->make(true);
-        }
-        
-        return view('order.pending', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }
-    
-    
-    
-    
-    
-    
-    public function orders_printing(Request $request) {
-      $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders For Printing"]
-        ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('printed','=','0')->get();
-        
-        if (request()->ajax()) {
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
-           }
-           
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('printed', "=", "0")->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           if($request->get('timings')=="Today"){
-               $orders->whereDate('created_at', '=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Yesterday"){
-                $date=date_create();
-                date_modify($date,"-1 days");
-               $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-           }
-           
-           if($request->get('timings')=="Last_7_days"){
-                $date=date_create();
-                date_modify($date,"-7 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="This_Month"){
-                $orders->where('created_at', '>=', date("Y-m-01"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Last_30_days"){
-                $date=date_create();
-                date_modify($date,"-30 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-            return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
-                ->addColumn('statusDisplay', function(Order $order) {
-                            return ucwords(str_replace('_', ' ', $order->status));
-                                })
-                ->addColumn('actions', function(Order $order) {
-                            return $order->getActionsDropdown();
-                                })
-                ->addColumn('created_at_formatted', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                })
-                ->rawColumns(['actions'])
-                ->make(true);
-        }
-        
-        return view('order.printing', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }  
-    
-    public function orders_shipped(Request $request)
-    {
-        $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders Shipped"]
-        ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-            
-        }
-
-    if ( request()->ajax()) {
-        
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
-           }
-           
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $statuses = array('shipped');
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses)->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           
-           if($request->get('timings')=="Today"){
-               $orders->whereDate('created_at', '=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Yesterday"){
-                $date=date_create();
-                date_modify($date,"-1 days");
-               $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-           }
-           
-           if($request->get('timings')=="Last_7_days"){
-                $date=date_create();
-                date_modify($date,"-7 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="This_Month"){
-                $orders->where('created_at', '>=', date("Y-m-01"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Last_30_days"){
-                $date=date_create();
-                date_modify($date,"-30 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-            return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
-                ->addColumn('statusDisplay', function(Order $order) {
-                            return ucwords(str_replace('_', ' ', $order->status));
-                                })
-                ->addColumn('actions', function(Order $order) {
-                            return $order->getActionsDropdown();
-                                })
-                ->addColumn('created_at_formatted', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                })
-                ->rawColumns(['actions'])
-                ->make(true);
-        }
-        
-        return view('order.shipped', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }
-    
-    
-    public function orders_delivered(Request $request)
-    {
-        $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders Delivered"]
-        ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-            
-        }
-
-    if ( request()->ajax()) {
-        
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
-           }
-           
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $statuses = array('delivered');
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses)->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           
-           if($request->get('timings')=="Today"){
-               $orders->whereDate('created_at', '=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Yesterday"){
-                $date=date_create();
-                date_modify($date,"-1 days");
-               $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-           }
-           
-           if($request->get('timings')=="Last_7_days"){
-                $date=date_create();
-                date_modify($date,"-7 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="This_Month"){
-                $orders->where('created_at', '>=', date("Y-m-01"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Last_30_days"){
-                $date=date_create();
-                date_modify($date,"-30 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-            return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
-                ->addColumn('statusDisplay', function(Order $order) {
-                            return ucwords(str_replace('_', ' ', $order->status));
-                                })
-                ->addColumn('actions', function(Order $order) {
-                            return $order->getActionsDropdown();
-                                })
-                ->addColumn('created_at_formatted', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                })
-                ->rawColumns(['actions'])
-                ->make(true);
-        }
-        
-        return view('order.delivered', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }
-    
-    
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-     
-     
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Order $order)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Order $order)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Order $order)
-    {
-        //
-    }
 
     public function cancelModal(Order $order){
 
@@ -847,6 +420,33 @@ class OrderController extends Controller
       $counter = 0;
       foreach($products as $product){
         if($product->site == 'lazada'){
+          $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+          // die(var_dump($product->id));
+          $r = new LazopRequest('/order/items/get','GET');
+          $r->addApiParam('order_id', $product->id);
+          $result = $c->execute($r,$product->shop->access_token);
+          $item = json_decode($result, true);
+          if($item['code'] == 0){
+            $items = [];
+            $items_sku = [];
+            $orders['lazada'][$counter] = (array) $product->toArray();
+           
+            foreach ( $item['data'] as $item) {
+              $sku = $item['sku'];
+              if(!in_array($sku, $items_sku)) {
+                  array_push($items_sku, $sku);
+                  $items[$sku] = array(
+                      'sku' => $sku,
+                      'name' => $item['name'],
+                      'qty' => 1,
+                  );
+              }
+              else {
+                  $items[$sku]['qty'] += 1;
+              }
+            }
+            $orders['lazada'][$counter]['items'] = $items;
+          }
 
         }else if($product->site == 'shopee'){
           $client = $product->shop->shopeeGetClient();
@@ -854,9 +454,9 @@ class OrderController extends Controller
           if(isset($order_details['orders'][0])){
             $orders['shopee'][$counter] = $order_details['orders'][0];
             $orders['shopee'][$counter]['shop_name'] = $product->shop->name;
-            $counter += 1;
           }
         }
+         $counter += 1;
       }
       return view('order.modal.packing_list', compact('orders'));
     }

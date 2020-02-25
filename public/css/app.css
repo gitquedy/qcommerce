@@ -1,0 +1,18 @@
+@media print
+{    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+    .print, .print *{
+        display: block;
+    }
+    .hrBlack{
+        color:red !important;
+        background-color:red !important;
+    }
+    .pagebreak {
+        clear: both;
+        page-break-after: always;
+    }
+}

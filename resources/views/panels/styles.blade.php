@@ -29,3 +29,5 @@ $configData = Helper::applClasses();
         <link rel="stylesheet" href="{{ asset(mix('css/core/colors/palette-gradient.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/toastr.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('css/plugins/extensions/toastr.css')) }}">
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
