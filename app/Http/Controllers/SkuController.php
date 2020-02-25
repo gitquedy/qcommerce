@@ -250,7 +250,9 @@ class SkuController extends Controller
                         </Product>
                     </Request>';
                 if(env('lazada_sku_sync', true)){
-                    $response = Products::product_update($access_token,$xml);
+                    if($prod->site == 'lazada'){
+                        $response = Products::product_update($access_token,$xml);
+                    }
                 }
             }
             $request->session()->flash('flash_success', 'Success !');
@@ -296,7 +298,9 @@ class SkuController extends Controller
                             </Product>
                         </Request>';
                     if(env('lazada_sku_sync', true)){
-                        $response = Products::product_update($access_token,$xml);
+                        if($prod->site == 'lazada'){
+                            $response = Products::product_update($access_token,$xml);
+                        }
                     }
                 }
             }
@@ -338,7 +342,9 @@ class SkuController extends Controller
                         </Product>
                     </Request>';
                 if(env('lazada_sku_sync', true)){
-                    $response = Products::product_update($access_token,$xml);
+                    if($prod->site == 'lazada'){
+                        $response = Products::product_update($access_token,$xml);
+                    }
                 }
             }
         }
@@ -435,7 +441,9 @@ class SkuController extends Controller
             </Product>
         </Request>';
         if(env('lazada_sku_sync', true)){
-            $response = Products::product_update($access_token,$xml);
+            if($prod->site == 'lazada'){
+                $response = Products::product_update($access_token,$xml);
+            }
         }
         print json_encode($result);
     }
