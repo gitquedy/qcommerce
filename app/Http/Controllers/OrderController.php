@@ -15,6 +15,7 @@ use App\Utilities;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use App\Products;
 
 class OrderController extends Controller
 {
@@ -745,8 +746,7 @@ class OrderController extends Controller
     public function print_shipping($order_id="",Request $request){
             $order = Order::where('id', "=", $order_id)->first();
             if($order->site == 'lazada'){
-              $order->printed = true;
-              $order->save();
+              $order->update(['printed' => true]);
 
               $Result = Order::get_shipping_level($order_id);
               $jsOBJ = json_decode($Result);
@@ -763,6 +763,7 @@ class OrderController extends Controller
               }
             }else{
               $client =$order->shop->shopeeGetClient();
+              $order->update(['printed' => true]);
               $result = $client->logistics->getAirwayBill(['ordersn_list' => [$order->ordersn]])->getData();
               if(count($result['result']['airway_bills']) > 0){
                 return redirect($result['result']['airway_bills'][0]['airway_bill']);
@@ -837,6 +838,27 @@ class OrderController extends Controller
         $total_count++;
       }
       echo "<br><br>----Done <h1>Total Count: $total_count</h1><h3>With Tracking No: $total_success</h3><h3>Blank: $total_blank</h3><h3>Failed: $total_failed</h3>";
+    }
+
+    public function printPackingList(Request $request){
+      $ids = explode(',',$request->get('ids'));
+      $products = Order::whereIn('id', $ids)->get();
+      $orders = ['shopee' => [], 'lazada' => []];
+      $counter = 0;
+      foreach($products as $product){
+        if($product->site == 'lazada'){
+
+        }else if($product->site == 'shopee'){
+          $client = $product->shop->shopeeGetClient();
+          $order_details = $client->order->getOrderDetails(['ordersn_list' => array_values([$product->ordersn])])->getData();
+          if(isset($order_details['orders'][0])){
+            $orders['shopee'][$counter] = $order_details['orders'][0];
+            $orders['shopee'][$counter]['shop_name'] = $product->shop->name;
+            $counter += 1;
+          }
+        }
+      }
+      return view('order.modal.packing_list', compact('orders'));
     }
     
     
