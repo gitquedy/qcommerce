@@ -107,14 +107,11 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/order/cancelModal/{order}', 'OrderController@cancelModal');
 	Route::post('/order/cancelSubmit/{order}', 'OrderController@cancelSubmit');
 	Route::get('/order/cancel/{order}', 'OrderController@cancel')->name('order.cancel');
+	Route::get('/order/printPackingList', 'OrderController@printPackingList')->name('order.printPackingList');
 	Route::resource('/order', 'OrderController');
-	Route::get('/orders_pending', 'OrderController@orders_pending')->name('order.pending');
-	Route::get('/orders_printing', 'OrderController@orders_printing')->name('order.printing');
-	Route::get('/orders_ready_to_ship', 'OrderController@orders_ready_to_ship')->name('order.ready_to_ship');
-	Route::get('/orders_shipped', 'OrderController@orders_shipped')->name('order.shipped');
-	Route::get('/orders_delivered', 'OrderController@orders_delivered')->name('order.delivered');
 	Route::get('/order/print_shipping/{id}', 'OrderController@print_shipping')->name('order.print_shipping');
 	Route::post('/order/print_shipping_mass', 'OrderController@print_shipping_mass')->name('order.print_shipping_mass');
+	
 
 
 

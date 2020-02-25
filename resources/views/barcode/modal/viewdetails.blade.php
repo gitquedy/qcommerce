@@ -1,5 +1,3 @@
-@php
-@endphp
 <style>
     .product_image{
         width:80px;

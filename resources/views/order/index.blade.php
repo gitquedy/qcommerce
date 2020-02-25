@@ -125,6 +125,7 @@
           <div class="dropdown-menu">
             <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}">Delete</a>-->
             <a class="dropdown-item" onclick="print_label()" >Print Shipping Label</a>
+            <a class="dropdown-item printPackingList" data-href="{{ action('OrderController@printPackingList') }}" >Print Packing List</a>
             <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
             <!--<a class="dropdown-item" href="#">Another Action</a>-->
           </div>
@@ -223,8 +224,6 @@
     $(document).ready(function(){
       var str = $('#status').val(); 
       hideShippingStatus(str);
-
-
       $('input[name="site"]').change(function(){
         var site = $('input[name="site"]:checked').val();
         url = "{{ action('OrderController@index')}}?site=" + site;
@@ -251,14 +250,12 @@
   });  
   
   function print_label(){
-      var selected_ids = [];
-      
+    var selected_ids = [];
     $(".dt-checkboxes").each(function(){
        if($(this).prop('checked')==true){
            selected_ids.push($(this).parent().parent().data('id'));
        }
     });
-    
     if(selected_ids.length==0){
           Swal.fire(
           'Warning !',
@@ -272,5 +269,40 @@
     $('#mass_print_form').submit();
     
   }
+
+  $(document).on("click", '.printPackingList', function () {
+
+   var selected_ids = [];
+    
+   $(".dt-checkboxes").each(function(){
+      if($(this).prop('checked')==true){
+          selected_ids.push($(this).parent().parent().data('id'));
+      }
+   });
+    
+   if(selected_ids.length==0){
+         Swal.fire(
+         'Warning!',
+         'Please select atleast one order',
+         'warning'
+       );
+       return false;
+     }
+    var url = $(this).data("href") + "?ids=" + selected_ids.toString();
+    var container = $(".view_modal");
+    $.ajax({
+      method: "GET",
+      url: url,
+      dataType: "html",
+      success: function success(result) {
+        $(container).html(result).modal("show");
+      },
+      error: function error(jqXhr, json, errorThrown) {
+        console.log(jqXhr);
+        console.log(json);
+        console.log(errorThrown);
+      }
+    });
+  });
   </script>
 @endsection
