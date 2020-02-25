@@ -605,6 +605,8 @@ class Products extends Model
     		    $product->Images = implode('|',$P_images);
     		    
     		    $product->updated_at = date('Y-m-d H:i:s');
+
+                $product->site = 'lazada';
     		    
     		    $product->save();
                 
