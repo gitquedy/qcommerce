@@ -41,6 +41,7 @@ class syncFirstTime extends Command
         $shops = Shop::where('is_first_time', true)->get();
         foreach($shops as $shop){
             $shop->syncOrders();
+            $shop->syncShopeeProducts();
             $shop->touch();
             $shop->update(['is_first_time', false]);
         }

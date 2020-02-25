@@ -31,8 +31,37 @@
 <section class="card">
     <div class="card-content">
       <div class="card-body">
-      
         <div class="row">
+          <div class="col-sm-4">
+            <ul class="list-unstyled mb-0">
+              <li class="d-inline-block mr-2">
+                <fieldset>
+                 <div class="vs-radio-con">
+                    <input type="radio" id="site" name="site"  value="lazada" {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+                    <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                    <span class="">Lazada</span>
+                  </div>
+                </fieldset>
+              </li>
+              <li class="d-inline-block mr-2">
+                <fieldset>
+                  <div class="vs-radio-con">
+                    <input type="radio" id="site" name="site" value="shopee" {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
+                    <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                    <span class="">Shopee</span>
+                  </div>
+                </fieldset>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <br><div class="row">
       <!--     <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Order ID:
@@ -112,7 +141,8 @@
                 <input type="checkbox">
             </th>
             <th>Shop</th>
-            <th>Model</th>
+            <th>Item ID</th>
+            <th>Sku</th>
             <th>Image</th>
             <th>Name</th>
             <th>Price</th>
@@ -238,7 +268,8 @@
                 
             },
             { data: 'shop', name: 'shop'},
-            { data: 'model', name: 'model'},
+            { data: 'item_id', name: 'item_id'},
+            { data: 'SellerSku', name: 'SellerSku'},
             { data: 'image', name: 'image', orderable : false,
             "render": function (data){
                     return '<img src="'+data+'" class="product_image">';
@@ -255,6 +286,7 @@
                 data.shop = $("#shop").val();
                 data.status = $("#status").val();
                 data.timings = $("#timings").val();
+                data.site = $('input[name="site"]:checked').val();
             }
         };
   var buttons = [
@@ -279,7 +311,13 @@
         dropdownAutoWidth: true,
         width: '100%'
       });
+      $('input[name="site"]').change(function(){
+        var site = $('input[name="site"]:checked').val();
+        url = "{{ action('ProductController@index')}}?site=" + site;
+        window.location.href = url;
+      });
   }); 
+
   
   
   var shop_json = '<?php echo json_encode($all_shops)?>';

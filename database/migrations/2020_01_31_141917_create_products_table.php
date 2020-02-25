@@ -15,14 +15,15 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('item_id')->nullable();
-            $table->string('primary_category')->nullable();
+            $table->string('site');
             $table->string('SellerSku');
             $table->string('SkuId');
+            $table->text('name');
+            $table->string('item_id')->nullable();
+            $table->string('primary_category')->nullable();
             $table->unsignedInteger('seller_sku_id')->nullable();
             $table->unsignedInteger('shop_id')->nullable();
-            $table->text('name');
-            $table->binary('short_description');
+            $table->binary('short_description')->nullable();
             $table->binary('description')->nullable();
             $table->string('brand')->nullable();
             $table->string('model')->nullable();
@@ -40,7 +41,7 @@ class CreateProductsTable extends Migration
             $table->string('min_delivery_time')->nullable();
             $table->string('Available')->nullable();
             $table->string('Status')->nullable();
-            $table->integer('seen')->nullable();
+            $table->integer('seen')->nullable()->default(0);
             $table->timestamps();
         });
     }

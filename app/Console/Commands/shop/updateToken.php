@@ -38,7 +38,7 @@ class updateToken extends Command
      */
     public function handle()
     {
-        $shops = Shop::all();
+        $shops = Shop::where('site', 'lazada')->get();
         foreach($shops as $shop){
             $shop->refreshToken();
             $shop->touch();

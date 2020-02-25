@@ -79,7 +79,7 @@
                 </a>
                 <ul class="menu-content">
                     <li class="">
-                        <a href="{{url("/product")}}">
+                        <a href="{{url('/product')}}?site=lazada">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">List Products</span>
                         </a>
@@ -101,7 +101,7 @@
                 </a>
                 <ul class="menu-content">
                     <li class="">
-                        <a href="{{url("/order")}}">
+                        <a href="{{url('/order')}}?site=lazada">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">All Orders</span>
                             @if($sidebar_data['order_all']>0)
@@ -110,7 +110,7 @@
                         </a>
                     </li>
                     <li class="">
-                        <a href="{{url("/orders_pending")}}">
+                        <a href="{{url('/order')}}?site=lazada&status=pending">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Pending</span>
                             @if($sidebar_data['order_pending']>0)
@@ -119,7 +119,7 @@
                         </a>
                     </li>
                     <li class="">
-                        <a href="{{url("/orders_printing")}}">
+                        <a href="{{url('/order')}}?site=lazada&printed=false">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">For Printing</span>
                             @if($sidebar_data['order_printing']>0)
@@ -128,7 +128,7 @@
                         </a>
                     </li>
                     <li class="">
-                        <a href="{{url("/orders_ready_to_ship")}}">
+                        <a href="{{url('/order')}}?site=lazada&status=ready_to_ship">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Ready to ship</span>
                             @if($sidebar_data['order_ready']>0)
@@ -137,7 +137,7 @@
                         </a>
                     </li>
                     <li class="">
-                        <a href="{{url("/orders_shipped")}}">
+                        <a href="{{url('/order')}}?site=lazada&status=shipped">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Shipped</span>
                             @if($sidebar_data['order_shipped']>0)
@@ -146,7 +146,7 @@
                         </a>
                     </li>
                     <li class="">
-                        <a href="{{url("/orders_delivered")}}">
+                        <a href="{{url('/order')}}?site=lazada&status=delivered">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Delivered</span>
                             @if($sidebar_data['order_delivered']>0)
@@ -154,15 +154,6 @@
                             @endif
                         </a>
                     </li>
-                    
-                    
-                    
-                    <!--<li class="">-->
-                    <!--    <a href="{{url("/shop/create")}}">-->
-                    <!--        <i class="feather icon-plus"></i>-->
-                    <!--        <span class="menu-title" data-i18n="">Add Shop</span>-->
-                    <!--    </a>-->
-                    <!--</li>-->
                 </ul>
             </li>
             

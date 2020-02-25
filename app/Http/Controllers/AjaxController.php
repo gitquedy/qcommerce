@@ -15,10 +15,6 @@ use DB;
 class AjaxController extends Controller
 {
     public function get_notification(){
-        
-        
-        
-        
         $Shop = Shop::get_auth_shops();
         
         $Shop_array = array();

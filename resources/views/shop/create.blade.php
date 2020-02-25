@@ -24,7 +24,6 @@
                 </div>
               </div>
               <br>
-
               <p><b>Step 1</b> : <button class="btn btn-primary continue"><i class="fa fa-check"></i> Connect Shop by clicking here</button></p>
               <p><b>Step 2</b> : Login Your e-commerce and click "Authorized"</p>
               <p><b>Step 3</b> : Put your store name and set your preferred shortname (usually 2-3 character)</p>

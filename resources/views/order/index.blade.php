@@ -18,17 +18,42 @@
 @section('content')
 {{-- Data list view starts --}}
 <section class="card">
+  <div class="card-header">
+    <h4 class="card-title">Filter </h4>
+  </div>
     <div class="card-content">
       <div class="card-body">
         <div class="row">
-      <!--     <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Order ID:
-            </div>
-            <div class="form-group">
-              <input type="text" id="search" class="form-control inputSearch" placeholder="Input order id here..">
-            </div>
-          </div> -->
+          <div class="col-sm-4">
+            <ul class="list-unstyled mb-0">
+              <li class="d-inline-block mr-2">
+                <fieldset>
+                 <div class="vs-radio-con">
+                    <input type="radio" id="site" name="site"  value="lazada" {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+                    <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                    <span class="">Lazada</span>
+                  </div>
+                </fieldset>
+              </li>
+              <li class="d-inline-block mr-2">
+                <fieldset>
+                  <div class="vs-radio-con">
+                    <input type="radio" id="site" name="site" value="shopee" {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
+                    <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                    <span class="">Shopee</span>
+                  </div>
+                </fieldset>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <br><div class="row">
           <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Shop:
@@ -49,7 +74,7 @@
             <div class="form-group">
               <select name="status[]" id="status" class="select2 form-control selectFilter" multiple="multiple">
                 @foreach($statuses as $status)
-                  <option value="{{ $status }}" {{ $status == 'pending' || $status == 'ready_to_ship' || $status == 'shipped' ? 'selected' : '' }}>{{ ucwords(str_replace("_"," ", $status)) }}</option>
+                  <option value="{{ $status }}" {{ in_array($status, $selectedStatuses) ? 'selected' : '' }}>{{ ucwords(str_replace("_"," ", $status)) }}</option>
                 @endforeach
               </select>
             </div>
@@ -66,6 +91,23 @@
                 <option value="Last_7_days">Last 7 days</option>
                 <option value="Last_30_days">Last 30 days</option>
                 <option value="This_Month">This Month</option>
+              </select>
+            </div>
+            <input type="hidden" id="printed" value="{{ $request->get('printed') ? true : false }}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 col-12">
+        </div>
+        <div class="col-sm-4 col-12 shipping_status">
+            <div class="text-bold-600 font-medium-2">
+              Shipping Status:
+            </div>
+            <div class="form-group">
+              <select name="shipping_status" id="shipping_status" class="select2 form-control selectFilter">
+                <option value="All">All</option>
+                <option value="to_process">To Process</option>
+                <option value="processed">Processed</option>
               </select>
             </div>
         </div>
@@ -96,7 +138,7 @@
         <thead>
           <tr>
             <th>For Checkbox</th>
-            <th>Order Number</th>
+            <th> {{ $request->get('site') == 'shopee' ?  'Order SN' : 'Order Number'  }}</th>
             <th>Seller</th>
             <th>Creation Date</th>
             <!-- <th>Creation Date</th> -->
@@ -136,9 +178,10 @@
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
+     var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
-            { data: 'id', name: 'id', orderable : false},
-            { data: 'id', name: 'id'},
+            { data: id, name: id, orderable : false},
+            { data: id, name: id},
             { data: 'shop', name: 'shop.short_name'},
             { data: 'created_at_formatted', name: 'created_at' },
             // { data: 'created_at', name: 'created_at' },
@@ -154,6 +197,9 @@
                 data.shop = $("#shop").val();
                 data.status = $("#status").val();
                 data.timings = $("#timings").val();
+                data.printed = $("#printed").val();
+                data.site = $('input[name="site"]:checked').val();
+                data.shipping_status =  $("#shipping_status").val();
             }
         };
   var buttons = [
@@ -175,15 +221,34 @@
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
     $(document).ready(function(){
+      var str = $('#status').val(); 
+      hideShippingStatus(str);
+
+
+      $('input[name="site"]').change(function(){
+        var site = $('input[name="site"]:checked').val();
+        url = "{{ action('OrderController@index')}}?site=" + site;
+        window.location.href = url;
+      });
       $(".select2").select2({
         dropdownAutoWidth: true,
         width: '100%'
       });
+
+      $('#status').change(function(){
+        var str = $(this).val(); 
+        hideShippingStatus(str);
+      });
+
+      function hideShippingStatus(str){
+        if(str.includes('READY_TO_SHIP') == true){
+          $('.shipping_status').show();
+        }else{
+          $('.shipping_status').hide();
+        }
+      }
+
   });  
-  
-  
-  
-  
   
   function print_label(){
       var selected_ids = [];

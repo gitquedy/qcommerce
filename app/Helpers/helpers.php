@@ -206,7 +206,7 @@ class Helper
         $order_printing = Order::whereIn('shop_id',$shop_array)->where('printed','=','0')->get()->count();
         $order_ready = Order::whereIn('shop_id',$shop_array)->where('status','=','ready_to_ship')->get()->count();
         $order_shipped = Order::whereIn('shop_id',$shop_array)->where('status','=','shipped')->get()->count();
-        $order_delivered = Order::whereIn('shop_id',$shop_array)->where('status','=','delivered')->get()->count();
+        $order_delivered = Order::whereIn('shop_id',$shop_array)->whereIn('status',['delivered', 'COMPLETED'])->get()->count();
         
         $result['order_all'] = $order_all;
         $result['order_pending'] = $order_pending;

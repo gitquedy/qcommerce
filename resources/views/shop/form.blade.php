@@ -17,7 +17,7 @@
               </div>
               <div class="card-content">
                   <div class="card-body">
-                      <form action="{{ action('ShopController@store') }}" method="POST" class="faorm" enctype="multipart/form-data">
+                      <form action="{{ action('ShopController@store') }}" method="POST" class="form" enctype="multipart/form-data">
                           @csrf
                           <input type="hidden" name="code" value="{{ $request->get('code') }}">
                           <input type="hidden" name="shop_id" value="{{ $request->get('shop_id') }}">

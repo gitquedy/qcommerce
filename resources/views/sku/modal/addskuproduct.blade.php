@@ -17,7 +17,7 @@
         <select name="shop" id="ap_shop" class="select2 form-control ap_reset">
           <option value="" disabled hidden selected></option>
           @foreach($all_shops as $shop)
-            <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</option>
+            <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }} - {{ ucfirst($shop->site) }}</option>
           @endforeach
         </select>
       </div>

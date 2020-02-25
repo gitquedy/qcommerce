@@ -26,10 +26,7 @@ class ShopController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        
-
-        
+    { 
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
@@ -61,9 +58,7 @@ class ShopController extends Controller
                         })
             ->addColumn('orders', function(Shop $shop) {
                             $html = $shop->orders()->whereDate('created_at','=',date('Y-m-d'))->count();
-                            
                             $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$html.'</div></div></div>';
-                            
                            return $html;
                         })
             ->addColumn('pending_count', function(Shop $shop) {
@@ -85,12 +80,10 @@ class ShopController extends Controller
             ->addColumn('products', function(Shop $shop) {
                            $product_count =  Products::where('shop_id','=',$shop->id)->get()->count();
                            return '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$product_count.'</div></div></div>';
-                           
                         })
             ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products'])
             ->make(true);
         }
-
         return view('shop.index', [
             'breadcrumbs' => $breadcrumbs,
         ]);
@@ -112,11 +105,6 @@ class ShopController extends Controller
      */
     public function create()
     {  
-        $request = new Shopee('shop/get');
-        $request->addApiParam('shopid', 90958825);
-        $request = $request->execute();
-
-
         $breadcrumbs = [
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
@@ -149,14 +137,13 @@ class ShopController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), ['name' => ['required'], 'short_name' => 'required']);
+        $validator = Validator::make($request->all(), ['name' => ['required', 'regex:/^[\pL\s\-]+$/u'], 'short_name' => 'required'], ['name.regex' => 'Only character\'s are allowed']);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
             }
         try {
             $data = $request->all();
-            die(var_dump($data));
             DB::beginTransaction();
             if($data['code'] != null){
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
@@ -184,18 +171,50 @@ class ShopController extends Controller
                 $data['email'] = $responseData['account'];
                 $data['expires_in'] = Carbon::now()->addDays(6);
                 $data['user_id'] = $request->user()->id;
+                $data['site'] = 'lazada';
                 $shop = Shop::create($data);
-            }else if($data['shop_id'] != null){
                 $output = ['success' => 1,
-                        'msg' => 'Shop added successfully!1111',
+                    'msg' => 'Shop added successfully!',
+                    'redirect' => action('ShopController@index')
+                ];
+            }else if($data['shop_id'] != null){
+                $client = new \Shopee\Client([
+                    'secret' => Shopee::shopee_app_key(),
+                    'partner_id' => Shopee::shopee_partner_id(),
+                    'shopid' => (int) $data['shop_id'],
+                ]);
+                $client = $client->shop->getShopInfo()->getData();
+                if(array_key_exists('error', $client)){
+                    $output = ['success' => 0,
+                        'msg' => 'Sorry something went wrong, please try again later. '. $client['error'] .': [ '. $client['msg'] .' ]',
+                        'redirect' => action('ShopController@index')
+                    ];
+                    return response()->json($output);
+                }
+                $shop = Shop::where('shop_id', $data['shop_id'])->where('user_id', $request->user()->id)->first();
+                if($shop != null){
+                    $output = ['success' => 0,
+                            'msg' => 'Shop '. $shop->shop_id .' '. $client['shop_name'] .' already exists!',
+                            'redirect' => action('ShopController@index')
+                        ];
+                    return response()->json($output);
+                }
+                $data = [
+                    'expires_in' => Carbon::now()->addDays(364),
+                    'site' => 'shopee',
+                    'shop_id' => $client['shop_id'],
+                    'name' => $data['name'],
+                    'short_name' => $data['short_name'],
+                    'user_id' => $request->user()->id,
+                ];
+                $shop = Shop::create($data);
+                $output = ['success' => 1,
+                        'msg' => 'Shop added successfully!',
                         'redirect' => action('ShopController@index')
                     ];
             }
             DB::commit();
-            // $output = ['success' => 1,
-            //             'msg' => 'Shop added successfully!',
-            //             'redirect' => action('ShopController@index')
-            //         ];
+          
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
@@ -249,5 +268,9 @@ class ShopController extends Controller
     public function destroy(Shop $shop)
     {
         //
+    }
+
+    public function getShop(Shop $shop){
+      die(var_dump($shop));
     }
 }

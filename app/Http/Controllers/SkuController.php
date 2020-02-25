@@ -149,7 +149,7 @@ class SkuController extends Controller
         $sku->name = $request->name;
         $sku->brand = $request->brand;
         $sku->category = $request->category;
-        $sku->suppler = $request->suppler;
+        $sku->supplier = $request->suppler;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
         $sku->quantity = $request->quantity;

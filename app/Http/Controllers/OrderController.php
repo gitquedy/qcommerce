@@ -25,42 +25,67 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        
-        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
         ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
+        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc');
+        if($request->get('site') == 'shopee'){
+           $statuses = Order::$shopee_statuses;
+           $all_shops = $all_shops->where('site', 'shopee');
+           $selectedStatuses = ['UNPAID','READY_TO_SHIP'];
+        }else{
+           $statuses = Order::$statuses;
+           $all_shops = $all_shops->where('site', 'lazada');
+           $selectedStatuses = ['pending','ready_to_ship','shipped'];
+        }
+        if($request->get('status')){
+          $selectedStatuses = [$request->get('status')];
+        }
+
+        $all_shops = $all_shops->get();
         
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
         }
-        
+
         $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
         
         foreach($orders as $ordersVAL){
             $tmp_order = Order::find($ordersVAL->id);
             $tmp_order->seen = 'yes';
             $tmp_order->save();
-            
         }
 
     if ( request()->ajax()) {
         
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
+           $shops_id = $shops->pluck('id')->toArray();
+           $statuses = $request->get('status', ['shipped']);
+           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses);
            if($request->get('shop', 'all') != 'all'){
                 $shops->where('id', $request->get('shop'));
            }
+
+           $orders->where('site', $request->get('site', 'lazada'));
+
+           if($request->get('site') == 'lazada'){
+              $orders->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
+           }else if($request->get('site') == 'shopee'){
+              $orders->orderByRaw('CASE WHEN status = "UNPAID" THEN 1 WHEN status = "READY_TO_SHIP" THEN 2 WHEN status = "SHIPPED" THEN 3 WHEN status = "COMPLETED" THEN 4 else 5 END');
+              if($request->get('shipping_status') != 'ALL'){
+                if($request->get('shipping_status') == 'to_process'){
+                   $orders->where('tracking_no', '=', '');
+                }else if($request->get('shipping_status') == 'processed'){
+                  $orders->where('tracking_no', '!=', '');
+                }
+              }
+           }
+
+           if($request->printed){
+            $orders->where('printed', $request->printed);
+           }
            
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $statuses = $request->get('status', ['shipped']);
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses)->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
            
            if($request->get('timings')=="Today"){
                $orders->whereDate('created_at', '=', date('Y-m-d'));
@@ -112,10 +137,9 @@ class OrderController extends Controller
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
             'statuses' => $statuses,
+            'selectedStatuses' => $selectedStatuses,
         ]);
     }
-    
-
     
     
     
@@ -291,105 +315,7 @@ class OrderController extends Controller
             'all_shops' => $all_shops,
             'statuses' => $statuses,
         ]);
-    }
-    
-    
-    
-    
-    
-    
-    public function orders_ready_to_ship(Request $request)
-    {
-        $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders Ready to ship"]
-        ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
-        $statuses = Order::$statuses;
-        // foreach($all_shops as $shopSync){
-        //     $shopSync->syncOrders(Carbon::now()->subDays(2)->format('Y-m-d'), '+1 day');
-        // }
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-            
-        }
-
-    if ( request()->ajax()) {
-        
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
-           }
-           
-           
-           $shops_id = $shops->pluck('id')->toArray();
-           $statuses = array('ready_to_ship');
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses)->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
-           
-           if($request->get('timings')=="Today"){
-               $orders->whereDate('created_at', '=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Yesterday"){
-                $date=date_create();
-                date_modify($date,"-1 days");
-               $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-           }
-           
-           if($request->get('timings')=="Last_7_days"){
-                $date=date_create();
-                date_modify($date,"-7 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="This_Month"){
-                $orders->where('created_at', '>=', date("Y-m-01"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-           if($request->get('timings')=="Last_30_days"){
-                $date=date_create();
-                date_modify($date,"-30 days");
-                $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                $orders->where('created_at', '<=', date('Y-m-d'));
-           }
-           
-            return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
-                ->addColumn('statusDisplay', function(Order $order) {
-                            return ucwords(str_replace('_', ' ', $order->status));
-                                })
-                ->addColumn('actions', function(Order $order) {
-                            return $order->getActionsDropdown();
-                                })
-                ->addColumn('created_at_formatted', function(Order $order) {
-                            return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                })
-                ->rawColumns(['actions'])
-                ->make(true);
-        }
-        
-        return view('order.ready_to_ship', [
-            'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
-            'statuses' => $statuses,
-        ]);
-    }
-    
-    
-    
+    }  
     
     public function orders_shipped(Request $request)
     {
@@ -642,6 +568,35 @@ class OrderController extends Controller
         //
     }
 
+    public function cancelModal(Order $order){
+
+      return view ('order.cancel', compact('order'));
+    }
+
+    public function cancelSubmit(Order $order, Request $request){
+      try {
+            DB::beginTransaction();
+            $client =  $order->shop->shopeeGetClient();
+            $result = $client->order->cancelOrder(['ordersn' => $order->ordersn, 'cancel_reason' => $request->reason])->getData();
+            if(isset($result['modified_time'])){
+              $order->update(['status' => 'CANCELLED']);
+            }
+            DB::commit();
+            $output = ['success' => 1,
+                        'msg' => $order->ordersn . ' Successfully cancelled!'
+                    ];
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+      return response()->json($output);
+    }
+
+
+
     public function cancel(Order $order,Request $request){
         try {
             $msg = $request->get('input');
@@ -667,6 +622,62 @@ class OrderController extends Controller
         }
         return response()->json($output);
     }    
+
+    
+
+   public function readyToShipShopee(Order $order,Request $request){
+       return view ('order.ready_to_ship', compact('order'));
+   }
+   public function pickupDetailsShopee(Order $order,Request $request){
+    $client = $order->shop->shopeeGetClient();
+    $info = $client->logistics->getLogisticInfo(['ordersn' => $order->ordersn])->getData();
+    $counter = 0;
+    
+    foreach($info['pickup']['address_list'] as $i){
+      $timeslot = 0;
+      foreach($i['time_slot_list'] as $d){
+        $info['pickup']['address_list'][$counter]['time_slot_list'][$timeslot]['date'] = Carbon::createFromTimestamp($d['date'])->toDateString();
+        $timeslot += 1;
+      }
+      $counter += 1;
+    }
+    return view ('order.pickup_details', compact('order', 'info'));
+   }
+   public function pickupDetailsPostShopee(Order $order,Request $request){
+    try {
+      $client = $order->shop->shopeeGetClient();
+      $params = ['ordersn' => $order->ordersn ,
+       'pickup' => ['pickup_time_id' => $request->pickup_time_id, 'address_id' => (int)$request->address_id]
+      ];
+      $result = $client->logistics->init($params)->getData();
+      $order->update(['tracking_no' => '123']);
+      $output = ['success' => 1,
+                    'msg' => 'Ready to ship Order Serial No: ' . $order->ordersn,
+                ];
+    } catch (\Exception $e) {
+        \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        $output = ['success' => 0,
+                    'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                ];
+         DB::rollBack();
+    }
+    return response()->json($output);
+   }
+   
+
+   public function readyToShipDropOff(Order $order,Request $request){
+      $client = $order->shop->shopeeGetClient();
+  
+      $branch = $client->logistics->getBranch(['ordersn' => $order->ordersn])->getData();
+      if(isset($branch['msg'])){
+        $request->session()->flash('flash_error', $order->ordersn. ' ' .$branch['msg']);
+          return redirect(action('OrderController@index'). '?site=shopee');
+      }
+      $params = ['ordersn' => $order->ordersn, 'dropoff' => ['branch_id' => $branch['branch']['branch_id']]];
+      $result = $client->logistics->init($params)->getData();
+      $request->session()->flash('flash_success', 'Ready to ship: Tracking No: ' . $result['tracking_number']);
+      return redirect(action('OrderController@index'). '?site=shopee');
+   }
 
     public function readyToShip(Order $order,Request $request){
         $order_id = $request->get('order_id');
@@ -732,27 +743,34 @@ class OrderController extends Controller
     
     
     public function print_shipping($order_id="",Request $request){
-        
             $order = Order::where('id', "=", $order_id)->first();
-            $order->printed = true;
-            $order->save();
+            if($order->site == 'lazada'){
+              $order->printed = true;
+              $order->save();
 
-            $Result = Order::get_shipping_level($order_id);
-            $jsOBJ = json_decode($Result);
-            
-            if($jsOBJ->code==0){
-                if(isset($jsOBJ->data->document->file)){
-                    $document = base64_decode($jsOBJ->data->document->file);
-                    echo $document;
-                }
-            
+              $Result = Order::get_shipping_level($order_id);
+              $jsOBJ = json_decode($Result);
+              
+              if($jsOBJ->code==0){
+                  if(isset($jsOBJ->data->document->file)){
+                      $document = base64_decode($jsOBJ->data->document->file);
+                      echo $document;
+                  }
+              
+              }else{
+                  $request->session()->flash('flash_error',$Result);
+                  return redirect('/order?site=lazada');
+              }
             }else{
-                $request->session()->flash('flash_error',$Result);
-                return redirect('/order');
+              $client =$order->shop->shopeeGetClient();
+              $result = $client->logistics->getAirwayBill(['ordersn_list' => [$order->ordersn]])->getData();
+              if(count($result['result']['airway_bills']) > 0){
+                return redirect($result['result']['airway_bills'][0]['airway_bill']);
+              }else{
+                  $request->session()->flash('flash_error',$result['result']['errors'][0]['error_description']);
+                  return redirect('/order?site=shopee');
+              }
             }
-            
-            
-        
     }
     
     public function print_shipping_mass(Request $request){

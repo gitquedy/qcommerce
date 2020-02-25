@@ -44,6 +44,7 @@ class syncOrders extends Command
         $shops = Shop::all();
         foreach($shops as $shop){
             $shop->syncOrders(Carbon::now()->subDays(7)->format('Y-m-d'), '+2 day');
+            $shop->syncShopeeProducts(Carbon::now()->subDays(7)->format('Y-m-d'), '+2 day');
             $shop->touch();
             echo 'Synced Orders Successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
         }

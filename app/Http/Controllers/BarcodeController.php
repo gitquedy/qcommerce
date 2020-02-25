@@ -50,39 +50,63 @@ class BarcodeController extends Controller
         $order = Order::whereIn('shop_id',$Shop_array)->where(function($query) use ($input)
                 {
                     $query->where('tracking_no','=', $input)
-                    ->orWhere('id','=',$input);
+                    ->orWhere('id','=',$input)
+                    ->orWhere('ordersn', $input);
                 })->get()->first();
         if($order) {
+            $items = [];
+            $items_sku = [];
             $shop = Shop::whereId($order->shop_id)->get()->first();
-            $code = $order->id;
-            $api_key = Lazop::get_api_key();
-            $api_secret = Lazop::get_api_secret();
-            $accessToken = $shop->access_token;
-            $client = new LazopClient("https://api.lazada.com.ph/rest", $api_key, $api_secret);
-            $r = new LazopRequest("/order/items/get",'GET');
-            $r->addApiParam("order_id", $code);
-            $response = $client->execute($r, $accessToken);
-            $data = json_decode($response, true);
-            $items = array();
-            $items_sku = array();
-            foreach ($data['data'] as $item) {
-                $sku = $item['sku'];
-                if(!in_array($sku, $items_sku)) {
-                    array_push($items_sku, $sku);
-                    $items[$sku] = array(
-                        'sku' => $sku,
-                        'pic' => $item['product_main_image'],
-                        'name' => $item['name'],
-                        'qty' => 1,
-                    );
+            if($order->site == 'lazada'){
+                $code = $order->id;
+                $api_key = Lazop::get_api_key();
+                $api_secret = Lazop::get_api_secret();
+                $accessToken = $shop->access_token;
+                $client = new LazopClient("https://api.lazada.com.ph/rest", $api_key, $api_secret);
+                $r = new LazopRequest("/order/items/get",'GET');
+                $r->addApiParam("order_id", $code);
+                $response = $client->execute($r, $accessToken);
+                $data = json_decode($response, true);
+                foreach ($data['data'] as $item) {
+                    $sku = $item['sku'];
+                    if(!in_array($sku, $items_sku)) {
+                        array_push($items_sku, $sku);
+                        $items[$sku] = array(
+                            'sku' => $sku,
+                            'pic' => $item['product_main_image'],
+                            'name' => $item['name'],
+                            'qty' => 1,
+                        );
+                    }
+                    else {
+                        $items[$sku]['qty'] += 1;
+                    }
                 }
-                else {
-                    $items[$sku]['qty'] += 1;
+                
+            } else if ($order->site == 'shopee'){
+                $client = $shop->shopeeGetClient();
+                $data = $client->order->getOrderDetails(['ordersn_list' => array_values([$order->ordersn])])->getData();
+                foreach ($data['orders'][0]['items'] as $item) {
+                    $sku = $item['item_sku'];
+                    if(!in_array($sku, $items_sku)) {
+                        array_push($items_sku, $sku);
+                        $items[$sku] = array(
+                            'sku' => $sku,
+                            'pic' => '',
+                            'name' => $item['item_name'],
+                            'qty' => 1,
+                        );
+                    }
+                    else {
+                        $items[$sku]['qty'] += 1;
+                    }
                 }
+            }else{
+                $result['error'] = "Invalid Code.";
             }
-
             $result['data']['order'] = $order;
             $result['data']['items'] = $items;
+            
         }
         else {
             $result['error'] = "Invalid Code.";
@@ -115,7 +139,6 @@ class BarcodeController extends Controller
                 $shop_id = $request->shop_id;
                 $access_token = Shop::find($shop_id)->access_token;
                 $prod = Products::where('SellerSku', $sku)->first();
-                
                 if($prod->seller_sku_id) {
                     $sku = Sku::whereId($prod->seller_sku_id)->first();
                     $sku->quantity -= $qty;

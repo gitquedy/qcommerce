@@ -17,12 +17,13 @@ class CreateShopTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('shop_id')->nullable();
             $table->string('name');
             $table->string('short_name');
             $table->string('site')->nullable();
-            $table->string('email');
-            $table->string('refresh_token');
-            $table->string('access_token');
+            $table->string('email')->nullable();
+            $table->string('refresh_token')->nullable();
+            $table->string('access_token')->nullable();
             $table->string('expires_in');
             $table->string('is_first_time')->default(true);
             $table->string('active')->default('2');

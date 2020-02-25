@@ -18,11 +18,14 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['user_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time'];
+    protected $fillable = ['user_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
     ];
+
+    public static $shopee_statuses = ['UNPAID','READY_TO_SHIP','RETRY_SHIP','SHIPPED','TO_CONFIRM_RECEIVE','IN_CANCEL','CANCELLED','TO_RETURN','COMPLETED'];
+    //pending = READY_TO_SHIP
     
     public function products(){
 		return $this->belongsTo(Products::class, 'id','shop_id');
@@ -30,72 +33,172 @@ class Shop extends Model
     
     public function syncOrders($date = '2018-01-01', $step = '+3 day'){
         try {
-        $this->update(['active' => 2]);
-        $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
-        $created_before_increment = 1;
-        $orders = [];
-        $length = count($dates);
-        foreach($dates as $index => $date){
-            $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
-            $created_before_increment += 1;
-            $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-            $r = new LazopRequest('/orders/get','GET');
-            $r->addApiParam('created_after', $date);
-            $r->addApiParam('created_before', $created_before);
-            $r->addApiParam('sort_by','updated_at');
-            $result = $c->execute($r, $this->access_token);
-            $data = json_decode($result, true);
-            if(isset($data['data']['orders'])){
-                $orders = array_merge_recursive($data['data']['orders'], $orders);
+            $this->update(['active' => 2]);
+            if($this->site == 'lazada'){
+                $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
+                $created_before_increment = 1;
+                $orders = [];
+                $length = count($dates);
+                foreach($dates as $index => $date){
+                    $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
+                    $created_before_increment += 1;
+                    $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+                    $r = new LazopRequest('/orders/get','GET');
+                    $r->addApiParam('created_after', $date);
+                    $r->addApiParam('created_before', $created_before);
+                    $r->addApiParam('sort_by','updated_at');
+                    $result = $c->execute($r, $this->access_token);
+                    $data = json_decode($result, true);
+                    if(isset($data['data']['orders'])){
+                        $orders = array_merge_recursive($data['data']['orders'], $orders);
+                    }
+                }
+                if($orders){
+                    $orders = array_map(function($order){
+                        $status = $order['statuses'][0];
+                        $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
+                        $order['printed'] = $printed;
+                        unset($order['statuses']);
+                        unset($order['address_billing']);
+                        unset($order['address_shipping']);
+                        unset($order['order_number']);  
+                        $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
+                        unset($order['order_id']);     
+                        $record = Order::updateOrCreate(
+                        ['id' => $order['id']], $order);
+                        return $order;
+                    }, $orders);
+                }
+            }else if($this->site == 'shopee'){
+                
+                $orders = $this->shopeeGetOrdersPerDate($date);
+                $this->shopeeSaveOrdersPerSN($orders);
+                
             }
-        }
-        if($orders){
-            $orders = array_map(function($order){
-                $status = $order['statuses'][0];
-                unset($order['statuses']);
-                unset($order['address_billing']);
-                unset($order['address_shipping']);
-                unset($order['order_number']);  
-                $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id]);
-                unset($order['order_id']);     
-                $record = Order::updateOrCreate(
-                ['id' => $order['id']], $order);
-                return $order;
-            }, $orders);
-        }
-        $this->update(['active' => 1, 'is_first_time' => false]);
+             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
                         'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
                     ];
         }
-        return $data;
+        // return $data;
+    }
+
+    public function shopeeGetClient(){
+        return new \Shopee\Client(['secret' => Shopee::shopee_app_key(), 'partner_id' => Shopee::shopee_partner_id(),
+                    'shopid' => $this->shop_id,
+                ]);;
+    }
+
+    public function shopeeGetOrdersPerDate($date){
+        $client = $this->shopeeGetClient();
+        $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+1 day');
+        $orders  = [];
+        $created_before_increment = 1;
+        foreach($dates as $date){
+            $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
+            $created_before_increment += 1;
+            $more = true;
+            $offset = 0;
+            while($more){
+                $params = [
+                    'create_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
+                    'create_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
+                    'pagination_entries_per_page' => 100,
+                    'pagination_offset' => $offset,
+                ];
+                $offset += 100;
+                $result = $client->order->getOrdersList($params)->getData();
+                if(isset($result['orders'])){
+                    $more = $result['more'];
+                    if(count($result['orders']) > 0){
+                        foreach($result['orders'] as $order){
+                            $orders[] = $order;
+                        }
+                    }
+                }
+            }
+        }
+        return $orders;
+    }
+
+    public function shopeeSaveOrdersPerSN($orders){
+        $client = $this->shopeeGetClient();
+        $orders = array_chunk($orders,50);
+        $ordersn_list = [];
+        foreach($orders as $order){
+            $ordersn_list = [];
+            foreach($order as $o){
+                $ordersn_list[] = $o['ordersn'];
+            }
+            $order_details = $client->order->getOrderDetails(['ordersn_list' => array_values($ordersn_list)])->getData();
+            if(isset($order_details['orders'])){
+                foreach($order_details['orders'] as $order){
+                    $printed = $order['order_status'] == 'READY_TO_SHIP' || $order['order_status'] == 'RETRY_SHIP' || $order['order_status'] == 'UNPAID' ? false : true;
+                    $orders_details = [
+                        'ordersn' => $order['ordersn'],
+                        'payment_method' => $order['payment_method'],
+                        'price' => $order['total_amount'],
+                        'created_at' => Carbon::createFromTimestamp($order['create_time'])->toDateTimeString(),
+                        'updated_at' => Carbon::createFromTimestamp($order['update_time'])->toDateTimeString(),
+                        'shop_id' => $this->id,
+                        'site' => 'shopee',
+                        'items_count' => count($order['items']),
+                        'status' => $order['order_status'],
+                        'tracking_no' => $order['tracking_no'],
+                        'shipping_fee' => $order['actual_shipping_cost'],
+                        'customer_first_name' => $order['recipient_address']['name'],
+                        'printed' => $printed,
+                    ];
+                    $record = Order::updateOrCreate(
+                    ['ordersn' => $orders_details['ordersn']], $orders_details);
+                }
+            }
+        }
     }
 
     public function refreshToken(){
-        $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-        $r = new LazopRequest('/auth/token/refresh');
-        $r->addApiParam('refresh_token', $this->refresh_token);
-        $result = $c->execute($r);
-        $response = json_decode($result, true);
-        if(! isset($response['message'])){
-            $data = [
-                'refresh_token' => $response['refresh_token'],
-                'access_token' => $response['access_token'],
-                'expires_in' => Carbon::now()->addDays(6),
-            ];
-            $this->update($data);
-            return true;
-        }else{
-            return false;
+        if($this->site == 'lazada'){
+            $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+            $r = new LazopRequest('/auth/token/refresh');
+            $r->addApiParam('refresh_token', $this->refresh_token);
+            $result = $c->execute($r);
+            $response = json_decode($result, true);
+            if(! isset($response['message'])){
+                $data = [
+                    'refresh_token' => $response['refresh_token'],
+                    'access_token' => $response['access_token'],
+                    'expires_in' => Carbon::now()->addDays(6),
+                ];
+                $this->update($data);
+                return true;
+            }else{
+                return false;
+            }
         }
     }
 
     public function orders($status = null){
         $orders = $this->hasMany(Order::class, 'shop_id', 'id');
         if($status){
-            $orders->where('status', $status);
+            if($this->site == 'lazada'){
+                $orders->where('status', $status);
+            }else if($this->site == 'shopee'){
+                if($status == 'pending'){
+                    $orders->where('status','READY_TO_SHIP');
+                }
+                else if($status == 'ready_to_ship'){
+                    $orders->where('status','READY_TO_SHIP');
+                }
+                else if($status == 'shipped'){
+                    $orders->where('status','SHIPPED');
+                }
+                else if($status == 'delivered'){
+                   $orders->where('status','COMPLETED');
+                }
+            }
+            
         }
         return $orders;
     }
@@ -110,46 +213,66 @@ class Shop extends Model
         
     }
 
-    // public static function dummyOrder(){
-    //     return ['data' => ['count' => [0], 'orders' => []], 'code' => [], 'request_id' => []];
-    // }
+    public function syncShopeeProducts($date = '2018-01-01', $step = '+10 day'){
+        if($this->site == 'shopee'){
+            $client = $this->shopeeGetClient();
+            $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', $step);
+            $products = [];
+            $created_before_increment = 1;
+            foreach($dates as $date){
+                $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
+                $created_before_increment += 1;
+                $more = true;
+                $offset = 0;
+                while($more){
+                    $params = [
+                        'update_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
+                        'update_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
+                        'pagination_entries_per_page' => 100,
+                        'pagination_offset' => $offset,
+                    ];
+                    $offset += 100;
+                    $result = $client->item->getItemsList($params)->getData();
+                    if(isset($result['items'])){
+                        $more = $result['more'];
+                        if(count($result['items']) > 0){
+                            foreach($result['items'] as $product){
+                                $products[] = $product;
+                            }
+                        }
+                    }else{
+                        $more = false;
+                    }
+                }
+            }
+            $this->shopeeSaveProductsPerItem($products);
+        }
+        
+    }
 
-    // public function getTotalOrders($status = null){
-    //         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-    //         $r = new LazopRequest('/orders/get','GET');
-    //         $r->addApiParam('created_before', Carbon::now()->addYears(3)->format('c'));
-    //         if($status){
-    //             $r->addApiParam('status', $status);
-    //         }
-    //         $r->addApiParam('sort_direction','DESC');
-    //         $r->addApiParam('update_after', Carbon::now()->subYears(3)->format('c'));
-    //         $r->addApiParam('sort_by','updated_at');
-    //         $result = $c->execute($r, $this->access_token);
-    //         $data = json_decode($result, true);
-    //         if(! isset($data['message'])){
-    //             $data['data']['orders'] = array_map(function($data){
-    //                 $str_status = ucwords(str_replace("_"," ", $data['statuses'][0]));
-    //                 return array_merge($data, ['seller' => $this->name, 'status' => $str_status, 'seller_id' => $this->id]);
-    //             }, $data['data']['orders']);
-    //         }
-    //         return $data;
-    // }
-
-    // public function searchOrderID(){
-    //         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-    //         $r = new LazopRequest('/order/get','GET');
-    //         $r->addApiParam("order_id", $this->id);
-    //         $result = $c->execute($r, $this->access_token);
-    //         $data = json_decode($result, true);
-    //         if(! isset($data['message'])){
-    //             $data['data']['status'] = ucwords(str_replace("_"," ", $data['data']['statuses'][0]));
-    //             $data['data']['seller'] = $this->name;
-    //             $data['data']['seller_id'] = $this->id;
-    //         }else{
-    //             return $this->dummyOrder();
-    //         }
-    //         $data['data']['orders'] = [$data['data']];
-    //         $data['data']['count'] = [1];
-    //         return $data;
-    // }
+    public function shopeeSaveProductsPerItem($products){
+        $client = $this->shopeeGetClient();
+        foreach($products as $product){
+            if(isset($product['item_id'])){
+                $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData();
+                if(count($product_details['item']) > 0){
+                    $product_details = [
+                    'shop_id' => $this->id,
+                    'site' => 'shopee',
+                    'SkuId' => $product_details['item']['item_sku'],
+                    'SellerSku' => $product_details['item']['item_sku'],
+                    'item_id' => $product_details['item']['item_id'],
+                    'price' => $product_details['item']['price'],
+                    'Images' => implode('|', $product_details['item']['images']),
+                    'name' => $product_details['item']['name'],
+                    'Status' => $product_details['item']['status'],
+                    'created_at' => Carbon::createFromTimestamp($product_details['item']['create_time'])->toDateTimeString(),
+                    'updated_at' => Carbon::createFromTimestamp($product_details['item']['update_time'])->toDateTimeString(),
+                    ];
+                    $record = Products::updateOrCreate(
+                    ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                }
+            }
+        }
+    }
 }

@@ -21,7 +21,7 @@ class Sku extends Model
     protected $table = 'sku';
     	
     
-    protected $fillable = ['item_id', 'shop_id', 'SellerSku', 'primary_category', 'name', 'brand', 'cost', 'price', 'quantity', 'Available', 'updated_at', 'created_at'];
+    protected $fillable = ['item_id', 'shop_id', 'SellerSku', 'primary_category', 'name', 'brand', 'supplier' , 'cost', 'price', 'quantity', 'Available', 'updated_at', 'created_at'];
     
     
     

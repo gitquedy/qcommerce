@@ -25,14 +25,17 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        
+    { 
         $Products_unseen =  Products::where('seen','=',0);
-        
-        
-        
-        
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+     
+        $all_shops = Shop::where('user_id', $request->user()->id);
+        if($request->get('site') == 'shopee'){
+           $all_shops = $all_shops->where('site', 'shopee');
+        }else{
+           $all_shops = $all_shops->where('site', 'lazada');
+        }
+
+        $all_shops = $all_shops->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
@@ -44,21 +47,14 @@ class ProductController extends Controller
             $tmp_pro = Products::find($Products_unseenVAL->id);
             $tmp_pro->seen = 1;
             $tmp_pro->save();
-            
         }
-        
-        
-        
+
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
         ];
         
-        
-        
-        
         $statuses = array();
 
-        
         if ( request()->ajax()) {
             
                
@@ -69,6 +65,8 @@ class ProductController extends Controller
                }else{
                    $Products->whereIn('shop_id', $Shop_array);
                }
+
+               $Products->where('site', $request->get('site', 'lazada'));
                
                 return Datatables::eloquent($Products)
                 ->addColumn('shop', function(Products $product) {
@@ -83,19 +81,30 @@ class ProductController extends Controller
                     return $image_url;
                                     })
                 ->addColumn('action', function(Products $product) {
-                                return '<div class="btn-group dropup mr-1 mb-1">
+                    $actions = '';
+                    if($product->site == 'lazada'){
+                        $actions = '<div class="btn-group dropup mr-1 mb-1">
                         <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                         Action<span class="sr-only">Toggle Dropdown</span></button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
                             <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                             <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
-                            
                         </div></div>';
-                                    })
+                    }else if($product->site == 'shopee'){
+                        $actions = '<div class="btn-group dropup mr-1 mb-1">
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        Action<span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>';
+                            // <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                            // <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                        $actions .= '</div></div>';
+                    }
+                    return $actions;
+                    })
                     ->make(true);
             }
-            
             return view('product.index', [
                 'breadcrumbs' => $breadcrumbs,
                 'all_shops' => $all_shops,

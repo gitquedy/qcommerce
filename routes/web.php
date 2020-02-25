@@ -29,6 +29,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::resource('/crud', 'CrudController');
 
 	Route::get('/lazop/receive', 'LazopController@receive')->name('lazop.receive');
+	Route::get('/shop/getShop/{shop}', 'ShopController@getShop');
 	Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 	Route::resource('/shop', 'ShopController');
 	
@@ -103,6 +104,8 @@ Route::group(['middleware' => 'auth'], function()
 
 	Route::get('/order/readyToShip/{order}', 'OrderController@readyToShip')->name('order.readyToShip');
 	Route::post('/order/readyToShipMultiple/', 'OrderController@readyToShipMultiple')->name('order.readyToShipMultiple');
+	Route::get('/order/cancelModal/{order}', 'OrderController@cancelModal');
+	Route::post('/order/cancelSubmit/{order}', 'OrderController@cancelSubmit');
 	Route::get('/order/cancel/{order}', 'OrderController@cancel')->name('order.cancel');
 	Route::resource('/order', 'OrderController');
 	Route::get('/orders_pending', 'OrderController@orders_pending')->name('order.pending');
@@ -112,7 +115,13 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/orders_delivered', 'OrderController@orders_delivered')->name('order.delivered');
 	Route::get('/order/print_shipping/{id}', 'OrderController@print_shipping')->name('order.print_shipping');
 	Route::post('/order/print_shipping_mass', 'OrderController@print_shipping_mass')->name('order.print_shipping_mass');
-	
+
+
+
+	Route::get('/order/readyToShipShopee/{order}', 'OrderController@readyToShipShopee');
+	Route::get('/order/pickupDetailsShopee/{order}', 'OrderController@pickupDetailsShopee');
+	Route::post('/order/pickupDetailsPostShopee/{order}', 'OrderController@pickupDetailsPostShopee');
+	Route::get('/order/readyToShipDropOff/{order}', 'OrderController@readyToShipDropOff');
 	
 
 

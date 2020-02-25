@@ -18,20 +18,20 @@ class Products extends Model
 {
     protected $table = 'products';
     
-    protected $fillable = ['item_id', 'shop_id', 'name', 'short_description', 'brand', 'model', 'quantity'];
+    protected $fillable = ['item_id', 'shop_id', 'name', 'short_description', 'brand', 'model', 'quantity','site','SkuId','SellerSku','price','Images','Status','created_at','updated_at'];
     
-    
+
     
     public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id','id');
 	}
-	
+
     
     
     public static function syncProducts($date = '2018-01-01', $step = '+3 day'){
-        
-        
-        $shops = Shop::get();
+
+            
+        $shops = Shop::where('site', 'lazada')->get();
         $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
         $created_before_increment = 1;
         $orders = [];
@@ -83,14 +83,12 @@ class Products extends Model
                 $r->addApiParam('limit',$limit);
                 $result = $c->execute($r,$shopsVAL->access_token);
                 $data = json_decode($result, true);
-                
             
                 if(isset($data['data']['products'])){
                     foreach($data['data']['products'] as $Produ){
                         $products_all[$shopsVAL->id]['items'][] = $Produ;
                     }
                 }
-                
                 $offset = $i*$limit-1;
     		}
     		
@@ -122,6 +120,8 @@ class Products extends Model
     		    }
     		    
     		    $productDATA->shop_id = $shopsVAL->id;
+
+                $productDATA->site = 'lazada';
     		    
     		    if(isset($productsVAL['attributes']['name'])){
     		    $productDATA->name = (string) $productsVAL['attributes']['name'];
@@ -199,17 +199,10 @@ class Products extends Model
     		    if(isset($productsVAL['skus'][0]['Status'])){
     		        $productDATA->Status = $productsVAL['skus'][0]['Status'];
     		    }
-    		    
     		    $productDATA->Images = implode('|',$P_images);
-    		    
     		    $productDATA->created_at = date('Y-m-d H:i:s');
     		    $productDATA->updated_at = date('Y-m-d H:i:s');
-    		    
-    		    
-    		    
     		    $productDATA->save();
-    		    
-    		    
             }
     		
     		
@@ -624,31 +617,25 @@ class Products extends Model
     
     public static function delete_not_exist_products(){
         
-        $Products = Products::get();
+        $Products = Products::where('site', 'lazada')->get();
         
         foreach($Products as $ProductVAL){
             
             $shop = Shop::find($ProductVAL->shop_id);
-            
             if($shop){
-                
                 $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-                    $r = new LazopRequest('/product/item/get','GET');
-                    $r->addApiParam('item_id', $ProductVAL->item_id);
-                    $result = $c->execute($r,$shop->access_token);
-                    
-                    $obj = json_decode($result);
-                    
-                    if($obj->code!=0){
-                        $current_product = Products::find($ProductVAL->id);
-                        $current_product->delete();
-                    }
-                
+                $r = new LazopRequest('/product/item/get','GET');
+                $r->addApiParam('item_id', $ProductVAL->item_id);
+                $result = $c->execute($r,$shop->access_token);
+                $obj = json_decode($result);
+                if($obj->code!=0){
+                    $current_product = Products::find($ProductVAL->id);
+                    $current_product->delete();
+                }
             }else{
-                        $current_product = Products::find($ProductVAL->id);
-                        $current_product->delete();
+                $current_product = Products::find($ProductVAL->id);
+                $current_product->delete();
             }
-            
 
         }
 
