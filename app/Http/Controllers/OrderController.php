@@ -84,7 +84,7 @@ class OrderController extends Controller
            }
 
            if($request->printed){
-            $orders->where('printed', $request->printed);
+            $orders->where('printed', 0);
            }
            
            
@@ -319,7 +319,7 @@ class OrderController extends Controller
     public function print_shipping($order_id="",Request $request){
             $order = Order::where('id', "=", $order_id)->first();
             if($order->site == 'lazada'){
-              $order->update(['printed' => false]);
+              $order->update(['printed' => true]);
 
               $Result = Order::get_shipping_level($order_id);
               $jsOBJ = json_decode($Result);
@@ -355,7 +355,7 @@ class OrderController extends Controller
         
         foreach($ids as $orderVAL){
             $order = Order::where('id', "=", $orderVAL)->first();
-            $order->printed = false;
+            $order->printed = true;
             $order->save();
 
             $Result =    Order::get_shipping_level($orderVAL);

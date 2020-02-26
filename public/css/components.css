@@ -931,13 +931,23 @@ body.footer-hidden .footer {
 
 .main-menu .navbar-header .navbar-brand .brand-logo {
   background: url(/images/vuexy-logo.png?c4ab1f1147d7d70ed03b795c6829d77e) no-repeat;
-  background-position: -65px -54px;
-  height: 24px;
+  background-position: -65px -47px;
+  height: 38px;
   width: 35px;
 }
 
+.main-menu .navbar-header .navbar-brand .brand-text-logo {
+  background: url(/images/text-logo.png) no-repeat;
+  background-size: 145px auto;
+  background-position: center;
+  height: 38px;
+  width: 165px;
+  margin-left: 5px;
+}
+
 .main-menu .navbar-header .navbar-brand .brand-text {
-  color: #7367f0;
+  color: #ffffff;
+  /*color: #7367f0;*/
   padding-left: 1rem;
   font-weight: 600;
   letter-spacing: 0.01rem;

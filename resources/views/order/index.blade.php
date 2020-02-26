@@ -226,6 +226,9 @@
       hideShippingStatus(str);
       $('input[name="site"]').change(function(){
         var site = $('input[name="site"]:checked').val();
+        @if (isset($_GET['printed']))
+          site += "&printed=false";
+        @endif
         url = "{{ action('OrderController@index')}}?site=" + site;
         window.location.href = url;
       });
