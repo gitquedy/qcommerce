@@ -41,6 +41,8 @@ class AuthController extends Controller
             'password' => 'required',
         ];
 
+        $validator = Validator::make($request->all(), $validation);
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->toArray(), 'success' => 0]);
         }
@@ -55,6 +57,6 @@ class AuthController extends Controller
 
 
     public function user(Request $request){
-        return response()->json(['user' => $request->user]);
+        return response()->json(['user' => $request->user, 'success' => 1]);
     }
 }
