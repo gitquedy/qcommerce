@@ -6,6 +6,7 @@ use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -26,7 +27,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'api_token',
     ];
 
     /**
@@ -48,5 +49,16 @@ class User extends Authenticatable
         }else{
             return false;
         }
+    }
+
+    public function updateToken()
+    {
+        $token = Str::random(80);
+
+        $this->forceFill([
+            'api_token' => hash('sha256', $token),
+        ])->save();
+
+        return $token;
     }
 }
