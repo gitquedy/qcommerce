@@ -52,10 +52,10 @@ class AuthController extends Controller
         if(! auth()->attempt($data)){
             return response()->json(['message' => 'Invalid Credentials', 'success' => 0]);
         }
-        
+
         $token = auth()->user()->updateToken();
 
-        return response()->json(['user' => auth()->user(), 'access_token' => $token, 'success' => 1, 'message' => 'Successfully logged in']);
+        return response()->json(['data' => auth()->user(), 'access_token' => $token, 'success' => 1, 'message' => 'Successfully logged in']);
     }
 
 
