@@ -273,21 +273,27 @@ class DashboardController extends Controller
     	            
     	        }
     	    }
-    	    
-    	    
-    	    
     	    $Shop_pie[$ShopVAL->id]['today'] = $today_order;
     	    $Shop_pie[$ShopVAL->id]['monthly'] = $monthly_order;
     	    $Shop_pie[$ShopVAL->id]['last7'] = $last_7_days_order;
     	    $Shop_pie[$ShopVAL->id]['last30'] = $last_30_days_order;
     	    $Shop_pie[$ShopVAL->id]['yesterday'] = $yesterday_orders;
-    	    
-    	    
-    	    
+            $Shop_pie[$ShopVAL->id]['name'] = $ShopVAL->name . ' (' . ucfirst($ShopVAL->site) . ')';
     	}
     	
     	
-       
+       // die(var_dump(['monthly_sales' => number_format($monthly_sales),
+       //      'today_sales' =>number_format($today_sales),
+       //      'today_order_count' =>number_format($today_order_count),
+       //      'shipped_counter'=>number_format($shipped_counter),
+       //      'combine_chart'=>$combine_chart,
+       //      'monthly'=>$monthly,
+       //      'Shop'=>$Shop,
+       //      'colour'=>$colour,
+       //      'six_month_data'=>array_reverse($six_month_data),
+       //      'hour_data'=>$hour_data,
+       //      'hour_orders'=>$hour_orders,
+       //      'Shop_pie'=>$Shop_pie]));
         
         $pageConfigs = [
             'pageHeader' => false

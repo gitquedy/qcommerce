@@ -436,12 +436,11 @@
             
             store_names.push(valuePIE.name);
             store_values.push(parseFloat(main_amount));
-            
-          
+
           li_string += '<li class="list-group-item d-flex justify-content-between ">'+
                               '<div class="series-info">'+
                                   '<i class="fa fa-circle font-small-3 "></i>'+
-                                  '<span class="text-bold-600">'+valuePIE.name+'</span>'+
+                                  '<span class="text-bold-600">'+valuePIE.name +'</span>'+
                               '</div>'+
                               '<div class="product-result">'+
                                   '<span>'+main_amount+

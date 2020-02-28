@@ -13,6 +13,7 @@ use App\Library\lazada\LazopClient;
 use App\Library\lazada\UrlConstants;
 use Auth;
 use DB;
+use App\Policies\ShopPolicy;
 
 class Shop extends Model
 {
@@ -25,6 +26,10 @@ class Shop extends Model
     ];
 
     public static $shopee_statuses = ['UNPAID','READY_TO_SHIP','RETRY_SHIP','SHIPPED','TO_CONFIRM_RECEIVE','IN_CANCEL','CANCELLED','TO_RETURN','COMPLETED'];
+
+    protected $policies = [
+        Shop::class => ShopPolicy::class,
+    ];
     //pending = READY_TO_SHIP
     
     public function products(){

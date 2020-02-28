@@ -24,7 +24,7 @@ class AuthController extends Controller
         $token = $user->updateToken();
 
 
-        return response()->json(['user' => $user, 'access_token' => $token]);
+        return response()->json(['user' => $user, 'access_token' => $token, 'message' => 'Successfully registered']);
     }
 
     public function login(Request $request){
@@ -38,7 +38,7 @@ class AuthController extends Controller
         }
         $token = auth()->user()->updateToken();
 
-        return response()->json(['user' => auth()->user(), 'access_token' => $token, 'success' => 1]);
+        return response()->json(['user' => auth()->user(), 'access_token' => $token, 'success' => 1, 'message' => 'Successfully logged in']);
     }
 
 
