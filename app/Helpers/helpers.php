@@ -200,7 +200,6 @@ class Helper
         foreach($shops as $shopsVAL){
             $shop_array[] = $shopsVAL->id;
         }
-        
         $order_all = Order::whereIn('shop_id',$shop_array)->get()->count();
         $order_pending = Order::whereIn('shop_id',$shop_array)->where('status','=','pending')->get()->count();
         $order_printing = Order::whereIn('shop_id',$shop_array)->where('printed','=','0')->get()->count();

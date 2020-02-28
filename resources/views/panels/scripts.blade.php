@@ -45,7 +45,7 @@
                 
                 if(main_data.orders>0){
                 
-                   not_string += '<a class="d-flex justify-content-between" href="{{url("/orders_pending")}}">'+
+                   not_string += '<a class="d-flex justify-content-between" href="{{url("/order")}}?site=lazada&status=pending">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><i class="feather icon-shopping-cart font-medium-5 primary"></i></div>'+
                                         '<div class="media-body">'+
@@ -58,7 +58,7 @@
                 
                 if(main_data.total_new_products>0){
                 
-                   not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}">'+
+                   not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=lazada">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><i class="feather icon-package font-medium-5 primary"></i></div>'+
                                         '<div class="media-body">'+

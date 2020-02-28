@@ -84,7 +84,7 @@ class OrderController extends Controller
            }
 
            if($request->printed){
-            $orders->where('printed', $request->printed);
+            $orders->where('printed', 0);
            }
            
            
