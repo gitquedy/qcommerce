@@ -36,6 +36,7 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
+        $data = (object)[];
         $validation = [
             'email' => 'email|required',
             'password' => 'required',
@@ -44,7 +45,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), $validation);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()->toArray(), 'success' => 0]);
+            return response()->json(['error' => $validator->errors()->toArray(), 'success' => 0, 'data' => $data]);
         }
 
         $data = $request->only(['email', 'password']);
