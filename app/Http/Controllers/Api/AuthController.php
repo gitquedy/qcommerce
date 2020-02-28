@@ -5,33 +5,45 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
+use Validator;
 
 class AuthController extends Controller
 {
     public function register(Request $request){
 
-        
-        $data = $request->validate([
+        $data = (object)[];
+        $validation = [
             'first_name' => 'required|max:55',
             'last_name' => 'required|max:55',
             'phone' => ['nullable','regex:/^(09|\+639)\d{9}$/'],
             'email' => 'email|required|unique:users',
             'password' => 'required|confirmed',
-        ]);
+        ];
 
-        $data['password'] = bcrypt($request->password);
-        $user = User::create($data);
+        $validator = Validator::make($request->all(), $validation);
+        
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->toArray(), 'success' => 0, 'data' => $data, 'message' => 'Input error']);
+        }
+
+        $user = $request->only(['first_name','last_name','phone','email','password']);
+
+        $user['password'] = bcrypt($request->password);
+        $user = User::create($user);
         $token = $user->updateToken();
 
-
-        return response()->json(['user' => $user, 'access_token' => $token, 'message' => 'Successfully registered']);
+        return response()->json(['data' => $user, 'access_token' => $token, 'message' => 'Successfully registered', 'success' => 1]);
     }
 
     public function login(Request $request){
-        $data = $request->validate([
+        $validation = [
             'email' => 'email|required',
             'password' => 'required',
-        ]);
+        ];
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->toArray(), 'success' => 0]);
+        }
 
         if(! auth()->attempt($data)){
             return response()->json(['message' => 'Invalid Credentials', 'success' => 0]);
