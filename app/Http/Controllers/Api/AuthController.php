@@ -31,6 +31,7 @@ class AuthController extends Controller
         $user['password'] = bcrypt($request->password);
         $user = User::create($user);
         $token = $user->updateToken();
+        $user = User::find($user->id);
 
         return response()->json(['data' => $user, 'access_token' => $token, 'message' => 'Successfully registered', 'success' => 1]);
     }
