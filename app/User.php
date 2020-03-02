@@ -43,6 +43,10 @@ class User extends Authenticatable
         return $this->last_name.", ".$this->first_name;
     }
 
+    public function shops(){
+        return $this->hasMany(Shop::class, 'user_id', 'id');
+    }
+
     public function isAdmin(){
         if (env('ADMIN') == $this->email){
             return true;

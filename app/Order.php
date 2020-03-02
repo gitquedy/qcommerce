@@ -30,7 +30,6 @@ class Order extends Model
     public static $shopee_statuses = [
         'UNPAID','READY_TO_SHIP', 'RETRY_SHIP', 'SHIPPED' ,'COMPLETED', 'TO_CONFIRM_RECEIVE' ,'IN_CANCEL','CANCELLED','TO_RETURN',
      ];
-     
 	public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id', 'id');
 	}

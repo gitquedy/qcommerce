@@ -29,6 +29,8 @@ Route::group([
   ], function() {
       Route::get('logout', 'AuthController@logout');
       Route::get('user', 'AuthController@user');
+      Route::get('shop/create/links', 'Api\ShopController@links');
+      Route::resource('shop', 'Api\ShopController');
   });
 
 
