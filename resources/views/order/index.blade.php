@@ -33,7 +33,7 @@
     <div class="card-content">
       <div class="card-body">
         <div class="row">
-          <div class="col-sm-4 shop_filter">
+          <div class="col-sm-12 shop_filter">
               <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
               <label for="site1" class="btn btn-lg btn-outline-primary {{ $request->get("site") == "lazada" ?  "active" : ""}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
