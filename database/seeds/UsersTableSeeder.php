@@ -19,5 +19,12 @@ class UsersTableSeeder extends Seeder
             'role' => 'admin',
             'password' => Hash::make('admin123'),
         ]);
+        User::create([
+            'first_name' => 'Quedy',
+            'last_name' => 'Dev',
+            'email' => 'dev.quedy@quedymedia.com',
+            'role' => 'Seller',
+            'password' => Hash::make('test123'),
+        ]);
     }
 }

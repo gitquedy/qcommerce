@@ -34,6 +34,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('shop:updateToken')
                  ->cron('0 0 */5 * *')
                  ->appendOutputTo('storage/logs/cron_updateToken.log');
+        $schedule->command('shop:syncShippingDetails')
+                 ->cron('0 0 */5 * *')
+                 ->appendOutputTo('storage/logs/cron_syncShippingDetails.log');
     }
 
     /**

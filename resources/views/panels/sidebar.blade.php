@@ -25,7 +25,7 @@
             
             
             <li class="nav-item  ">
-                <a >
+                <a>
                     <span class="menu-title" data-i18n="nav.order">Navigation</span>
                 </a>
             </li>
@@ -158,6 +158,13 @@
                 </ul>
             </li>
             
+            <li class="nav-item  ">
+                <a href="{{url('/shippingfee')}}">
+                    <i class="feather icon-truck"></i>
+                    <span class="menu-title" data-i18n="">Shipping Fee</span>
+                </a>
+            </li>
+            
             
             
             <li class="nav-item  ">
@@ -179,7 +186,6 @@
                 <a href="">
                     <i class="feather icon-package"></i>
                     <span class="menu-title" data-i18n="">SKU</span>
-                    
                 </a>
                 <ul class="menu-content">
                     <li class="">

@@ -35,6 +35,14 @@ class Order extends Model
 		return $this->belongsTo(Shop::class, 'shop_id', 'id');
 	}
 
+    public function customer_payout_fees() {
+        return $this->hasOne(ShippingFee::class, 'order_no', 'id')->where('trans_type', 8);
+    }
+
+    public function seller_payout_fees() {
+        return $this->hasOne(ShippingFee::class, 'order_no', 'id')->where('trans_type', 7);
+    }
+
 	public function getActionsDropdown(){
         $nextAction = self::getNextAction();
         $status = $this->status;

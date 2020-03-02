@@ -25,6 +25,7 @@ class CreateOrderTable extends Migration
             $table->string('shipping_fee');
             $table->string('items_count');
             $table->string('status');
+            $table->unsignedInteger('shipping_fee_reconciled')->default(0);
             $table->boolean('printed')->default(0);
             $table->boolean('packed')->default(0);
             $table->unsignedInteger('shop_id');

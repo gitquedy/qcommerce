@@ -13,6 +13,15 @@
 @section('mystyle')
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
+        <style>
+          .shop_filter input[type='radio']{
+            opacity: 0;
+          }
+          .shop_logo  {
+            width: 50px;
+            height: auto;
+          }
+        </style>
 @endsection
 
 @section('content')
@@ -24,8 +33,20 @@
     <div class="card-content">
       <div class="card-body">
         <div class="row">
-          <div class="col-sm-4">
-            <ul class="list-unstyled mb-0">
+          <div class="col-sm-4 shop_filter">
+              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+              <label for="site1" class="btn btn-lg btn-outline-primary {{ $request->get("site") == "lazada" ?  "active" : ""}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
+                Lazada
+                <span id="notif_site1" class="badge badge-secondary">0</span>
+              </label>
+              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
+              <label for="site2" class="btn btn-lg btn-outline-primary {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
+                Shopee
+                <span id="notif_site2" class="badge badge-secondary">0</span>
+              </label>
+            {{-- <ul class="list-unstyled mb-0">
               <li class="d-inline-block mr-2">
                 <fieldset>
                  <div class="vs-radio-con">
@@ -50,7 +71,7 @@
                   </div>
                 </fieldset>
               </li>
-            </ul>
+            </ul> --}}
           </div>
         </div>
         <br><div class="row">

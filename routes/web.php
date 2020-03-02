@@ -120,6 +120,8 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/order/pickupDetailsPostShopee/{order}', 'OrderController@pickupDetailsPostShopee');
 	Route::get('/order/readyToShipDropOff/{order}', 'OrderController@readyToShipDropOff');
 	
+	// Route Shipping Fee
+	Route::get('/shippingfee', 'ShippingFeeController@index')->name('shippingfee.index');
 
 
 	// Route Dashboards

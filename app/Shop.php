@@ -7,6 +7,7 @@ use App\Lazop;
 use App\Order;
 use App\Products;
 use App\Utilities;
+use App\ShippingFee;
 use Carbon\Carbon;
 use App\Library\lazada\LazopRequest;
 use App\Library\lazada\LazopClient;
@@ -70,10 +71,8 @@ class Shop extends Model
                     }, $orders);
                 }
             }else if($this->site == 'shopee'){
-                
                 $orders = $this->shopeeGetOrdersPerDate($date);
                 $this->shopeeSaveOrdersPerSN($orders);
-                
             }
              $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -83,6 +82,85 @@ class Shop extends Model
                     ];
         }
         // return $data;
+    }
+
+    public function syncShippingDetails($start_date, $end_date) {
+        try {
+            if($this->site == 'lazada'){
+                $order_ids = array();
+                foreach (array(7,8) as $trans_type) {
+                    $lazada_payout_fees = [];
+                    $c = new LazopClient(UrlConstants::getPH(),Lazop::get_api_key(),Lazop::get_api_secret());
+                    $r = new LazopRequest('/finance/transaction/detail/get','GET');
+                    $r->addApiParam('trans_type', $trans_type);
+                    $r->addApiParam('start_time', $start_date);
+                    $r->addApiParam('end_time', $end_date);
+                    $result = $c->execute($r, $this->access_token);
+                    $data = json_decode($result, true);
+                    if(isset($data['data'])){
+                        $lpf_ids = array();
+                        $lpf_data = array();
+                        $result = $data['data'];
+                        foreach($result as $lpf) {
+                            if(!in_array($lpf['order_no'], $order_ids)) {
+                                array_push($order_ids, $lpf['order_no']);
+                            }
+                            if(!in_array($lpf['order_no'], $lpf_ids)) {
+                                $lpf_ids[] = $lpf['order_no'];
+                                unset($lpf['shipping_provider']);
+                                unset($lpf['WHT_included_in_amount']);
+                                unset($lpf['lazada_sku']);
+                                unset($lpf['orderItem_no']);
+                                unset($lpf['orderItem_status']);
+                                unset($lpf['shipping_speed']);
+                                unset($lpf['WHT_amount']);
+                                unset($lpf['transaction_number']);
+                                unset($lpf['seller_sku']);
+                                unset($lpf['details']);
+                                unset($lpf['VAT_in_amount']);
+                                unset($lpf['shipment_type']);
+                                $lpf['trans_type'] = $trans_type;
+                                $lpf_data[] = $lpf;
+                            }
+                            else {
+                                $key = array_search($lpf['order_no'], $lpf_ids);
+                                $lpf_data[$key]['amount'] += $lpf['amount'];
+                            }
+                        }
+                        $lazada_payout_fees = $lpf_data;
+                    }
+                    if($lazada_payout_fees){
+                        foreach ($lazada_payout_fees as $l) {
+                            $order_no = $l['order_no'];
+                            $fee_name = $l['fee_name'];
+                            $record = ShippingFee::updateOrCreate(['order_no' => $order_no, 'fee_name' => $fee_name], $l);
+                        }
+                    }
+                }
+                // dd($order_ids);
+                $overcharge_ids = array();
+                foreach ($order_ids as $id) {
+                    $seller = ShippingFee::whereOrderNo($id)->where('trans_type', 7)->first();
+                    $customer = ShippingFee::whereOrderNo($id)->where('trans_type', 8)->first();
+                    if(isset($seller['amount']) && isset($customer['amount'])) {
+                        $seller_fee = abs(round($seller['amount']));
+                        $customer_fee = abs(round($customer['amount']));
+                        if($seller_fee > $customer_fee) {
+                            array_push($overcharge_ids, $id);
+                        }
+                    }
+                }
+                $overcharge = Order::whereIn('id', $overcharge_ids)->where('shipping_fee_reconciled', 0)->update(['shipping_fee_reconciled' => 1]);
+            } else if($this->site == 'shopee'){
+                // code
+            }
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+            print json_encode($output);
+        }
     }
 
     public function shopeeGetClient(){
