@@ -46,35 +46,25 @@
                 Shopee
                 <span id="notif_site2" class="badge badge-secondary">0</span>
               </label>
-            {{-- <ul class="list-unstyled mb-0">
-              <li class="d-inline-block mr-2">
-                <fieldset>
-                 <div class="vs-radio-con">
-                    <input type="radio" id="site" name="site"  value="lazada" {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
-                    <span class="vs-radio">
-                      <span class="vs-radio--border"></span>
-                      <span class="vs-radio--circle"></span>
-                    </span>
-                    <span class="">Lazada</span>
-                  </div>
-                </fieldset>
-              </li>
-              <li class="d-inline-block mr-2">
-                <fieldset>
-                  <div class="vs-radio-con">
-                    <input type="radio" id="site" name="site" value="shopee" {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
-                    <span class="vs-radio">
-                      <span class="vs-radio--border"></span>
-                      <span class="vs-radio--circle"></span>
-                    </span>
-                    <span class="">Shopee</span>
-                  </div>
-                </fieldset>
-              </li>
-            </ul> --}}
           </div>
         </div>
-        <br><div class="row">
+        <br>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
+                <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
+              </label>
+              @foreach($statuses as $status)
+                <label class="btn btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
+                  <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucwords(str_replace("_"," ", $status)) }}
+                </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
           <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Shop:
@@ -84,18 +74,6 @@
                 <option value="all">All</option>
                 @foreach($all_shops as $shop)
                   <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</option>
-                @endforeach
-              </select>
-            </div>
-        </div>
-        <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Status:
-            </div>
-            <div class="form-group">
-              <select name="status[]" id="status" class="select2 form-control selectFilter" multiple="multiple">
-                @foreach($statuses as $status)
-                  <option value="{{ $status }}" {{ in_array($status, $selectedStatuses) ? 'selected' : '' }}>{{ ucwords(str_replace("_"," ", $status)) }}</option>
                 @endforeach
               </select>
             </div>
@@ -116,10 +94,6 @@
             </div>
             <input type="hidden" id="printed" value="{{ $request->get('printed') ? true : false }}">
         </div>
-      </div>
-      <div class="row">
-        <div class="col-sm-4 col-12">
-        </div>
         <div class="col-sm-4 col-12 shipping_status">
             <div class="text-bold-600 font-medium-2">
               Shipping Status:
@@ -132,6 +106,11 @@
               </select>
             </div>
         </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 col-12">
+        </div>
+        
       </div>
     </div>
   </section>
@@ -217,7 +196,7 @@
           url: '{{ route('order.index') }}',
           data: function (data) {
                 data.shop = $("#shop").val();
-                data.status = $("#status").val();
+                data.status = $("input[name=status]:checked").val();
                 data.timings = $("#timings").val();
                 data.printed = $("#printed").val();
                 data.site = $('input[name="site"]:checked').val();
@@ -258,13 +237,19 @@
         width: '100%'
       });
 
-      $('#status').change(function(){
-        var str = $(this).val(); 
-        hideShippingStatus(str);
+      // $('#status').change(function(){
+      //   var str = $(this).val(); 
+      //   alert(str);
+      //   hideShippingStatus(str);
+      // });
+
+      $(document).on('change', 'input[name=status]', function() {
+          var str = $("input[name=status]:checked").val();
+          hideShippingStatus(str);
       });
 
       function hideShippingStatus(str){
-        if(str.includes('READY_TO_SHIP') == true){
+        if(str == 'READY_TO_SHIP'){
           $('.shipping_status').show();
         }else{
           $('.shipping_status').hide();

@@ -33,14 +33,17 @@ class OrderController extends Controller
         if($request->get('site') == 'shopee'){
            $statuses = Order::$shopee_statuses;
            $all_shops = $all_shops->where('site', 'shopee');
-           $selectedStatuses = ['UNPAID','READY_TO_SHIP'];
+           // $selectedStatuses = ['UNPAID','READY_TO_SHIP'];
         }else{
            $statuses = Order::$statuses;
            $all_shops = $all_shops->where('site', 'lazada');
-           $selectedStatuses = ['pending','ready_to_ship','shipped'];
+           // $selectedStatuses = ['pending','ready_to_ship','shipped'];
         }
         if($request->get('status')){
-          $selectedStatuses = [$request->get('status')];
+          $selectedStatus = $request->get('status');
+        }
+        else {
+          $selectedStatus = 'all';
         }
 
         $all_shops = $all_shops->get();
@@ -62,8 +65,13 @@ class OrderController extends Controller
         
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
            $shops_id = $shops->pluck('id')->toArray();
-           $statuses = $request->get('status', ['shipped']);
-           $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->whereIn('status', $statuses);
+           $status = $request->get('status');
+           if($status == 'all') {
+              $orders = Order::with('shop')->whereIn('shop_id', $shops_id);
+           }
+           else {
+              $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('status', $status);
+           }
            if($request->get('shop', 'all') != 'all'){
                 $shops->where('id', $request->get('shop'));
            }
@@ -138,7 +146,7 @@ class OrderController extends Controller
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
             'statuses' => $statuses,
-            'selectedStatuses' => $selectedStatuses,
+            'selectedStatus' => $selectedStatus,
         ]);
     }
 
