@@ -19,7 +19,7 @@ class CreateOrderTable extends Migration
             $table->string('tracking_no')->nullable();
             $table->string('site')->nullable();
             $table->string('customer_last_name')->nullable();
-            $table->string('price');
+            $table->float('price', 10, 2);
             $table->string('payment_method');
             $table->string('customer_first_name');
             $table->string('shipping_fee');

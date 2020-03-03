@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Utilities extends Model
 {
@@ -43,5 +44,29 @@ class Utilities extends Model
     }
 
     return $dates;
-}
+    }
+
+    public static function getToday24Hours(){
+        $now = Carbon::now()->startOfDay();
+        $data = [];
+        $data[] = $now->toDateTimeString();
+        for($i = 1; $i < 24; $i++){
+            $data[] = $now->addHour(1)->toDateTimeString();
+        }
+        $data[] =  $now->endOfDay()->toDateTimeString();
+        return $data;
+    }
+
+    public static function getMonthsDates($last = 7){
+        // last 6 months dates
+
+        $now = Carbon::now()->startOfMonth();
+        $data[] = Carbon::now()->endOfMonth()->toDateTimeString();
+        $data[] = $now->toDateTimeString();
+        for($i = 1; $i < $last; $i++){
+            $data[] = $now->subMonths(1)->toDateTimeString();
+        }
+        $data = array_reverse($data);
+        return $data;
+    }
 }

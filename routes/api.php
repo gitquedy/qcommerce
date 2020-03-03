@@ -30,6 +30,7 @@ Route::group([
       Route::get('logout', 'AuthController@logout');
       Route::get('user', 'AuthController@user');
       Route::get('shop/create/links', 'Api\ShopController@links');
+      Route::get('shop/getDashboardDetails/', 'Api\ShopController@getDashboardDetails');
       Route::resource('shop', 'Api\ShopController');
   });
 

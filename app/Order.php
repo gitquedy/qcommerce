@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn'
+		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled'
 			];
 
     public $timestamps = false;
@@ -179,8 +179,9 @@ class Order extends Model
         $query = DB::table('order');
         $query->where('shop_id',$shop);
         $query->where('status', '!=', 'canceled');
-        
-        
+        // CANCELLED = shopee
+        // canceled = Lazada 
+
         if($type=='today'){
             $query->whereDate('created_at',"=",date('Y-m-d'));
         }
@@ -224,7 +225,7 @@ class Order extends Model
         return number_format($total, 2);
     }
 
-    private static function tofloat($num) {
+    public static function tofloat($num) {
         $dotPos = strrpos($num, '.');
         $commaPos = strrpos($num, ',');
         $sep = (($dotPos > $commaPos) && $dotPos) ? $dotPos :
@@ -420,5 +421,9 @@ class Order extends Model
         $r->addApiParam('loginMessage','password is not correct');
         var_dump($c->execute($r));
         
+    }
+
+    public static function statusNotIncludedInSales(){
+        return ['CANCELLED', 'canceled', 'returned', 'failed', 'IN_CANCEL', 'TO_RETURN'];
     }
 }

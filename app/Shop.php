@@ -64,10 +64,11 @@ class Shop extends Model
                         $status = $order['statuses'][0];
                         $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
                         $order['printed'] = $printed;
+                        $order['price'] = Order::tofloat($order['price']);
                         unset($order['statuses']);
                         unset($order['address_billing']);
                         unset($order['address_shipping']);
-                        unset($order['order_number']);  
+                        unset($order['order_number']);
                         $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
                         unset($order['order_id']);     
                         $record = Order::updateOrCreate(
@@ -358,4 +359,37 @@ class Shop extends Model
             }
         }
     }
+
+    public function totalSales(){
+       $datas = ['week' => 0, 'yesterday' => 0, 'today' => 0, 'month' => 0];
+       foreach($datas as $key => $val){
+            if($key == 'week'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->sum('price');
+            }else if($key == 'today'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->sum('price');
+            }else if($key == 'yesterday'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->sum('price');
+            }else if($key == 'month'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->sum('price');
+            }
+       }
+       return (object) $datas;
+    }
+
+    public function totalOrders(){
+        $datas = ['week' => 0, 'yesterday' => 0, 'today' => 0, 'month' => 0];
+       foreach($datas as $key => $val){
+            if($key == 'week'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+            }else if($key == 'today'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->count();
+            }else if($key == 'yesterday'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->count();
+            }else if($key == 'month'){
+                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->count();
+            }
+       }
+       return (object) $datas;
+    }
 }
+

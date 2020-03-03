@@ -7,6 +7,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use App\Utilities;
 
 class User extends Authenticatable
 {
@@ -64,5 +66,58 @@ class User extends Authenticatable
         ])->save();
 
         return $token;
+    }
+
+    public function totalSalesToday($shops){
+        $shops = $shops->pluck('id');
+        $data = [];
+        $dates = Utilities::getToday24Hours();
+        $iteration = 1;
+        foreach($dates as $key => $date){
+            if($iteration == 25){ //skip last
+                continue;
+            }
+            $data[$date] =  Order::whereIn('shop_id', $shops)->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $iteration++;
+        }
+
+        return (object) $data;
+    }
+
+    public function totalOrdersToday($shops){
+        $shops = $shops->pluck('id');
+        $data = [];
+        $dates = Utilities::getToday24Hours();
+        $iteration = 1;
+        foreach($dates as $key => $date){
+            if($iteration == 25){ //skip last
+                continue;
+            }
+            $data[$date] =  Order::whereIn('shop_id', $shops)->whereBetween('created_at', [$date, $dates[$iteration]])->count();
+            $iteration++;
+        }
+        return (object) $data;
+    }
+
+    public function currentPendingOrders($shops){
+        $shops = $shops->pluck('id');
+        $data = 0;
+        $data = Order::whereIn('shop_id', $shops)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
+        return $data;
+    }
+
+    public function totalMonthlySales($shops){
+        $shops = $shops->pluck('id');
+        $dates =Utilities::getMonthsDates(7);
+        $iteration = 1;
+        $data = [];
+        foreach($dates as $key => $date){
+            if($iteration == 8){ //skip last
+                continue;
+            }
+            $data[$date] =  Order::whereIn('shop_id', $shops)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $iteration++;
+        }
+        return $data;
     }
 }
