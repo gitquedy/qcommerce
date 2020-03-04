@@ -62,8 +62,10 @@ class OrderController extends Controller
         }
 
     if ( request()->ajax()) {
-        
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
+           if($request->get('shop') != ''){
+                $shops->whereIn('id', explode(",", $request->get('shop')));
+           }
            $shops_id = $shops->pluck('id')->toArray();
            $status = $request->get('status');
            if($status == 'all') {
@@ -71,9 +73,6 @@ class OrderController extends Controller
            }
            else {
               $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('status', $status);
-           }
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
            }
 
            $orders->where('site', $request->get('site', 'lazada'));

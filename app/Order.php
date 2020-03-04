@@ -24,7 +24,7 @@ class Order extends Model
     public $timestamps = false;
 
     public static $statuses = [
-              'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
+              'pending', 'unpaid', 'ready_to_ship', 'shipped', 'delivered',  'returned', 'failed',  'canceled', 
     ];
 
     public static $shopee_statuses = [
