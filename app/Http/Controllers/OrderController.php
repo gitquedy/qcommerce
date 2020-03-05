@@ -54,6 +54,8 @@ class OrderController extends Controller
         }
 
         $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
+        $lazada_count = Order::where('site','lazada')->whereIn('status', ['pending', 'ready_to_ship'])->count();
+        $shopee_count = Order::where('site','shopee')->whereIn('status', ['UNPAID', 'READY_TO_SHIP'])->count();
         
         foreach($orders as $ordersVAL){
             $tmp_order = Order::find($ordersVAL->id);
@@ -62,8 +64,10 @@ class OrderController extends Controller
         }
 
     if ( request()->ajax()) {
-        
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
+           if($request->get('shop') != ''){
+                $shops->whereIn('id', explode(",", $request->get('shop')));
+           }
            $shops_id = $shops->pluck('id')->toArray();
            $status = $request->get('status');
            if($status == 'all') {
@@ -71,9 +75,6 @@ class OrderController extends Controller
            }
            else {
               $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('status', $status);
-           }
-           if($request->get('shop', 'all') != 'all'){
-                $shops->where('id', $request->get('shop'));
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
@@ -150,6 +151,8 @@ class OrderController extends Controller
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
             'statuses' => $statuses,
+            'lazada_count' => $lazada_count,
+            'shopee_count' => $shopee_count,
             'selectedStatus' => $selectedStatus,
         ]);
     }

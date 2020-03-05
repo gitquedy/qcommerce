@@ -25,24 +25,24 @@
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12 shop_filter">
-              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
-              <label for="site1" class="btn btn-lg btn-outline-primary {{ $request->get("site") == "lazada" ?  "active" : ""}}">
+              <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get("site") == "lazada" ?  "active" : ""}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
                 Lazada
-                <span id="notif_site1" class="badge badge-secondary">0</span>
+                <span id="notif_site1" class="badge badge-secondary">{{$lazada_count}}</span>
               </label>
-              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
-              <label for="site2" class="btn btn-lg btn-outline-primary {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
+              <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
                 Shopee
-                <span id="notif_site2" class="badge badge-secondary">0</span>
+                <span id="notif_site2" class="badge badge-secondary">{{$shopee_count}}</span>
               </label>
+              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
           </div>
         </div>
         <br>
         <div class="row">
           <div class="col-sm-12">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <div class="btn-group-toggle" data-toggle="buttons">
               <label class="btn btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
                 <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
               </label>
@@ -56,47 +56,53 @@
         </div>
         <br>
         <div class="row">
-          <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Shop:
+          <div class="col-12">
+            <div class="btn-group mb-1">
+              <input type="hidden" id="shop" name="shop" class="selectFilter">
+              <input type="hidden" id="timings" name="timings" class="selectFilter">
+              <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  All Shop
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}
+                  @foreach($all_shops as $shop)
+                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</a>
+                  @endforeach
+                </div>
+              </div>
             </div>
-            <div class="form-group">
-              <select name="shop" id="shop" class="select2 form-control selectFilter">
-                <option value="all">All</option>
-                @foreach($all_shops as $shop)
-                  <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</option>
-                @endforeach
-              </select>
+            <div class="btn-group mb-1">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Date Filter
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  {{-- <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="All">All</a> --}}
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Today">Today</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Yesterday">Yesterday</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_7_days">Last 7 days</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_30_days">Last 30 days</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="This_Month">This Month</a>
+                </div>
+              </div>
             </div>
-        </div>
-        <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Date Filter:
+            <div class="btn-group mb-1 shipping_status">
+              <div class="dropdown ">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Shipping Status
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="All">All</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="to_process">To Process</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="processed">Processed</a>
+                </div>
+              </div>
             </div>
-            <div class="form-group">
-              <select name="timings[]" id="timings" class="select2 form-control selectFilter" >
-                <option value="All">All</option>
-                <option value="Today">Today</option>
-                <option value="Yesterday">Yesterday</option>
-                <option value="Last_7_days">Last 7 days</option>
-                <option value="Last_30_days">Last 30 days</option>
-                <option value="This_Month">This Month</option>
-              </select>
-            </div>
-            <input type="hidden" id="printed" value="{{ $request->get('printed') ? true : false }}">
-        </div>
-        <div class="col-sm-4 col-12 shipping_status">
-            <div class="text-bold-600 font-medium-2">
-              Shipping Status:
-            </div>
-            <div class="form-group">
-              <select name="shipping_status" id="shipping_status" class="select2 form-control selectFilter">
-                <option value="All">All</option>
-                <option value="to_process">To Process</option>
-                <option value="processed">Processed</option>
-              </select>
-            </div>
-        </div>
+            <div class="btn-group" id="chip_area_shop"></div>
+            <div class="btn-group" id="chip_area_timings"></div>
+          </div>
       </div>
       <div class="row">
         <div class="col-sm-4 col-12">
@@ -238,6 +244,46 @@
           var str = $("input[name=status]:checked").val();
           hideShippingStatus(str);
       });
+
+      $(document).on('click', '.chip-closeable',function() {
+        var target = $(this).data('target');
+        console.log($(this).data('type'));
+        if($(this).data('type') == "multiple") {
+          var value = $("#"+target).val().split(',');
+          const index = value.indexOf($(this).data('value').toString());
+          if (index > -1) {
+            value.splice(index, 1);
+          }
+          $("#"+target).val(value.join(',')).trigger('change');
+        }
+        else {
+          $("#"+target).val('').trigger('change');
+        }
+      });
+
+      $(document).on('click', '.filter_btn', function(event) {
+          event.preventDefault();
+          var target = $(this).data('target');
+          if($(this).data('type') == "multiple") {
+            if($("#"+target).val()==""){
+              $("#"+target).val($(this).data('value')).trigger('change');
+              $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+            }
+            else {
+              var value = $("#"+target).val().split(',');
+              if($.inArray($(this).data('value').toString(), value) === -1){
+                value.push($(this).data('value'));
+                $("#"+target).val(value.join(',')).trigger('change');
+                $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+              }
+            }
+          }
+          else {
+            $('#chip_area_'+target).html('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+            $("#"+target).val($(this).data('value')).trigger('change');
+          }
+      });
+      
 
       function hideShippingStatus(str){
         if(str == 'READY_TO_SHIP'){

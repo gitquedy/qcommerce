@@ -22,7 +22,7 @@ class UsersTableSeeder extends Seeder
         User::create([
             'first_name' => 'Quedy',
             'last_name' => 'Dev',
-            'email' => 'dev.quedy@quedymedia.com',
+            'email' => 'dev@quedy.com',
             'role' => 'Seller',
             'password' => Hash::make('test123'),
         ]);

@@ -77,7 +77,7 @@
 
   /***** Chips *****/
   // To close chips
-  $('.chip-closeable').on('click', function () {
+  $(document).on('click', '.chip-closeable',function () {
     $(this).closest('.chip').remove();
   })
 })(window, document, jQuery);
