@@ -63,12 +63,12 @@
               <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
               <div class="dropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  All Shop
+                  <i class="fa fa-shopping-cart"></i>All Shop
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
                     {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}
                   @foreach($all_shops as $shop)
-                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</a>
+                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</a>
                   @endforeach
                 </div>
               </div>
@@ -76,7 +76,7 @@
             <div class="btn-group mb-1">
               <div class="dropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Date Filter
+                  <i class="fa fa-filter"></i>Date Filter
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
                   {{-- <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="All">All</a> --}}
@@ -261,28 +261,7 @@
         }
       });
 
-      $(document).on('click', '.filter_btn', function(event) {
-          event.preventDefault();
-          var target = $(this).data('target');
-          if($(this).data('type') == "multiple") {
-            if($("#"+target).val()==""){
-              $("#"+target).val($(this).data('value')).trigger('change');
-              $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
-            }
-            else {
-              var value = $("#"+target).val().split(',');
-              if($.inArray($(this).data('value').toString(), value) === -1){
-                value.push($(this).data('value'));
-                $("#"+target).val(value.join(',')).trigger('change');
-                $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
-              }
-            }
-          }
-          else {
-            $('#chip_area_'+target).html('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
-            $("#"+target).val($(this).data('value')).trigger('change');
-          }
-      });
+      
       
 
       function hideShippingStatus(str){

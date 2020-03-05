@@ -241,6 +241,30 @@ $(document).ready(function () {
   if (navigator.userAgent.indexOf('Mac OS X') != -1) {
     $(".dt-checkboxes-cell input, .dt-checkboxes").addClass("mac-checkbox");
   }
+
+
+  $(document).on('click', '.filter_btn', function(event) {
+      event.preventDefault();
+      var target = $(this).data('target');
+      if($(this).data('type') == "multiple") {
+        if($("#"+target).val()==""){
+          $("#"+target).val($(this).data('value')).trigger('change');
+          $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+        }
+        else {
+          var value = $("#"+target).val().split(',');
+          if($.inArray($(this).data('value').toString(), value) === -1){
+            value.push($(this).data('value'));
+            $("#"+target).val(value.join(',')).trigger('change');
+            $('#chip_area_'+target).append('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+          }
+        }
+      }
+      else {
+        $('#chip_area_'+target).html('<div class="chip chip-primary"><div class="chip-body"><span class="chip-text">'+$(this).html()+'</span><div class="chip-closeable" data-target="'+target+'" data-type="'+$(this).data('type')+'" data-value="'+$(this).data('value')+'"><i class="feather icon-x"></i></div></div></div>');
+        $("#"+target).val($(this).data('value')).trigger('change');
+      }
+  });
   
   
 //   $(document).click(function(event){

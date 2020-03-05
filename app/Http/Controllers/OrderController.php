@@ -177,9 +177,9 @@ class OrderController extends Controller
           
              $shops = $request->user()->shops;
               
-             if($request->get('shop', 'all') != 'all'){
-                  $shops = $shops->where('id', $request->get('shop'));
-             }
+             if($request->get('shop') != ''){
+                $shops->whereIn('id', explode(",", $request->get('shop')));
+           }
 
 
              $shops_id = $shops->pluck('id')->toArray();
@@ -251,7 +251,7 @@ class OrderController extends Controller
           
           return view('order.returnReconciliation', [
               'breadcrumbs' => $breadcrumbs,
-              'shops' => $shops,
+              'all_shops' => $shops,
               'totals' => $totals
           ]);
     }

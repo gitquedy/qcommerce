@@ -22,19 +22,19 @@
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12 shop_filter">
-              <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
+              <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
                 <p>Total Returned Orders</p>
                 <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['total'] }}</span> Orders</p>
               </label>
               
-              <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
+              <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="not_confirm"  {{ $request->get('tab') == 'not_confirm' ? 'checked' : '' }}>
                 <p>Unconfirmed Return</p>
                 <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['unconfirmed'] }}</span> Orders</p>
               </label>
               
-              <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
+              <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="confirm"  {{ $request->get('tab') == 'confirm' ? 'checked' : '' }}>
                 <p>Confirmed Return</p>
                 <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['confirmed'] }}</span> Orders</p>
@@ -43,34 +43,46 @@
         </div>
         <br>
         <div class="row">
-          <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Shop:
+          <div class="col-12">
+            <div class="btn-group mb-1">
+              <input type="hidden" id="shop" name="shop" class="selectFilter">
+              <input type="hidden" id="timings" name="timings" class="selectFilter">
+              <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <i class="fa fa-shopping-cart"></i> All Shop
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}
+                  @foreach($all_shops as $shop)
+                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</a>
+                  @endforeach
+                </div>
+              </div>
             </div>
-            <div class="form-group">
-              <select name="shop" id="shop" class="select2 form-control selectFilter">
-                <option value="all">All</option>
-                @foreach($shops as $shop)
-                  <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</option>
-                @endforeach
-              </select>
+            <div class="btn-group mb-1">
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <i class="fa fa-filter"></i> Date Filter
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  {{-- <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="All">All</a> --}}
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Today">Today</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Yesterday">Yesterday</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_7_days">Last 7 days</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_30_days">Last 30 days</a>
+                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="This_Month">This Month</a>
+                </div>
+              </div>
             </div>
-        </div>
+            <div class="btn-group" id="chip_area_shop"></div>
+            <div class="btn-group" id="chip_area_timings"></div>
+          </div>
+      </div>
+      <div class="row">
         <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Date Filter:
-            </div>
-            <div class="form-group">
-              <select name="timings[]" id="timings" class="select2 form-control selectFilter" >
-                <option value="All">All</option>
-                <option value="Today">Today</option>
-                <option value="Yesterday">Yesterday</option>
-                <option value="Last_7_days">Last 7 days</option>
-                <option value="Last_30_days">Last 30 days</option>
-                <option value="This_Month">This Month</option>
-              </select>
-            </div>
         </div>
+        
       </div>
     </div>
   </section>
