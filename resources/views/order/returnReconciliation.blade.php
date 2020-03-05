@@ -150,8 +150,7 @@
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
-    $(row).attr('data-
-      ction', "{{route('barcode.viewBarcode')}}");
+    $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
