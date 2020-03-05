@@ -4,6 +4,7 @@ namespace App\Console\Commands\shop;
 
 use Illuminate\Console\Command;
 use App\Shop;
+use Carbon\Carbon;
 
 class syncShippingDetails extends Command
 {
