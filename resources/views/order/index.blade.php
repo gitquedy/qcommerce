@@ -17,10 +17,11 @@
           .shop_filter input[type='radio']{
             opacity: 0;
             width: 0;
+            height: 0;
           }
           .shop_filter label{
-            margin-left: -4px;
-            margin-right: 8px;
+            /*margin-left: -4px;*/
+            /*margin-right: 8px;*/
           }
           .shop_logo  {
             width: 50px;
@@ -39,24 +40,24 @@
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12 shop_filter">
-              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
-              <label for="site1" class="btn btn-lg btn-outline-primary {{ $request->get("site") == "lazada" ?  "active" : ""}}">
+              <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get("site") == "lazada" ?  "active" : ""}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
                 Lazada
                 <span id="notif_site1" class="badge badge-secondary">{{$lazada_count}}</span>
               </label>
-              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
-              <label for="site2" class="btn btn-lg btn-outline-primary {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
+              <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
                 Shopee
                 <span id="notif_site2" class="badge badge-secondary">{{$shopee_count}}</span>
               </label>
+              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
           </div>
         </div>
         <br>
         <div class="row">
           <div class="col-sm-12">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <div class="btn-group-toggle" data-toggle="buttons">
               <label class="btn btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
                 <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
               </label>
