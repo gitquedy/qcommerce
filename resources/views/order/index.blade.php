@@ -57,37 +57,8 @@
         <br>
         <div class="row">
           <div class="col-12">
-            <div class="btn-group mb-1">
-              <input type="hidden" id="shop" name="shop" class="selectFilter">
-              <input type="hidden" id="timings" name="timings" class="selectFilter">
-              <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa fa-shopping-cart"></i>All Shop
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}
-                  @foreach($all_shops as $shop)
-                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</a>
-                  @endforeach
-                </div>
-              </div>
-            </div>
-            <div class="btn-group mb-1">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa fa-filter"></i>Date Filter
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  {{-- <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="All">All</a> --}}
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Today">Today</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Yesterday">Yesterday</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_7_days">Last 7 days</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_30_days">Last 30 days</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="This_Month">This Month</a>
-                </div>
-              </div>
-            </div>
+            @include('order.components.shopFilter')
+            @include('order.components.dateFilter')
             <div class="btn-group mb-1 shipping_status">
               <div class="dropdown ">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -103,11 +74,6 @@
             <div class="btn-group" id="chip_area_shop"></div>
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
-      </div>
-      <div class="row">
-        <div class="col-sm-4 col-12">
-        </div>
-        
       </div>
     </div>
   </section>
@@ -247,7 +213,6 @@
 
       $(document).on('click', '.chip-closeable',function() {
         var target = $(this).data('target');
-        console.log($(this).data('type'));
         if($(this).data('type') == "multiple") {
           var value = $("#"+target).val().split(',');
           const index = value.indexOf($(this).data('value').toString());

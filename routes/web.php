@@ -114,22 +114,28 @@ Route::group(['middleware' => 'auth'], function()
 	
 
 	// Return Reconciliation
-	Route::get('/order/reconciliation/returned', 'OrderController@returnReconciliation')->name('order.returnReconciliation');
-	Route::post('/order/reconciliation/returned/reconcile', 'OrderController@returnReconcile')->name('order.returnReconcile');
+	Route::get('/order/reconciliation/returned', 'ReturnController@index')->name('order.returnReconciliation');
+	Route::post('/order/reconciliation/returned/reconcile', 'ReturnController@returnReconcile');
+	Route::get('/order/reconciliation/returned/headers', 'ReturnController@headers');
 
 
+	// Return Reconciliation
+	Route::get('/order/reconciliation/payout', 'PayoutController@index')->name('order.returnReconciliation');
+	Route::post('/order/reconciliation/payout/reconcile', 'PayoutController@payoutReconcile');
+	Route::get('/order/reconciliation/payout/headers', 'PayoutController@headers');
 
 
-
-
+	// Shipping fee Reconciliation
+	Route::get('/order/reconciliation/shippingFee', 'ShippingFeeController@index')->name('shippingfee.index');
+	Route::get('/order/reconciliation/shippingFee/headers', 'ShippingFeeController@headers')->name('shippingfee.headers');
 
 	Route::get('/order/readyToShipShopee/{order}', 'OrderController@readyToShipShopee');
 	Route::get('/order/pickupDetailsShopee/{order}', 'OrderController@pickupDetailsShopee');
 	Route::post('/order/pickupDetailsPostShopee/{order}', 'OrderController@pickupDetailsPostShopee');
 	Route::get('/order/readyToShipDropOff/{order}', 'OrderController@readyToShipDropOff');
 	
-	// Route Shipping Fee
-	Route::get('/shippingfee', 'ShippingFeeController@index')->name('shippingfee.index');
+
+	
 
 
 	// Route Dashboards

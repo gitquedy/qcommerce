@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Return Reconciliation')
+@section('title', 'Payout Reconciliation')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -24,68 +24,34 @@
           <div class="col-sm-12 shop_filter">
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
-                <p>Total Returned Orders</p>
-                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['total'] }}</span> Orders</p>
+                <p>Total Delivered Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_total">0</span> Orders</p>
               </label>
               
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="not_confirm"  {{ $request->get('tab') == 'not_confirm' ? 'checked' : '' }}>
-                <p>Unconfirmed Return</p>
-                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['unconfirmed'] }}</span> Orders</p>
+                <p>Unconfirmed Payout</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_unconfirmed">0</span> Orders</p>
               </label>
               
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="confirm"  {{ $request->get('tab') == 'confirm' ? 'checked' : '' }}>
-                <p>Confirmed Return</p>
-                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['confirmed'] }}</span> Orders</p>
+                <p>Confirmed Payout</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_confirmed">0</span> Orders</p>
               </label>
           </div>
         </div>
         <br>
         <div class="row">
           <div class="col-12">
-            <div class="btn-group mb-1">
-              <input type="hidden" id="shop" name="shop" class="selectFilter">
-              <input type="hidden" id="timings" name="timings" class="selectFilter">
-              <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 <i class="fa fa-shopping-cart"></i> All Shop
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}
-                  @foreach($all_shops as $shop)
-                    <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</a>
-                  @endforeach
-                </div>
-              </div>
-            </div>
-            <div class="btn-group mb-1">
-              <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 <i class="fa fa-filter"></i> Date Filter
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  {{-- <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="All">All</a> --}}
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Today">Today</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Yesterday">Yesterday</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_7_days">Last 7 days</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="Last_30_days">Last 30 days</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="timings" data-type="single" data-value="This_Month">This Month</a>
-                </div>
-              </div>
-            </div>
+            @include('order.components.shopFilter')
+            @include('order.components.dateFilter')
             <div class="btn-group" id="chip_area_shop"></div>
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
       </div>
-      <div class="row">
-        <div class="col-sm-4 col-12">
-        </div>
-        
-      </div>
     </div>
-  </section>
+  </section>  
 <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
@@ -95,8 +61,8 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item reconcile" data-href="{{ action('OrderController@returnReconcile') }}" data-action="Confirm">Reconcile Orders</a>
-            <a class="dropdown-item reconcile" data-href="{{ action('OrderController@returnReconcile') }}" data-action="Unconfirm">Remove Reconciliation</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Confirm">Reconcile Orders</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Unconfirm">Remove Reconciliation</a>
           </div>
         </div>
       </div>
@@ -150,7 +116,7 @@
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {
-          url: '{{ route('order.returnReconciliation') }}',
+          url: '{{ action("PayoutController@index") }}',
           data: function (data) {
                 data.shop = $("#shop").val();
                 data.timings = $("#timings").val();
@@ -170,9 +136,23 @@
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
     $(document).ready(function(){
+      function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('PayoutController@headers')  }}",
+        success: function success(result) {
+            $('#header_total').html(result.data.total);
+            $('#header_unconfirmed').html(result.data.unconfirmed);
+            $('#header_confirmed').html(result.data.confirmed);
+          },
+        });     
+      }
+
+      getHeaders(); // on load get headers
+
       $('input[name="tab"]').change(function(){
         var tab = $('input[name="tab"]:checked').val();
-        url = "{{ action('OrderController@returnReconciliation')}}?tab=" + tab;
+        url = "{{ action('PayoutController@index')}}?tab=" + tab;
         window.location.href = url;
       });
       $(".select2").select2({
@@ -200,7 +180,11 @@
       method: "POST",
       url: url,
       success: function success(result) {
+        if(result.success == 1){
+          toastr.success(result.msg);
+        }
         $('.data-list-view').DataTable().ajax.reload();
+        getHeaders();
       },
       error: function error(jqXhr, json, errorThrown) {
         console.log(jqXhr);
@@ -209,6 +193,21 @@
       }
     });
   });
+
+  $(document).on('click', '.chip-closeable',function() {
+        var target = $(this).data('target');
+        if($(this).data('type') == "multiple") {
+          var value = $("#"+target).val().split(',');
+          const index = value.indexOf($(this).data('value').toString());
+          if (index > -1) {
+            value.splice(index, 1);
+          }
+          $("#"+target).val(value.join(',')).trigger('change');
+        }
+        else {
+          $("#"+target).val('').trigger('change');
+        }
+      });
 });
   </script>
 @endsection

@@ -29,6 +29,7 @@ class CreateOrderTable extends Migration
             $table->boolean('printed')->default(0);
             $table->boolean('packed')->default(0);
             $table->boolean('returned')->default(0);
+            $table->boolean('payout')->default(0);
             $table->unsignedInteger('shop_id');
             $table->string('seen')->nullable();
             $table->string('created_at');

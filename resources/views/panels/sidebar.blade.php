@@ -51,65 +51,40 @@
 
 
         
-            <li class="nav-item  ">
-                <a href="">
-                    <i class="feather icon-shopping-bag"></i>
-                    <span class="menu-title" data-i18n="">Shops</span>
-                </a>
-                <ul class="menu-content">
-                    <li class="">
-                        <a href="{{url("/shop")}}">
-                            <i class="feather icon-circle"></i>
-                            <span class="menu-title" data-i18n="">List Shop</span>
-                        </a>
-                    </li>
-                    <li class="">
-                        <a href="{{url("/shop/create")}}">
-                            <i class="feather icon-plus"></i>
-                            <span class="menu-title" data-i18n="">Add Shop</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            
             
             
             <li class="nav-item  ">
-                <a href="">
+                <a href="{{url('/product')}}?site=lazada">
                     <i class="feather icon-package "></i>
                     <span class="menu-title" data-i18n="">Products</span>
                 </a>
-                <ul class="menu-content">
+<!--                 <ul class="menu-content">
                     <li class="">
                         <a href="{{url('/product')}}?site=lazada">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">List Products</span>
                         </a>
                     </li>
-                    <!--<li class="">-->
-                    <!--    <a href="{{url("/shop/create")}}">-->
-                    <!--        <i class="feather icon-plus"></i>-->
-                    <!--        <span class="menu-title" data-i18n="">Add Shop</span>-->
-                    <!--    </a>-->
-                    <!--</li>-->
-                </ul>
+                </ul> -->
             </li>
             
             <li class="nav-item  ">
-                <a href="">
+                <a href="{{url('/order')}}?site=lazada&status=pending">
                     <i class="feather icon-shopping-cart"></i>
                     <span class="menu-title" data-i18n="">Orders</span>
                     
                 </a>
-                <ul class="menu-content">
-                    <li class="">
+                <!-- <ul class="menu-content"> -->
+<!--                     <li class="">
                         <a href="{{url('/order')}}?site=lazada&status=pending">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">All Orders</span>
-                  <!--           @if($sidebar_data['order_all']>0)
+                            @if($sidebar_data['order_all']>0)
                             <span class="badge badge-pill badge-info float-right">{!!$sidebar_data['order_all']!!}</span>
-                            @endif -->
+                            @endif
                         </a>
-                    </li>
+                    </li> -->
                   <!--   <li class="">
                         <a href="{{url('/order')}}?site=lazada&status=pending">
                             <i class="feather icon-circle"></i>
@@ -171,9 +146,9 @@
                         </li> -->
 
                
-    
+                  <!-- </ul> -->
                   </li>
-              </ul>
+
             
 
             <li class="nav-item  ">
@@ -183,14 +158,14 @@
                 </a>
                 <ul class="menu-content">
                     <li class="">
-                        <a href="{{url('/shippingfee')}}?tab=all">
+                        <a href="{{url('/order/reconciliation/shippingFee')}}?tab=all">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Shipping Fee</span>
                         </a>
                     </li>
 
                     <li class="">
-                        <a href="#">
+                        <a href="{{url('/order/reconciliation/payout')}}?tab=all">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Payout</span>
                         </a>
@@ -204,6 +179,28 @@
                     </li>
 
                     
+                </ul>
+            </li>
+
+
+            <li class="nav-item  ">
+                <a href="">
+                    <i class="feather icon-shopping-bag"></i>
+                    <span class="menu-title" data-i18n="">Shops</span>
+                </a>
+                <ul class="menu-content">
+                    <li class="">
+                        <a href="{{url("/shop")}}">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">List Shop</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{url("/shop/create")}}">
+                            <i class="feather icon-plus"></i>
+                            <span class="menu-title" data-i18n="">Add Shop</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             

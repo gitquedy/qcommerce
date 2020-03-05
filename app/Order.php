@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned'
+		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout'
 			];
 
     public $timestamps = false;
@@ -430,6 +430,10 @@ class Order extends Model
     public static function statusesForReturned(){
         return ['returned', 'TO_RETURN', 'failed', 'CANCELLED'];
     }
+
+    public static function statusesforDelivered(){
+        return ['delivered', 'COMPLETED', 'TO_CONFIRM_RECEIVE'];
+    }  
 
     public function getImgAndIdDisplay(){
         // return  $this->shop->getImgSiteDisplay();
