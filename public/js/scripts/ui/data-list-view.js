@@ -7,10 +7,10 @@
     Author: PIXINVENT
     Author URL: http://www.themeforest.net/user/pixinvent
 ==========================================================================================*/
-
+var table = '';
 $(document).ready(function () {
   "use strict";
-  var table = $(".data-list-view").DataTable({
+     table = $(".data-list-view").DataTable({
         processing: true,
         serverSide: false,
         ajax: table_route,
@@ -37,7 +37,7 @@ $(document).ready(function () {
         bInfo: typeof BInfo !== 'undefined' ? BInfo : true,
         bFilter: typeof bFilter !== 'undefined' ? bFilter : true,
         pageLength: pageLength,
-        order: [[1, 'asc']],
+        // order: [[1, 'asc']],
         buttons: buttons,
         initComplete: function(t, e) {
             $(".dt-buttons .btn").removeClass("btn-secondary")

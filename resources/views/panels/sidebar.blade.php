@@ -102,15 +102,15 @@
                 </a>
                 <ul class="menu-content">
                     <li class="">
-                        <a href="{{url('/order')}}?site=lazada">
+                        <a href="{{url('/order')}}?site=lazada&status=pending">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">All Orders</span>
-                            @if($sidebar_data['order_all']>0)
+                  <!--           @if($sidebar_data['order_all']>0)
                             <span class="badge badge-pill badge-info float-right">{!!$sidebar_data['order_all']!!}</span>
-                            @endif
+                            @endif -->
                         </a>
                     </li>
-                    <li class="">
+                  <!--   <li class="">
                         <a href="{{url('/order')}}?site=lazada&status=pending">
                             <i class="feather icon-circle"></i>
                             <span class="menu-title" data-i18n="">Pending</span>
@@ -154,17 +154,58 @@
                             <span class="badge badge-pill badge-success float-right">{!!$sidebar_data['order_delivered']!!}</span>
                             @endif
                         </a>
+                    </li> -->
+<!-- 
+                    <li class="">
+                            <a href="{{url('/order/reconciliation/returned')}}?tab=all">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Return Reconciliation</span>
+                            </a>
+                        </li>
+
+                        <li class="">
+                            <a href="{{url('/shippingfee')}}?tab=all">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Shipping Fee Reconciliation</span>
+                            </a>
+                        </li> -->
+
+               
+    
+                  </li>
+              </ul>
+            
+
+            <li class="nav-item  ">
+                <a href="">
+                    <i class="feather icon-briefcase "></i>
+                    <span class="menu-title" data-i18n="">Reconciliation</span>
+                </a>
+                <ul class="menu-content">
+                    <li class="">
+                        <a href="{{url('/shippingfee')}}?tab=all">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">Shipping Fee</span>
+                        </a>
                     </li>
+
+                    <li class="">
+                        <a href="#">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">Payout</span>
+                        </a>
+                    </li>
+
+                    <li class="">
+                        <a href="{{url('/order/reconciliation/returned')}}?tab=all">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">Return Orders</span>
+                        </a>
+                    </li>
+
+                    
                 </ul>
             </li>
-            
-            <li class="nav-item  ">
-                <a href="{{url('/shippingfee')}}">
-                    <i class="feather icon-truck"></i>
-                    <span class="menu-title" data-i18n="">Shipping Fee</span>
-                </a>
-            </li>
-            
             
             
             <li class="nav-item  ">

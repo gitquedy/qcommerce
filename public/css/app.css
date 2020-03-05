@@ -15,4 +15,18 @@
         clear: both;
         page-break-after: always;
     }
+
+    .pd-l-5 {
+        padding-left: 5px;
+    }
+
+
+}
+
+.shop_filter input[type='radio']{
+    opacity: 0;
+}
+.shop_logo  {
+    width: 50px;
+    height: auto;
 }

@@ -62,6 +62,9 @@ class Shop extends Model
                 if($orders){
                     $orders = array_map(function($order){
                         $status = $order['statuses'][0];
+                        if(array_key_exists(1,$order['statuses'])){
+                             $status = $order['statuses'][1];
+                        }
                         $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
                         $order['printed'] = $printed;
                         $order['price'] = Order::tofloat($order['price']);
@@ -390,6 +393,10 @@ class Shop extends Model
             }
        }
        return (object) $datas;
+    }
+
+    public function getImgSiteDisplay(){
+        return '<img src="'.asset('images/shop/30x30/'. $this->site.'.png').'" alt="'. $this->site .'" style="width:15px; height:15px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->short_name .' </span>';
     }
 }
 

@@ -113,6 +113,14 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/order/print_shipping_mass', 'OrderController@print_shipping_mass')->name('order.print_shipping_mass');
 	
 
+	// Return Reconciliation
+	Route::get('/order/reconciliation/returned', 'OrderController@returnReconciliation')->name('order.returnReconciliation');
+	Route::post('/order/reconciliation/returned/reconcile', 'OrderController@returnReconcile')->name('order.returnReconcile');
+
+
+
+
+
 
 
 	Route::get('/order/readyToShipShopee/{order}', 'OrderController@readyToShipShopee');

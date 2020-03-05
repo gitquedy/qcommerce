@@ -77,7 +77,8 @@ class OrderController extends Controller
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
-
+           $orders->orderBy('updated_at', 'desc');
+           
            if($request->get('site') == 'lazada'){
               $orders->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
            }else if($request->get('site') == 'shopee'){
@@ -126,9 +127,12 @@ class OrderController extends Controller
            }
            
             return Datatables::eloquent($orders)
-                ->addColumn('shop', function(Order $order) {
-                            return $order->shop ? $order->shop->short_name : '';
-                                })
+                ->addColumn('idDisplay', function(Order $order) {
+                              return $order->getImgAndIdDisplay();
+                                  })
+                // ->addColumn('shop', function(Order $order) {
+                //             return $order->shop ? $order->shop->short_name : '';
+                //                 })
                 ->addColumn('statusDisplay', function(Order $order) {
                             return ucwords(str_replace('_', ' ', $order->status));
                                 })
@@ -138,7 +142,7 @@ class OrderController extends Controller
                 ->addColumn('created_at_formatted', function(Order $order) {
                             return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
                                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'idDisplay'])
                 ->make(true);
         }
         
@@ -149,6 +153,115 @@ class OrderController extends Controller
             'selectedStatus' => $selectedStatus,
         ]);
     }
+
+    public function returnReconciliation(Request $request)
+    {
+      $breadcrumbs = [
+          // ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
+      ];
+      $shops = $request->user()->shops;
+      $shops_id = $shops->pluck('id')->toArray();
+      $totals = [
+        'unconfirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', false)->count(),
+        'confirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', true)->count(),
+      ];
+      $totals['total'] = $totals['unconfirmed'] + $totals['confirmed'];
+
+      if ( request()->ajax()) {
+          
+             $shops = $request->user()->shops;
+              
+             if($request->get('shop', 'all') != 'all'){
+                  $shops = $shops->where('id', $request->get('shop'));
+             }
+
+
+             $shops_id = $shops->pluck('id')->toArray();
+
+             $orders = Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->orderBy('updated_at', 'desc');
+
+
+             if($request->get('tab') == 'not_confirm'){
+              $orders->where('returned', false);
+             }
+
+             if($request->get('tab') == 'confirm'){
+              $orders->where('returned', true);
+             }
+             
+             if($request->get('timings')=="Today"){
+                 $orders->whereDate('created_at', '=', date('Y-m-d'));
+             }
+             
+             if($request->get('timings')=="Yesterday"){
+                  $date=date_create();
+                  date_modify($date,"-1 days");
+                 $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
+             }
+             
+             if($request->get('timings')=="Last_7_days"){
+                  $date=date_create();
+                  date_modify($date,"-7 days");
+                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
+                  $orders->where('created_at', '<=', date('Y-m-d'));
+             }
+             
+             if($request->get('timings')=="This_Month"){
+                  $orders->where('created_at', '>=', date("Y-m-01"));
+                  $orders->where('created_at', '<=', date('Y-m-d'));
+             }
+             
+             if($request->get('timings')=="Last_30_days"){
+                  $date=date_create();
+                  date_modify($date,"-30 days");
+                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
+                  $orders->where('created_at', '<=', date('Y-m-d'));
+             }
+             
+              return Datatables::eloquent($orders)
+                  ->addColumn('idDisplay', function(Order $order) {
+                              return $order->getImgAndIdDisplay();
+                                  })
+                  // ->addColumn('shop', function(Order $order) {
+                  //             return $order->shop ? $order->shop->getImgSiteDisplay() : '';
+                  //                 })
+                  ->addColumn('actions', function(Order $order) {
+                              $text = $order->returned == true ? 'Unconfirm' : 'Confirm';
+                              $class = $order->returned == false ? 'text-primary' : 'text-danger';
+                              return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('OrderController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
+                              })
+                  ->addColumn('created_at_formatted', function(Order $order) {
+                              return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
+                                  })
+                  ->addColumn('updated_at_formatted', function(Order $order) {
+                                  $created = new Carbon($order->updated_at);
+                                  $now = Carbon::now();
+                                  return  $created->diffForHumans();
+                              //  return Utilities::format_date($order->updated_at, 'M. d,Y H:i A');
+                                  })
+                  ->rawColumns(['actions', 'shop', 'idDisplay'])
+                  ->make(true);
+          }
+          
+          return view('order.returnReconciliation', [
+              'breadcrumbs' => $breadcrumbs,
+              'shops' => $shops,
+              'totals' => $totals
+          ]);
+    }
+
+    public function returnReconcile(Request $request){
+        $ids = explode(',',$request->get('ids'));
+        $status = $request->get('action', 'Confirm') == 'Confirm' ? 1 : 0;
+
+        Order::whereIn('id', $ids)->orWhereIn('ordersn', $ids)->update(['returned' => $status]);
+
+
+    }
+
+
+
+    
 
     public function cancelModal(Order $order){
 

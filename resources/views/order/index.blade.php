@@ -13,15 +13,6 @@
 @section('mystyle')
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
-        <style>
-          .shop_filter input[type='radio']{
-            opacity: 0;
-          }
-          .shop_logo  {
-            width: 50px;
-            height: auto;
-          }
-        </style>
 @endsection
 
 @section('content')
@@ -140,7 +131,7 @@
           <tr>
             <th>For Checkbox</th>
             <th> {{ $request->get('site') == 'shopee' ?  'Order SN' : 'Order Number'  }}</th>
-            <th>Seller</th>
+            <!-- <th>Seller</th> -->
             <th>Creation Date</th>
             <!-- <th>Creation Date</th> -->
             <th>Payment Method</th>
@@ -182,8 +173,8 @@
      var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
-            { data: id, name: id},
-            { data: 'shop', name: 'shop.short_name'},
+            { data: 'idDisplay', name: 'idDisplay'},
+            // { data: 'shop', name: 'shop.short_name'},
             { data: 'created_at_formatted', name: 'created_at' },
             // { data: 'created_at', name: 'created_at' },
             { data: 'payment_method', name: 'payment_method' },

@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled'
+		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned'
 			];
 
     public $timestamps = false;
@@ -426,4 +426,18 @@ class Order extends Model
     public static function statusNotIncludedInSales(){
         return ['CANCELLED', 'canceled', 'returned', 'failed', 'IN_CANCEL', 'TO_RETURN'];
     }
+
+    public static function statusesForReturned(){
+        return ['returned', 'TO_RETURN', 'failed', 'CANCELLED'];
+    }
+
+    public function getImgAndIdDisplay(){
+        // return  $this->shop->getImgSiteDisplay();
+    return '<div class="text-primary font-medium-2 text-bold-600">'. $this->OrderID() .' </div>' . $this->shop->getImgSiteDisplay();
+    }
+
+    public function OrderID(){
+        return $this->site == 'lazada' ? $this->id : $this->ordersn;
+    }
+    
 }
