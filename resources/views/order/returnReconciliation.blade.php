@@ -25,19 +25,19 @@
               <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
                 <p>Total Returned Orders</p>
-                <p class="text-warning text-bold-400 font-large-1">{{ $totals['total'] }} Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['total'] }}</span> Orders</p>
               </label>
               
               <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="not_confirm"  {{ $request->get('tab') == 'not_confirm' ? 'checked' : '' }}>
                 <p>Unconfirmed Return</p>
-                <p class="text-warning text-bold-400 font-large-1">{{ $totals['unconfirmed'] }} Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['unconfirmed'] }}</span> Orders</p>
               </label>
               
               <label class="btn btn-lg btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="confirm"  {{ $request->get('tab') == 'confirm' ? 'checked' : '' }}>
                 <p>Confirmed Return</p>
-                <p class="text-warning text-bold-400 font-large-1">{{ $totals['confirmed'] }} Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span>{{ $totals['confirmed'] }}</span> Orders</p>
               </label>
           </div>
         </div>
@@ -101,7 +101,6 @@
             <th>Created At</th>
             <th>Last Update</th>
             <th>Amount</th>
-            <th>reconciled</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -136,7 +135,6 @@
             { data: 'created_at_formatted', name: 'created_at_formatted' },
             { data: 'updated_at_formatted', name: 'updated_at_formatted' },
             { data: 'price', name: 'price' },
-            { data: 'returned', name: 'returned' },
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {
@@ -152,7 +150,8 @@
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
-    $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
+    $(row).attr('data-
+      ction', "{{route('barcode.viewBarcode')}}");
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
