@@ -43,11 +43,11 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
+              <label class="btn px-1 btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
                 <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
               </label>
               @foreach($statuses as $status)
-                <label class="btn btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
+                <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
                   <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucwords(str_replace("_"," ", $status)) }}
                 </label>
               @endforeach
@@ -139,7 +139,7 @@
             <th> {{ $request->get('site') == 'shopee' ?  'Order SN' : 'Order Number'  }}</th>
             <!-- <th>Seller</th> -->
             <th>Creation Date</th>
-            <!-- <th>Creation Date</th> -->
+            <th>Order Since</th>
             <th>Payment Method</th>
             <th>Price</th>
             <th>Item Count</th>
@@ -182,7 +182,7 @@
             { data: 'idDisplay', name: 'idDisplay'},
             // { data: 'shop', name: 'shop.short_name'},
             { data: 'created_at_formatted', name: 'created_at' },
-            // { data: 'created_at', name: 'created_at' },
+            { data: 'created_at_human_read', name: 'created_at_human_read' },
             { data: 'payment_method', name: 'payment_method' },
             { data: 'price', name: 'price' },
             { data: 'items_count', name: 'items_count' },

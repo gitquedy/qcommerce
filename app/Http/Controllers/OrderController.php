@@ -54,8 +54,8 @@ class OrderController extends Controller
         }
 
         $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        $lazada_count = Order::where('site','lazada')->whereIn('status', ['pending', 'ready_to_ship'])->count();
-        $shopee_count = Order::where('site','shopee')->whereIn('status', ['UNPAID', 'READY_TO_SHIP'])->count();
+        $lazada_count = Order::where('site','lazada')->whereIn('status', ['pending'])->count();
+        $shopee_count = Order::where('site','shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
         
         foreach($orders as $ordersVAL){
             $tmp_order = Order::find($ordersVAL->id);
@@ -142,6 +142,9 @@ class OrderController extends Controller
                                 })
                 ->addColumn('created_at_formatted', function(Order $order) {
                             return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
+                                })
+                ->addColumn('created_at_human_read', function(Order $order) {
+                            return Carbon::parse($order->created_at)->diffForHumans();;
                                 })
                 ->rawColumns(['actions', 'idDisplay'])
                 ->make(true);
