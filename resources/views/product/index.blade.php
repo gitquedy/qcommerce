@@ -62,6 +62,10 @@
           </div>
         </div>
         <br><div class="row">
+          <div class="col-sm-12">
+            @include('order.components.shopFilter')
+            <div class="btn-group" id="chip_area_shop"></div>
+          </div>
       <!--     <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Order ID:
@@ -70,7 +74,7 @@
               <input type="text" id="search" class="form-control inputSearch" placeholder="Input order id here..">
             </div>
           </div> -->
-          <div class="col-sm-4 col-12">
+          {{-- <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Shop:
             </div>
@@ -82,7 +86,7 @@
                 @endforeach
               </select>
             </div>
-        </div>
+          </div> --}}
         <div class="col-sm-4 col-12">
             <!--<div class="text-bold-600 font-medium-2">-->
             <!--  Status:-->

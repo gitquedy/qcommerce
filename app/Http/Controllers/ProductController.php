@@ -60,7 +60,7 @@ class ProductController extends Controller
                
                $Products = Products::with('shop')->orderBy('updated_at', 'desc');
                
-               if($request->get('shop', 'all') != 'all'){
+               if($request->get('shop') != ''){
                     $Products->where('shop_id', $request->get('shop'));
                }else{
                    $Products->whereIn('shop_id', $Shop_array);

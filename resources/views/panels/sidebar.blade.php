@@ -50,9 +50,26 @@
             </li>
 
 
-        
-            
-            
+            <li class="nav-item  ">
+                <a href="">
+                    <i class="feather icon-shopping-bag"></i>
+                    <span class="menu-title" data-i18n="">Shops</span>
+                </a>
+                <ul class="menu-content">
+                    <li class="">
+                        <a href="{{url("/shop")}}">
+                            <i class="feather icon-circle"></i>
+                            <span class="menu-title" data-i18n="">List Shop</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{url("/shop/create")}}">
+                            <i class="feather icon-plus"></i>
+                            <span class="menu-title" data-i18n="">Add Shop</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             
             <li class="nav-item  ">
                 <a href="{{url('/product')}}?site=lazada">
@@ -181,29 +198,6 @@
                     
                 </ul>
             </li>
-
-
-            <li class="nav-item  ">
-                <a href="">
-                    <i class="feather icon-shopping-bag"></i>
-                    <span class="menu-title" data-i18n="">Shops</span>
-                </a>
-                <ul class="menu-content">
-                    <li class="">
-                        <a href="{{url("/shop")}}">
-                            <i class="feather icon-circle"></i>
-                            <span class="menu-title" data-i18n="">List Shop</span>
-                        </a>
-                    </li>
-                    <li class="">
-                        <a href="{{url("/shop/create")}}">
-                            <i class="feather icon-plus"></i>
-                            <span class="menu-title" data-i18n="">Add Shop</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            
             
             <li class="nav-item  ">
                 <a >

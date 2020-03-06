@@ -210,23 +210,6 @@
           var str = $("input[name=status]:checked").val();
           hideShippingStatus(str);
       });
-
-      $(document).on('click', '.chip-closeable',function() {
-        var target = $(this).data('target');
-        if($(this).data('type') == "multiple") {
-          var value = $("#"+target).val().split(',');
-          const index = value.indexOf($(this).data('value').toString());
-          if (index > -1) {
-            value.splice(index, 1);
-          }
-          $("#"+target).val(value.join(',')).trigger('change');
-        }
-        else {
-          $("#"+target).val('').trigger('change');
-        }
-      });
-
-      
       
 
       function hideShippingStatus(str){

@@ -400,7 +400,7 @@ class Shop extends Model
     }
 
     public function getImgSiteDisplayWithFullName(){
-        return '<img src="'.asset('images/shop/30x30/'. $this->site.'.png').'" alt="'. $this->site .'" style="width:15px; height:15px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->name .' ('. $this->short_name .')</span>';
+        return '<img src="'.asset('images/shop/30x30/'. $this->site.'.png').'" class="m-0" alt="'. $this->site .'" style="width:15px; height:15px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->name .' ('. $this->short_name .')</span>';
     }
 }
 
