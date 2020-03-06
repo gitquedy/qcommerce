@@ -74,10 +74,19 @@ class ReturnController extends Controller
                   ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                                   })
+                  ->addColumn('return_status', function (Order $order) {
+                              return ($order->returned)? "Confirmed":"Pending";
+                  })
                   ->addColumn('actions', function(Order $order) {
-                              $text = $order->returned == true ? 'Unconfirm' : 'Confirm';
-                              $class = $order->returned == false ? 'text-primary' : 'text-danger';
-                              return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
+                              if ($order->returned == true) {
+                                return '<button type="button" class="btn btn-sm btn-outline-primary view_reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="view">View Details</button>';
+                              }
+                              else {
+                                return '<button type="button" class="btn btn-primary reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="Confirm">Confirm</button>';
+                              }
+                              // $text = $order->returned == true ? 'Unconfirm' : 'Confirm';
+                              // $class = $order->returned == false ? 'text-primary' : 'text-danger';
+                              // return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
                               })
                   ->addColumn('created_at_formatted', function(Order $order) {
                               return Utilities::format_date($order->created_at, 'M. d,Y H:i A');

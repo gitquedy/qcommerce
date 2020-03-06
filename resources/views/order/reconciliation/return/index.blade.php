@@ -79,6 +79,7 @@
             <th>Created At</th>
             <th>Last Update</th>
             <th>Amount</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -113,6 +114,7 @@
             { data: 'created_at_formatted', name: 'created_at_formatted' },
             { data: 'updated_at_formatted', name: 'updated_at_formatted' },
             { data: 'price', name: 'price' },
+            { data: 'return_status', name: 'return_status' },
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {
