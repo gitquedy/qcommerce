@@ -35,6 +35,9 @@ class ProductController extends Controller
            $all_shops = $all_shops->where('site', 'lazada');
         }
 
+        $lazada_count = number_format(Products::with('shop')->orderBy('updated_at', 'desc')->where('site', 'lazada')->count());
+        $shopee_count = number_format(Products::with('shop')->orderBy('updated_at', 'desc')->where('site', 'shopee')->count());
+
         $all_shops = $all_shops->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
@@ -108,6 +111,8 @@ class ProductController extends Controller
             return view('product.index', [
                 'breadcrumbs' => $breadcrumbs,
                 'all_shops' => $all_shops,
+                'lazada_count' => $lazada_count,
+                'shopee_count' => $shopee_count,
                 'statuses' => $statuses,
             ]);
         }
