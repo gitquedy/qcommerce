@@ -35,8 +35,6 @@ class ProductController extends Controller
            $all_shops = $all_shops->where('site', 'lazada');
         }
 
-        $lazada_count = number_format(Products::with('shop')->orderBy('updated_at', 'desc')->where('site', 'lazada')->count());
-        $shopee_count = number_format(Products::with('shop')->orderBy('updated_at', 'desc')->where('site', 'shopee')->count());
 
         $all_shops = $all_shops->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
@@ -45,6 +43,8 @@ class ProductController extends Controller
         }
         
         $Products_unseen =  Products::whereIn('shop_id',$Shop_array)->where('seen','=',0)->get();
+        $lazada_count = number_format(Products::join('shop', 'shop.id', '=', 'products.shop_id')->where('shop.user_id', $request->user()->id)->orderBy('products.updated_at', 'desc')->where('products.site', 'lazada')->count());
+        $shopee_count = number_format(Products::join('shop', 'shop.id', '=', 'products.shop_id')->where('shop.user_id', $request->user()->id)->orderBy('products.updated_at', 'desc')->where('products.site', 'shopee')->count());
         
         foreach($Products_unseen as $Products_unseenVAL){
             $tmp_pro = Products::find($Products_unseenVAL->id);
