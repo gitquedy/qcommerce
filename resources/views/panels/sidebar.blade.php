@@ -191,7 +191,7 @@
                     <li class="">
                         <a href="{{url('/order/reconciliation/returned')}}?tab=all">
                             <i class="feather icon-circle"></i>
-                            <span class="menu-title" data-i18n="">Return Orders</span>
+                            <span class="menu-title" data-i18n="">Failed Delivery Return</span>
                         </a>
                     </li>
 
