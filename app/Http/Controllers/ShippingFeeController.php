@@ -70,28 +70,50 @@ class ShippingFeeController extends Controller
                 ->addColumn('overcharge', function (Order $order) {
                             return number_format(abs($order->seller_payout_fees->amount) - $order->customer_payout_fees->amount);
                 })
+                // ->addColumn('action', function(Order $order) {
+                //                $text = $order->shipping_fee_reconciled == 1 ? 'Reconcile' : 'Reconcile';
+                //                $class = $order->shipping_fee_reconciled == 1 ? 'text-primary' : 'text-danger';
+                //               return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
+                //               })
+
                 ->addColumn('action', function(Order $order) {
-                               $text = $order->shipping_fee_reconciled == 1 ? 'Reconcile' : 'Reconcile';
-                               $class = $order->shipping_fee_reconciled == 1 ? 'text-primary' : 'text-danger';
-                              return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
+                              $disabled = ['filed' => 'disabled' , 'resolved' => 'disabled'];
+                              if($order->shipping_fee_reconciled == 1){
+                                $disabled['filed'] = '';
+                              }else if($order->shipping_fee_reconciled == 2){
+                                $disabled['resolved'] = '';
+                              }
+                    return  '<div class="btn-group dropup mr-1 mb-1">
+                                 <button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>
+                                  <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                                  <span class="sr-only">Toggle Dropdown</span></button>
+                                  <div class="dropdown-menu">
+                                      <a class="dropdown-item confirm '. $disabled['filed'] .'" href="#" data-text="Are you sure to mark ' . $order->OrderID() .' as filed dispute ?" data-text=""  data-href="'. action('ShippingFeeController@filed', $order->id) .'"><i class="fa fa-file aria-hidden="true"></i> Filed Dispute</a>
+                                      <a class="dropdown-item confirm '. $disabled['resolved'] .'" href="#" data-text="Are you sure mark ' . $order->OrderID() .' as resolved?" data-text=""  data-href="'. action('ShippingFeeController@resolved', $order->id) .'"><i class="fa fa-handshake-o aria-hidden="true"></i> Resolved</a>
+                                  </div></div>';
                               })
 
                 ->addColumn('shipping_fee_reconciled', function(Order $order) {
                                if ($order->shipping_fee_reconciled == 1) {
-                                  return "Over Charged";
+                                  $text =  "Over Charged";
+                                  $class= "text-danger";
                                 }
                                 else if($order->shipping_fee_reconciled == 2) {
-                                  return "Filed Discpute";
+                                  $text =  "Filed Discpute";
+                                  $class= "text-warning";
                                 }
                                 else if($order->shipping_fee_reconciled == 3) {
-                                  return "Resolved";
+                                  $text =  "Resolved";
+                                  $class= "text-success";
                                 }
                                 else {
-                                  return "Pending";
+                                  $text = "Pending";
+                                  $class= "text-danger";
                                 }
-                              })
-                    ->rawColumns(['action', 'idDisplay'])
-	            ->make(true);
+                              return '<span class="'. $class .' font-medium-1 text-bold-400">' . $text .'</span>';
+                                  })
+                  ->rawColumns(['action', 'idDisplay', 'shipping_fee_reconciled'])
+	                  ->make(true);
 	        }
 
         return view('order.reconciliation.shippingFee.index', [
@@ -111,5 +133,44 @@ class ShippingFeeController extends Controller
       ];
       return response()->json(['data' => $data]);
     }
+
+    public function filed(Order $order){
+        try {
+          $text = 'filed dispute';
+          $order->update(['shipping_fee_reconciled' => 2]);
+
+          $output = ['success' => 1,
+              'msg' => 'Order '. $order->orderID() .' successfully '. $text,
+          ];
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+    public function resolved(Order $order){
+        try {
+          $text = 'resolved';
+          $order->update(['shipping_fee_reconciled' => 3]);
+
+          $output = ['success' => 1,
+              'msg' => 'Order '. $order->orderID() .' successfully '. $text . ' payout',
+          ];
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
 
 }

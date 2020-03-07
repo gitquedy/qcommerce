@@ -132,6 +132,8 @@ Route::group(['middleware' => 'auth'], function()
 	// Shipping fee Reconciliation
 	Route::get('/order/reconciliation/shippingFee', 'ShippingFeeController@index')->name('shippingfee.index');
 	Route::get('/order/reconciliation/shippingFee/headers', 'ShippingFeeController@headers')->name('shippingfee.headers');
+	Route::get('/order/reconciliation/shippingFee/filed/{order}', 'ShippingFeeController@filed');
+	Route::get('/order/reconciliation/shippingFee/resolved/{order}', 'ShippingFeeController@resolved');
 
 	Route::get('/order/readyToShipShopee/{order}', 'OrderController@readyToShipShopee');
 	Route::get('/order/pickupDetailsShopee/{order}', 'OrderController@pickupDetailsShopee');

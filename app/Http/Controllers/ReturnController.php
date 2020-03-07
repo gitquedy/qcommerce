@@ -85,7 +85,7 @@ class ReturnController extends Controller
                                           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                                           <span class="sr-only">Toggle Dropdown</span></button>
                                           <div class="dropdown-menu">
-                                              <a class="dropdown-item confirm'. $disabled .'" href="#" data-text="Are you sure to ' . $text . ' ' . $order->OrderID() .' return?" data-text="This Action is irreversible."  data-href="'. action('ReturnController@returnReconcileSingle', $order->id) .'"><i class="fa fa-check aria-hidden="true"></i> '. $text .'</a>
+                                              <a class="dropdown-item confirm'. $disabled .'" href="#" data-text="Are you sure to ' . $text . ' ' . $order->OrderID() .' return?" data-text=""  data-href="'. action('ReturnController@returnReconcileSingle', $order->id) .'"><i class="fa fa-check aria-hidden="true"></i> '. $text .'</a>
                                           </div></div>';
                                           })
                   ->addColumn('statusText', function(Order $order) {

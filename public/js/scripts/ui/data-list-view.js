@@ -16,6 +16,7 @@ $(document).ready(function () {
         ajax: table_route,
         columns: columnns,
         createdRow: created_row_function,
+        drawCallback: (typeof draw_callback_function === "function")  ? draw_callback_function : function(){},
         responsive: !1,
         columnDefs: [{
             orderable: false,

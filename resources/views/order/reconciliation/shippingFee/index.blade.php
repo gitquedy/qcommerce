@@ -69,7 +69,7 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop">Delete</a>
+            <!-- <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop">Delete</a> -->
             <!--<a class="dropdown-item" href="#">Print</a>-->
             <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
             <!--<a class="dropdown-item" href="#">Another Action</a>-->
@@ -119,6 +119,20 @@
 @endsection
 @section('myscript')
   {{-- Page js files --}}
+  <script type="text/javascript">
+    function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('ShippingFeeController@headers')  }}",
+        success: function success(result) {
+            $('#header_total').html(result.data.total);
+            $('#header_pending').html(result.data.pending);
+            $('#header_filed').html(result.data.filed);
+            $('#header_resolved').html(result.data.resolved);
+          },
+        });     
+      }
+  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
@@ -128,7 +142,6 @@
                     return '<input type="checkbox" class="dt-checkboxes">';
                 },
                 className:'dt-checkboxes-cell'
-                
             },
             { data: 'idDisplay', name: 'idDisplay' ,orderable : false},
             { data: 'seller_payout_fees.statement', name: 'seller_payout_fees.statement' },
@@ -153,6 +166,13 @@
   }
   var aLengthMenu = [[4, 10, 15, 20],[4, 10, 15, 20]];
   var pageLength = 10;
+
+  function draw_callback_function(settings){
+    getHeaders();
+  }
+</script>
+  <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+<script>
   $(document).ready(function(){
       $('.view_modal').on('hidden.bs.modal', function () {
         table.ajax.reload();
@@ -179,22 +199,8 @@
         }
       });
 
-      function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('ShippingFeeController@headers')  }}",
-        success: function success(result) {
-            $('#header_total').html(result.data.total);
-            $('#header_pending').html(result.data.pending);
-            $('#header_filed').html(result.data.filed);
-            $('#header_resolved').html(result.data.resolved);
-          },
-        });     
-      }
-
       getHeaders(); // on load get headers
 
   });  
   </script>
-  <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 @endsection

@@ -106,6 +106,19 @@
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
+    function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('PayoutController@headers')  }}",
+        success: function success(result) {
+            $('#header_total').html(result.data.total);
+            $('#header_unconfirmed').html(result.data.unconfirmed);
+            $('#header_confirmed').html(result.data.confirmed);
+          },
+        });     
+      }
+  </script>
+  <script type="text/javascript">
      var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
@@ -132,24 +145,15 @@
     $(row).attr('data-id', JSON.parse(data.id));
     $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
   }
+  function draw_callback_function(settings){
+    getHeaders();
+  }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
     $(document).ready(function(){
-      function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('PayoutController@headers')  }}",
-        success: function success(result) {
-            $('#header_total').html(result.data.total);
-            $('#header_unconfirmed').html(result.data.unconfirmed);
-            $('#header_confirmed').html(result.data.confirmed);
-          },
-        });     
-      }
-
       getHeaders(); // on load get headers
 
       $('input[name="tab"]').change(function(){
