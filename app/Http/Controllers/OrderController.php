@@ -46,22 +46,15 @@ class OrderController extends Controller
           $selectedStatus = 'all';
         }
 
+      
         $all_shops = $all_shops->get();
-        
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
+        $shop_ids = $all_shops->pluck('id');
 
-        $orders = Order::select('id')->whereIn('shop_id',$Shop_array)->where('seen','=','no')->get();
-        $lazada_count = Order::where('site','lazada')->whereIn('status', ['pending'])->count();
-        $shopee_count = Order::where('site','shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
+
+        $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->where('seen','=','no')->update(['seen' => 'yes']);
+        $lazada_count = Order::where('site','lazada')->whereIn('shop_id',$shop_ids)->whereIn('status', ['pending'])->count();
+        $shopee_count = Order::where('site','shopee')->whereIn('shop_id',$shop_ids)->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
         
-        foreach($orders as $ordersVAL){
-            $tmp_order = Order::find($ordersVAL->id);
-            $tmp_order->seen = 'yes';
-            $tmp_order->save();
-        }
 
     if ( request()->ajax()) {
            $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
