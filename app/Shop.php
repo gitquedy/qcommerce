@@ -50,8 +50,8 @@ class Shop extends Model
                     $created_before_increment += 1;
                     $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
                     $r = new LazopRequest('/orders/get','GET');
-                    $r->addApiParam('created_after', $date);
-                    $r->addApiParam('created_before', $created_before);
+                    $r->addApiParam('update_after', $date);
+                    $r->addApiParam('update_before', $created_before);
                     $r->addApiParam('sort_by','updated_at');
                     $result = $c->execute($r, $this->access_token);
                     $data = json_decode($result, true);
@@ -190,8 +190,8 @@ class Shop extends Model
             $offset = 0;
             while($more){
                 $params = [
-                    'create_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
-                    'create_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
+                    'update_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
+                    'update_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
                     'pagination_entries_per_page' => 100,
                     'pagination_offset' => $offset,
                 ];
