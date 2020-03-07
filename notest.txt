@@ -1,1 +1,62 @@
-php artisan make:controller Api\\TestController --api
+pero una muna pla gab tapusin na  muna ung sa shipping recon
+
+
+👍
+1
+ung mga action
+
+
+pra matapos na din ung module na un at ung sa payout
+
+
+👍
+1
+
+Ralph
+tapos di nag uupdate ung order status gab
+
+
+23 pa nakalagay na ready to ship ng greenoptions sa qcommerce pero sa lazada 18 nlng tlga
+
+
+👍
+1
+
+Ralph
+meron na mga nagpresignup haha
+
+
+❤
+1
+
+FRI 11:17 PM
+
+Ralph
+👍
+1
+
+
+
+Ralph
+Ung package naten simple lng P350 per shop per month
+
+
+👍
+1
+7:19 AM
+
+Romar Patrick
+Guys nagtry ako mag print gamit ung q commerce pero ganyan lang ung lumilitaw wala xang button to print
+
+
+
+
+kung pwedeng my button xa na print pero pwede xa ctrl + P
+
+
+👍
+1
+9:26 AM
+
+Ralph
+my bug din pla sa orders sa shopee.. sa system nsa 60+ shipping ko pero ung actual nsa 16 lng

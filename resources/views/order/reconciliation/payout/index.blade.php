@@ -61,8 +61,8 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Confirm">Reconcile Orders</a>
-            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Unconfirm">Remove Reconciliation</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Confirm">Confirm Payout</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Unconfirm">Unconfirm Payout</a>
           </div>
         </div>
       </div>
@@ -79,6 +79,7 @@
             <th>Created At</th>
             <th>Last Update</th>
             <th>Amount</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -113,6 +114,7 @@
             { data: 'created_at_formatted', name: 'created_at_formatted' },
             { data: 'updated_at_formatted', name: 'updated_at_formatted' },
             { data: 'price', name: 'price' },
+            { data: 'statusText', name: 'statusText' },
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {

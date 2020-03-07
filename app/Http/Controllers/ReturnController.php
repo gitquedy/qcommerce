@@ -78,16 +78,21 @@ class ReturnController extends Controller
                               return ($order->returned)? "Confirmed":"Pending";
                   })
                   ->addColumn('actions', function(Order $order) {
-                              if ($order->returned == true) {
-                                return '<button type="button" class="btn btn-sm btn-outline-primary view_reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="view">View Details</button>';
-                              }
-                              else {
-                                return '<button type="button" class="btn btn-primary reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="Confirm">Confirm</button>';
-                              }
-                              // $text = $order->returned == true ? 'Unconfirm' : 'Confirm';
-                              // $class = $order->returned == false ? 'text-primary' : 'text-danger';
-                              // return '<span class="'. $class . ' font-medium-2 text-bold-400 reconcile" data-href="'. action('ReturnController@returnReconcile') .'" data-id="'. $order->OrderID() .'" data-action="'. $text .'">'. $text .'</span>';
-                              })
+                              $text = $order->returned == true ? 'Unconfirm' : 'Confirm';
+                                          $disabled =  $order->payout == true ? '' : '';
+                                return  '<div class="btn-group dropup mr-1 mb-1">
+                                         <button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>
+                                          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                                          <span class="sr-only">Toggle Dropdown</span></button>
+                                          <div class="dropdown-menu">
+                                              <a class="dropdown-item confirm'. $disabled .'" href="#" data-text="Are you sure to ' . $text . ' ' . $order->OrderID() .' return?" data-text="This Action is irreversible."  data-href="'. action('ReturnController@returnReconcileSingle', $order->id) .'"><i class="fa fa-check aria-hidden="true"></i> '. $text .'</a>
+                                          </div></div>';
+                                          })
+                  ->addColumn('statusText', function(Order $order) {
+                                  $class = $order->returned == true ? 'text-primary' : 'text-danger';
+                                  $text = $order->returned == true ? 'Confirmed' : 'Unconfirmed';
+                                  return '<span class="'. $class .' font-medium-1 text-bold-400">' . $text .'</span>';
+                                  })
                   ->addColumn('created_at_formatted', function(Order $order) {
                               return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
                                   })
@@ -96,7 +101,7 @@ class ReturnController extends Controller
                                   $now = Carbon::now();
                                   return  $created->diffForHumans();
                                   })
-                  ->rawColumns(['actions', 'shop', 'idDisplay'])
+                  ->rawColumns(['actions', 'shop', 'idDisplay', 'statusText'])
                   ->make(true);
           }
           
@@ -124,4 +129,30 @@ class ReturnController extends Controller
         Order::whereIn('id', $ids)->orWhereIn('ordersn', $ids)->update(['returned' => $status]);
         return response()->json(['success' => 1, 'msg' => 'Return Reconciliation successfully updated']);
     }
+
+    public function returnReconcileSingle(Order $order){
+        try {
+          $text = $order->returned == true ? 'unconfirmed' : 'confirmed';
+            if($order->returned == true){
+              $order->update(['returned' => false]);
+            }else{
+              $order->update(['returned' => true]);
+            }
+
+              $output = ['success' => 1,
+                  'msg' => 'Order '. $order->orderID() .' successfully '. $text . ' return',
+              ];
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+
+    }
+
+
 }

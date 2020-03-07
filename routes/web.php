@@ -117,11 +117,15 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/order/reconciliation/returned', 'ReturnController@index')->name('order.returnReconciliation');
 	Route::post('/order/reconciliation/returned/reconcile', 'ReturnController@returnReconcile');
 	Route::get('/order/reconciliation/returned/headers', 'ReturnController@headers');
+	
+	Route::get('/order/reconciliation/returned/reconcileSingle/{order}', 'ReturnController@returnReconcileSingle');
 
 
 	// Return Reconciliation
 	Route::get('/order/reconciliation/payout', 'PayoutController@index')->name('order.returnReconciliation');
 	Route::post('/order/reconciliation/payout/reconcile', 'PayoutController@payoutReconcile');
+	Route::get('/order/reconciliation/payout/reconcileSingle/{order}', 'PayoutController@payoutReconcileSingle');
+
 	Route::get('/order/reconciliation/payout/headers', 'PayoutController@headers');
 
 
