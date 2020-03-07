@@ -133,8 +133,8 @@
             { data: 'idDisplay', name: 'idDisplay' ,orderable : false},
             { data: 'seller_payout_fees.statement', name: 'seller_payout_fees.statement' },
             { data: 'shipping_fee', name: 'shipping_fee' },
-            { data: 'customer_payout_fees.amount', name: 'customer_payout_fees.amount' },
-            { data: 'seller_payout_fees.amount', name: 'seller_payout_fees.amount' },
+            { data: 'shipping_by_customer', name: 'shipping_by_customer' },
+            { data: 'shipping_by_seller', name: 'shipping_by_seller' },
             { data: 'overcharge', name: 'overcharge' },
             { data: 'shipping_fee_reconciled', name: 'shipping_fee_reconciled', },
             { data: 'action', name: 'action' }

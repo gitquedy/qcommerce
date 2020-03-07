@@ -61,8 +61,14 @@ class ShippingFeeController extends Controller
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                             })
+                ->addColumn('shipping_by_customer', function (Order $order) {
+                            return number_format($order->customer_payout_fees->amount);
+                })
+                ->addColumn('shipping_by_seller', function (Order $order) {
+                            return number_format(abs($order->seller_payout_fees->amount));
+                })
                 ->addColumn('overcharge', function (Order $order) {
-                            return $order->customer_payout_fees->amount - abs($order->seller_payout_fees->amount);
+                            return number_format(abs($order->seller_payout_fees->amount) - $order->customer_payout_fees->amount);
                 })
                 ->addColumn('action', function(Order $order) {
                                $text = $order->shipping_fee_reconciled == 1 ? 'Reconcile' : 'Reconcile';

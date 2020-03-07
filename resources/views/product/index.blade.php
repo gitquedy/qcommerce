@@ -32,6 +32,22 @@
     <div class="card-content">
       <div class="card-body">
         <div class="row">
+          <div class="col-sm-12 shop_filter">
+              <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get("site") == "lazada" ?  "active" : ""}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
+                Lazada
+                <span id="notif_site1" class="badge badge-secondary">{{$lazada_count}}</span>
+              </label>
+              <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
+                Shopee
+                <span id="notif_site2" class="badge badge-secondary">{{$shopee_count}}</span>
+              </label>
+              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
+              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
+          </div>
+        </div>
+        {{-- <div class="row">
           <div class="col-sm-4">
             <ul class="list-unstyled mb-0">
               <li class="d-inline-block mr-2">
@@ -60,8 +76,12 @@
               </li>
             </ul>
           </div>
-        </div>
+        </div> --}}
         <br><div class="row">
+          <div class="col-sm-12">
+            @include('order.components.shopFilter')
+            <div class="btn-group" id="chip_area_shop"></div>
+          </div>
       <!--     <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Order ID:
@@ -70,7 +90,7 @@
               <input type="text" id="search" class="form-control inputSearch" placeholder="Input order id here..">
             </div>
           </div> -->
-          <div class="col-sm-4 col-12">
+          {{-- <div class="col-sm-4 col-12">
             <div class="text-bold-600 font-medium-2">
               Shop:
             </div>
@@ -82,7 +102,7 @@
                 @endforeach
               </select>
             </div>
-        </div>
+          </div> --}}
         <div class="col-sm-4 col-12">
             <!--<div class="text-bold-600 font-medium-2">-->
             <!--  Status:-->
