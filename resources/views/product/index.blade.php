@@ -82,53 +82,6 @@
             @include('order.components.shopFilter')
             <div class="btn-group" id="chip_area_shop"></div>
           </div>
-      <!--     <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Order ID:
-            </div>
-            <div class="form-group">
-              <input type="text" id="search" class="form-control inputSearch" placeholder="Input order id here..">
-            </div>
-          </div> -->
-          {{-- <div class="col-sm-4 col-12">
-            <div class="text-bold-600 font-medium-2">
-              Shop:
-            </div>
-            <div class="form-group">
-              <select name="shop" id="shop" class="select2 form-control selectFilter">
-                <option value="all">All</option>
-                @foreach($all_shops as $shop)
-                  <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }}</option>
-                @endforeach
-              </select>
-            </div>
-          </div> --}}
-        <div class="col-sm-4 col-12">
-            <!--<div class="text-bold-600 font-medium-2">-->
-            <!--  Status:-->
-            <!--</div>-->
-            <!--<div class="form-group">-->
-            <!--  <select name="status[]" id="status" class="select2 form-control selectFilter" multiple="multiple">-->
-            <!--    @foreach($statuses as $status)-->
-            <!--      <option value="{{ $status }}" {{ $status == 'pending' || $status == 'ready_to_ship' || $status == 'shipped' ? 'selected' : '' }}>{{ ucwords(str_replace("_"," ", $status)) }}</option>-->
-            <!--    @endforeach-->
-            <!--  </select>-->
-            <!--</div>-->
-        </div>
-        <div class="col-sm-4 col-12">
-            <!--<div class="text-bold-600 font-medium-2">-->
-            <!--  Date Filter:-->
-            <!--</div>-->
-            <!--<div class="form-group">-->
-            <!--  <select name="timings[]" id="timings" class="select2 form-control selectFilter" >-->
-            <!--    <option value="All">All</option>-->
-            <!--    <option value="Today">Today</option>-->
-            <!--    <option value="Yesterday">Yesterday</option>-->
-            <!--    <option value="Last_7_days">Last 7 days</option>-->
-            <!--    <option value="Last_30_days">Last 30 days</option>-->
-            <!--    <option value="This_Month">This Month</option>-->
-            <!--  </select>-->
-            <!--</div>-->
         </div>
       </div>
     </div>
@@ -160,7 +113,6 @@
             <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                 <input type="checkbox">
             </th>
-            <th>Shop</th>
             <th>Item ID</th>
             <th>Sku</th>
             <th>Image</th>
@@ -287,8 +239,7 @@
                 className:'dt-checkboxes-cell'
                 
             },
-            { data: 'shop', name: 'shop'},
-            { data: 'item_id', name: 'item_id'},
+            { data: 'getImgAndIdDisplay', name: 'getImgAndIdDisplay'},
             { data: 'SellerSku', name: 'SellerSku'},
             { data: 'image', name: 'image', orderable : false,
             "render": function (data){

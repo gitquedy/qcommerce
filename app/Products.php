@@ -26,6 +26,11 @@ class Products extends Model
 		return $this->belongsTo(Shop::class, 'shop_id','id');
 	}
 
+    public function getImgAndIdDisplay(){
+        return '<div class="text-primary font-medium-2 text-bold-600">'. $this->item_id .' </div>' . $this->shop->getImgSiteDisplay();
+    }
+
+
     
     
     public static function syncProducts($date = '2018-01-01', $step = '+3 day'){

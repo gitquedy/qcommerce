@@ -83,6 +83,9 @@ class ProductController extends Controller
                     }
                     return $image_url;
                                     })
+                ->addColumn('getImgAndIdDisplay', function(Products $product) {
+                                return $product->getImgAndIdDisplay();
+                 })
                 ->addColumn('action', function(Products $product) {
                     $actions = '';
                     if($product->site == 'lazada'){
@@ -95,17 +98,18 @@ class ProductController extends Controller
                             <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
                         </div></div>';
                     }else if($product->site == 'shopee'){
-                        $actions = '<div class="btn-group dropup mr-1 mb-1">
-                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-                        Action<span class="sr-only">Toggle Dropdown</span></button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>';
-                            // <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                            // <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
-                        $actions .= '</div></div>';
-                    }
-                    return $actions;
+                            $actions = '<div class="btn-group dropup mr-1 mb-1">
+                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                            Action<span class="sr-only">Toggle Dropdown</span></button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>';
+                                // <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                                // <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                            $actions .= '</div></div>';
+                        }
+                        return $actions;
                     })
+                    ->rawColumns(['getImgAndIdDisplay', 'action'])
                     ->make(true);
             }
             return view('product.index', [
