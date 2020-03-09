@@ -95,7 +95,7 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item" onclick="mass_copy()"  > Duplicate</a>
+            <a class="dropdown-item duplicateForm" data-href="{{ action('ProductController@duplicateForm') }}"  > Duplicate Products</a>
             <!--<a class="dropdown-item" href="#">Print</a>-->
             <a class="dropdown-item massAction" href="#" data-action="{{ route('product.bulkremove') }}"> Delete</a>
             <!--<a class="dropdown-item" href="#">Another Action</a>-->
@@ -125,92 +125,6 @@
       </table>
     </div>
     {{-- DataTable ends --}}
-    
-    
-    <div class="modal" id="duplicate_modal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-    
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title">Duplicate Product</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-    
-          <!-- Modal body -->
-          <div class="modal-body"> 
-          
-              <form action="{{route('product.process_duplicate_product')}}" method="post" >
-                  @csrf
-              <input type="hidden" id="product_id" name="product_id" >
-              
-              <label>Select Shop</label>
-              <select class="form-control"  required name="shop_id" >
-                  <option value="">select</option>
-                  @foreach($all_shops as $shopVAL)
-                  <option class="shop_option" value="{{$shopVAL->id}}">{{$shopVAL->name}}</option>
-                  @endforeach
-                 
-              </select>
-              <br/>
-              <div class="text-right">
-                  <button type="submit" class="btn btn-primary"> Duplicate</button>
-                  
-              </div>
-              </form>
-            
-          </div>
-    
-    
-        </div>
-      </div>
-    </div>
-
-{{-- Modal ends --}}
-
-
-
-<!-- The Modal -->
-<div class="modal" id="mass_copy">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Duplicate Products</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-
-      <!-- Modal body -->
-      <div class="modal-body">
-        <form action="{{route('product.mass_copy')}}" method="post" >
-                  @csrf
-              <input type="hidden" id="mass_products_copy" name="products" >
-              
-              <label>Select Shop</label>
-              <select class="form-control"  required name="shop_id" >
-                  <option value="">select</option>
-                  @foreach($all_shops as $shopVAL)
-                  <option  value="{{$shopVAL->id}}">{{$shopVAL->name}}</option>
-                  @endforeach
-                 
-              </select>
-              <br/>
-              <div class="text-right">
-                  <button type="submit" class="btn btn-primary"> Duplicate</button>
-                  
-              </div>
-        </form>
-      </div>
-
-
-    </div>
-  </div>
-</div>
-
-
-
-
   </section>
   {{-- Data list view end --}}
 @endsection
@@ -245,7 +159,6 @@
             "render": function (data){
                     return '<img src="'+data+'" class="product_image">';
                 },
-                
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
@@ -320,33 +233,39 @@
       
   }
   
-  
-  function mass_copy(){
-      
-      var selected_products = [];
-      
-       $(".dt-checkboxes").each(function(){
-           if($(this).prop('checked')==true){
-               selected_products.push($(this).parent().parent().data('id'));
-           }
-        });
-     
-         if(selected_products.length==0){
-             Swal.fire(
-              '',
-              'Please Select atleast a product !',
-              'warning'
-            );
-            return false;
-         }
-         
-         $('#mass_products_copy').val(JSON.stringify(selected_products));
-         $('#mass_copy').modal('show');
-      
-  }
-  
-  
- 
- 
+  $(document).on("click", '.duplicateForm', function () {
+
+   var selected_ids = [];
+    
+   $(".dt-checkboxes").each(function(){
+      if($(this).prop('checked')==true){
+          selected_ids.push($(this).parent().parent().data('id'));
+      }
+   });
+    
+   if(selected_ids.length==0){
+         Swal.fire(
+         'Warning!',
+         'Please select atleast one order',
+         'warning'
+       );
+       return false;
+     }
+    var url = $(this).data("href") + "?ids=" + selected_ids.toString();
+    var container = $(".view_modal");
+    $.ajax({
+      method: "GET",
+      url: url,
+      dataType: "html",
+      success: function success(result) {
+        $(container).html(result).modal("show");
+      },
+      error: function error(jqXhr, json, errorThrown) {
+        console.log(jqXhr);
+        console.log(json);
+        console.log(errorThrown);
+      }
+    });
+  });
   </script>
 @endsection

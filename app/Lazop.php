@@ -3,6 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Library\lazada\LazopRequest;
+use App\Library\lazada\LazopClient;
+use App\Library\lazada\UrlConstants;
 
 class Lazop extends Model
 {
@@ -19,5 +22,13 @@ class Lazop extends Model
 
     public static function get_api_secret(){
     	return env('lazada_app_secret');
+    }
+
+    public static function getCategoryTree(){
+        $c = new LazopClient(UrlConstants::getPH(),self::get_api_key(),self::get_api_secret());
+        $request = new LazopRequest('/category/tree/get','GET');
+        $result = $c->execute($request);
+        $data = json_decode($result, true);
+        return $data;
     }
 }

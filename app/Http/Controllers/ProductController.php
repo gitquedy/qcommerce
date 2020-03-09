@@ -26,31 +26,18 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     { 
-        $Products_unseen =  Products::where('seen','=',0);
-     
-        $all_shops = Shop::where('user_id', $request->user()->id);
+        $all_shops = $request->user()->shops;
+
+        $shop_ids = $all_shops->pluck('id');
+        $lazada_count = Products::whereIn('shop_id' , $shop_ids)->where('site', 'lazada')->count();
+        $shopee_count = Products::whereIn('shop_id' , $shop_ids)->where('site', 'shopee')->count();
+
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
         }else{
            $all_shops = $all_shops->where('site', 'lazada');
         }
-
-
-        $all_shops = $all_shops->orderBy('updated_at', 'desc')->get();
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        
-        $Products_unseen =  Products::whereIn('shop_id',$Shop_array)->where('seen','=',0)->get();
-        $lazada_count = number_format(Products::join('shop', 'shop.id', '=', 'products.shop_id')->where('shop.user_id', $request->user()->id)->orderBy('products.updated_at', 'desc')->where('products.site', 'lazada')->count());
-        $shopee_count = number_format(Products::join('shop', 'shop.id', '=', 'products.shop_id')->where('shop.user_id', $request->user()->id)->orderBy('products.updated_at', 'desc')->where('products.site', 'shopee')->count());
-        
-        foreach($Products_unseen as $Products_unseenVAL){
-            $tmp_pro = Products::find($Products_unseenVAL->id);
-            $tmp_pro->seen = 1;
-            $tmp_pro->save();
-        }
+         $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->where('seen','=',0)->get();
 
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
@@ -59,14 +46,12 @@ class ProductController extends Controller
         $statuses = array();
 
         if ( request()->ajax()) {
-            
-               
                $Products = Products::with('shop')->orderBy('updated_at', 'desc');
                
                if($request->get('shop') != ''){
                     $Products->where('shop_id', $request->get('shop'));
                }else{
-                   $Products->whereIn('shop_id', $Shop_array);
+                   $Products->whereIn('shop_id', $shop_ids);
                }
 
                $Products->where('site', $request->get('site', 'lazada'));
@@ -94,8 +79,8 @@ class ProductController extends Controller
                         Action<span class="sr-only">Toggle Dropdown</span></button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
-                            <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                            <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                            <a class="dropdown-item" href="'. action('ProductController@edit', $product->id).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                            <a class="dropdown-item modal_button" href="#" data-href="'. action('ProductController@duplicateForm') .'?ids='. $product->id .'"><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
                         </div></div>';
                     }else if($product->site == 'shopee'){
                             $actions = '<div class="btn-group dropup mr-1 mb-1">
@@ -122,51 +107,32 @@ class ProductController extends Controller
         }
     
     
-    public function edit($id=""){
-        Products::sync_single_product($id);
+    public function edit(Products $product, Request $request){
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Product"], ['name'=>"Edit Product"]
         ];
-        $product = Products::find($id);
+        $product_details = $product->getDetails();
+        if($product_details->code != "0"){
+            $request->session()->flash('flash_error', 'Sorry something went wrong');
+            return redirect(action('ProductController@index') . '?site=lazada');
+        }
         return view('product.edit', [
             'breadcrumbs' => $breadcrumbs,
             'product' => $product,
+            'product_details' => $product_details
         ]);
     }
     
     
-    public function update(Request $request){
-        
-        // echo "<pre>";
-        
-        // print_r($request->input());
-        
-        // die();
-        
-        
-        
-        $shop_id = $request->shop_id;
-        
-        $access_token = Shop::find($shop_id)->access_token;
-        
+    public function update(Request $request, Products $product){
         $images = $request->input('Image');
-        
         $image_xml = '<Images>';
-        
         foreach($images as $imagesVAL){
             $image_xml .= '<Image>'.$imagesVAL.'</Image>';
         }
-        
-       $short_description =  Helper::minifier($request->short_description);
+        $short_description =  Helper::minifier($request->short_description);
        $description = Helper::minifier($request->description);
-       
-
-        
-        
         $image_xml .= '</Images>';
-                        
-        
-        
                 $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                     <Request>
                         <Product>
@@ -180,7 +146,6 @@ class ProductController extends Controller
                             <Skus>
                                 <Sku>
                                     <SellerSku>'.$request->SellerSku.'</SellerSku>
-                                    
                                     <package_length>'.$request->package_length.'</package_length>
                                     <package_height>'.$request->package_height.'</package_height>
                                     <package_weight>'.$request->package_weight.'</package_weight>
@@ -197,45 +162,27 @@ class ProductController extends Controller
                                     <package_length>'.$request->package_length.'</package_length>
                                     <package_weight>'.$request->package_weight.'</package_weight>
                                     <Available>'.$request->Available.'</Available>
-                                    <Status>'.$request->Status.'</Status>
-                                    
-                    
-                                    
+                                    <Status>'.$request->Status.'</Status>      
                                 </Sku>
                             </Skus>
                         </Product>
                     </Request>';
-                    
-                    
-                    
-
-                    
-            
-            $response =  Products::product_update($access_token,$xml);
-            
+            $response =  $product->product_update($xml);
+            $product->sync();
             try {
-                
                 $obj = json_decode($response);
-                
             }
             catch(Exception $e) {
                 $request->session()->flash('flash_error', 'somthing went wrong !');
             }
-            
             if(isset($obj->code)){
                 if($obj->code==0){
-                    $request->session()->flash('flash_success', 'Product Update Success !');
+                    $request->session()->flash('flash_success', $product->name . ' successfully updated');
                 }else{
                     $request->session()->flash('flash_error', $obj->message);
                 }
             }
-            
-
-            
-            Products::sync_single_product($request->id);
-            
-            
-        return redirect('/product');
+        return redirect(action('ProductController@index') . '?site=' . $product->site );
         
     }
     
@@ -246,86 +193,7 @@ class ProductController extends Controller
         echo $result;
         
     }
-    
-    public function process_duplicate_product(Request $request){
-        
-        $response = Products::duplicate_product($request->product_id,$request->shop_id);
-        
-        try {
-                
-                $obj = json_decode($response);
-                
-            }
-            catch(Exception $e) {
-                $request->session()->flash('flash_error', $response);
-            }
-            
-            if(isset($obj->code)){
-                if($obj->code==0){
-                    $request->session()->flash('flash_success', 'Product Duplicated Success !');
-                }else{
-                    $request->session()->flash('flash_error', $response);
-                }
-            }
-         
-        
-        return redirect('/product');
-    }
-    
-    
-    
-    
-    public function mass_copy(Request $request){
-        
-
-        
-        try {
-            $products = json_decode($request->products);
-        }
-        catch(Exception $e) {
-            $request->session()->flash('flash_error', 'Invalid Products ');
-            return redirect('/product');
-        }
-        
-        $feedback = array();
-        $count_success = 0;
-        $count_failed = 0;
-        
-        foreach($products as $productsVAL){
-         
-          $response = Products::duplicate_product($productsVAL,$request->shop_id);
-          
-            try {
-                
-                $obj = json_decode($response);
-                
-            }
-            catch(Exception $e) {
-                $feedback[] = $response;
-            }
-            
-            if(isset($obj->code)){
-                if($obj->code==0){
-                    $count_success++;
-                }else{
-                    $count_failed++;
-                    $feedback[] = $response;
-                }
-            }
-         
-        }
-        
-        $flash_message  = "Success : ".$count_success." Failed : ".$count_failed." Logs : ".implode("----",$feedback);
-        
-        
-        
-        $request->session()->flash('flash_success', $flash_message);
-        
-        return redirect('/product');
-    }
-    
-    
-    
+     
     public function bulkremove(Request $request){
         
         
@@ -343,13 +211,72 @@ class ProductController extends Controller
         $output = Products::where('shop_id',$request->shop_id)->get();
         echo json_encode($output);
     }
-    
-    
-    
-    
-    
-    
 
+    public function searchProduct(Request $request){
 
+       $search = $request->get('search');
+       $site = $request->get('site');
+       $shop_ids = $request->user()->shops->pluck('id')->toArray();
+       $product = Products::where('site', $site)->whereIn('shop_id', $shop_ids)->where('item_id', $search)->orWhere('SellerSku', $search)->orWhere('SkuId', $search)->first();
+       if($product == null){
+            $output = ['success' => 0,
+                        'msg' => 'Product not found',
+            ];
+       }else{
+            $output = ['success' => 1,
+                        'msg' => 'Product Found',
+                        'product' => $product,
+                        'html' => '<tr>
+                        <td><input type="hidden" name="product['. $product->id .']" class="item_ids" value="'. $product->id .'">'. $product->getImgAndIdDisplay() .'</td>
+                        <td>'. $product->SellerSku .'</td>
+                        <td>'. $product->name .'</td>
+                        <td><button class="btn btn-danger remove_row"><i class="fa fa-trash"></i></button></td>
+                      </tr>'
+            ];
+       }
+       return response()->json($output);
+    }
 
+    public function duplicateForm(Request $request){
+        $products = Products::whereIn('id',explode(',', $request->ids))->get();
+
+        $shops = $request->user()->shops->where('site', $products->first()->site);
+ 
+
+        return view('product.modal.duplicate', compact('products', 'shops'));
+    }
+
+    public function duplicateProudcts(Request $request){
+        if($request->input(['product']) == null){
+            return response()->json(['msg' => 'No products found please add products first.']);
+        }
+        $validator = Validator::make($request->all(), ['shop_id' => ['required', 'exists:shop,id']]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+        try {
+            DB::beginTransaction();
+
+            $duplicate_to = Shop::find($request->shop_id);
+            $products = Products::whereIn('id', $request->product)->whereIn('shop_id', $request->user()->shops->pluck('id')->toArray())->get();
+
+            foreach($products as $product){
+                if($duplicate_to->site == $product->site){
+                    $product->duplicate_product($duplicate_to);
+                }
+            }
+            DB::commit();
+            $output = ['success' => 1,
+                        'msg' => 'Products duplicated successfully!',
+                    ];
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
 }

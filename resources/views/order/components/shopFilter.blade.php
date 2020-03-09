@@ -4,7 +4,7 @@
     <input type="hidden" id="shipping_status" name="shipping_status" class="selectFilter">
     <div class="dropdown">
       <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-       <i class="fa fa-shopping-cart"></i> All Shop
+       <i class="fa fa-shopping-cart"></i> All Shops
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
           {{-- <a class="dropdown-item shop_filter_btn" href="#" data-shop_id="all">All Shop</a> --}}

@@ -13,6 +13,40 @@
 @section('mystyle')
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
+        <style>
+          .image_uploader{
+              background-color:#F1F1F1;
+              min-height:200px;
+              border-radius:5px;
+              padding:10px;
+          }
+          .inner_card{
+              background-color:white;
+              min-height:150px;
+              box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
+          }
+          .flex{
+              display:flex;
+          }
+          .upload_btn{
+              border:2px dashed #F1F1F1;
+          }
+          .upload_items{
+              padding:10px;
+          }
+          .image_divr{
+              border:2px dashed #F1F1F1;
+              margin:2px;
+          }
+          .x_button{
+              border:none;
+              width:100%;
+          }
+          .product_image{
+            width:150px;
+            height:auto;
+          }
+      </style>     
 @endsection
 
 @section('content')
@@ -24,188 +58,147 @@
 
 <section class="card">
     <div class="card-content">
-      <div class="card-body">
-          
-          
-           
-          
-          
-          
-          
-          
+      <div class="card-body">   
           @if($product)
-          <form action="{{route('product.update')}}"  onsubmit="validate(event)" method="post" >
-              @csrf
+          <form action="{{ action('ProductController@update', $product->id) }}"  onsubmit="validate(event)" method="post" >
+              @csrf 
+              @method('put')
               
-              
-              
-              
-              <style>
-                  .image_uploader{
-                      background-color:#F1F1F1;
-                      min-height:200px;
-                      border-radius:5px;
-                      padding:10px;
-                      
-                  }
-                  .inner_card{
-                      background-color:white;
-                      min-height:150px;
-                      box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
-                  }
-                  .flex{
-                      display:flex;
-                  }
-                  .upload_btn{
-                      border:2px dashed #F1F1F1;
-                  }
-                  .upload_items{
-                      padding:10px;
-                  }
-                  .image_divr{
-                      border:2px dashed #F1F1F1;
-                      margin:2px;
-                  }
-                  .x_button{
-                      
-                      border:none;
-                      width:100%;
-                  }
-                  .product_image{
-                    width:150px;
-                    height:auto;
-                }
-              </style>
-              
-              
-              
-              
-              <div class="image_uploader">
-                  <div class="inner_card flex">
-                      <div id="sortable" class="upload_items flex">
-                  <?php 
-                  $exp = array();
-              if($product->Images!=''){
-                $exp = explode("|",$product->Images);  
-              }
-              foreach($exp as $expVAL){ ?>
-                  <div class="image_divr ui-state-default">
-                      
-                          <img draggable="false" src="<?php echo $expVAL;?>" class="product_image">
-                          <input type="hidden" value="<?php echo $expVAL;?>" name="Image[]">
-                          <br/>
-                          <button type="button"  class="x_button" onclick="remove_self(this)"  ><i class="fa fa-times"></i></button>
-                          
+              <div class="row"> 
+                <div class="col-md-6">
+                  <div classs="form-group">
+                      <label>Name</label>
+                      <input type="text" class="form-control"  name="name" value="{!! $product->name!!}">
                   </div>
-                  
-                  <?php  } ?>
-                  </div>
-                      <div class="upload_items">
-                          <button class="btn upload_btn" type="button" onclick="$('#file').click()"><i class="fa fa-upload"></i> Upload</button>
-                          <input type="file" onchange="encodeImageFileAsURL(this)" class="form-control" id="file" style="display:none;"/>
-                      </div>
-                  </div>
+                </div>
+              </div><br>
+              
+          <div class="row">
+            <div class="col-md-6">
+              <div classs="form-group">
+                  <label>Brand</label>
+                  <input type="text" class="form-control" name="brand" value="{!! $product_details->data->attributes->brand !!}">
               </div>
-              
-              
+            </div>
+            <div class="col-md-6">
+              <div classs="form-group">
+                  <label>Model</label>
+                  <input type="text" class="form-control" name="model" value="{!! $product_details->data->attributes->model !!}">
+              </div>
+           </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Quantity</label>
+                  <input type="text" class="form-control" name="quantity" value="{!! $product_details->data->skus[0]->quantity !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Price</label>
+                  <input type="text" class="form-control" name="price" value="{!! $product_details->data->skus[0]->price !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                <label>Available</label>
+                <input type="text" class="form-control" name="Available" value="{!! $product_details->data->skus[0]->Available !!}">
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Minimum Delivery Time</label>
+                  <input type="text" class="form-control" name="min_delivery_time" value="{!! $product_details->data->skus[0]->min_delivery_time !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                <label>Special Price</label>
+                <input type="text" class="form-control" name="special_price" value="{!! $product_details->data->skus[0]->special_price !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                <label>Color Family</label>
+                <input type="text" class="form-control" name="color_family" value="{!! $product_details->data->skus[0]->color_family !!}">
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Package Width</label>
+                  <input type="text" class="form-control" name="package_width" value="{!! $product_details->data->skus[0]->package_width !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Package Length</label>
+                  <input type="package_length" class="form-control" name="package_length" value="{!! $product_details->data->skus[0]->package_length !!}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div classs="form-group">
+                  <label>Package Height</label>
+                  <input type="text" class="form-control" name="package_height" value="{!! $product_details->data->skus[0]->package_height !!}">
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-4">
+             <div classs="form-group">
+                  <label>Package Weight</label>
+                  <input type="text" class="form-control" name="package_weight" value="{!! $product_details->data->skus[0]->package_weight !!}">
+              </div>
+            </div>
+          </div><br>
 
-
-              
+          <div class="row">
+                <div class="col-md-12">
+                  <div class="image_uploader">
+                      <div class="inner_card flex">
+                          <div id="sortable" class="upload_items flex">
+                            @foreach(explode("|",$product->Images) as $img)
+                                <div class="image_divr ui-state-default">
+                                  <img draggable="false" src="{{ $img }}" class="product_image">
+                                  <input type="hidden" value="{{ $img }} " name="Image[]">
+                                  <br/>
+                                  <button type="button"  class="x_button" onclick="remove_self(this)"  ><i class="fa fa-times"></i></button> 
+                                </div>
+                              @endforeach
+                          </div>
+                          <div class="upload_items">
+                              <button class="btn upload_btn" type="button" onclick="$('#file').click()"><i class="fa fa-upload"></i> Upload</button>
+                              <input type="file" onchange="encodeImageFileAsURL(this)" class="form-control" id="file" style="display:none;"/>
+                          </div>
+                      </div>
+                  </div>    
+                </div>  
+              </div><br>
               <input type="hidden" name="SellerSku" value="{!! $product->SellerSku!!}">
               <input type="hidden" name="shop_id" id="shop_id" value="{!! $product->shop_id!!}">
-              <input type="hidden" name="id" value="{!! $product->id!!}">
-              
+              <input type="hidden" name="id" value="{!! $product->id!!}">   
+           <div class="row">
+            <div class="col-md-12">
+              <div classs="form-group">
+                  <label>Description</label>
+                  <textarea type="text" id="description" class="form-control"  name="description"  rows="4" >{!! $product_details->data->attributes->description!!}</textarea>
+              </div>
+            </div>
+          </div><br>
+            <div class="row">
+              <div class="col-md-12">
+                <div classs="form-group">
+                    <label>Short Description</label>
+                    <textarea type="text" class="form-control" id="short_description" name="short_description" rows="4" >{!! $product_details->data->attributes->short_description !!}</textarea>
+                </div>
+              </div>
+          </div><br>
           
           
-          <div classs="form-group">
-              <label>Name</label>
-              <input type="text" class="form-control"  name="name" value="{!! $product->name!!}">
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>Short Description</label>
-              <textarea type="text" class="form-control" id="short_description" name="short_description" rows="4" >{!! $product->short_description!!}</textarea>
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>Description</label>
-              <textarea type="text" id="description" class="form-control"  name="description"  rows="4" >{!! $product->description!!}</textarea>
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Brand</label>
-              <input type="text" class="form-control" name="brand" value="{!! $product->brand!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Model</label>
-              <input type="text" class="form-control" name="model" value="{!! $product->model!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Quantity</label>
-              <input type="text" class="form-control" name="quantity" value="{!! $product->quantity!!}">
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>Minimum Delivery Time</label>
-              <input type="text" class="form-control" name="min_delivery_time" value="{!! $product->min_delivery_time!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Color Family</label>
-              <input type="text" class="form-control" name="color_family" value="{!! $product->color_family!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Package Width</label>
-              <input type="text" class="form-control" name="package_width" value="{!! $product->package_width!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Package Length</label>
-              <input type="package_length" class="form-control" name="package_length" value="{!! $product->package_length!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Package Height</label>
-              <input type="text" class="form-control" name="package_height" value="{!! $product->package_height!!}">
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>Special Price</label>
-              <input type="text" class="form-control" name="special_price" value="{!! $product->special_price!!}">
-          </div>
-          <br/>
-          <div classs="form-group">
-              <label>Price</label>
-              <input type="text" class="form-control" name="price" value="{!! $product->price!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Package Weight</label>
-              <input type="text" class="form-control" name="package_weight" value="{!! $product->package_weight!!}">
-          </div>
-          
-          <br/>
-          <div classs="form-group">
-              <label>Available</label>
-              <input type="text" class="form-control" name="Available" value="{!! $product->Available!!}">
-          </div>
-          <br/>
-          
-          
-
-         
-          <br/>
           <div classs="form-group">
               {{-- <label>Images</label> --}}
               <?php
@@ -214,35 +207,15 @@
               
               if($product->Images!=''){
                 $exp = explode("|",$product->Images);  
-              }
-              
-              
-              
-              
-              
-              
-              ?>
-              
-              
-             
-              
-              
-              
+              }     
+              ?>            
           </div>
           <br/>
           <div class="text-right">
               <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-          
-          
+          </div>  
            </form>
-          
-          
-
-          @endif
-        
-        
-        
+          @endif      
       </div>
     </div>
   </section>
@@ -392,20 +365,12 @@ CKEDITOR.replace( 'description', {
 
         });
     }
-    
-    
-    
     function remove_self(ele){
         $(ele).parent().remove()
     }
-    
-    
     $( function() {
     $( "#sortable" ).sortable();
     $( "#sortable" ).disableSelection();
-  } );
-    
-    
+  } ); 
  </script>
- 
 @endsection

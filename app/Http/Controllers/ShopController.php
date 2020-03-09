@@ -89,15 +89,6 @@ class ShopController extends Controller
         ]);
     }
     
-    
-    
-    
-    public function testmax(Request $request)
-    {
-       $x = base64_encode(time());
-       echo base64_decode($x);
-    }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -223,54 +214,5 @@ class ShopController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Shop $shop)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Shop $shop)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Shop $shop)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Shop $shop)
-    {
-        //
-    }
-
-    public function getShop(Shop $shop){
-      die(var_dump($shop));
     }
 }

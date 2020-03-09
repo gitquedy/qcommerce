@@ -34,7 +34,7 @@ class Shop extends Model
     //pending = READY_TO_SHIP
     
     public function products(){
-		return $this->belongsTo(Products::class, 'id','shop_id');
+		return $this->hasMany(Products::class, 'shop_id','id');
 	}
     
     public function syncOrders($date = '2018-01-01', $step = '+3 day'){
@@ -178,6 +178,36 @@ class Shop extends Model
                 ]);;
     }
 
+    public function shopeeGetCategories(){
+        $client = $this->shopeeGetClient();
+        $result = $client->item->getCategories()->getData();
+
+
+        //arrange
+        // foreach($result['categories'] as $category){
+        //     dd($category);
+        // }
+
+
+        return $result;
+    }
+
+    public function shopeeGetAttributes(){
+        $client = $this->shopeeGetClient();
+        $result = $client->item->getAttributes(['category_id' => 6712])->getData();
+
+        die(var_dump($result));
+        //arrange
+        foreach($result['categories'] as $category){
+            dd($category);
+        }
+
+
+        return $result;
+    }
+
+
+
     public function shopeeGetOrdersPerDate($date){
         $client = $this->shopeeGetClient();
         $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+1 day');
@@ -297,7 +327,65 @@ class Shop extends Model
         $result = Shop::where('user_id','=',$user_id)->get();
         
         return $result;
-        
+    }
+
+    public function lazadaGetClient(){
+        return new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+    }
+
+
+    public function syncLazadaProducts(){
+        if($this->site == 'lazada'){
+            $c = $this->lazadaGetClient();
+            $r = new LazopRequest('/products/get','GET');
+            $r->addApiParam('created_after', '2018-01-01T00:00:00+08:00');
+            $r->addApiParam('created_before', date('Y-m-d').'T00:00:00+08:00');
+            $r->addApiParam('limit','20');
+            $result = $c->execute($r,$this->access_token);
+            $data = json_decode($result, true);
+            // dd($data);
+            $products = [];
+            $delete_item_ids = $this->products->pluck('item_id')->toArray();
+            if($data['code'] == "0"){
+                $count = $data['data']['total_products'];
+                $products = $data['data']['products'];
+                $offset = 20;
+                while($offset <= $count){
+                    $r = new LazopRequest('/products/get','GET');
+                    $r->addApiParam('created_after', '2018-01-01T00:00:00+08:00');
+                    $r->addApiParam('created_before', date('Y-m-d').'T00:00:00+08:00');
+                    $r->addApiParam('offset',$offset);
+                    $r->addApiParam('limit','20');
+                    $result = $c->execute($r,$this->access_token);
+                    $data = json_decode($result, true);
+                    if($data['code'] == "0"){
+                        $products = array_merge($products, $data['data']['products']);
+                    }
+                    $offset += 20;
+                }
+
+                foreach($products as $product_details){
+                    $product_details = [
+                    'shop_id' => $this->id,
+                    'site' => 'lazada',
+                    'SkuId' => $product_details['skus'][0]['SkuId'],
+                    'SellerSku' => $product_details['skus'][0]['SellerSku'],
+                    'item_id' => $product_details['item_id'],
+                    'price' =>  $product_details['skus'][0]['price'],
+                    'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
+                    'name' => $product_details['attributes']['name'],
+                    'Status' => $product_details['skus'][0]['Status'],
+                    'Url' => $product_details['skus'][0]['Url'],
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    ];
+                    $delete_item_ids = array_diff( $delete_item_ids, [$product_details['item_id']]);
+                    $record = Products::updateOrCreate(
+                    ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                }
+                Products::whereIn('item_id', $delete_item_ids)->delete();
+            }
+        }
     }
 
     public function syncShopeeProducts($date = '2018-01-01', $step = '+10 day'){
@@ -334,7 +422,6 @@ class Shop extends Model
             }
             $this->shopeeSaveProductsPerItem($products);
         }
-        
     }
 
     public function shopeeSaveProductsPerItem($products){

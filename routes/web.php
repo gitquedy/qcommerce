@@ -38,15 +38,21 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/barcode/view_barcode', 'BarcodeController@viewBarcode')->name('barcode.viewBarcode');
 	Route::post('/barcode/packed_items', 'BarcodeController@packedItems')->name('barcode.packedItems');
 	
-	Route::resource('/product', 'ProductController');
-	Route::get('/product/edit/{id}', 'ProductController@edit')->name('product.edit');
-	Route::post('/product/update', 'ProductController@update')->name('product.update');
+	Route::resource('/product', 'ProductController')->only(['index', 'edit', 'update']);
 	Route::post('/product/upload_image', 'ProductController@upload_image')->name('product.upload_image');
 	Route::post('/product/ajax_duplicate_modal', 'ProductController@ajax_duplicate_modal')->name('product.ajax_duplicate_modal');
 	Route::post('/product/process_duplicate_product', 'ProductController@process_duplicate_product')->name('product.process_duplicate_product');
 	Route::post('/product/mass_copy', 'ProductController@mass_copy')->name('product.mass_copy');
 	Route::post('/product/bulkremove', 'ProductController@bulkremove')->name('product.bulkremove');
 	Route::post('/product/ajaxlistproduct', 'ProductController@ajaxlistproduct')->name('product.ajaxlistproduct');
+
+	Route::get('/product/duplicateForm', 'ProductController@duplicateForm')->name('product.duplicateForm');
+	Route::post('/product/duplicateProudcts', 'ProductController@duplicateProudcts')->name('product.duplicateProudcts');
+	Route::get('/product/searchProduct', 'ProductController@searchProduct')->name('product.searchProduct');
+	
+
+	
+
 	
 	
 	Route::resource('/sku', 'SkuController');
