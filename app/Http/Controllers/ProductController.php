@@ -46,7 +46,7 @@ class ProductController extends Controller
         else {
           $selectedStatus = 'all';
         }
-         $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->update(['seen' => 'yes']);
+         $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->update(['seen' => true]);
 
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
