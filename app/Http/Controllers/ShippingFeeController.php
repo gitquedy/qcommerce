@@ -78,13 +78,15 @@ class ShippingFeeController extends Controller
 
                 ->addColumn('action', function(Order $order) {
                               $disabled = ['filed' => 'disabled' , 'resolved' => 'disabled'];
+                              $button = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>';
                               if($order->shipping_fee_reconciled == 1){
                                 $disabled['filed'] = '';
+                                $button = '<a class="text-danger" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"><button type="button" class="btn btn-primary">File Dispute</button></a>';
                               }else if($order->shipping_fee_reconciled == 2){
                                 $disabled['resolved'] = '';
                               }
                     return  '<div class="btn-group dropup mr-1 mb-1">
-                                 <button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>
+                                 '. $button .'
                                   <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                                   <span class="sr-only">Toggle Dropdown</span></button>
                                   <div class="dropdown-menu">
@@ -95,7 +97,7 @@ class ShippingFeeController extends Controller
 
                 ->addColumn('shipping_fee_reconciled', function(Order $order) {
                                if ($order->shipping_fee_reconciled == 1) {
-                                  $text =  '<a class="text-danger" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"> Over Charged </a>';
+                                  $text =  'Over Charged';
                                   $class= "text-danger";
                                 }
                                 else if($order->shipping_fee_reconciled == 2) {
