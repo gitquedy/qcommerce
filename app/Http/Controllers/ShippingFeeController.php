@@ -95,7 +95,7 @@ class ShippingFeeController extends Controller
 
                 ->addColumn('shipping_fee_reconciled', function(Order $order) {
                                if ($order->shipping_fee_reconciled == 1) {
-                                  $text =  '<a href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"> Over Charged </a>';
+                                  $text =  '<a class="text-danger" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"> Over Charged </a>';
                                   $class= "text-danger";
                                 }
                                 else if($order->shipping_fee_reconciled == 2) {
