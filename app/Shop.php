@@ -343,12 +343,13 @@ class Shop extends Model
             $r->addApiParam('limit','20');
             $result = $c->execute($r,$this->access_token);
             $data = json_decode($result, true);
-            // dd($data);
             $products = [];
             $delete_item_ids = $this->products->pluck('item_id')->toArray();
             if($data['code'] == "0"){
-                $count = $data['data']['total_products'];
-                $products = $data['data']['products'];
+                $count = isset($data['data']['total_products'])  ? $data['data']['total_products'] : 0;
+                if(isset($data['data']['products'])){
+                    $products = $data['data']['products'];
+                }
                 $offset = 20;
                 while($offset <= $count){
                     $r = new LazopRequest('/products/get','GET');
@@ -359,7 +360,9 @@ class Shop extends Model
                     $result = $c->execute($r,$this->access_token);
                     $data = json_decode($result, true);
                     if($data['code'] == "0"){
-                        $products = array_merge($products, $data['data']['products']);
+                        if($products = $data['data']['products']){
+                            $products = array_merge($products, $data['data']['products']);
+                        }
                     }
                     $offset += 20;
                 }
