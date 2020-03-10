@@ -81,7 +81,7 @@ class ShippingFeeController extends Controller
                               $button = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>';
                               if($order->shipping_fee_reconciled == 1){
                                 $disabled['filed'] = '';
-                                $button = '<a class="text-danger" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"><button type="button" class="btn btn-primary">File Dispute</button></a>';
+                                $button = '<button type="button" class="btn btn-primary"><a class="text-danger" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en">File Dispute</a></button>';
                               }else if($order->shipping_fee_reconciled == 2){
                                 $disabled['resolved'] = '';
                               }
