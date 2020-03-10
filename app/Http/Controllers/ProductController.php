@@ -34,16 +34,23 @@ class ProductController extends Controller
 
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
+           $statuses = Products::$shopeeStatuses;
         }else{
+           $statuses = Products::$lazadaStatuses;
            $all_shops = $all_shops->where('site', 'lazada');
+        }
+
+        if($request->get('status')){
+          $selectedStatus = $request->get('status');
+        }
+        else {
+          $selectedStatus = 'all';
         }
          $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->where('seen','=',0)->get();
 
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
         ];
-        
-        $statuses = array();
 
         if ( request()->ajax()) {
                $Products = Products::with('shop')->orderBy('updated_at', 'desc');
@@ -53,7 +60,13 @@ class ProductController extends Controller
                }else{
                    $Products->whereIn('shop_id', $shop_ids);
                }
+               
 
+               $status = $request->get('status');
+               if($status != 'all') {
+                  $Products->where('status', $status);
+               }
+                  
                $Products->where('site', $request->get('site', 'lazada'));
                
                 return Datatables::eloquent($Products)
@@ -87,9 +100,8 @@ class ProductController extends Controller
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                             Action<span class="sr-only">Toggle Dropdown</span></button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>';
-                                // <a class="dropdown-item" href="'.route('product.edit',array('id'=>$product->id)).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                                // <a class="dropdown-item" onclick="duplicate_product('.$product->id.','.$product->shop_id.')" ><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                                <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                                <a class="dropdown-item modal_button" href="#" data-href="'. action('ProductController@duplicateForm') .'?ids='. $product->id .'"><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>';
                             $actions .= '</div></div>';
                         }
                         return $actions;
@@ -103,6 +115,7 @@ class ProductController extends Controller
                 'lazada_count' => $lazada_count,
                 'shopee_count' => $shopee_count,
                 'statuses' => $statuses,
+                'selectedStatus' => $selectedStatus,
             ]);
         }
     
@@ -212,6 +225,8 @@ class ProductController extends Controller
         echo json_encode($output);
     }
 
+
+
     public function searchProduct(Request $request){
 
        $search = $request->get('search');
@@ -241,8 +256,7 @@ class ProductController extends Controller
         $products = Products::whereIn('id',explode(',', $request->ids))->get();
 
         $shops = $request->user()->shops->where('site', $products->first()->site);
- 
-
+        
         return view('product.modal.duplicate', compact('products', 'shops'));
     }
 
@@ -250,7 +264,10 @@ class ProductController extends Controller
         if($request->input(['product']) == null){
             return response()->json(['msg' => 'No products found please add products first.']);
         }
-        $validator = Validator::make($request->all(), ['shop_id' => ['required', 'exists:shop,id']]);
+        $validator = Validator::make($request->all(), [
+            'shop_id' => ['required', 'exists:shop,id'],
+            'logistic_ids' => ['required_if:site,shopee']
+        ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
@@ -260,15 +277,25 @@ class ProductController extends Controller
 
             $duplicate_to = Shop::find($request->shop_id);
             $products = Products::whereIn('id', $request->product)->whereIn('shop_id', $request->user()->shops->pluck('id')->toArray())->get();
-
-            foreach($products as $product){
-                if($duplicate_to->site == $product->site){
-                    $product->duplicate_product($duplicate_to);
+            $site = $request->site;
+            $msgs = [];
+            if($request->site == 'lazada'){
+                foreach($products as $product){
+                    if($duplicate_to->site == $product->site){
+                        $msgs[] = $product->duplicate_product($duplicate_to);
+                    }
+                }
+            }else if($request->site == 'shopee'){
+                foreach($products as $product){
+                    if($duplicate_to->site == $product->site){
+                        $msgs[] = $product->duplicate_product($duplicate_to, $request->logistic_ids);
+                    }
                 }
             }
+            $msgs = implode('<br>', $msgs);
             DB::commit();
             $output = ['success' => 1,
-                        'msg' => 'Products duplicated successfully!',
+                        'msg' => $msgs,
                     ];
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());

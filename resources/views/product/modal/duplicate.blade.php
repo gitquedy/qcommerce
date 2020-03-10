@@ -27,6 +27,7 @@
 
 <form action="{{ action('ProductController@duplicateProudcts') }}" class="form" method="POST">
   @csrf 
+  <input type="hidden" name="site" value="{{ $products->first()->site }}">
       <section class="card">
         <div class="card-content">
           <div class="card-body">
@@ -64,16 +65,23 @@
     <section class="card">
           <div class="card-content">
             <div class="card-body">
-              <h4 class="card-title">Select Shop</h4>
               <div class="row">
                   <div class="col-md-6">
-                  <select class="form-control s2" name="shop_id">
-                    <option hidden selected disabled></option>
-                    @foreach($shops as $shop)
-                      <option value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</option>
-                    @endforeach
-                  </select>
+                    <label class="card-title">Shop</label>
+                    <select class="form-control s2" name="shop_id" id="shop_id">
+                      <option hidden selected disabled></option>
+                      @foreach($shops as $shop)
+                        <option value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</option>
+                      @endforeach
+                    </select>
                 </div>
+                @if($products->first()->site == 'shopee')
+                  <div class="col-md-6">
+                     <label class="card-title">Logistics</label>
+                     <select class="form-control s2" multiple="multiple" name="logistic_ids[]" id="logistic_ids">
+                     </select>
+                  </div>
+                @endif
               </div>
             </div>
           </div>
@@ -98,6 +106,31 @@
         dropdownAutoWidth: true,
         width: '100%'
       });
+      @if($products->first()->site == 'shopee')
+      $(document).on('change', '#shop_id', function(){
+        var url = "{{ action('ShopController@shopeeGetLogistics', ':id') }}";
+        url = url.replace(':id', $(this).val());
+        $.ajax({
+            method: "GET",
+            url: url,
+            success: function success(result) {
+              $('#logistic_ids').find('option').remove()
+              $.each(result.logistics, function (i, item) {
+                $('#logistic_ids').append($('<option>', { 
+                    value: item.logistic_id,
+                    text : item.logistic_name,
+                    selected: item.preferred
+                  }));
+              });
+            },
+            error: function error(jqXhr, json, errorThrown) {
+              console.log(jqXhr);
+              console.log(json);
+              console.log(errorThrown);
+            }
+          });
+      })
+      @endif
   }); 
   // $('#searchProduct').keypress(function (e) {
     $('#searchProduct').keyup(function (e) {

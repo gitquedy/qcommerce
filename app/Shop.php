@@ -178,33 +178,22 @@ class Shop extends Model
                 ]);;
     }
 
-    public function shopeeGetCategories(){
+    public function shopeeGetLogistics(){
         $client = $this->shopeeGetClient();
-        $result = $client->item->getCategories()->getData();
-
-
-        //arrange
-        // foreach($result['categories'] as $category){
-        //     dd($category);
-        // }
-
-
-        return $result;
+        return $client->logistics->getLogistics()->getData();
     }
 
-    public function shopeeGetAttributes(){
-        $client = $this->shopeeGetClient();
-        $result = $client->item->getAttributes(['category_id' => 6712])->getData();
+    // public function shopeeGetCategories(){
+    //     $client = $this->shopeeGetClient();
+    //     $result = $client->item->getCategories()->getData();
+    //     return $result;
+    // }
 
-        die(var_dump($result));
-        //arrange
-        foreach($result['categories'] as $category){
-            dd($category);
-        }
-
-
-        return $result;
-    }
+    // public function shopeeGetAttributes(){
+    //     $client = $this->shopeeGetClient();
+    //     $result = $client->item->getAttributes(['category_id' => 6712])->getData();
+    //     return $result;
+    // }
 
 
 

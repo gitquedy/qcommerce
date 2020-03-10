@@ -20,6 +20,11 @@ class Products extends Model
     
     protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','Images','Status', 'Url','created_at','updated_at'];
     
+    public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
+
+    public static $shopeeStatuses = ['NORMAL', 'DELETED', 'BANNED', 'UNLIST'];
+
+
     public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id','id');
 	}
@@ -182,7 +187,7 @@ class Products extends Model
         return $xml;
     }
     
-    public function duplicate_product(Shop $duplicate_to){
+    public function duplicate_product(Shop $duplicate_to, $logistics_ids = null){
         
         if($duplicate_to->site == 'lazada'){
             $xml = $this->getXML();
@@ -213,8 +218,68 @@ class Products extends Model
                     ];
                 $record = Products::updateOrCreate(
                     ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                return $this->name . ' Add item successfully';
+            }
+        }else if($duplicate_to->site == 'shopee'){
+            $product_details = $this->shopeeGetItemDetail();
+            if(isset($product_details['item'])){
+                $duplicate_to_client = $duplicate_to->shopeeGetClient();
+                unset($product_details['item']['shopid']);
+
+                //logistics
+                $c_logistics = $duplicate_to->shopeeGetLogistics();
+                unset($product_details['item']['logistics']);
+                foreach($logistics_ids as $key => $value){
+                    foreach($c_logistics['logistics'] as $c_logistic){
+                        if($value == $c_logistic['logistic_id']){
+                            if($c_logistic['fee_type'] == "SIZE_SELECTION"){
+                                $product_details['item']['logistics'][0]['size_id'] = 1;
+                            }
+                            $product_details['item']['logistics'][0]['logistic_id'] = (int)$value;
+                            $product_details['item']['logistics'][0]['enabled'] = true;
+                            break;
+                        }
+                    }
+                }
+    
+                //images
+                foreach($product_details['item']['images'] as $key => $imgUrl){
+                    unset($product_details['item']['images'][$key]);
+                    $product_details['item']['images'][$key]['url'] = $imgUrl;
+                }
+
+                //attributes
+                foreach($product_details['item']['attributes'] as $key => $value){
+                    $product_details['item']['attributes'][$key]['attributes_id'] = $value['attribute_id'];
+                    $product_details['item']['attributes'][$key]['value'] = $value['attribute_value'];
+                }
+
+                $duplicate_product = $duplicate_to_client->item->add($product_details['item'])->getData();
+                if(isset($duplicate_product['item'])){
+                    $product_details = [
+                    'shop_id' => $duplicate_to->id,
+                    'site' => 'shopee',
+                    'SkuId' => $duplicate_product['item']['item_sku'],
+                    'SellerSku' => $duplicate_product['item']['item_sku'],
+                    'item_id' => $duplicate_product['item']['item_id'],
+                    'price' => $duplicate_product['item']['price'],
+                    'Images' => implode('|', $duplicate_product['item']['images']),
+                    'name' => $duplicate_product['item']['name'],
+                    'Status' => $duplicate_product['item']['status'],
+                    'created_at' => Carbon::createFromTimestamp($duplicate_product['item']['create_time'])->toDateTimeString(),
+                    'updated_at' => Carbon::createFromTimestamp($duplicate_product['item']['update_time'])->toDateTimeString(),
+                    ];
+                    $record = Products::updateOrCreate(
+                        ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                }
+                return $this->name . ' ' . $duplicate_product['msg'];
             }
         }
+    }
+
+    public function shopeeGetItemDetail(){
+        $client = $this->shop->shopeeGetClient();
+        return $client->item->getItemDetail(['item_id' => (int) $this->item_id])->getData();
     }
     
     public static function remove_product($products=array()){

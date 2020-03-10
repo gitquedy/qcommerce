@@ -30,9 +30,11 @@ Route::group(['middleware' => 'auth'], function()
 
 	Route::get('/lazop/receive', 'LazopController@receive')->name('lazop.receive');
 	Route::get('/shop/getShop/{shop}', 'ShopController@getShop');
+
+	Route::get('/shop/shopeeGetLogistics/{shop}', 'ShopController@shopeeGetLogistics');
 	Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 	Route::resource('/shop', 'ShopController');
-	
+
 	Route::resource('/barcode', 'BarcodeController');
 	Route::post('/barcode/check_barcode', 'BarcodeController@checkBarcode')->name('barcode.checkBarcode');
 	Route::post('/barcode/view_barcode', 'BarcodeController@viewBarcode')->name('barcode.viewBarcode');

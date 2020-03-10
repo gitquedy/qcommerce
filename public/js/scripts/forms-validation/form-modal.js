@@ -9,7 +9,7 @@ $(".form").submit(function(e) {
       contentType: false,
       success: function(result){
         if(result.success == true){
-          toastr.success(result.msg);
+          toastr.success(result.msg, '' , {positionClass : "toast-top-center", escapeHTML: false});
           $('.view_modal').modal('toggle');
         }else{
           if(result.msg){
@@ -17,7 +17,7 @@ $(".form").submit(function(e) {
           }
            $('.error').remove();
               $.each(result.error, function(index, val){
-              $('[name="'+ index +'"]').after('<label class="text-danger error">' + val + '</label>');
+              $('[id="'+ index +'"]').after('<label class="text-danger error">' + val + '</label>');
               });
         }
         $('.btn_save').prop('disabled', false);

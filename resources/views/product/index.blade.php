@@ -77,7 +77,23 @@
             </ul>
           </div>
         </div> --}}
-        <br><div class="row">
+        <br>
+        <div class="row">
+        <div class="col-sm-12">
+          <div class="btn-group-toggle" data-toggle="buttons">
+              <label class="btn px-1 btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
+                <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
+              </label>
+              @foreach($statuses as $status)
+                <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
+                  <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucfirst(strtolower($status)) }}
+                </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="row">
           <div class="col-sm-12">
             @include('order.components.shopFilter')
             <div class="btn-group" id="chip_area_shop"></div>
@@ -118,6 +134,7 @@
             <th>Image</th>
             <th>Name</th>
             <th>Price</th>
+            <th>Status</th>
             <th>Actions</th>
             
           </tr>
@@ -162,13 +179,14 @@
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
+            { data: 'Status', name: 'Status'},
             { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {
           url: '{{ route('product.index') }}',
           data: function (data) {
                 data.shop = $("#shop").val();
-                data.status = $("#status").val();
+                data.status = $("input[name=status]:checked").val();
                 data.timings = $("#timings").val();
                 data.site = $('input[name="site"]:checked').val();
             }

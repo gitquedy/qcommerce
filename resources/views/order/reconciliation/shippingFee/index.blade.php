@@ -56,6 +56,11 @@
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
       </div>
+      <div class="row">
+        <div class="col-12">
+          <a target="_blank" class="btn btn-info" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en"><i class="fa fa-file"></i> File Dispute here</a>
+        </div>
+      </div>
     </div>
   </section>  
 

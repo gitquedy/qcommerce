@@ -35,17 +35,6 @@ class ShopController extends Controller
             return Datatables::eloquent($shop)
             ->editColumn('site', function(Shop $shop) {
                             return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';
-                            // switch ($shop->site) {
-                            //     case 'lazada':
-                            //             return '<img src="" style="display:block; width:100%; height:auto;">';
-                            //         break;
-                            //     case 'shopee':
-                            //             return '<img src="" style="display:block; width:100%; height:auto;">';
-                            //         break;
-                            //     default:
-                            //             return '--';
-                            //         break;
-                            // }
                         })
             ->addColumn('statusChip', function(Shop $shop) {
                             $html = '';
@@ -214,5 +203,21 @@ class ShopController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+    public function shopeeGetLogistics(Request $request, Shop $shop){
+        $logistics = $shop->shopeeGetLogistics();
+        $data = [];
+        foreach($logistics['logistics'] as $logistic){
+            if($logistic['enabled']){
+                $data[] =  [
+                    'weight_limits' => $logistic['weight_limits'],
+                    'logistic_name' => $logistic['logistic_name'],
+                    'logistic_id' => $logistic['logistic_id'],
+                    'preferred' => $logistic['preferred'],
+                ];
+            }
+        }
+        return response()->json(['logistics' => $data]);
     }
 }
