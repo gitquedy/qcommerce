@@ -51,7 +51,7 @@ class OrderController extends Controller
         $shop_ids = $all_shops->pluck('id');
 
 
-        $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->where('seen','=','no')->update(['seen' => 'yes']);
+        $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->update(['seen' => 'yes']);
         $lazada_count = Order::where('site','lazada')->whereIn('shop_id',$shop_ids)->whereIn('status', ['pending'])->count();
         $shopee_count = Order::where('site','shopee')->whereIn('shop_id',$shop_ids)->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
         
