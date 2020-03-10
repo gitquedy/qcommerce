@@ -32,7 +32,7 @@ class Kernel extends ConsoleKernel
                  ->everyFifteenMinutes()
                  ->appendOutputTo('storage/logs/cron_syncorders.log');
         $schedule->command('shop:syncProducts')
-                 ->dailyAt('01:00')
+                 ->hourly()
                  ->appendOutputTo('storage/logs/cron_syncProducts.log');
         $schedule->command('shop:updateToken')
                  ->cron('0 0 */5 * *')

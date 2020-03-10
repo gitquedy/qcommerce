@@ -113,12 +113,10 @@ class Products extends Model
         $xml .= '<name>'.$product_details->attributes->name.'</name>';
         }
         if(isset($product_details->attributes->short_description)){
-            $short_desc = str_replace("<"," ",$product_details->attributes->short_description);
-            $short_desc = str_replace(">"," ",$short_desc);
-            $xml .= '<short_description>'.$short_desc.'</short_description>';
+            $xml .= '<short_description><![CDATA['.$product_details->attributes->short_description.']]></short_description>';
         }
         if(isset($product_details->attributes->description)){
-        $xml .= '<description>'.$product_details->attributes->description.'</description>';
+        $xml .= '<description><![CDATA['.$product_details->attributes->description.']]></description>';
         }
         if(isset($product_details->attributes->brand)){
         $xml .= '<brand>'.$product_details->attributes->brand.'</brand>';
