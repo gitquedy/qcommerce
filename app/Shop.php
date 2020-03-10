@@ -360,7 +360,7 @@ class Shop extends Model
                     $result = $c->execute($r,$this->access_token);
                     $data = json_decode($result, true);
                     if($data['code'] == "0"){
-                        if($products = $data['data']['products']){
+                         if(isset($data['data']['products'])){
                             $products = array_merge($products, $data['data']['products']);
                         }
                     }
