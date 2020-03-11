@@ -134,6 +134,10 @@ class Products extends Model
         $xml .= '<animal_pets>'.$product_details->attributes->animal_pets.'</animal_pets>';
         }
 
+        if(isset($product_details->attributes->warranty_type)){
+        $xml .= '<warranty_type>'.$product_details->attributes->warranty_type.'</warranty_type>';
+        }
+
         $xml .= '</Attributes>
                             <Skus>
                                 <Sku>';                  
