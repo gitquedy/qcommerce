@@ -129,6 +129,11 @@ class Products extends Model
         if(isset($product_details->attributes->model)){
         $xml .= '<model>'.$product_details->attributes->model.'</model>';
         }
+
+        if(isset($product_details->attributes->animal_pets)){
+        $xml .= '<animal_pets>'.$product_details->attributes->animal_pets.'</animal_pets>';
+        }
+
         $xml .= '</Attributes>
                             <Skus>
                                 <Sku>';                  
@@ -181,8 +186,9 @@ class Products extends Model
         if(isset($product_details->skus[0]->special_to_date)){
             $xml .= '<special_to_date>'.$product_details->skus[0]->special_to_date.'</special_to_date>';
         }
-        $xml .= '<package_content>This is what\'s in the box </package_content>';
-        
+        if(isset($product_details->attributes->name)){
+            $xml .= '<package_content>'. $product_details->attributes->name .'</package_content>';
+        }
         $xml .= '</Sku></Skus></Product></Request>';
         return $xml;
     }
@@ -195,14 +201,14 @@ class Products extends Model
             $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
             $r = new LazopRequest('/product/create','POST');
             $r->addApiParam('payload', $xml);
-            $resultX = $c->execute($r,$duplicate_to->access_token);
-
+            $duplicate_product = $c->execute($r,$duplicate_to->access_token);
+            $duplicate_product = json_decode($duplicate_product, true);
             $c = $this->shop->lazadaGetClient();
             $r = new LazopRequest('/product/item/get','GET');
-            $r->addApiParam('item_id', $this->item_id);
-            $result = $c->execute($r,$this->shop->access_token);
+            $r->addApiParam('seller_sku', $this->SellerSku);
+            $result = $c->execute($r,$duplicate_to->access_token);
             $data = json_decode($result, true);
-            if($data['code'] == "0"){
+            if($data['code'] == "0" && $duplicate_product['code'] == "0"){
                 $product_details = $data['data'];
                 $product_details = [
                     'shop_id' => $duplicate_to->id,
@@ -220,6 +226,8 @@ class Products extends Model
                 $record = Products::updateOrCreate(
                     ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                 return $this->name . ' Add item successfully';
+            }else{
+                return $this->name . ' ' . $duplicate_product['message'] . ' (' . $duplicate_product['detail'][0]['message']  .')';
             }
         }else if($duplicate_to->site == 'shopee'){
             $product_details = $this->shopeeGetItemDetail();

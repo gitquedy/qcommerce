@@ -390,7 +390,7 @@ class Shop extends Model
             foreach($dates as $date){
                 $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
                 $created_before_increment += 1;
-                $more = true;
+                $more = true;   
                 $offset = 0;
                 while($more){
                     $params = [
