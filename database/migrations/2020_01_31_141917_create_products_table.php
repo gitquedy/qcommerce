@@ -21,6 +21,8 @@ class CreateProductsTable extends Migration
             $table->text('name');
             $table->string('item_id');
             $table->unsignedInteger('shop_id')->nullable();
+
+            $table->integer('quantity')->default(0);
             $table->text('Images')->nullable();
             $table->string('Url')->nullable();
             $table->float('price', 15, 2)->nullable();

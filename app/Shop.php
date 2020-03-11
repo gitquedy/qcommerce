@@ -368,6 +368,7 @@ class Shop extends Model
                     'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],
                     'Url' => $product_details['skus'][0]['Url'],
+                    'quantity' => $product_details['skus'][0]['quantity'],
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                     ];
@@ -432,6 +433,7 @@ class Shop extends Model
                     'Images' => implode('|', $product_details['item']['images']),
                     'name' => $product_details['item']['name'],
                     'Status' => $product_details['item']['status'],
+                    'quantity' => $product_details['item']['stock'],
                     'created_at' => Carbon::createFromTimestamp($product_details['item']['create_time'])->toDateTimeString(),
                     'updated_at' => Carbon::createFromTimestamp($product_details['item']['update_time'])->toDateTimeString(),
                     ];

@@ -36,12 +36,12 @@
               <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get("site") == "lazada" ?  "active" : ""}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
                 Lazada
-                <span id="notif_site1" class="badge badge-secondary">{{$lazada_count}}</span>
+                <span id="badge_lazada_total" class="badge badge-secondary"></span>
               </label>
               <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
                 Shopee
-                <span id="notif_site2" class="badge badge-secondary">{{$shopee_count}}</span>
+                <span id="badge_shopee_total" class="badge badge-secondary"></span>
               </label>
               <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
               <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
@@ -87,6 +87,7 @@
               @foreach($statuses as $status)
                 <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
                   <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucfirst(strtolower($status)) }}
+                   <span id="badge_{{ $status }}" class="badge badge-secondary"></span>
                 </label>
               @endforeach
             </div>
@@ -134,6 +135,7 @@
             <th>Image</th>
             <th>Name</th>
             <th>Price</th>
+            <th>Available</th>
             <th>Status</th>
             <th>Actions</th>
             
@@ -159,6 +161,19 @@
 @endsection
 @section('myscript')
   {{-- Page js files --}}
+  <script type="text/javascript">
+    function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('ProductController@headers')  }}?site={{ $request->get('site') }}",
+        success: function success(result) {     
+            $.each(result.data, function (i, item) {
+              $('#badge_' + i).html(item);
+            });
+          },
+        });     
+      }
+  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
@@ -179,7 +194,8 @@
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
-            { data: 'Status', name: 'Status'},
+            { data: 'quantity', name: 'quantity'},
+            { data: 'status_display', name: 'status_display'},
             { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {
@@ -202,6 +218,9 @@
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
+  }
+  function draw_callback_function(settings){
+    getHeaders();
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;

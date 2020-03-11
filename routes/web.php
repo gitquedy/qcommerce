@@ -51,7 +51,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/product/duplicateForm', 'ProductController@duplicateForm')->name('product.duplicateForm');
 	Route::post('/product/duplicateProudcts', 'ProductController@duplicateProudcts')->name('product.duplicateProudcts');
 	Route::get('/product/searchProduct', 'ProductController@searchProduct')->name('product.searchProduct');
-	
+	Route::get('/product/headers', 'ProductController@headers')->name('product.headers');
 
 	
 

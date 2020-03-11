@@ -29,8 +29,6 @@ class ProductController extends Controller
         $all_shops = $request->user()->shops;
 
         $shop_ids = $all_shops->pluck('id');
-        $lazada_count = Products::whereIn('shop_id' , $shop_ids)->where('site', 'lazada')->count();
-        $shopee_count = Products::whereIn('shop_id' , $shop_ids)->where('site', 'shopee')->count();
 
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
@@ -64,7 +62,12 @@ class ProductController extends Controller
 
                $status = $request->get('status');
                if($status != 'all') {
-                  $Products->where('status', $status);
+                  if($status == 'sold-out'){
+                    $Products->where('quantity', 0);
+                  }else{
+                    $Products->where('status', $status);
+                  }
+                  
                }
                   
                $Products->where('site', $request->get('site', 'lazada'));
@@ -83,6 +86,9 @@ class ProductController extends Controller
                                     })
                 ->addColumn('getImgAndIdDisplay', function(Products $product) {
                                 return $product->getImgAndIdDisplay();
+                 })
+                ->addColumn('status_display', function(Products $product) {
+                                return ucfirst(strtolower($product->Status));
                  })
                 ->addColumn('action', function(Products $product) {
                     $actions = '';
@@ -106,14 +112,12 @@ class ProductController extends Controller
                         }
                         return $actions;
                     })
-                    ->rawColumns(['getImgAndIdDisplay', 'action'])
+                    ->rawColumns(['getImgAndIdDisplay', 'action', 'status_display'])
                     ->make(true);
             }
             return view('product.index', [
                 'breadcrumbs' => $breadcrumbs,
                 'all_shops' => $all_shops,
-                'lazada_count' => $lazada_count,
-                'shopee_count' => $shopee_count,
                 'statuses' => $statuses,
                 'selectedStatus' => $selectedStatus,
             ]);
@@ -305,5 +309,36 @@ class ProductController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+    public function headers(Request $request){
+        $data = [];
+        $shop_ids = $request->user()->shops->pluck('id')->toArray();
+
+        if($request->site == 'lazada'){
+            $lazada_statuses = Products::$lazadaStatuses;
+            foreach($lazada_statuses as $status){
+                $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'lazada');
+                if($status == 'sold-out'){
+                    $data[$status] = $products->where('quantity', 0)->count();
+                }else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }else{
+            $shopee_statuses = Products::$shopeeStatuses;
+            foreach($shopee_statuses as $status){
+                $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
+                if($status == 'sold-out'){
+                    $data[$status] = $products->where('quantity', 0)->count();
+                }else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }
+        $data['lazada_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->count();
+        $data['shopee_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->count();
+
+        return response()->json(['data' => $data]); 
     }
 }

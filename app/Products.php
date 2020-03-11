@@ -18,11 +18,11 @@ class Products extends Model
 {
     protected $table = 'products';
     
-    protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','Images','Status', 'Url','created_at','updated_at'];
+    protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','Images','Status', 'Url','quantity','created_at','updated_at'];
     
     public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
 
-    public static $shopeeStatuses = ['NORMAL', 'DELETED', 'BANNED', 'UNLIST'];
+    public static $shopeeStatuses = ['NORMAL', 'DELETED', 'BANNED', 'UNLIST', 'sold-out'];
 
 
     public function shop(){
@@ -214,6 +214,7 @@ class Products extends Model
                     'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
                     'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],
+                    'quantity' => $product_details['skus'][0]['quantity'],
                     'Url' => $product_details['skus'][0]['Url'],
                     ];
                 $record = Products::updateOrCreate(
@@ -266,6 +267,7 @@ class Products extends Model
                     'Images' => implode('|', $duplicate_product['item']['images']),
                     'name' => $duplicate_product['item']['name'],
                     'Status' => $duplicate_product['item']['status'],
+                    'quantity' => $product_details['item']['stock'],
                     'created_at' => Carbon::createFromTimestamp($duplicate_product['item']['create_time'])->toDateTimeString(),
                     'updated_at' => Carbon::createFromTimestamp($duplicate_product['item']['update_time'])->toDateTimeString(),
                     ];
