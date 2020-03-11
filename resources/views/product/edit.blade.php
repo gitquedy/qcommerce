@@ -13,40 +13,7 @@
 @section('mystyle')
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
-        <style>
-          .image_uploader{
-              background-color:#F1F1F1;
-              min-height:200px;
-              border-radius:5px;
-              padding:10px;
-          }
-          .inner_card{
-              background-color:white;
-              min-height:150px;
-              box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.75);
-          }
-          .flex{
-              display:flex;
-          }
-          .upload_btn{
-              border:2px dashed #F1F1F1;
-          }
-          .upload_items{
-              padding:10px;
-          }
-          .image_divr{
-              border:2px dashed #F1F1F1;
-              margin:2px;
-          }
-          .x_button{
-              border:none;
-              width:100%;
-          }
-          .product_image{
-            width:150px;
-            height:auto;
-          }
-      </style>     
+        <link rel="stylesheet" href="{{ asset('css/product.css') }}">
 @endsection
 
 @section('content')
