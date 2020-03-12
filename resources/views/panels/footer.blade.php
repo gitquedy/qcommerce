@@ -8,5 +8,17 @@
         <button class="btn btn-primary btn-icon scroll-top" type="button"><i class="feather icon-arrow-up"></i></button>
     </p>
 </footer>
-<script id="cid0020000243065808524" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 300px;height: 500px;">{"handle":"qcommerceasia","arch":"js","styles":{"a":"10163a","b":100,"c":"FFFFFF","d":"FFFFFF","k":"10163a","l":"10163a","m":"10163a","n":"FFFFFF","p":"10","q":"10163a","r":100,"pos":"br","cv":1,"cvbg":"CC0000","cvw":75,"cvh":30,"surl":0}}</script>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5e69af9eeec7650c331f8d8f/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 <!-- END: Footer-->
