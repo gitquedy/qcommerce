@@ -28,8 +28,8 @@
                               @csrf
                               <div class="form-label-group">
                                       <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
-                                      <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Company Name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-                                      <label for="name">Company Name</label>
+                                      <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Company Name / Full Name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                      <label for="name">Company Name / Full Name</label>
                                       @error('name')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

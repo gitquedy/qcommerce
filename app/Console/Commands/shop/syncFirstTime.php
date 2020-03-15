@@ -4,6 +4,7 @@ namespace App\Console\Commands\shop;
 
 use Illuminate\Console\Command;
 use App\Shop;
+use Carbon\Carbon;
 
 class syncFirstTime extends Command
 {
@@ -43,6 +44,7 @@ class syncFirstTime extends Command
             $shop->syncOrders();
             $shop->syncShopeeProducts();
             $shop->syncLazadaProducts();
+            $shop->syncShippingDetails(Carbon::now()->subDays(30)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
             $shop->touch();
             $shop->update(['is_first_time', false]);
         }

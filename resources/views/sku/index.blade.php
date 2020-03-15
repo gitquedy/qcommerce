@@ -56,11 +56,11 @@
             <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                 <input type="checkbox">
             </th>
-            <th>Code</th>
+            <th>SKU Code</th>
             <th>Image</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Category</th>
+            <th>Product Name</th>
+            <!-- <th>Brand</th> -->
+            <!-- <th>Category</th> -->
             <th>Supplier</th>
             <th>Cost</th>
             <th>Price</th>
@@ -115,8 +115,8 @@
               },
             },
             { data: 'name', name: 'name'},
-            { data: 'brand_name', name: 'brand_name'},
-            { data: 'category_name', name: 'category_name'},
+            // { data: 'brand_name', name: 'brand_name'},
+            // { data: 'category_name', name: 'category_name'},
             { data: 'supplier_company', name: 'supplier_company'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},

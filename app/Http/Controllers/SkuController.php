@@ -117,14 +117,14 @@ class SkuController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"SKU  Create"]
         ];
         
-        $Category = Category::auth_category();
-        $Brand = Brand::auth_brand();
+        // $Category = Category::auth_category();
+        // $Brand = Brand::auth_brand();
         $Supplier = Supplier::auth_supplier();
         
         return view('sku.create', [
             'breadcrumbs' => $breadcrumbs,
-            'Category'=> $Category,
-            'Brand'=> $Brand,
+            // 'Category'=> $Category,
+            // 'Brand'=> $Brand,
             'Supplier' => $Supplier
             ]);
         
@@ -135,8 +135,8 @@ class SkuController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            'brand' => 'nullable',
-            'category' => 'nullable',
+            // 'brand' => 'nullable',
+            // 'category' => 'nullable',
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
@@ -147,8 +147,8 @@ class SkuController extends Controller
         $sku->business_id = Auth::user()->business_id;
         $sku->code = $request->code;
         $sku->name = $request->name;
-        $sku->brand = $request->brand;
-        $sku->category = $request->category;
+        // $sku->brand = $request->brand;
+        // $sku->category = $request->category;
         $sku->supplier = $request->suppler;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
@@ -183,16 +183,16 @@ class SkuController extends Controller
         
         $Sku = Sku::find($id);
         
-        $Category = Category::auth_category();
-        $Brand = Brand::auth_brand();
+        // $Category = Category::auth_category();
+        // $Brand = Brand::auth_brand();
         $Supplier = Supplier::auth_supplier();
 
         
         return view('sku.edit', [
             'breadcrumbs' => $breadcrumbs,
             'Sku'=> $Sku,
-            'Category'=> $Category,
-            'Brand'=> $Brand,
+            // 'Category'=> $Category,
+            // 'Brand'=> $Brand,
             'Supplier' => $Supplier
             ]);
         
@@ -209,8 +209,8 @@ class SkuController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            'brand' => 'nullable',
-            'category' => 'nullable',
+            // 'brand' => 'nullable',
+            // 'category' => 'nullable',
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
@@ -220,8 +220,8 @@ class SkuController extends Controller
         $sku = Sku::find($request->id);
         $sku->code = $request->code;
         $sku->name = $request->name;
-        $sku->brand = $request->brand;
-        $sku->category = $request->category;
+        // $sku->brand = $request->brand;
+        // $sku->category = $request->category;
         $sku->supplier = $request->supplier;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
@@ -251,7 +251,7 @@ class SkuController extends Controller
                     </Request>';
                 if(env('lazada_sku_sync', true)){
                     if($prod->site == 'lazada'){
-                        $response = Products::product_update($access_token,$xml);
+                        $response = $prod->product_update($xml);
                     }
                 }
             }
@@ -381,7 +381,7 @@ class SkuController extends Controller
            
             return Datatables::eloquent($Sku_prod)
                         ->addColumn('shop', function(Products $product) {
-                            return $product->shop ? $product->shop->short_name : '';
+                            return $product->shop->getImgSiteDisplay();
                                 })
                         ->addColumn('image', function(Products $product) {
                             $image_url = '';
@@ -400,6 +400,7 @@ class SkuController extends Controller
                         <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
                     </div></div>';
                                 })
+                        ->rawColumns(['shop', 'action'])
                         ->make(true);
         }
         

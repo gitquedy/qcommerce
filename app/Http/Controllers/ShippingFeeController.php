@@ -31,8 +31,7 @@ class ShippingFeeController extends Controller
                                 ->where('shipping_fee_reconciled','!=',0)
                                 ->with('seller_payout_fees')
                                 ->with('customer_payout_fees')
-                                ->orderBy('order.updated_at', 'desc');
-
+                                ->orderBy('order.updated_at', 'desc');     
                  if($request->get('timings')=="Today"){
                     $orders->whereDate('created_at', '=', date('Y-m-d'));
                  }

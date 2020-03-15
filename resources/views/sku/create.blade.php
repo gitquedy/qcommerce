@@ -42,49 +42,45 @@
           @csrf
           <div class="row">
               <div class="col-md-6 form-group">
-                  <lable>Code</lable>
+                  <lable>SKU Code</lable>
                   <input class="form-control" name="code">
               </div>
               <div class="col-md-6 form-group">
-                  <lable>Name</lable>
+                  <lable>Product Name</lable>
                   <input class="form-control" name="name">
               </div>
-              <div class="col-md-6 form-group">
-                  <lable>Brand</lable>
-                  <div class="form-group">
-                      <div class="input-group">
-                        <select class="form-control s280" id="brand" name="brand" style="width:80% !important">
-                              <option value="" disabled selected></option>
-                              @foreach($Brand as $BrandVAL)
-                              <option  value="{{$BrandVAL->id}}">{{$BrandVAL->code." - ".$BrandVAL->name}}</option>
-                              @endforeach
-                          </select>
-                          @can('brand.manage')
-                          <div class="input-group-append">
-                            <button type="button" data-toggle="modal" data-target="#brand_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
-                          </div>
-                        @endcan
-                      </div>
+<!--           <div class="col-md-6 form-group">
+                <lable>Brand</lable>
+                <div class="form-group">
+                    <div class="input-group">
+                      <select class="form-control s280" id="brand" name="brand" style="width:80% !important">
+                            <option value="" disabled selected></option>
+                
+                        </select>
+                        @can('brand.manage')
+                        <div class="input-group-append">
+                          <button type="button" data-toggle="modal" data-target="#brand_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                        </div>
+                      @endcan
                     </div>
-              </div>
-              <div class="col-md-6 form-group">
-                  <lable>Category</lable>
-                  <div class="form-group">
-                      <div class="input-group">
-                        <select class="form-control s280" name="category" id="category">
-                              <option value="" disabled selected></option>
-                              @foreach($Category as $CategoryVAL)
-                              <option  value="{{$CategoryVAL->id}}">{{$CategoryVAL->code." - ".$CategoryVAL->name}}</option>
-                              @endforeach
-                          </select>
-                        @can('category.manage')
-                          <div class="input-group-append">
-                            <button type="button" data-toggle="modal" data-target="#category_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
-                          </div>
-                        @endcan
-                      </div>
+                  </div>
+            </div>
+            <div class="col-md-6 form-group">
+                <lable>Category</lable>
+                <div class="form-group">
+                    <div class="input-group">
+                      <select class="form-control s280" name="category" id="category">
+                            <option value="" disabled selected></option>
+                     
+                        </select>
+                      @can('category.manage')
+                        <div class="input-group-append">
+                          <button type="button" data-toggle="modal" data-target="#category_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                        </div>
+                      @endcan
                     </div>
-              </div>
+                  </div>
+            </div> -->
               <div class="col-md-6 form-group">
                   <lable>Supplier</lable>
                   <div class="form-group">
@@ -135,17 +131,15 @@
 
 
 <!-- The Modal -->
-<div class="modal" id="brand_modal">
+<!-- <div class="modal" id="brand_modal">
   <div class="modal-dialog">
     <div class="modal-content">
 
-      <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Add New Brand</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
-      <!-- Modal body -->
       <div class="modal-body">
          @if ($errors->any())
             <div class="alert alert-danger">
@@ -170,7 +164,6 @@
           
       </div>
 
-      <!-- Modal footer -->
       <div class="modal-footer">
          <button class="btn btn-primary">Save</button>
          </form>
@@ -179,23 +172,22 @@
 
     </div>
   </div>
-</div>
+</div> -->
 
 
 
 
 <!-- The Modal -->
-<div class="modal" id="category_modal">
+<!-- <div class="modal" id="category_modal">
   <div class="modal-dialog">
     <div class="modal-content">
 
-      <!-- Modal Header -->
+      Modal Header
       <div class="modal-header">
         <h4 class="modal-title">Add New Category</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
-      <!-- Modal body -->
       <div class="modal-body">
          @if ($errors->any())
               <div class="alert alert-danger">
@@ -220,16 +212,13 @@
                   <lable>Parent Category</lable>
                   <select class="form-control s2" name="category_parent" id="category2" >
                               <option value="">select</option>
-                              @foreach($Category as $CategoryVAL)
-                              <option  value="{{$CategoryVAL->id}}">{{$CategoryVAL->code." - ".$CategoryVAL->name}}</option>
-                              @endforeach
+                    
                   </select>
               </div>
           </div>
           
       </div>
 
-      <!-- Modal footer -->
       <div class="modal-footer">
          <button class="btn btn-primary">Save</button>
          </form>
@@ -238,7 +227,7 @@
 
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- The Modal -->
 <div class="modal" id="supplier_modal">
@@ -316,89 +305,89 @@
 
 
 
-function process_add_brand(e){
+// function process_add_brand(e){
     
-    e.preventDefault();
-    $('#brand_modal').modal('hide');
+//     e.preventDefault();
+//     $('#brand_modal').modal('hide');
     
-    $.post("{{route('brand.add_ajax')}}",
-      {
-        code: $('#brand_code').val(),
-        name: $('#brand_name').val()
-      },
-      function(data, status){
-         if(data.success==1){
-             var opstr = '<option selected value="'+data.id+'">'+$('#brand_code').val()+' - '+$('#brand_name').val()+'</option>';
-             $('#brand').append(opstr);
+//     $.post("{{route('brand.add_ajax')}}",
+//       {
+//         code: $('#brand_code').val(),
+//         name: $('#brand_name').val()
+//       },
+//       function(data, status){
+//          if(data.success==1){
+//              var opstr = '<option selected value="'+data.id+'">'+$('#brand_code').val()+' - '+$('#brand_name').val()+'</option>';
+//              $('#brand').append(opstr);
              
-             $(".s280").select2({
-                dropdownAutoWidth: true,
-                width: '70%'
-              });
+//              $(".s280").select2({
+//                 dropdownAutoWidth: true,
+//                 width: '70%'
+//               });
               
-              Swal.fire(
-                  'success !',
-                  'Brand Added!',
-                  'success'
-                );
+//               Swal.fire(
+//                   'success !',
+//                   'Brand Added!',
+//                   'success'
+//                 );
              
-         }else{
-             Swal.fire(
-                  'Error !',
-                  'Brand Not Added !',
-                  'error'
-                );
-         }
-      });
+//          }else{
+//              Swal.fire(
+//                   'Error !',
+//                   'Brand Not Added !',
+//                   'error'
+//                 );
+//          }
+//       });
   
-}
+// }
 
 
-function process_add_category(e){
+// function process_add_category(e){
     
     
-    e.preventDefault();
-    $('#category_modal').modal('hide');
+//     e.preventDefault();
+//     $('#category_modal').modal('hide');
     
-    $.post("{{route('category.add_ajax')}}",
-      {
-        code: $('#category_code').val(),
-        name: $('#category_name').val(),
-        parent:$('#category2').val()
-      },
-      function(data, status){
-         if(data.success==1){
-             var opstr = '<option selected value="'+data.id+'">'+$('#category_code').val()+' - '+$('#category_name').val()+'</option>';
-             $('#category').append(opstr);
-             $('#category2').append(opstr);
+//     $.post("{{route('category.add_ajax')}}",
+//       {
+//         code: $('#category_code').val(),
+//         name: $('#category_name').val(),
+//         parent:$('#category2').val()
+//       },
+//       function(data, status){
+//          if(data.success==1){
+//              var opstr = '<option selected value="'+data.id+'">'+$('#category_code').val()+' - '+$('#category_name').val()+'</option>';
+//              $('#category').append(opstr);
+//              $('#category2').append(opstr);
              
-             $(".s280").select2({
-                dropdownAutoWidth: true,
-                width: '70%'
-              });
+//              $(".s280").select2({
+//                 dropdownAutoWidth: true,
+//                 width: '70%'
+//               });
               
-              $(".s2").select2({
-                dropdownAutoWidth: true,
-                width: '100%'
-              });
+//               $(".s2").select2({
+//                 dropdownAutoWidth: true,
+//                 width: '100%'
+//               });
               
-              Swal.fire(
-                  'success !',
-                  'Category Added!',
-                  'success'
-                );
+//               Swal.fire(
+//                   'success !',
+//                   'Category Added!',
+//                   'success'
+//                 );
              
-         }else{
-             Swal.fire(
-                  'Error !',
-                  'Category Not Added !',
-                  'error'
-                );
-         }
-      });
+//          }else{
+//              Swal.fire(
+//                   'Error !',
+//                   'Category Not Added !',
+//                   'error'
+//                 );
+//          }
+//       });
     
     
-}
+// }
 
 
 function process_add_supplier(e){
