@@ -229,8 +229,6 @@ class UserController extends Controller
       if($user->business_id != $request->user()->business_id){
           abort(401, 'You don\'t have access to edit this user');
       }
-      // 'unique:users'
-      // 
       $validator = Validator::make($request->all(),[
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

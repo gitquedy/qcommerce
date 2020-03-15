@@ -53,7 +53,8 @@ class OrderController extends Controller
     if ( request()->ajax()) {
            $shops = $request->user()->business->shops;
            if($request->get('shop') != ''){
-                $shops->whereIn('id', explode(",", $request->get('shop')));
+                $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
+
            }
            $shops_id = $shops->pluck('id')->toArray();
            $status = $request->get('status');
@@ -65,7 +66,7 @@ class OrderController extends Controller
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
-           $orders->orderBy('updated_at', 'desc');
+           $orders->orderBy('created_at', 'asc');
            
            if($request->get('site') == 'lazada'){
               $orders->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
@@ -481,10 +482,8 @@ class OrderController extends Controller
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
                 $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
-                if($status == 'SHIPPED'){
-                    $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNotNull('tracking_no')->count();
-                }else if($status == 'READY_TO_SHIP'){
-                   $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->count();
+                if($status == 'READY_TO_SHIP'){
+                   $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->orWhere('tracking_no' , '')->count();
                 }
                 else{
                     $data[$status] = $products->where('status', $status)->count();

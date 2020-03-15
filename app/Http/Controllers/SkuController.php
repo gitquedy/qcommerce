@@ -156,7 +156,7 @@ class SkuController extends Controller
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
-            $request->session()->flash('flash_success', 'Success !');
+            $request->session()->flash('flash_success', 'Successfully added SKU. Next step is to LINK your shop listing to your SKU');
         }else{
             $request->session()->flash('flash_error',"something Went wrong !");
         }

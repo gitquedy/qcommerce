@@ -151,6 +151,6 @@ use Notifiable, HasRoles;
     }
 
     public function getNameAndImgDisplay(){
-         return '<div class="text-primary font-medium-2 text-bold-600">'. $this->fullName() .' </div>' . '<img src="'. $this->imageUrl() .'" style="width:60px; height:60px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->id .' </span>';
+         return '<div class="text-primary font-medium-2 text-bold-600">'. $this->fullName() .' </div>' . '<img src="'. $this->imageUrl() .'" style="width:60px; height:60px">';
     }
 }

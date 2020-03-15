@@ -57,6 +57,7 @@
             <th>Ready to Ship</th>
             <th>Shipped</th>
             <th>UPDATED AT</th>
+            <th>Action</th>
           </tr>
         </thead>
       </table>
@@ -102,6 +103,7 @@
             { data: 'ready_to_ship_count', name: 'ready_to_ship_count' },
             { data: 'shipped_count', name: 'shipped_count' },
             { data: 'updated_at', name: 'updated_at' },
+            { data: 'action', name: 'action' },
         ];
   var table_route = '{{ route('shop.index') }}';
   var buttons = [

@@ -70,7 +70,16 @@ class ShopController extends Controller
                            $product_count =  Products::where('shop_id','=',$shop->id)->get()->count();
                            return '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$product_count.'</div></div></div>';
                         })
-            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products'])
+            ->addColumn('action', function(Shop $shop) {
+                    $actions = '<div class="btn-group dropup mr-1 mb-1">
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                    Action<span class="sr-only">Toggle Dropdown</span></button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item modal_button" href="#" data-href="'. action('ShopController@edit', $shop->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                    </div></div>';
+                    return $actions;
+             })
+            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action'])
             ->make(true);
         }
         return view('shop.index', [
@@ -193,6 +202,38 @@ class ShopController extends Controller
                         'redirect' => action('ShopController@index')
                     ];
             }
+            DB::commit();
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+    public function edit(Shop $shop){
+        return view('shop.edit', compact('shop'));
+    }
+
+    public function update(Shop $shop, Request $request){
+        $validator = Validator::make($request->all(), [
+                'name' => ['required', 'regex:/^[\pL\s\-]+$/u'],
+                'short_name' => 'required'
+            ], 
+        ['name.regex' => 'Only character\'s are allowed']);
+
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors','error' => $validator->errors()]);
+        }
+        try {
+            $shop->update($request->only(['short_name', 'name']));
+
+            $output = ['success' => 1,
+                'msg' => 'Shop updated successfully!',
+            ];
             DB::commit();
           
         } catch (\Exception $e) {

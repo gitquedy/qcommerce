@@ -31,14 +31,7 @@
                 </a>
             </li>  
         
-            @can('barcode.manage')
-            <li class="nav-item  ">
-                <a href="{{url('/barcode')}}">
-                    <i class="feather icon-hash"></i>
-                    <span class="menu-title" data-i18n="nav.order">Barcode</span>
-                </a>
-            </li>
-            @endcan
+            
 
             @can('shop.manage')
                 <li class="nav-item  ">
@@ -152,6 +145,15 @@
                 </li>
             @endcan
 
+            @can('barcode.manage')
+            <li class="nav-item  ">
+                <a href="{{url('/barcode')}}">
+                    <i class="feather icon-hash"></i>
+                    <span class="menu-title" data-i18n="nav.order">Barcode</span>
+                </a>
+            </li>
+            @endcan
+
             @can('supplier.manage')
                 <li class="nav-item  ">
                     <a href="">
@@ -209,7 +211,7 @@
                 </li>
             @endif
             
-            @if($request->user()->can('category.manage') || $request->user()->can('brand.manage'))
+            <!-- @if($request->user()->can('category.manage') || $request->user()->can('brand.manage'))
                 <li class="nav-item  ">
                     <a href="">
                         <i class="feather icon-settings"></i>
@@ -234,7 +236,7 @@
                         @endcan
                     </ul>
                 </li>
-            @endif
+            @endif -->
         </ul>
     </div>
 </div>
