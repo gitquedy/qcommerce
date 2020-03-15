@@ -16,6 +16,7 @@ use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Products;
+use App\Business;
 
 class OrderController extends Controller
 {
@@ -29,7 +30,7 @@ class OrderController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
         ];
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc');
+        $all_shops = $request->user()->business->shops;
         if($request->get('site') == 'shopee'){
            $statuses = Order::$shopee_statuses;
            $all_shops = $all_shops->where('site', 'shopee');
@@ -46,18 +47,11 @@ class OrderController extends Controller
           $selectedStatus = 'all';
         }
 
-      
-        $all_shops = $all_shops->get();
-        $shop_ids = $all_shops->pluck('id');
-
-
-        $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->update(['seen' => true]);
-        $lazada_count = Order::where('site','lazada')->whereIn('shop_id',$shop_ids)->whereIn('status', ['pending'])->count();
-        $shopee_count = Order::where('site','shopee')->whereIn('shop_id',$shop_ids)->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
-        
+        $shop_ids = $all_shops->pluck('id')->toArray();
+        $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->update(['seen' => true]); 
 
     if ( request()->ajax()) {
-           $shops = Shop::where('user_id', $request->user()->id)->orderBy('created_at', 'desc');
+           $shops = $request->user()->business->shops;
            if($request->get('shop') != ''){
                 $shops->whereIn('id', explode(",", $request->get('shop')));
            }
@@ -124,9 +118,6 @@ class OrderController extends Controller
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                                   })
-                // ->addColumn('shop', function(Order $order) {
-                //             return $order->shop ? $order->shop->short_name : '';
-                //                 })
                 ->addColumn('statusDisplay', function(Order $order) {
                             return ucwords(str_replace('_', ' ', $order->status));
                                 })
@@ -137,7 +128,10 @@ class OrderController extends Controller
                             return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
                                 })
                 ->addColumn('created_at_human_read', function(Order $order) {
-                            return Carbon::parse($order->created_at)->diffForHumans();;
+                            return Carbon::parse($order->created_at)->diffForHumans();
+                                })
+                ->addColumn('updated_at_at_human_read', function(Order $order) {
+                            return Carbon::parse($order->updated_at)->diffForHumans();
                                 })
                 ->rawColumns(['actions', 'idDisplay'])
                 ->make(true);
@@ -147,8 +141,6 @@ class OrderController extends Controller
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
             'statuses' => $statuses,
-            'lazada_count' => $lazada_count,
-            'shopee_count' => $shopee_count,
             'selectedStatus' => $selectedStatus,
         ]);
     }
@@ -470,6 +462,39 @@ class OrderController extends Controller
          $counter += 1;
       }
       return view('order.modal.packing_list', compact('orders'));
+    }
+
+
+
+    public function headers(Request $request){
+        $data = [];
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+
+
+        if($request->site == 'lazada'){
+            $lazada_statuses = Order::$statuses;
+            foreach($lazada_statuses as $status){
+                $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada');
+                $data[$status] = $products->where('status', $status)->count();
+            }
+        }else{
+            $shopee_statuses = Order::$shopee_statuses;
+            foreach($shopee_statuses as $status){
+                $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
+                if($status == 'SHIPPED'){
+                    $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNotNull('tracking_no')->count();
+                }else if($status == 'READY_TO_SHIP'){
+                   $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->count();
+                }
+                else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }
+        $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['ready_to_ship'])->count();
+        $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
+
+        return response()->json(['data' => $data]); 
     }
     
     

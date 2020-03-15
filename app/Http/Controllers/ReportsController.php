@@ -50,8 +50,8 @@ class ReportsController extends Controller
         ];
 
             if ( request()->ajax()) {
-                $user_id = Auth::user()->id;
-                $Sku = Sku::where('user_id','=',$user_id)->where('quantity', 0)->orderBy('updated_at', 'desc');
+                $business_id = Auth::user()->business_id;
+                $Sku = Sku::where('business_id','=',$business_id)->where('quantity', 0)->orderBy('updated_at', 'desc');
                 return Datatables::eloquent($Sku)
                     ->addColumn('category_name', function(Sku $SKSU) {
                                     $category = Category::find($SKSU->category);
@@ -101,8 +101,8 @@ class ReportsController extends Controller
         ];
 
             if ( request()->ajax()) {
-                $user_id = Auth::user()->id;
-                $Sku = Sku::where('user_id','=',$user_id)->whereRaw('quantity <= alert_quantity')->where('quantity','>', 0)->orderBy('updated_at', 'desc');
+                $business_id = Auth::user()->business_id;
+                $Sku = Sku::where('business_id','=',$business_id)->whereRaw('quantity <= alert_quantity')->where('quantity','>', 0)->orderBy('updated_at', 'desc');
                 return Datatables::eloquent($Sku)
                 ->addColumn('category_name', function(Sku $SKSU) {
                                 $category = Category::find($SKSU->category);

@@ -15,15 +15,15 @@ class Supplier extends Model
      * @var array
      */
     protected $fillable = [
-        'comapny', 'contact_person', 'phone', 'email', 'user_id',
+        'company', 'contact_person', 'phone', 'email', 'business_id',
     ];
 
 
     public static function auth_supplier(){
         
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $result = DB::table('suppliers')->where('user_id','=',$user_id)->orderBy('updated_at', 'desc')->get();
+        $result = DB::table('suppliers')->where('business_id','=',$business_id)->orderBy('updated_at', 'desc')->get();
         
         return $result;
         

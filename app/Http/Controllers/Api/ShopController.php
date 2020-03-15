@@ -17,7 +17,7 @@ class ShopController extends Controller
      */
     public function index(Request $request)
     {
-        $shops = $request->user()->shops()->paginate(10);
+        $shops = $request->user()->business->shops()->paginate(10);
 
         return response()->json(['shops' => $shops]);
     }
@@ -29,7 +29,7 @@ class ShopController extends Controller
     public function getDashboardDetails(Request $request){
         $user = $request->user();
         // $shops = $user->shops;
-        $shops = Shop::where('user_id', $user->id);
+        $shops = Shop::where('business_id', $user->business_id);
         if($request->get('shop_id')){
             $shops->where('id', $request->get('shop_id'));
         }
@@ -68,7 +68,7 @@ class ShopController extends Controller
 
     public function getShopTotalOrders(Request $request){
 
-        $shops = $request->user()->shops;
+        $shops = $request->user()->business->shops;
         if($request->get('shop_id')){
             $shops = $shops->where('id', $request->get('shop_id'));
         }

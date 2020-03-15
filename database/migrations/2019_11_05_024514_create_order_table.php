@@ -15,6 +15,12 @@ class CreateOrderTable extends Migration
     {
         Schema::create('order', function (Blueprint $table) {
             $table->bigIncrements('id');
+            
+            //fk
+            $table->unsignedBigInteger('shop_id');
+
+            $table->foreign('shop_id')->references('id')->on('shop')->onDelete('cascade');
+
             $table->string('ordersn')->nullable();
             $table->string('tracking_no')->nullable();
             $table->string('site')->nullable();
@@ -25,12 +31,11 @@ class CreateOrderTable extends Migration
             $table->string('shipping_fee');
             $table->string('items_count');
             $table->string('status');
-            $table->unsignedInteger('shipping_fee_reconciled')->default(0);
+            $table->unsignedBigInteger('shipping_fee_reconciled')->default(0);
             $table->boolean('printed')->default(0);
             $table->boolean('packed')->default(0);
             $table->boolean('returned')->default(0);
             $table->boolean('payout')->default(0);
-            $table->unsignedInteger('shop_id');
             $table->string('seen')->nullable();
             $table->string('created_at');
             $table->string('updated_at');

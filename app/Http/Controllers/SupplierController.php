@@ -24,10 +24,10 @@ class SupplierController extends Controller
         
         if ( request()->ajax()) {
             
-            $user_id = Auth::user()->id;
+            $business_id = Auth::user()->business_id;
             
                
-           $Supplier = Supplier::where('user_id','=',$user_id)->orderBy('updated_at', 'desc');
+           $Supplier = Supplier::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
             return Datatables::eloquent($Supplier)
             ->addColumn('action', function(Supplier $SUP) {
@@ -60,7 +60,7 @@ class SupplierController extends Controller
             'email' => 'present'
         ]);
         $Supplier = new Supplier();
-        $Supplier->user_id = Auth::user()->id;
+        $Supplier->business_id = Auth::user()->business_id;
         $Supplier->company = $request->company;
         $Supplier->contact_person = $request->contact_person;
         $Supplier->phone = $request->phone;
@@ -108,7 +108,7 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $supplier = new Supplier();
-        $supplier->user_id = Auth::user()->id;
+        $supplier->business_id = Auth::user()->business_id;
         $supplier->company = $request->company;
         $supplier->contact_person = $request->contact_person;
         $supplier->phone = $request->phone;
@@ -143,8 +143,8 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier, Request $request)
     {
-        $user_id = Auth::user()->id;
-        if($supplier->user_id != $user_id) {
+        $business_id = Auth::user()->business_id;
+        if($supplier->business_id != $business_id) {
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/supplier');
         }
@@ -202,8 +202,8 @@ class SupplierController extends Controller
     }
 
     public function delete($id){
-        $user_id = Auth::user()->id;
-        $Supplier_check = Supplier::where('user_id','=',$user_id)->where('id',$id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Supplier_check = Supplier::where('business_id','=',$business_id)->where('id',$id)->get()->count();
         if($Supplier_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/supplier');

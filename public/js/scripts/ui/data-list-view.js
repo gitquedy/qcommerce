@@ -172,7 +172,9 @@ $(document).ready(function () {
         data: {data:$(this).data('id')},
         success:function(result)
         {
+          if(typeof result === 'undefined'){
             $('.view_modal').html(result).modal();
+          }
         }
     });
   });

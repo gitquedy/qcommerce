@@ -28,12 +28,12 @@
               <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get("site") == "lazada" ?  "active" : ""}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
                 Lazada
-                <span id="notif_site1" class="badge badge-secondary">{{$lazada_count}}</span>
+                <span id="badge_lazada_total" class="badge badge-secondary"></span>
               </label>
               <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
                 Shopee
-                <span id="notif_site2" class="badge badge-secondary">{{$shopee_count}}</span>
+                <span id="badge_shopee_total" class="badge badge-secondary"></span>
               </label>
               <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
               <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
@@ -49,6 +49,7 @@
               @foreach($statuses as $status)
                 <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
                   <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucwords(str_replace("_"," ", $status)) }}
+                  <span id="badge_{{ $status }}" class="badge badge-secondary"></span>
                 </label>
               @endforeach
             </div>
@@ -104,8 +105,8 @@
             <th>For Checkbox</th>
             <th> {{ $request->get('site') == 'shopee' ?  'Order SN' : 'Order Number'  }}</th>
             <!-- <th>Seller</th> -->
-            <th>Creation Date</th>
-            <th>Order Since</th>
+            <th>Order Date</th>
+            <th>Last Update</th>
             <th>Payment Method</th>
             <th>Price</th>
             <th>Item Count</th>
@@ -140,15 +141,27 @@
 @endsection
 @section('myscript')
   {{-- Page js files --}}
+  <script type="text/javascript">
+    function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('OrderController@headers')  }}?site={{ $request->get('site') }}",
+        success: function success(result) {     
+            $.each(result.data, function (i, item) {
+              $('#badge_' + i).html(item);
+            });
+          },
+        });     
+      }
+  </script>
   <!-- datatables -->
   <script type="text/javascript">
      var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
             { data: 'idDisplay', name: 'idDisplay'},
-            // { data: 'shop', name: 'shop.short_name'},
             { data: 'created_at_formatted', name: 'created_at' },
-            { data: 'created_at_human_read', name: 'created_at_human_read' },
+            { data: 'updated_at_at_human_read', name: 'updated_at_at_human_read' },
             { data: 'payment_method', name: 'payment_method' },
             { data: 'price', name: 'price' },
             { data: 'items_count', name: 'items_count' },
@@ -167,17 +180,15 @@
             }
         };
   var buttons = [
-            // { text: "<i class='feather icon-plus'></i> Add New",
-            // action: function() {
-            //     window.location = '{{ route('order.create') }}';
-            // },
-            // className: "btn-outline-primary margin-r-10"}
             ];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
     $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
+  }
+  function draw_callback_function(settings){
+    getHeaders();
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
@@ -194,10 +205,6 @@
         @endif
         url = "{{ action('OrderController@index')}}?site=" + site;
         window.location.href = url;
-      });
-      $(".select2").select2({
-        dropdownAutoWidth: true,
-        width: '100%'
       });
 
       // $('#status').change(function(){

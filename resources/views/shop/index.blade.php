@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
 @endsection
 
+
 @section('content')
 {{-- Data list view starts --}}
 <section id="data-list-view" class="data-list-view-header">

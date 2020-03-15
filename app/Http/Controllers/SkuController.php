@@ -39,10 +39,10 @@ class SkuController extends Controller
         
         if ( request()->ajax()) {
             
-            $user_id = Auth::user()->id;
+            $business_id = Auth::user()->business_id;
             
                
-           $Sku = Sku::where('user_id','=',$user_id)->orderBy('updated_at', 'desc');
+           $Sku = Sku::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
            
             return Datatables::eloquent($Sku)
@@ -144,7 +144,7 @@ class SkuController extends Controller
             'alert_quantity' => 'required|numeric',
         ]);
         $sku = new Sku();
-        $sku->user_id = Auth::user()->id;
+        $sku->business_id = Auth::user()->business_id;
         $sku->code = $request->code;
         $sku->name = $request->name;
         $sku->brand = $request->brand;
@@ -168,9 +168,9 @@ class SkuController extends Controller
     
     public function edit($id="",Request $request){
         
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $Sku_check = Sku::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         
         if($Sku_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
@@ -200,8 +200,8 @@ class SkuController extends Controller
     
     
     public function update(Request $request){
-        $user_id = Auth::user()->id;
-        $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$request->id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Sku_check = Sku::where('business_id','=',$business_id)->where('id','=',$request->id)->get()->count();
         if($Sku_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/sku');
@@ -264,15 +264,15 @@ class SkuController extends Controller
     }
     
     public function quickUpdate(Request $request){
-        $user_id = Auth::user()->id;
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $business_id = Auth::user()->business_id;
+        $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
         }
         $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$request->sku)->orderBy('updated_at', 'desc')->get();
         $column = $request->name;
-        $sku = Sku::where('user_id','=', $user_id)->where('id','=',$request->sku)->first();
+        $sku = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku)->first();
         if($sku){
             $sku->$column = $request->val;
             $result = $sku->save();
@@ -312,9 +312,9 @@ class SkuController extends Controller
     }
 
     public function syncSkuProducts(Request $request) {
-        $user_id = Auth::user()->id;
-        $sku = Sku::where('user_id','=',$user_id)->whereIn('id', $request->ids)->get();
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $business_id = Auth::user()->business_id;
+        $sku = Sku::where('business_id','=',$business_id)->whereIn('id', $request->ids)->get();
+        $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
@@ -353,24 +353,24 @@ class SkuController extends Controller
     }
 
     public function skuproducts($id="",Request $request){
-        $user_id = Auth::user()->id;
-        $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Sku_check = Sku::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         
         if($Sku_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/sku');
         }
 
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Link Products"]
         ];
 
         if ( request()->ajax()) {
-            $user_id = Auth::user()->id;
+            $business_id = Auth::user()->business_id;
 
-            $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+            $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
             $Shop_array = array();
             foreach($all_shops as $all_shopsVAL){
                 $Shop_array[] = $all_shopsVAL->id;
@@ -412,18 +412,18 @@ class SkuController extends Controller
     }
 
     public function addproductmodal(Request $request){
-        $user_id = Auth::user()->id;
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $business_id = Auth::user()->business_id;
+        $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         $id  = $request->id;
         $title = "this SKU";
         return view('sku.modal.addskuproduct', compact('title', 'id', 'all_shops'));
     }
 
     public function addproduct(Request $request){
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         $prod = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
         $access_token = Shop::find($prod->shop_id)->access_token;
-        $sku = Sku::where('user_id','=', $user_id)->where('id','=',$request->sku_id)->first();
+        $sku = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku_id)->first();
         $prod->seller_sku_id = $request->sku_id;
         $prod->price = $sku->price;
         $prod->quantity = $sku->quantity;
@@ -442,7 +442,7 @@ class SkuController extends Controller
         </Request>';
         if(env('lazada_sku_sync', true)){
             if($prod->site == 'lazada'){
-                $response = Products::product_update($access_token,$xml);
+                $response = $prod->product_update($xml);
             }
         }
         print json_encode($result);
@@ -466,9 +466,9 @@ class SkuController extends Controller
     }
     
     public function delete($id, Request $request){
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $Sku_check = Sku::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $Sku_check = Sku::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         
         if($Sku_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");

@@ -50,6 +50,11 @@ class Handler extends ExceptionHandler
         if ($exception instanceof ModelNotFoundException && $request->wantsJson()) {
             return response()->json(['message' => '404 Page not found', 'success' => 0], 404);
         }
+        
+        if ($this->isHttpException($exception) && !($request->wantsJson())) {
+            return response()->view('error.httpException', compact('exception'), $exception->getStatusCode());
+        }
+
         return parent::render($request, $exception);
     }
 }

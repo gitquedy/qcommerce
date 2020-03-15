@@ -12,9 +12,9 @@
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^6.0",
-        "laravel/passport": "^7.3",
         "laravel/tinker": "^1.0",
         "minchao/shopee-php": "^0.0.8",
+        "spatie/laravel-permission": "^3.11",
         "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {

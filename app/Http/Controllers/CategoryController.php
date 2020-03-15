@@ -40,8 +40,8 @@ class CategoryController extends Controller
         
     if ( request()->ajax()) {
         
-            $user_id = Auth::user()->id;
-           $category = Category::where('user_id','=',$user_id)->orderBy('updated_at', 'desc');
+            $business_id = Auth::user()->business_id;
+           $category = Category::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
            
             return Datatables::eloquent($category)
@@ -93,7 +93,7 @@ class CategoryController extends Controller
     
     public function add(Request $request){
         
-        $duplicate_check = Category::where('code','=',$request->code)->where('user_id','=',Auth::user()->id)->get()->count();
+        $duplicate_check = Category::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
         
         if($duplicate_check>0){
             $request->session()->flash('flash_error',"Duplicate Category Code !");
@@ -102,7 +102,7 @@ class CategoryController extends Controller
         
         
         $Category = new Category();
-        $Category->user_id = Auth::user()->id;
+        $Category->business_id = Auth::user()->business_id;
         $Category->code = $request->code;
         $Category->name = $request->name;
         
@@ -125,7 +125,7 @@ class CategoryController extends Controller
     
     public function add_ajax(Request $request){
         
-        $duplicate_check = Category::where('code','=',$request->code)->where('user_id','=',Auth::user()->id)->get()->count();
+        $duplicate_check = Category::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
         
         if($duplicate_check>0){
             $output = ['success' => 0,
@@ -136,7 +136,7 @@ class CategoryController extends Controller
         
         
         $Category = new Category();
-        $Category->user_id = Auth::user()->id;
+        $Category->business_id = Auth::user()->business_id;
         $Category->code = $request->code;
         $Category->name = $request->name;
         
@@ -166,8 +166,8 @@ class CategoryController extends Controller
     
     public function edit($id="",Request $request){
         
-        $user_id = Auth::user()->id;
-        $Category_check = Category::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Category_check = Category::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         if($Category_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/category');
@@ -194,14 +194,14 @@ class CategoryController extends Controller
     public function update(Request $request){
         
         // validation start
-        $user_id = Auth::user()->id;
-        $Category_check = Category::where('user_id','=',$user_id)->where('id','=',$request->id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Category_check = Category::where('business_id','=',$business_id)->where('id','=',$request->id)->get()->count();
         if($Category_check!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/category');
         }
         
-        $duplicate_check = Category::where('code','=',$request->code)->where('user_id','=',$user_id)->where('id','=',$request->id)->get();
+        $duplicate_check = Category::where('code','=',$request->code)->where('business_id','=',$business_id)->where('id','=',$request->id)->get();
         
         foreach($duplicate_check as $duplicate_checkVAL){
             if($duplicate_checkVAL->id!=$request->id){
@@ -245,8 +245,8 @@ class CategoryController extends Controller
         
         $error = "";
         
-        $user_id = Auth::user()->id;
-        $Category_check = Category::where('user_id','=',$user_id)->where('id','=',$request->id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $Category_check = Category::where('business_id','=',$business_id)->where('id','=',$request->id)->get()->count();
         if($Category_check!=1){
             $error.="invalid request";
         }

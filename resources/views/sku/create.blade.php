@@ -59,9 +59,11 @@
                               <option  value="{{$BrandVAL->id}}">{{$BrandVAL->code." - ".$BrandVAL->name}}</option>
                               @endforeach
                           </select>
-                        <div class="input-group-append">
-                          <button type="button" data-toggle="modal" data-target="#brand_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
-                        </div>
+                          @can('brand.manage')
+                          <div class="input-group-append">
+                            <button type="button" data-toggle="modal" data-target="#brand_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                          </div>
+                        @endcan
                       </div>
                     </div>
               </div>
@@ -75,9 +77,11 @@
                               <option  value="{{$CategoryVAL->id}}">{{$CategoryVAL->code." - ".$CategoryVAL->name}}</option>
                               @endforeach
                           </select>
-                        <div class="input-group-append">
-                          <button type="button" data-toggle="modal" data-target="#category_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
-                        </div>
+                        @can('category.manage')
+                          <div class="input-group-append">
+                            <button type="button" data-toggle="modal" data-target="#category_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                          </div>
+                        @endcan
                       </div>
                     </div>
               </div>
@@ -91,9 +95,11 @@
                               <option  value="{{$SupplierVAL->id}}">{{$SupplierVAL->company}}</option>
                               @endforeach
                           </select>
-                        <div class="input-group-append">
-                          <button type="button" data-toggle="modal" data-target="#supplier_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
-                        </div>
+                        @can('supplier.manage')
+                          <div class="input-group-append">
+                            <button type="button" data-toggle="modal" data-target="#supplier_modal" class="btn btn-outline-primary btn-flat"><i class="fa fa-plus"></i> Add new</button>
+                          </div>
+                        @endcan
                       </div>
                     </div>
               </div>

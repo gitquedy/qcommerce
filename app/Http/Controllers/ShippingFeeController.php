@@ -17,11 +17,11 @@ class ShippingFeeController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"], ['name'=>"Shipping Fee Reconciliation"]
         ];
-        $shops = $request->user()->shops;
+        $shops = $request->user()->business->shops;
 
 		 if (request()->ajax()) {
 
-                 $shops = $request->user()->shops;
+                 $shops = $request->user()->business->shops;
                  if($request->get('shop') != ''){
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
                  }
@@ -81,6 +81,7 @@ class ShippingFeeController extends Controller
                               $button = '<button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>';
                               if($order->shipping_fee_reconciled == 1){
                                 $disabled['filed'] = '';
+                                $disabled['resolved'] = '';
                                 $button = '<button type="button" class="btn btn-primary"><a class="text-white" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en">File Dispute</a></button>';
                               }else if($order->shipping_fee_reconciled == 2){
                                 $disabled['resolved'] = '';
@@ -125,7 +126,7 @@ class ShippingFeeController extends Controller
     }
 
     public function headers(Request $request){
-      $shops = $request->user()->shops;
+      $shops = $request->user()->business->shops;
       $shops_id = $shops->pluck('id')->toArray();
       $data = [
         'pending' => Order::whereIn('shop_id', $shops_id)->where('shipping_fee_reconciled', 1)->count(),

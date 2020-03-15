@@ -116,17 +116,17 @@
 </script>
 @endif
 <script>
-$(document).ready(function(){
-      $(".s2").select2({
-        dropdownAutoWidth: true,
-        width: '100%'
-      });
-  }); 
+// $(document).ready(function(){
+//       $(".s2").select2({
+//         dropdownAutoWidth: true,
+//         width: '100%'
+//       });
+//   }); 
  
- $(document).ready(function(){
-      $(".s280").select2({
-        dropdownAutoWidth: true,
-        width: '70%'
-      });
-  }); 
+ // $(document).ready(function(){
+ //      $(".s280").select2({
+ //        dropdownAutoWidth: true,
+ //        width: '70%'
+ //      });
+ //  }); 
  </script>

@@ -26,7 +26,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     { 
-        $all_shops = $request->user()->shops;
+        $all_shops =  $request->user()->business->shops;
 
         $shop_ids = $all_shops->pluck('id');
 
@@ -235,7 +235,7 @@ class ProductController extends Controller
 
        $search = $request->get('search');
        $site = $request->get('site');
-       $shop_ids = $request->user()->shops->pluck('id')->toArray();
+       $shop_ids = $request->user()->business->shops->pluck('id')->toArray();
        $product = Products::where('site', $site)->whereIn('shop_id', $shop_ids)->where('item_id', $search)->orWhere('SellerSku', $search)->orWhere('SkuId', $search)->first();
        if($product == null){
             $output = ['success' => 0,
@@ -259,7 +259,7 @@ class ProductController extends Controller
     public function duplicateForm(Request $request){
         $products = Products::whereIn('id',explode(',', $request->ids))->get();
 
-        $shops = $request->user()->shops->where('site', $products->first()->site);
+        $shops = $request->user()->business->shops->where('site', $products->first()->site);
         
         return view('product.modal.duplicate', compact('products', 'shops'));
     }
@@ -280,7 +280,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $duplicate_to = Shop::find($request->shop_id);
-            $products = Products::whereIn('id', $request->product)->whereIn('shop_id', $request->user()->shops->pluck('id')->toArray())->get();
+            $products = Products::whereIn('id', $request->product)->whereIn('shop_id', $request->user()->business->shops->pluck('id')->toArray())->get();
             $site = $request->site;
             $msgs = [];
             if($request->site == 'lazada'){
@@ -313,7 +313,7 @@ class ProductController extends Controller
 
     public function headers(Request $request){
         $data = [];
-        $shop_ids = $request->user()->shops->pluck('id')->toArray();
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
 
         if($request->site == 'lazada'){
             $lazada_statuses = Products::$lazadaStatuses;

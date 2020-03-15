@@ -40,10 +40,10 @@ class BrandController extends Controller
         
     if ( request()->ajax()) {
         
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
            
-           $brand = Brand::where('user_id','=',$user_id)->orderBy('updated_at', 'desc');
+           $brand = Brand::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
            
             return Datatables::eloquent($brand)
@@ -85,7 +85,7 @@ class BrandController extends Controller
         
         // validation start
         
-        $duplicate_check = Brand::where('code','=',$request->code)->where('user_id','=',Auth::user()->id)->get()->count();
+        $duplicate_check = Brand::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
         if($duplicate_check>0){
             $request->session()->flash('flash_error',"Duplicate Brand code !");
             return redirect('/brand');
@@ -101,7 +101,7 @@ class BrandController extends Controller
         
         $Brand = new Brand();
         $Brand->code = $request->code;
-        $Brand->user_id = Auth::user()->id;
+        $Brand->business_id = Auth::user()->business_id;
         $Brand->name = $request->name;
         
         if($Brand->save()){
@@ -119,7 +119,7 @@ class BrandController extends Controller
         
         // validation start
         
-        $duplicate_check = Brand::where('code','=',$request->code)->where('user_id','=',Auth::user()->id)->get()->count();
+        $duplicate_check = Brand::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
         if($duplicate_check>0){
             $output = ['success' => 0,
                         'msg' => "Duplicate Brand code !",
@@ -136,7 +136,7 @@ class BrandController extends Controller
         
         $Brand = new Brand();
         $Brand->code = $request->code;
-        $Brand->user_id = Auth::user()->id;
+        $Brand->business_id = Auth::user()->business_id;
         $Brand->name = $request->name;
         
         
@@ -162,8 +162,8 @@ class BrandController extends Controller
         
         // validation start
 
-        $user_id = Auth::user()->id;
-        $brand_chk = Brand::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $brand_chk = Brand::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         
         if($brand_chk!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
@@ -188,16 +188,16 @@ class BrandController extends Controller
     public function update(Request $request){
         
         // validation start
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $brand_chk = Brand::where('user_id','=',$user_id)->where('id','=',$request->id)->get()->count();
+        $brand_chk = Brand::where('business_id','=',$business_id)->where('id','=',$request->id)->get()->count();
         
         if($brand_chk!=1){
             $request->session()->flash('flash_error',"Invalid Request !");
             return redirect('/brand');
         }
         
-        $duplicate = Brand::where('code','=',$request->code)->where('user_id','=',$user_id)->get();
+        $duplicate = Brand::where('code','=',$request->code)->where('business_id','=',$business_id)->get();
         foreach($duplicate as $duplicateVAL){
             if($request->id!=$duplicateVAL->id){
                 $request->session()->flash('flash_error',"Dupliacte Brand code !");
@@ -233,8 +233,8 @@ class BrandController extends Controller
         $Brand = Brand::find($id);
         
         // validation start
-        $user_id = Auth::user()->id;
-        $brand_chk = Brand::where('user_id','=',$user_id)->where('id','=',$id)->get()->count();
+        $business_id = Auth::user()->business_id;
+        $brand_chk = Brand::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
         
         $error = "";
         

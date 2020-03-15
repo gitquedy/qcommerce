@@ -31,7 +31,7 @@ class ShopController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
         if ( request()->ajax()) {
-           $shop = Shop::with('orders')->where('shop.user_id', $request->user()->id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
+           $shop = Shop::with('orders')->where('shop.business_id', $request->user()->business_id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
             ->editColumn('site', function(Shop $shop) {
                             return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';
@@ -150,7 +150,7 @@ class ShopController extends Controller
                 $data['access_token'] = $responseData['access_token'];
                 $data['email'] = $responseData['account'];
                 $data['expires_in'] = Carbon::now()->addDays(6);
-                $data['user_id'] = $request->user()->id;
+                $data['business_id'] = $request->user()->business_id;
                 $data['site'] = 'lazada';
                 $shop = Shop::create($data);
                 $output = ['success' => 1,
@@ -171,7 +171,7 @@ class ShopController extends Controller
                     ];
                     return response()->json($output);
                 }
-                $shop = Shop::where('shop_id', $data['shop_id'])->where('user_id', $request->user()->id)->first();
+                $shop = Shop::where('shop_id', $data['shop_id'])->where('business_id', $request->user()->business_id)->first();
                 if($shop != null){
                     $output = ['success' => 0,
                             'msg' => 'Shop '. $shop->shop_id .' '. $client['shop_name'] .' already exists!',
@@ -185,7 +185,7 @@ class ShopController extends Controller
                     'shop_id' => $client['shop_id'],
                     'name' => $data['name'],
                     'short_name' => $data['short_name'],
-                    'user_id' => $request->user()->id,
+                    'business_id' => $request->user()->business_id,
                 ];
                 $shop = Shop::create($data);
                 $output = ['success' => 1,

@@ -16,14 +16,14 @@ class Brand extends Model
     protected $table = 'brand';
     	
     
-    protected $fillable = ['code', 'name','updated_at', 'created_at'];
+    protected $fillable = ['business_id','code', 'name','updated_at', 'created_at'];
     
     
     public static function auth_brand(){
         
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $result = DB::table('brand')->where('user_id','=',$user_id)->orderBy('updated_at', 'desc')->get();
+        $result = DB::table('brand')->where('business_id','=',$business_id)->orderBy('updated_at', 'desc')->get();
         
         return $result;
         

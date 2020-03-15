@@ -26,6 +26,26 @@
                           <div class="card-body pt-0">
                             <form method="POST" action="{{ route('register') }}">
                               @csrf
+                              <div class="form-label-group">
+                                      <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
+                                      <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Company Name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                      <label for="name">Company Name</label>
+                                      @error('name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                      @enderror
+                                  </div>
+                              <div class="form-label-group">
+                                      <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
+                                      <input id="location" type="text" class="form-control @error('location') is-invalid @enderror" name="location" placeholder="Location" value="{{ old('location') }}" required autocomplete="location" autofocus>
+                                      <label for="location">Location</label>
+                                      @error('location')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                      @enderror
+                                  </div>
                                   <div class="form-label-group">
                                       <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
                                       <input id="first_name" type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" placeholder="First Name" value="{{ old('first_name') }}" required autocomplete="first_name" autofocus>

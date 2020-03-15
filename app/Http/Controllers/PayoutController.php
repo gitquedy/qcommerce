@@ -24,12 +24,12 @@ class PayoutController extends Controller
       $breadcrumbs = [
           // ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
       ];
-      $shops = $request->user()->shops;
+      $shops = $request->user()->business->shops;
       $shops_id = $shops->pluck('id')->toArray();
 
       if ( request()->ajax()) {
 
-             $shops = $request->user()->shops;
+             $shops = $request->user()->business->shops;
              if($request->get('shop') != ''){
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
              }
@@ -109,7 +109,7 @@ class PayoutController extends Controller
     }
 
     public function headers(Request $request){
-      $shops = $request->user()->shops;
+      $shops = $request->user()->business->shops;
       $shops_id = $shops->pluck('id')->toArray();
       $data = [
         'unconfirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesforDelivered())->where('payout', false)->count(),

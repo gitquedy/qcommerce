@@ -22,8 +22,8 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+
     public function index(){
-        
         $Shop = Shop::get_auth_shops();
         foreach ($Shop as $shop) {
             $shop->shop_info_data_today = Order::get_dashboard_shop_performance($shop->id,'today');

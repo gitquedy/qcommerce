@@ -15,7 +15,8 @@ class CreateSuppliersTable extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('business_id');
+            $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
             $table->string('company');
             $table->string('contact_person');
             $table->string('phone')->nullable();

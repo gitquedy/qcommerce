@@ -42,7 +42,7 @@ class BarcodeController extends Controller
     public function checkBarcode(Request $request)  {
         $result = array('error' => '', 'data' => array());
         $input = $request->data;
-        $all_shops = Shop::where('user_id', $request->user()->id)->orderBy('updated_at', 'desc')->get();
+        $all_shops = $request->user()->business->shops;
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;

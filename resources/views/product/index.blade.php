@@ -165,7 +165,7 @@
     function getHeaders(){
         $.ajax({
         method: "GET",
-        url: "{{ action('ProductController@headers')  }}?site={{ $request->get('site') }}",
+        url: "{{ action('ProductController@headers')  }}?site={{ $request->get('site') }}&shops=" + $("#shop").val(),
         success: function success(result) {     
             $.each(result.data, function (i, item) {
               $('#badge_' + i).html(item);
@@ -208,11 +208,7 @@
             }
         };
   var buttons = [
-            // { text: "<i class='feather icon-plus'></i> Add New",
-            // action: function() {
-            //     window.location = '{{ route('order.create') }}';
-            // },
-            // className: "btn-outline-primary margin-r-10"}
+
             ];
   var BInfo = true;
   var bFilter = true;

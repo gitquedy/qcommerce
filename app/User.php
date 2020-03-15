@@ -2,17 +2,20 @@
 
 namespace App;
 
-use Laravel\Passport\HasApiTokens;
+// use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Utilities;
+use Spatie\Permission\Models\Permission;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    // use HasApiTokens, Notifiable;
+use Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +23,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'picture', 'phone', 'email', 'password', 'role',
+        'first_name', 'last_name', 'picture', 'phone', 'email', 'password', 'role', 'business_id', 'status'
     ];
 
     /**
@@ -41,12 +44,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public static function ownerPermissions(){
+        $permissions = Permission::all();
+        return $permissions;
+    }
+
+    public function giveOwnerPermissions(){
+        $permissions = $this->ownerPermissions();
+        $this->givePermissionTo($permissions);
+    }
+
     public function formatName() {
         return $this->last_name.", ".$this->first_name;
     }
 
-    public function shops(){
-        return $this->hasMany(Shop::class, 'user_id', 'id');
+    public function business(){
+        return $this->belongsTo(Business::class, 'business_id', 'id');
     }
 
     public function isAdmin(){
@@ -55,6 +68,14 @@ class User extends Authenticatable
         }else{
             return false;
         }
+    }
+
+    public function getStatusDisplay(){
+        $status = '';
+        if($this->status == 1){
+            $status ='<div class="chip chip-success"><div class="chip-body"><div class="chip-text">Active</div></div></div>';
+        }
+        return $status;
     }
 
     public function updateToken()
@@ -119,5 +140,17 @@ class User extends Authenticatable
             $iteration++;
         }
         return $data;
+    }
+
+    public function fullName(){
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    public function imageUrl(){
+        return asset('images/profile/profile-picture/'.$this->picture);
+    }
+
+    public function getNameAndImgDisplay(){
+         return '<div class="text-primary font-medium-2 text-bold-600">'. $this->fullName() .' </div>' . '<img src="'. $this->imageUrl() .'" style="width:60px; height:60px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->id .' </span>';
     }
 }

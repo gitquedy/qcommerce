@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-        Passport::routes();
+        // Passport::routes();
         date_default_timezone_set('Asia/Manila');
 
     }

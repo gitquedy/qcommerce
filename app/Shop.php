@@ -20,7 +20,7 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['user_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
+    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
@@ -32,6 +32,10 @@ class Shop extends Model
         Shop::class => ShopPolicy::class,
     ];
     //pending = READY_TO_SHIP
+
+    public function business(){
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
     
     public function products(){
 		return $this->hasMany(Products::class, 'shop_id','id');
@@ -311,9 +315,9 @@ class Shop extends Model
     
     public static function get_auth_shops(){
         
-        $user_id = Auth::user()->id;
+        $business_id = Auth::user()->business_id;
         
-        $result = Shop::where('user_id','=',$user_id)->get();
+        $result = Shop::where('business_id','=',$business_id)->get();
         
         return $result;
     }

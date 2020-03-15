@@ -188,6 +188,7 @@ class CrudController extends Controller
         $title = 'crud ' . $crud->name;
         return view('layouts.delete', compact('action' , 'title'));
     }
+    
 
     public function massDelete(Request $request){
         
