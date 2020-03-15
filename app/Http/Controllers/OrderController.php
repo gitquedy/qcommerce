@@ -50,7 +50,7 @@ class OrderController extends Controller
         $shop_ids = $all_shops->pluck('id')->toArray();
         $orders = Order::select('id')->whereIn('shop_id',$shop_ids)->update(['seen' => true]); 
 
-    if ( request()->ajax()) {
+     if ( request()->ajax()) {
            $shops = $request->user()->business->shops;
            if($request->get('shop') != ''){
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
@@ -66,7 +66,8 @@ class OrderController extends Controller
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
-           $orders->orderBy('created_at', 'asc');
+           $orders->orderBy('created_at', 'ASC');
+           // $orders->orderBy('shop_id', 'ASC');
            
            if($request->get('site') == 'lazada'){
               $orders->orderByRaw('CASE WHEN status = "pending" THEN 1 WHEN status = "ready_to_ship" THEN 2 WHEN status = "shipped" THEN 3 else 4 END');
@@ -136,7 +137,7 @@ class OrderController extends Controller
                                 })
                 ->rawColumns(['actions', 'idDisplay'])
                 ->make(true);
-        }
+         }
         
         return view('order.index', [
             'breadcrumbs' => $breadcrumbs,
@@ -482,12 +483,12 @@ class OrderController extends Controller
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
                 $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
-                if($status == 'READY_TO_SHIP'){
-                   $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->orWhere('tracking_no' , '')->count();
-                }
-                else{
+                // if($status == 'READY_TO_SHIP'){
+                //    $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->count();
+                // }
+                // else{
                     $data[$status] = $products->where('status', $status)->count();
-                }
+                // }
             }
         }
         $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['ready_to_ship'])->count();

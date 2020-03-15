@@ -12,11 +12,11 @@
     <div class="row">
       <div class="col-md-6">
         <label>Name</label>
-        <input type="text" class="form-control" name="name" value={{ $shop->name }}>
+        <input type="text" class="form-control" name="name" value="{{ $shop->name }}">
       </div>
       <div class="col-md-6">
         <label>Short Name</label>
-        <input type="text" class="form-control" name="short_name" value={{ $shop->short_name }}>
+        <input type="text" class="form-control" name="short_name" value="{{ $shop->short_name }}">
       </div>
     </div>
  
