@@ -203,7 +203,13 @@
         @if (isset($_GET['printed']))
           site += "&printed=false";
         @endif
-        url = "{{ action('OrderController@index')}}?site=" + site;
+        var default_status = '';
+        if(site == 'lazada'){
+          default_status = 'pending';
+        }else{
+          default_status = 'READY_TO_SHIP'
+        }
+        url = "{{ action('OrderController@index')}}?site=" + site + "&status=" + default_status;
         window.location.href = url;
       });
 

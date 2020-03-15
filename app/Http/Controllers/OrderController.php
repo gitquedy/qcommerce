@@ -483,12 +483,7 @@ class OrderController extends Controller
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
                 $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
-                // if($status == 'READY_TO_SHIP'){
-                //    $data[$status] = $products->where('status', 'READY_TO_SHIP')->whereNull('tracking_no')->count();
-                // }
-                // else{
-                    $data[$status] = $products->where('status', $status)->count();
-                // }
+                $data[$status] = $products->where('status', $status)->count();
             }
         }
         $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['ready_to_ship'])->count();

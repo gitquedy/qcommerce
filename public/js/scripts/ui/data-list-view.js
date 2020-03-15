@@ -165,14 +165,14 @@ $(document).ready(function () {
   });
 
   $(".data-list-view").on("dblclick", "tbody tr", function () {
-    console.log($(this).data('id'));
+    var id = $(this).data('id');
     $.ajax({
         url: $(this).data('action'),
         method: "POST",
         data: {data:$(this).data('id')},
         success:function(result)
         {
-          if(typeof result === 'undefined'){
+          if(typeof id !== 'undefined'){
             $('.view_modal').html(result).modal();
           }
         }
