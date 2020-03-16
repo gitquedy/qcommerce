@@ -61,7 +61,7 @@
             <th>Product Name</th>
             <!-- <th>Brand</th> -->
             <!-- <th>Category</th> -->
-            <th>Supplier</th>
+            <th><!-- Supplier --></th>
             <th>Cost</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -117,7 +117,7 @@
             { data: 'name', name: 'name'},
             // { data: 'brand_name', name: 'brand_name'},
             // { data: 'category_name', name: 'category_name'},
-            { data: 'supplier_company', name: 'supplier_company'},
+            // { data: 'supplier_company', name: 'supplier_company'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
