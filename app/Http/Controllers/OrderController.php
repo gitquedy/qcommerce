@@ -471,19 +471,17 @@ class OrderController extends Controller
     public function headers(Request $request){
         $data = [];
         $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
-
-
         if($request->site == 'lazada'){
             $lazada_statuses = Order::$statuses;
             foreach($lazada_statuses as $status){
-                $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada');
-                $data[$status] = $products->where('status', $status)->count();
+                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada');
+                $data[$status] = $orders->where('status', $status)->count();
             }
         }else{
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
-                $products = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
-                $data[$status] = $products->where('status', $status)->count();
+                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
+                $data[$status] = $orders->where('status', $status)->count();
             }
         }
         $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending'])->count();
@@ -491,8 +489,4 @@ class OrderController extends Controller
 
         return response()->json(['data' => $data]); 
     }
-    
-    
-    
-    
 }

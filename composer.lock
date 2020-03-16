@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e60434d9da2fb95184bce38d36584e49",
+    "content-hash": "ee040df0e55d1710542a2845b12be712",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -977,6 +977,74 @@
                 "storage"
             ],
             "time": "2020-03-08T18:53:20+00:00"
+        },
+        {
+            "name": "marcin-orlowski/laravel-api-response-builder",
+            "version": "7.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MarcinOrlowski/laravel-api-response-builder.git",
+                "reference": "b30b8278e5573c7a952aee90a27b0581448eb59f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MarcinOrlowski/laravel-api-response-builder/zipball/b30b8278e5573c7a952aee90a27b0581448eb59f",
+                "reference": "b30b8278e5573c7a952aee90a27b0581448eb59f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">= 6.0",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.0",
+                "friendsofphp/php-cs-fixer": "^2.15",
+                "marcin-orlowski/coding-standard": "^1.3",
+                "marcin-orlowski/phpunit-extra-asserts": "^1.0",
+                "orchestra/testbench": "^4.0",
+                "phpunit/php-code-coverage": "^7.0",
+                "phpunit/phpunit": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "MarcinOrlowski\\ResponseBuilder\\ResponseBuilderServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/",
+                    "tests/",
+                    "tests/Traits/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcin Orlowski",
+                    "homepage": "http://MarcinOrlowski.com/"
+                }
+            ],
+            "description": "Helps building nice, normalized and easy to consume Laravel REST API.",
+            "homepage": "https://github.com/MarcinOrlowski/laravel-api-response-builder",
+            "keywords": [
+                "PHP7",
+                "android",
+                "api",
+                "builder",
+                "helper",
+                "ios",
+                "json",
+                "laravel",
+                "mobile",
+                "rest"
+            ],
+            "time": "2020-03-05T04:24:48+00:00"
         },
         {
             "name": "minchao/shopee-php",
@@ -3327,16 +3395,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v3.6.0",
+            "version": "v3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "1bdf24f065975594f6a117f0f1f6cabf1333b156"
+                "reference": "8f7961f7b9deb3b432452c18093cf16f88205902"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/1bdf24f065975594f6a117f0f1f6cabf1333b156",
-                "reference": "1bdf24f065975594f6a117f0f1f6cabf1333b156",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/8f7961f7b9deb3b432452c18093cf16f88205902",
+                "reference": "8f7961f7b9deb3b432452c18093cf16f88205902",
                 "shasum": ""
             },
             "require": {
@@ -3345,7 +3413,11 @@
                 "symfony/polyfill-ctype": "^1.9"
             },
             "require-dev": {
+                "ext-filter": "*",
                 "phpunit/phpunit": "^4.8.35 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "suggest": {
+                "ext-filter": "Required to use the boolean validator."
             },
             "type": "library",
             "extra": {
@@ -3380,7 +3452,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2019-09-10T21:37:39+00:00"
+            "time": "2020-03-12T13:44:00+00:00"
         },
         {
             "name": "yajra/laravel-datatables-oracle",

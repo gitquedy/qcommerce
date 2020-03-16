@@ -27,11 +27,14 @@ Route::group([
 Route::group([
     'middleware' => 'auth:api'
   ], function() {
-      Route::get('logout', 'AuthController@logout');
-      Route::get('user', 'AuthController@user');
+      // Route::get('logout', 'AuthController@logout');
+      Route::get('user', 'Api\AuthController@user');
       Route::get('shop/create/links', 'Api\ShopController@links');
       Route::get('shop/getDashboardDetails/', 'Api\ShopController@getDashboardDetails');
       Route::resource('shop', 'Api\ShopController');
+      Route::resource('order', 'Api\OrderController');
+      Route::get('order/constant/statuses', 'Api\OrderController@statuses');
+      Route::get('order/index/headers', 'Api\OrderController@headers');
   });
 
 

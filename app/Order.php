@@ -442,6 +442,5 @@ class Order extends Model
 
     public function OrderID(){
         return $this->site == 'lazada' ? $this->id : $this->ordersn;
-    }
-    
+    }    
 }

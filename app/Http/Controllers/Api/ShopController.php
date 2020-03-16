@@ -7,6 +7,8 @@ use App\Shop;
 use Illuminate\Http\Request;
 use App\Lazop;
 use App\Shopee;
+use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
+
 
 class ShopController extends Controller
 {
@@ -17,18 +19,23 @@ class ShopController extends Controller
      */
     public function index(Request $request)
     {
-        $shops = $request->user()->business->shops()->paginate(10);
-
-        return response()->json(['shops' => $shops]);
+        $shops = $request->user()->business->shops;
+        return ResponseBuilder::asSuccess(200)
+                  ->withData(['shops' => $shops])
+                  ->withMessage('OK')
+                  ->build();
     }
 
     public function links(Request $request){
-        return ['lazada' => Lazop::getAuthLink(), 'shopee' => Shopee::getAuthLink()];
+        return ResponseBuilder::asSuccess(200)
+                  ->withData(['lazada' => Lazop::getAuthLink(), 'shopee' => Shopee::getAuthLink()])
+                  ->withMessage('OK')
+                  ->build();
     }
 
     public function getDashboardDetails(Request $request){
         $user = $request->user();
-        // $shops = $user->shops;
+        $user->business = $user->business;
         $shops = Shop::where('business_id', $user->business_id);
         if($request->get('shop_id')){
             $shops->where('id', $request->get('shop_id'));
@@ -45,39 +52,26 @@ class ShopController extends Controller
             return $shop;
         });
 
+        $shop_ids = $shops->pluck('id')->toArray();
+
         if($request->get('total_sales_today')){
-            $user->totalSalesToday = $user->totalSalesToday($shops);
+            $user->totalSalesToday = $user->totalSalesToday($shop_ids);
         }
 
         if($request->get('total_orders_today')){
-            $user->totalOrdersToday = $user->totalOrdersToday($shops);
+            $user->totalOrdersToday = $user->totalOrdersToday($shop_ids);
         }
 
         if($request->get('current_pending_orders')){
-            $user->currentPendingOrders = $user->currentPendingOrders($shops);
+            $user->currentPendingOrders = $user->currentPendingOrders($shop_ids);
         }
 
         if($request->get('total_monthly_sales')){
-            $user->totalMonthlySales = $user->totalMonthlySales($shops);
+            $user->totalMonthlySales = $user->totalMonthlySales($shop_ids);
         }
 
-        $response = ['success' => 1, 'user' => $request->user(), 'shops' => $shops];
-        return response()->json($response);
-    }
-
-
-    public function getShopTotalOrders(Request $request){
-
-        $shops = $request->user()->business->shops;
-        if($request->get('shop_id')){
-            $shops = $shops->where('id', $request->get('shop_id'));
-        }
-
-        foreach($shops as $shop){
-            $shop = $shop->totalOrders();
-        }
-
-        return response()->json(['shops' => $shops, 'success' => 1]);
+        $data = ['user' => $request->user(), 'shops' => $shops];
+        return ResponseBuilder::success($data);
     }
 
     /**
@@ -100,7 +94,7 @@ class ShopController extends Controller
     public function show(Shop $shop)
     {
         $this->authorizeForUser(request()->user(), 'show', [$shop]);
-        return response()->json($shop);
+        return ResponseBuilder::success(['shop' => $shop]);
     }
 
     /**

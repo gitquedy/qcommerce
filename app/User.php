@@ -89,8 +89,7 @@ use Notifiable, HasRoles;
         return $token;
     }
 
-    public function totalSalesToday($shops){
-        $shops = $shops->pluck('id');
+    public function totalSalesToday($shop_ids){
         $data = [];
         $dates = Utilities::getToday24Hours();
         $iteration = 1;
@@ -98,45 +97,42 @@ use Notifiable, HasRoles;
             if($iteration == 25){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shops)->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
             $iteration++;
         }
 
-        return (object) $data;
-    }
-
-    public function totalOrdersToday($shops){
-        $shops = $shops->pluck('id');
-        $data = [];
-        $dates = Utilities::getToday24Hours();
-        $iteration = 1;
-        foreach($dates as $key => $date){
-            if($iteration == 25){ //skip last
-                continue;
-            }
-            $data[$date] =  Order::whereIn('shop_id', $shops)->whereBetween('created_at', [$date, $dates[$iteration]])->count();
-            $iteration++;
-        }
-        return (object) $data;
-    }
-
-    public function currentPendingOrders($shops){
-        $shops = $shops->pluck('id');
-        $data = 0;
-        $data = Order::whereIn('shop_id', $shops)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
         return $data;
     }
 
-    public function totalMonthlySales($shops){
-        $shops = $shops->pluck('id');
-        $dates =Utilities::getMonthsDates(7);
+    public function totalOrdersToday($shop_ids){
+        $data = [];
+        $dates = Utilities::getToday24Hours();
+        $iteration = 1;
+        foreach($dates as $key => $date){
+            if($iteration == 25){ //skip last
+                continue;
+            }
+            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereBetween('created_at', [$date, $dates[$iteration]])->count();
+            $iteration++;
+        }
+        return $data;
+    }
+
+    public function currentPendingOrders($shop_ids){
+        $data = 0;
+        $data = Order::whereIn('shop_id', $shop_ids)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
+        return $data;
+    }
+
+    public function totalMonthlySales($shop_ids){
+        $dates = Utilities::getMonthsDates(7);
         $iteration = 1;
         $data = [];
         foreach($dates as $key => $date){
             if($iteration == 8){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shops)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
             $iteration++;
         }
         return $data;

@@ -21,6 +21,6 @@ class ShopPolicy
     }
 
     public function show(User $user, Shop $shop){
-        return $user->id == $shop->user_id;
+        return $user->business_id == $shop->business_id;
     }
 }
