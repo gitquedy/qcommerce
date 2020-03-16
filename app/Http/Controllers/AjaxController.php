@@ -24,7 +24,7 @@ class AjaxController extends Controller
         
 
         
-        $orders = Order::select('id','created_at')->whereIn('shop_id',$Shop_array)->where('status','=','pending')->get();
+        $orders = Order::select('id','created_at')->whereIn('shop_id',$Shop_array)->whereIn('status',['pending', 'READY_TO_SHIP', 'RETRY_SHIP', 'UNPAID'])->whereNull('seen')->get();
         
         $Products_unseen = Products::select('id','created_at')->whereIn('shop_id',$Shop_array)->where('seen','=',0)->get()->toArray();
         

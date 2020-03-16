@@ -486,7 +486,7 @@ class OrderController extends Controller
                 $data[$status] = $products->where('status', $status)->count();
             }
         }
-        $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['ready_to_ship'])->count();
+        $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending'])->count();
         $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
 
         return response()->json(['data' => $data]); 
