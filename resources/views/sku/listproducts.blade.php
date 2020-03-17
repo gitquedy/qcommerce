@@ -28,9 +28,39 @@
     }
 </style>
 
-
-<section id="data-list-view" class="data-list-view-header">
-    <div class="action-btns d-none">
+<section>
+    <div class="row match-height">
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <div class="card">
+          <div class="card-content">
+            <img class="card-img-top img-fluid" src="{{ $sku->products->first() ? explode(',',$sku->products->first()->Images)[0] : asset('images/pages/content-img-1.jpg') }}"
+              alt="Card image cap">
+            <div class="card-body">
+              <h5>{{ $sku->code }} - {{ $sku->name }}</h5>
+              <table class="table">
+                <thead>
+                  <tr class="text-center">
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Quanity</th>
+                    <th>Alert Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <p class="card-text text-danger mb-0"><b>{{ number_format($sku->cost, 2) }}</b></p></td>
+                    <td><p class="card-text text-success mb-0"><b>{{ number_format($sku->price, 2) }}</b></p></td>
+                    <td><p class="card-text text-primary mb-0"><b>{{ number_format($sku->quantity, 2) }}</b></p></td>
+                    <td><p class="card-text text-warning mb-0"><b>{{ number_format($sku->alert_quantity, 2) }}</b></p></td>
+                  </tr>
+                </tbody>
+              </table> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-9 col-md-6 col-sm-12 data-list-view-header">
+      <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
           <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
@@ -66,8 +96,8 @@
       </table>
     </div>
     {{-- DataTable ends --}}
-
-  </section>
+      </div>
+</section>
   {{-- Data list view end --}}
 @endsection
 @section('vendor-script')
@@ -108,7 +138,7 @@
             { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {
-          url: '{{ route('sku.skuproducts', $id) }}',
+          url: '{{ route('sku.skuproducts', $sku->id) }}',
           data: function (data) {
                 // data.timings = $("#timings").val();
             }
@@ -119,7 +149,7 @@
               $.ajax({
                 url :  "{{ route('sku.addproductmodal') }}",
                 type: "POST",
-                data: 'id={{$id}}',
+                data: 'id={{$sku->id}}',
                 success: function (response) {
                   if(response) {
                     $(".view_modal").html(response).modal('show');

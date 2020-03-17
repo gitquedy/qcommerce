@@ -174,5 +174,11 @@ class ShippingFeeController extends Controller
         return response()->json($output);
     }
 
+    public function massReconcile(Request $request){
+        $ids = explode(',',$request->get('ids'));
+        $status = $request->get('action', 'resolved') == 'resolved' ? 3 : 2;
+        Order::whereIn('id', $ids)->orWhereIn('ordersn', $ids)->update(['shipping_fee_reconciled' => $status]);
+        return response()->json(['success' => 1, 'msg' => 'Shipping Fee Reconciliation successfully updated']);
+    }
 
 }

@@ -126,7 +126,6 @@ class PayoutController extends Controller
         return response()->json(['success' => 1, 'msg' => 'Payout Reconciliation successfully updated']);
     }
 
-
     public function payoutReconcileSingle(Order $order){
         try {
           $text = $order->payout == true ? 'unconfirmed' : 'confirmed';

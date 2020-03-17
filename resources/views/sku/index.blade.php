@@ -28,7 +28,6 @@
     }
 </style>
 
-
 <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
@@ -61,7 +60,7 @@
             <th>Product Name</th>
             <!-- <th>Brand</th> -->
             <!-- <th>Category</th> -->
-            <th><!-- Supplier --></th>
+            <!-- <th>Supplier</th> -->
             <th>Cost</th>
             <th>Price</th>
             <th>Quantity</th>

@@ -93,7 +93,7 @@ class SkuController extends Controller
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                             Action<span class="sr-only">Toggle Dropdown</span></button>
                             <div class="dropdown-menu">
-                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',['id'=>$SKSU->id]).'" > Link SKU Products</a>
+                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',$SKSU->id).'" > Link SKU Products</a>
                             <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
                             <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
                             </div>
@@ -352,14 +352,8 @@ class SkuController extends Controller
         return $result;
     }
 
-    public function skuproducts($id="",Request $request){
-        $business_id = Auth::user()->business_id;
-        $Sku_check = Sku::where('business_id','=',$business_id)->where('id','=',$id)->get()->count();
-        
-        if($Sku_check!=1){
-            $request->session()->flash('flash_error',"Invalid Request !");
-            return redirect('/sku');
-        }
+    public function skuproducts(Sku $sku,Request $request){
+
 
         $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         
@@ -375,8 +369,8 @@ class SkuController extends Controller
             foreach($all_shops as $all_shopsVAL){
                 $Shop_array[] = $all_shopsVAL->id;
             }
-               
-           $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc');
+           
+           $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc');
                         
            
             return Datatables::eloquent($Sku_prod)
@@ -405,7 +399,7 @@ class SkuController extends Controller
         }
         
         return view('sku.listproducts', [
-            'id' => $id,
+            'sku' => $sku,
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
             'statuses' => array(),

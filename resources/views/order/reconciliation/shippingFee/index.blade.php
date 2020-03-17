@@ -74,10 +74,8 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <!-- <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop">Delete</a> -->
-            <!--<a class="dropdown-item" href="#">Print</a>-->
-            <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
-            <!--<a class="dropdown-item" href="#">Another Action</a>-->
+            <a class="dropdown-item reconcile" data-href="{{ action('ShippingFeeController@massReconcile') }}" data-action="filed"><i class="fa fa-file"></i> Filed</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('ShippingFeeController@massReconcile') }}" data-action="resolved"><i class="fa fa-handshake-o"></i> Resolved</a>
           </div>
         </div>
       </div>
@@ -182,6 +180,41 @@
       $('.view_modal').on('hidden.bs.modal', function () {
         table.ajax.reload();
       });
+
+  $(document).on("click", '.reconcile', function () {
+   var selected_ids = [];
+   $(".dt-checkboxes").each(function(){
+      if($(this).prop('checked')==true){
+          selected_ids.push($(this).parent().parent().data('id'));
+      }
+   });
+    
+   if(selected_ids.length==0){
+         Swal.fire(
+         'Warning!',
+         'Please select atleast one order',
+         'warning'
+       );
+       return false;
+     }
+    var url = $(this).data("href") + "?ids=" + selected_ids.toString() + "&action=" + $(this).data('action');
+    $.ajax({
+      method: "POST",
+      url: url,
+      success: function success(result) {
+        if(result.success == 1){
+          toastr.success(result.msg);
+        }
+        $('.data-list-view').DataTable().ajax.reload();
+        getHeaders();
+      },
+      error: function error(jqXhr, json, errorThrown) {
+        console.log(jqXhr);
+        console.log(json);
+        console.log(errorThrown);
+      }
+    });
+  });
 
       $('input[name="tab"]').change(function(){
         var tab = $('input[name="tab"]:checked').val();

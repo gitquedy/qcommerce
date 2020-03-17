@@ -14,6 +14,7 @@ use App\Library\lazada\LazopRequest;
 use App\Library\lazada\LazopClient;
 use App\Library\lazada\UrlConstants;
 use Auth;
+use App\Products;
 use DB;
 
 class Sku extends Model
@@ -31,6 +32,10 @@ class Sku extends Model
 	
 	public function brand(){
 		return $this->belongsTo(Brand::class, 'brand','id');
+	}
+
+	public function products(){
+		return $this->hasMany(Products::class, 'seller_sku_id', 'id');
 	}
 	
     

@@ -67,7 +67,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/update/', 'SkuController@update')->name('sku.update');
 		Route::get('/sku/delete/{id}', 'SkuController@delete')->name('sku.delete');
 		Route::post('/sku/bulkremove', 'SkuController@bulkremove')->name('sku.bulkremove');
-		Route::get('/sku/skuproducts/{id}', 'SkuController@skuproducts')->name('sku.skuproducts');
+		Route::get('/sku/skuproducts/{sku}', 'SkuController@skuproducts')->name('sku.skuproducts');
 		Route::post('/sku/addproduct/', 'SkuController@addproduct')->name('sku.addproduct');
 		Route::post('/sku/addproductmodal/', 'SkuController@addproductmodal')->name('sku.addproductmodal');
 		Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
@@ -164,6 +164,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/order/reconciliation/shippingFee/headers', 'ShippingFeeController@headers')->name('shippingfee.headers');
 		Route::get('/order/reconciliation/shippingFee/filed/{order}', 'ShippingFeeController@filed');
 		Route::get('/order/reconciliation/shippingFee/resolved/{order}', 'ShippingFeeController@resolved');
+		Route::post('/order/reconciliation/shippingFee/massReconcile/', 'ShippingFeeController@massReconcile');
+		
 	});
 
 	// simple crud
