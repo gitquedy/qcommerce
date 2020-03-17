@@ -198,6 +198,18 @@
                                 <span class="menu-title" data-i18n="">Product Alert</span>
                             </a>
                         </li>
+                        <li class="">
+                            <a href="{{ action('ReportsController@dailySales') }}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Daily Sales</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ action('ReportsController@topSellingProducts') }}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Top Selling Products</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             @endcan

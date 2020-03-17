@@ -91,32 +91,6 @@
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
-    function getBase64Image(img) {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        return canvas.toDataURL("image/png");
-    }
-    // imageToBase64 = (URL) => {
-    //     let image;
-    //     image = new Image();
-    //     image.crossOrigin = 'Anonymous';
-    //     image.addEventListener('load', function() {
-    //         let canvas = document.createElement('canvas');
-    //         let context = canvas.getContext('2d');
-    //         canvas.width = image.width;
-    //         canvas.height = image.height;
-    //         context.drawImage(image, 0, 0);
-    //         try {
-    //             localStorage.setItem('saved-image-example', canvas.toDataURL('image/png'));
-    //         } catch (err) {
-    //             console.error(err)
-    //         }
-    //     });
-    //     image.src = URL;
-    // };
   var columnns = [
             { data: 'image', name: 'image', orderable : false,
               "render": function (data){
@@ -182,9 +156,4 @@
   var pageLength = 20;
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
-<script type="text/javascript">
-  $(document).ready(function(){
- 
-  });
-  </script>
 @endsection
