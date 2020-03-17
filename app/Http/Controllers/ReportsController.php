@@ -31,8 +31,6 @@ class ReportsController extends Controller
      */
     public function index(Request $request)
     {
-        
-        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"], ['name'=>"Reports"]
         ];
@@ -142,6 +140,27 @@ class ReportsController extends Controller
         return view('reports.product_alert', [
             'breadcrumbs' => $breadcrumbs,
             'suppliers' => $Suppliers,
+        ]);
+    }
+    public function topSellingProducts(Request $request){
+        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
+        if ( request()->ajax()) {
+            $products = Products::all();
+            return Datatables::eloquent($products)
+            ->make(true);
+        }
+        return view('reports.topSellingProducts', [
+            'breadcrumbs' => $breadcrumbs,
+        ]);
+    }
+    public function dailySales(Request $request){
+        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Reports"], ['name'=>"Daily Sales"]];
+        if ( request()->ajax()) {
+            return Datatables::eloquent($Sku)
+            ->make(true);
+        }
+        return view('reports.dailySales', [
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 }
