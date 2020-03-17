@@ -210,6 +210,7 @@
                     </a>
                 </li>
             @endif
+
             
             <!-- @if($request->user()->can('category.manage') || $request->user()->can('brand.manage'))
                 <li class="nav-item  ">
@@ -237,6 +238,60 @@
                     </ul>
                 </li>
             @endif -->
+
+
+            <li class="nav-item  ">
+                <a >
+                    <span class="menu-title" data-i18n="nav.order">POS</span>
+                </a>
+            </li>
+
+            @can('sales.manage')
+                <li class="nav-item  ">
+                    <a href="">
+                        <i class="feather icon-dollar-sign"></i>
+                        <span class="menu-title" data-i18n="">Sales</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="">
+                            <a href="">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List Sales</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add Sales</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+
+            @can('customer.manage')
+                <li class="nav-item  ">
+                    <a href="">
+                        <i class="feather icon-user"></i>
+                        <span class="menu-title" data-i18n="">Customers</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="">
+                            <a href="{{url('customer')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List Customer</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add Customer</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+            
         </ul>
     </div>
 </div>

@@ -114,6 +114,13 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/user/delete/{user}', 'UserController@delete');
 	});
 
+
+	// Route::group(['middleware' => 'permission:customer.manage'], function()
+	// {
+		Route::resource('/customer', 'CustomerController');
+		Route::get('/customer/delete/{customer}', 'CustomerController@delete');
+	// });
+
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
 		Route::get('/reports/', 'ReportsController@index')->name('reports.index');
