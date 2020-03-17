@@ -27,6 +27,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), $validation);
         if ($validator->fails()) {
             return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
                   ->withDebugData(['error' => $validator->errors()->toArray()])
                   ->withMessage('Invalid Input')
                   ->build();
@@ -61,6 +62,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
                   ->withDebugData(['error' => $validator->errors()->toArray()])
                   ->withMessage('Invalid Input')
                   ->build();
