@@ -16,14 +16,14 @@
           return;
         }
         $.each(result.report, function (i, item) {
-            $labels.push(item.seller_sku);
+            $labels.push(item.product_name);
             $units.push(item.total_quantity);
             $sales.push(parseFloat(item.total_price));
             $total_sales += parseFloat(item.total_price);
             $total_units += parseFloat(item.total_quantity);
 
             $table_row = '<tr><th>' + item.seller_sku + '</th><td>' + item.product_name + '</td><td>' + parseFloat(item.total_quantity)
-                          + '</td><td>' + parseFloat(item.total_price)  +'</td></tr>';
+                          + '</td><td>' + Number((parseFloat(item.total_price)).toFixed(1)).toLocaleString();+'</td></tr>';
             $('#report-table tbody').append($table_row);             
         });
         $total_sales = Number(($total_sales).toFixed(1)).toLocaleString();
