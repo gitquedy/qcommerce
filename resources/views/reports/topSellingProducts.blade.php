@@ -9,8 +9,8 @@
 @section('content')
 <div class="row">
   <div class="col-12">
-    @include('order.components.shopFilter')
-    @include('order.components.dateFilter')
+    @include('reports.components.shopFilter')
+    @include('reports.components.dateFilter')
     <input type="hidden" id="no_of_products" name="no_of_products" class="selectFilter">
     <div class="btn-group mb-1">
     <div class="dropdown">
