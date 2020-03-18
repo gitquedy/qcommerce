@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Validator;
 use App\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -34,7 +37,7 @@ class CustomerController extends Controller
                     </div></div>';
                     return $actions;
              })
-            ->rawColumns(['nameAndImgDisplay', 'action', 'statusDisplay'])
+            ->rawColumns(['action'])
             ->make(true);
         }
         return view('customer.index', [
@@ -63,40 +66,26 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-    	print json_encode($requst->all());die();
         $validator = Validator::make($request->all(),[
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:customers'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'picture' => ['mimes:jpeg,png'],
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customer',
+            'phone' => 'nullable',
+            'price_group' => 'required',
+            'address' => 'nullable',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        $user = Auth::user();
         try {
             $data = $request->all();
             DB::beginTransaction();
-            $data['business_id'] = $request->customer()->business_id;
+            $data['business_id'] = $user->business_id;
 
-            if ($request->hasFile('picture')) {
-                $image = $request->file('picture');
-                $image_name = sha1(time()) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/profile/profile-picture/') , $image_name);
-
-                $data['picture'] = $image_name;
-            }
-
-
-            $data['password'] = Hash::make($data['password']);
-            $data['role'] = 'Staff';
             $customer = Customer::create($data);
-           
-             if($request->has('permissions')){
-                $permissions = Permission::whereIn('name', $request->permissions)->get();
-                $customer->givePermissionTo($permissions);
-            }
+
             $output = ['success' => 1,
                 'msg' => 'Customer added successfully!',
                 'redirect' => action('CustomerController@index')
@@ -132,7 +121,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer, Request $request)
     {
-        if($customer->business_id != $request->customer()->business_id){
+        if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
 
@@ -148,40 +137,26 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-      if($customer->business_id != $request->customer()->business_id){
+      if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
       }
-      $validator = Validator::make($request->all(),[
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('customers')->ignore($customer->id)],
-            'password' => ['nullable','string', 'min:8', 'confirmed'],
-            'picture' => ['mimes:jpeg,png'],
+
+       $validator = Validator::make($request->all(),[
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customer,email,'.$customer->id,
+            'phone' => 'nullable',
+            'price_group' => 'required',
+            'address' => 'nullable',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors','error' => $validator->errors()]);
         }
         try {
-            $data = $request->only(['first_name', 'last_name', 'email']);
+            $data = $request->all();
             DB::beginTransaction();
-            $data['business_id'] = $request->customer()->business_id;
-
-            if ($request->hasFile('picture')) {
-                $image = $request->file('picture');
-                $image_name = sha1(time()) . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/profile/profile-picture/') , $image_name);
-                $data['picture'] = $image_name;
-            }
-            if($request->password != null){
-              $data['password'] = Hash::make($request->password);
-            }
-            $permissions = Customer::ownerPermissions();
-            $customer->revokePermissionTo($permissions);
-             if($request->has('permissions')){
-                $permissions = Permission::whereIn('name', $request->permissions)->get();
-                $customer->givePermissionTo($permissions);
-            }
+            $data['business_id'] = Auth::user()->business_id;
             $customer = $customer->update($data);
 
             $output = ['success' => 1,
@@ -209,7 +184,7 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer, Request $request)
     {
-      if($customer->business_id != $request->customer()->business_id){
+      if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
       }
         try {
@@ -230,7 +205,7 @@ class CustomerController extends Controller
     }
 
     public function delete(Customer $customer, Request $request){
-      if($customer->business_id != $request->customer()->business_id){
+      if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
       }
         $action = action('CustomerController@destroy', $customer->id);

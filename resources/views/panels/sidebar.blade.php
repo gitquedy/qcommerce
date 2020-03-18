@@ -258,7 +258,7 @@
                 </a>
             </li>
 
-            @can('sales.manage')
+            {{-- @can('sales.manage') --}}
                 <li class="nav-item  ">
                     <a href="">
                         <i class="feather icon-dollar-sign"></i>
@@ -266,22 +266,22 @@
                     </a>
                     <ul class="menu-content">
                         <li class="">
-                            <a href="">
+                            <a href="{{url('sales')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List Sales</span>
                             </a>
                         </li>
                         <li class="">
-                            <a href="">
+                            <a href="{{url('sales/create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add Sales</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-            @endcan
+            {{-- @endcan --}}
 
-            @can('customer.manage')
+            {{-- @can('customer.manage') --}}
                 <li class="nav-item  ">
                     <a href="">
                         <i class="feather icon-user"></i>
@@ -295,14 +295,14 @@
                             </a>
                         </li>
                         <li class="">
-                            <a href="">
+                            <a href="{{url('customer/create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add Customer</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-            @endcan
+            {{-- @endcan --}}
             
         </ul>
     </div>

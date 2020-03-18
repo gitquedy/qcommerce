@@ -8,6 +8,7 @@
         <script src="{{ asset(mix('js/core/app.js')) }}"></script>
         <script src="{{ asset(mix('js/scripts/components.js')) }}"></script>
         <script src="{{ asset('vendors/js/printThis/printThis.js') }}"></script>
+        <script src="{{ asset('vendors/js/forms/extended/typeahead/typeahead.bundle.min.js') }}"></script>
         <script>
             function notification(){
              

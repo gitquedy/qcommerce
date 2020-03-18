@@ -68,9 +68,9 @@
                                 <div class="form-group">
                                     <label>Price Group</label>
                                     <div class="position-relative has-icon-left">
-                                      <select name="price_group" id="price_group" class="form-control" placeholder="Price Group">
-                                        <option value=""></option>
-                                        <option value="">Test</option>
+                                      <select name="price_group" id="price_group" class="form-control s2" placeholder="Price Group">
+                                        <option value="" hidden>Select Price Group</option>
+                                        <option value="0">None</option>
                                       </select>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-users"></i>
