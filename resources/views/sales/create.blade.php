@@ -276,7 +276,9 @@
         $(".search-input").on('typeahead:selected', function (event, datum, name) {
             $(this).typeahead("val", "");
             var items = {};
-            items = JSON.parse(localStorage.getItem("items"));
+            if(localStorage.getItem("items")) {
+              items = JSON.parse(localStorage.getItem("items"));            
+            }
             var i = datum.id;
             if(items[i]) {
               items[i]['quantity']++;
