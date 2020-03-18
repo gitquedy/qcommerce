@@ -115,17 +115,18 @@
                               <div class="form-group">
                                   <label>Order Items</label>
                                   <div class="table-responsive">
-                                    <table class="table data-list-view">
+                                    <table class="table data-list-view" id="sku_tables">
                                       <thead>
                                         <tr>
-                                          <th>Product (Code - Name)</th>
-                                          <th>Net Unit Price</th>
-                                          <th>Quantity</th>
-                                          <th>Subtotal (PHP)</th>
-                                          <th><i class="feather icon-trash"></i></th>
+                                          <th width="55%">Product (Code - Name)</th>
+                                          <th width="15%">Unit Price</th>
+                                          <th width="10%">Quantity</th>
+                                          <th width="15%">Subtotal (PHP)</th>
+                                          <th width="5%"><i class="feather icon-trash"></i></th>
                                         </tr>
                                       </thead>
                                       <tbody>
+                                        
                                       </tbody>
                                     </table>
                                   </div>
@@ -157,7 +158,7 @@
                         <div class="row">
                           <div class="col-6">
                            <div class="col-12">
-                                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
+                                {{-- <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save"> --}}
                                <!--  <button type="reset" class="btn btn-outline-warning mr-1 mb-1">Reset --> </button>
                             </div>
                           </div>
@@ -180,6 +181,56 @@
 @section('myscript')
 <script type="text/javascript">
     jQuery(document).ready(function($) {
+        reloadTable();
+
+        function reloadTable() {
+          var items = JSON.parse(localStorage.getItem("items"));
+          var html = '';
+          $("#sku_tables tbody").html(html);
+          $.each(items, function(i, data) {
+            var qty = (data.quantity)?data.quantity:1;
+            var price = (data.custom_price)?data.custom_price:data.price;
+            var sub_total = price * qty;
+            html += '<tr data-id="'+i+'">'+
+                      '<td>'+
+                        '<div class="media">'+
+                          '<img class="d-flex mr-1 product_image" src="'+data.image+'" alt="Generic placeholder image">'+
+                          '<div class="media-body">'+
+                            '<h5 class="mt-0">'+data.name+'</h5>'+
+                            ((data.brand)?data.brand+'<br>':'')+
+                            data.code+
+                          '</div>'+
+                        '</div>'+
+                      '</td>'+
+                      '<td class="text-right p-4">'+
+                        '<label class="label-price">'+data.price+'</label>'+
+                        '<input type="hidden" name="price" class="form-control text-right" value="'+data.price+'">'+
+                      '</td>'+
+                      '<td>'+
+                      '<div class="input-group">'+
+                        '<div class="input-group-prepend d-none d-md-inline-block">'+
+                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
+                        '</div>'+
+                        '<input type="number" name="quantity" min="1" max="'+data.quantity+'" class="form-control text-right change_sku" value="'+qty+'">'+
+                        '<div class="input-group-append d-none d-md-inline-block h-100">'+
+                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
+                        '</div>'+
+                      '</div>'+
+                      '</td>'+
+
+                      '<td class="text-right"><label class="sub_total">'+sub_total+'</label></td>'+
+                      '<td><i class="feather icon-x remove_sku" style="cursor: pointer;"></i></td>'+
+                    '</tr>';
+          });
+          $("#sku_tables tbody").append(html);
+        }
+
+        function recalculate(tr) {
+          var quantity = tr.find('input[name=quantity]').val();
+          var price = tr.find('input[name=price]').val();
+          var sub_total = price * quantity;
+          tr.find('.sub_total').html(sub_total);
+        }
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
@@ -209,7 +260,6 @@
                     '<ul class="list-group search-results-dropdown w-100">'
                 ],
                 suggestion: function (data) {
-                  console.log(data);
                     return '<li class="list-group-item list-group-item-action w-100">'+
                               '<div class="media">'+
                                 '<img class="d-flex mr-1 product_image" src="'+data.image+'" alt="Generic placeholder image">'+
@@ -221,6 +271,76 @@
                             '</li>'
           }
             }
+        });
+
+        $(".search-input").on('typeahead:selected', function (event, datum, name) {
+            $(this).typeahead("val", "");
+            var items = {};
+            items = JSON.parse(localStorage.getItem("items"));
+            var i = datum.id;
+            if(items[i]) {
+              items[i]['quantity']++;
+            }
+            else {
+              items[i] = {};
+              items[i]['id']  = datum.id;
+              items[i]['code']  = datum.code;
+              items[i]['name']  = datum.name;
+              items[i]['brand']  = datum.brand;
+              items[i]['cost']  = datum.cost;
+              items[i]['price']  = datum.price;
+              items[i]['quantity']  = 1;
+              items[i]['image']  = datum.image;
+            }
+            localStorage.setItem("items", JSON.stringify(items));
+            reloadTable();
+        });
+
+        $(document).on('change', '.change_sku', function() {
+            var id = $(this).closest('tr').data('id');
+            var input = $(this)
+            var name = $(this).attr('name');
+            var val = $(this).val();
+            var items = JSON.parse(localStorage.getItem("items"));
+            items[id][name] = val;
+            localStorage.setItem("items", JSON.stringify(items));
+            recalculate($(this).closest('tr'));
+        });
+
+        $(document).on('click', '.update_sku', function() {
+            var change = $(this).data('change');
+            var action = $(this).data('action')?$(this).data('action'):null;
+            var id = $(this).closest('tr').data('id');
+            var input = $(this).closest('tr').find('input[name='+change+']');
+            var val = input.val();
+            switch(action) {
+              case 'add': 
+                  val++;
+                break;
+              case 'subtract':
+                  if(val > 1) {
+                    val--;
+                  }
+                break;
+              case 'replace': 
+                  val = $(this).val();
+                break;
+              default:
+                break;
+            }
+            input.val(val);
+            var items = JSON.parse(localStorage.getItem("items"));
+            items[id][change] = val;
+            localStorage.setItem("items", JSON.stringify(items));
+            recalculate($(this).closest('tr'));
+        });
+
+        $(document).on('click', '.remove_sku', function() {
+            var id = $(this).closest('tr').data('id');
+            var items = JSON.parse(localStorage.getItem("items"));
+            delete items[id];
+            localStorage.setItem("items", JSON.stringify(items));
+            reloadTable();
         });
     });
 </script>
