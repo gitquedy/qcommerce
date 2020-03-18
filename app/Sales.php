@@ -17,7 +17,7 @@ class Sales extends Model
 	}
 
 	public function items(){
-		return $this->hasMany('App\SaleItems', 'sales_id',);
+		return $this->hasMany('App\SaleItems', 'sales_id');
 	}
 
     public function customerName() {
