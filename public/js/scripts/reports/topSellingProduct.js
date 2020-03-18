@@ -26,7 +26,7 @@
                           + '</td><td>' + Number((parseFloat(item.total_price)).toFixed(1)).toLocaleString();+'</td></tr>';
             $('#report-table tbody').append($table_row);             
         });
-        $total_sales = Number(($total_sales).toFixed(1)).toLocaleString();
+        // $total_sales = Number(($total_sales).toFixed(1)).toLocaleString();
         $('#total_sales').html($total_sales);
         $('#total_units').html($total_units);
         var mixedChartOptions = {

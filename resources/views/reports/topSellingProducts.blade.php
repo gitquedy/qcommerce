@@ -5,12 +5,14 @@
 @section('vendor-style')
         <!-- vednor css files -->
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/charts/apexcharts.css')) }}">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection
 @section('content')
 <div class="row">
   <div class="col-12">
     @include('reports.components.shopFilter')
     @include('reports.components.dateFilter')
+    
     <input type="hidden" id="no_of_products" name="no_of_products" class="selectFilter">
     <div class="btn-group mb-1">
     <div class="dropdown">
@@ -64,7 +66,6 @@
                           </tr>
                       </thead>
                       <tbody>
-
                       </tbody>
                   </table>
               </div>
@@ -79,14 +80,20 @@
 @section('vendor-script')
         <!-- vednor files -->
         <script src="{{ asset(mix('vendors/js/charts/apexcharts.min.js')) }}"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        <script src="{{ asset('js/scripts/reports/daterange.js') }}"></script>
+
 @endsection
 @section('myscript')
+
         <!-- Page js files -->
          <script src="{{ asset('js/scripts/reports/colors.js') }}"></script>
+
          
         <script type="text/javascript">
           function getParams(){
-            var $params = '?shop=' + $("#shop").val() + '&timings=' + $("#timings").val() + "&no_of_products=" + $("#no_of_products").val();
+            var $params = '?shop=' + $("#shop").val() + '&daterange=' + $("#daterange").val() + "&no_of_products=" + $("#no_of_products").val();
             return $params;
           }
           var url = "{{ action('ReportsController@topSellingProducts')  }}";
@@ -94,8 +101,6 @@
         <script src="{{ asset('js/scripts/reports/topSellingProduct.js') }}"></script>
         <script src="{{ asset('js/scripts/reports/filter.js') }}"></script>
         <script type="text/javascript"></script>
-
-
         <script type="text/javascript">
           $(document).ready(function(){
             getChart();
