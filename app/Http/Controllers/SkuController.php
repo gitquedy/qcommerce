@@ -37,7 +37,7 @@ class SkuController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
         ];
         
-        if ( request()->ajax()) {
+        if (request()->ajax()) {
             
             $business_id = Auth::user()->business_id;
             
@@ -143,6 +143,9 @@ class SkuController extends Controller
             'quantity' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
         $sku = new Sku();
         $sku->business_id = Auth::user()->business_id;
         $sku->code = $request->code;
@@ -459,6 +462,19 @@ class SkuController extends Controller
     public function show() {
 
     }
+
+     public function search($search)
+    {
+          $result = Sku::where('name', 'LIKE', '%'. $search. '%')->orWhere('code', 'LIKE', '%'. $search. '%')->get();
+          foreach ($result as &$r) {
+              $products = Products::where('seller_sku_id', $r->id)->first();
+                if($products){
+                   $r->image = $products->Images;
+                }
+          }
+          return response()->json($result);
+            
+    } 
     
     public function delete($id, Request $request){
         $business_id = Auth::user()->business_id;

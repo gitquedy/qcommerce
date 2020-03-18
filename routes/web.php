@@ -73,6 +73,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 		Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
+		Route::get('/sku/search/{search?}', 'SkuController@search')->name('sku.search');
 	});
 
 	Route::group(['middleware' => 'permission:supplier.manage'], function()
@@ -113,6 +114,19 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/user', 'UserController');
 		Route::get('/user/delete/{user}', 'UserController@delete');
 	});
+
+
+	// Route::group(['middleware' => 'permission:customer.manage'], function()
+	// {
+		Route::resource('/customer', 'CustomerController');
+		Route::get('/customer/delete/{customer}', 'CustomerController@delete');
+	// });
+
+	// Route::group(['middleware' => 'permission:sales.manage'], function()
+	// {
+		Route::resource('/sales', 'SalesController');
+		Route::get('/sales/delete/{sales}', 'SalesController@delete');
+	// });
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
