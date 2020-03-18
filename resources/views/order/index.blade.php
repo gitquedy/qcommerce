@@ -290,5 +290,6 @@
       }
     });
   });
+  
   </script>
 @endsection

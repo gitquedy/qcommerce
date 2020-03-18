@@ -21,6 +21,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use Helper;
 use Auth;
+use App\OrderItem;
 
 class ReportsController extends Controller
 {
@@ -144,13 +145,73 @@ class ReportsController extends Controller
     }
     public function topSellingProducts(Request $request){
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
-        if ( request()->ajax()) {
-            $products = Products::all();
-            return Datatables::eloquent($products)
-            ->make(true);
+        $all_shops = $request->user()->business->shops;
+
+        if (request()->ajax()) {
+            $shops = $request->user()->business->shops();
+            if($request->get('shop') != null){
+               $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+            }
+            $shop_ids = $shops->pluck('id');
+
+            $no_of_products = 5;
+            if($request->get('no_of_products') != null){
+                $no_of_products = $request->get('no_of_products');
+            }
+
+            $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
+                ->join('order', 'order.id', '=', 'order_item.order_id')
+                ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                ->whereIn('products.shop_id', $shop_ids)
+                ->groupBy('order_item.product_id')
+                ->orderBy('total_quantity', 'desc')->take($no_of_products);
+                
+                
+           if($request->get('timings')=="Today"){
+               $orderItems->whereDate('order_item.created_at', '=', date('Y-m-d'));
+           }
+           
+           if($request->get('timings')=="Yesterday"){
+                $date=date_create();
+                date_modify($date,"-1 days");
+               $orderItems->whereDate('order_item.created_at', '=', date_format($date,"Y-m-d"));
+           }
+           
+           if($request->get('timings')=="Last_7_days"){
+                $date=date_create();
+                date_modify($date,"-7 days");
+                $orderItems->where('order_item.created_at', '>=', date_format($date,"Y-m-d"));
+                $orderItems->where('order_item.created_at', '<=', date('Y-m-d'));
+           }
+           
+           if($request->get('timings')=="This_Month"){
+                $orderItems->where('order_item.created_at', '>=', date("Y-m-01"));
+                $orderItems->where('order_item.created_at', '<=', date('Y-m-d'));
+           }
+           
+           if($request->get('timings')=="Last_30_days"){
+                $date=date_create();
+                date_modify($date,"-30 days");
+                $orderItems->where('order_item.created_at', '>=', date_format($date,"Y-m-d"));
+                $orderItems->where('order_item.created_at', '<=', date('Y-m-d'));
+           }
+           $orderItems = $orderItems->get();
+
+            $data = ['count' => 0];
+            foreach($orderItems as $orderItem){
+                $sku = $orderItem->product->SellerSku;
+                $data['report'][$sku]['seller_sku'] = $orderItem->product->SellerSku;
+                $data['report'][$sku]['product_name'] = $orderItem->product->name;
+                $data['report'][$sku]['total_price'] =  $orderItem->total_price;
+                $data['report'][$sku]['total_quantity'] =  $orderItem->total_quantity;
+
+                $data['count'] += 1;
+            }
+            return $data;
         }
         return view('reports.topSellingProducts', [
             'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
         ]);
     }
     public function dailySales(Request $request){

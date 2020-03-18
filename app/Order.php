@@ -30,9 +30,14 @@ class Order extends Model
     public static $shopee_statuses = [
         'UNPAID','READY_TO_SHIP', 'RETRY_SHIP', 'SHIPPED' ,'COMPLETED', 'TO_CONFIRM_RECEIVE' ,'IN_CANCEL','CANCELLED','TO_RETURN',
      ];
+
 	public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id', 'id');
 	}
+
+    public function products(){
+        return $this->hasMany(OrderItem::class, 'order_id', 'id');
+    }
 
     public function customer_payout_fees() {
         return $this->hasOne(ShippingFee::class, 'order_no', 'id')->where('trans_type', 8);

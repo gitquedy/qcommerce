@@ -41,9 +41,9 @@ class syncFirstTime extends Command
     {
         $shops = Shop::where('is_first_time', true)->get();
         foreach($shops as $shop){
-            $shop->syncOrders();
             $shop->syncShopeeProducts();
             $shop->syncLazadaProducts();
+            $shop->syncOrders();
             $shop->syncShippingDetails(Carbon::now()->subDays(30)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
             $shop->touch();
             $shop->update(['is_first_time', false]);

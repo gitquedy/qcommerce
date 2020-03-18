@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\Order;
+use App\OrderItem;
 use App\Products;
 use App\Utilities;
 use App\ShippingFee;
@@ -80,6 +81,39 @@ class Shop extends Model
                         unset($order['order_id']);     
                         $record = Order::updateOrCreate(
                         ['id' => $order['id']], $order);
+                        $c = $this->lazadaGetClient();
+                        $r = new LazopRequest("/order/items/get",'GET');
+                        $r->addApiParam("order_id", $order['id']);
+                        $response = $c->execute($r, $this->access_token);
+                        $data = json_decode($response, true);
+                        $item_ids = [];
+                        $items = [];
+                        foreach ($data['data'] as $item) {
+                            $item_id = $item['sku'];
+                            $product = Products::where('SellerSku', $item_id)->first();
+                            if($product != null){
+                                if(!in_array($item_id, $item_ids)) {
+                                    array_push($item_ids, $item_id);
+                                    $items[$item_id] = array(
+                                        'order_id' => $record->id,
+                                        'product_id' => $product->id,
+                                        'quantity' => 1,
+                                        'price' => $item['paid_price'],
+                                        'created_at' => Carbon::parse($record->created_at)->format('Y-m-d H:i:s'),
+                                        'updated_at' => Carbon::parse($record->updated_at)->format('Y-m-d H:i:s'),
+                                    );
+                                }
+                                else {
+                                    $items[$item_id]['quantity'] += 1;
+                                    $items[$item_id]['price'] += $item['paid_price'];
+                                }
+                            }
+                        } // item
+                        foreach($items as $item_detail){
+                            OrderItem::updateOrCreate(
+                                    ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                                );
+                        }
                         return $order;
                     }, $orders);
                 }
@@ -187,20 +221,6 @@ class Shop extends Model
         return $client->logistics->getLogistics()->getData();
     }
 
-    // public function shopeeGetCategories(){
-    //     $client = $this->shopeeGetClient();
-    //     $result = $client->item->getCategories()->getData();
-    //     return $result;
-    // }
-
-    // public function shopeeGetAttributes(){
-    //     $client = $this->shopeeGetClient();
-    //     $result = $client->item->getAttributes(['category_id' => 6712])->getData();
-    //     return $result;
-    // }
-
-
-
     public function shopeeGetOrdersPerDate($date){
         $client = $this->shopeeGetClient();
         $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+1 day');
@@ -263,7 +283,23 @@ class Shop extends Model
                     ];
                     $record = Order::updateOrCreate(
                     ['ordersn' => $orders_details['ordersn']], $orders_details);
-                }
+                    foreach($order['items'] as $item){
+                        $product = Products::where('item_id', $item['item_id'])->first();
+                        if($product != null){
+                            $item_detail = [
+                                'order_id' => $record->id,
+                                'product_id' => $product->id,
+                                'quantity' => $item['variation_quantity_purchased'],
+                                'price' => $item['variation_discounted_price'],
+                                'created_at' => $record->created_at,
+                                'updated_at' => $record->updated_at
+                            ];
+                            OrderItem::updateOrCreate(
+                                ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                            );
+                        }
+                    } //items
+                } // orders
             }
         }
     }
@@ -425,7 +461,7 @@ class Shop extends Model
         $client = $this->shopeeGetClient();
         foreach($products as $product){
             if(isset($product['item_id'])){
-                $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData();
+                $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData(); 
                 if(count($product_details['item']) > 0){
                     $product_details = [
                     'shop_id' => $this->id,

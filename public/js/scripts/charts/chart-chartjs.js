@@ -159,7 +159,6 @@ $(window).on("load", function () {
       display: true,
       text: 'Predicted world population (millions) in 2050'
     },
-
   };
 
   // Chart Data

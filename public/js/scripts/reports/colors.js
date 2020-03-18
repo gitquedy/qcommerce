@@ -1,12 +1,8 @@
-var $primary = '#7367F0';
-var $success = '#28C76F';
-var $danger = '#EA5455';
-var $warning = '#FF9F43';
-var $label_color = '#1E1E1E';
-var grid_line_color = '#dae1e7';
-var scatter_grid_color = '#f3f3f3';
-var $scatter_point_light = '#D1D4DB';
-var $scatter_point_dark = '#5175E0';
-var $white = '#fff';
-var $black = '#000';
-var themeColors = [$primary, $success, $danger, $warning, $label_color];
+var $primary = '#7367F0',
+    $success = '#28C76F',
+    $danger = '#EA5455',
+    $warning = '#FF9F43',
+    $info = '#00cfe8',
+    $label_color_light = '#dae1e7';
+
+  var themeColors = [$primary, $success, $danger, $warning, $info];

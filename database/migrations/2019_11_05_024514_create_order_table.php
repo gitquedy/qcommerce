@@ -18,7 +18,6 @@ class CreateOrderTable extends Migration
             
             //fk
             $table->unsignedBigInteger('shop_id');
-
             $table->foreign('shop_id')->references('id')->on('shop')->onDelete('cascade');
 
             $table->string('ordersn')->nullable();
