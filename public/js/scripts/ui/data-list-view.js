@@ -38,6 +38,7 @@ $(document).ready(function () {
         bInfo: typeof BInfo !== 'undefined' ? BInfo : true,
         bFilter: typeof bFilter !== 'undefined' ? bFilter : true,
         pageLength: pageLength,
+        "aaSorting": [],
         // order: [[1, 'asc']],
         buttons: buttons,
         initComplete: function(t, e) {
