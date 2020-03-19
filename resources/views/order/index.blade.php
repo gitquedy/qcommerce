@@ -60,7 +60,7 @@
         <div class="row">
           <div class="col-12">
             @include('order.components.shopFilter')
-            @include('order.components.dateFilter')
+            @include('reports.components.dateFilter')
             <div class="btn-group mb-1 shipping_status">
               <div class="dropdown ">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -146,10 +146,14 @@
 @section('myscript')
   {{-- Page js files --}}
   <script type="text/javascript">
+    function getParams(){
+            var $params = "?site={{ $request->get('site') }}" + "&daterange=" + $("#daterange").val();
+            return $params;
+          }
     function getHeaders(){
         $.ajax({
         method: "GET",
-        url: "{{ action('OrderController@headers')  }}?site={{ $request->get('site') }}",
+        url: "{{ action('OrderController@headers')  }}" + getParams(),
         success: function success(result) {     
             $.each(result.data, function (i, item) {
               $('#badge_' + i).html(item);
@@ -177,7 +181,7 @@
           data: function (data) {
                 data.shop = $("#shop").val();
                 data.status = $("input[name=status]:checked").val();
-                data.timings = $("#timings").val();
+                data.daterange = $("#daterange").val();
                 data.printed = $("#printed").val();
                 data.site = $('input[name="site"]:checked').val();
                 data.shipping_status =  $("#shipping_status").val();
