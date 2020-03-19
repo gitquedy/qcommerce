@@ -33,7 +33,7 @@ class Customer extends Model
     public function business(){
         return $this->belongsTo(Business::class, 'business_id', 'id');
     }
-
+    
     public function fullName(){
         return $this->first_name . ' ' . $this->last_name;
     }

@@ -13,14 +13,10 @@ class Sales extends Model
     ];
 
     public function customer(){
-		return $this->belongsTo('App\Customer', 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
 	}
 
 	public function items(){
 		return $this->hasMany('App\SaleItems', 'sales_id');
 	}
-
-    public function customerName() {
-        return $this->customer()->last_name.", ".$this->customer()->first_name;
-    }
 }

@@ -81,4 +81,3 @@
 
     }); 
 </script>
-<script src="{{ asset('js/scripts/forms-validation/form-modal.js') }}"></script>

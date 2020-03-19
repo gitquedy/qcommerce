@@ -120,6 +120,8 @@ Route::group(['middleware' => 'auth'], function()
 	// {
 		Route::resource('/customer', 'CustomerController');
 		Route::get('/customer/delete/{customer}', 'CustomerController@delete');
+		Route::post('/customer/addCustomerModal', 'CustomerController@addCustomerModal')->name('customer.addCustomerModal');
+		Route::post('/customer/addCustomerAjax', 'CustomerController@addCustomerAjax')->name('customer.addCustomerAjax');
 	// });
 
 	// Route::group(['middleware' => 'permission:sales.manage'], function()

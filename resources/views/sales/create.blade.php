@@ -85,8 +85,9 @@
                                 <div class="form-group">
                                     <label>Customer</label>
                                     <div class="position-relative has-icon-left">
-                                      <select name="customer_id" class="form-control select2 update_select" placeholder="Select Customer">
+                                      <select name="customer_id" id="select_customer" class="form-control select2 update_select" placeholder="Select Customer">
                                         <option value="" disabled selected></option>
+                                        <option value="add_new">Add New Customer</option>
                                         @forelse($customers as $customer)
                                         <option value="{{ $customer->id }}">{{ $customer->formatName() }}</option>
                                         @empty
@@ -122,19 +123,28 @@
                               <div class="form-group">
                                   <label>Order Items</label>  
                                   <div class="table-responsive">
-                                    <table class="table" id="sku_tables">
+                                    <table class="table" id="sales_item_tables">
                                       <thead>
                                         <tr>
-                                          <th width="55%">Product (Code - Name)</th>
-                                          <th width="15%">Unit Price</th>
-                                          <th width="10%">Quantity</th>
-                                          <th width="15%">Subtotal (PHP)</th>
-                                          <th width="5%"><i class="feather icon-trash"></i></th>
+                                          <th class="text-center" width="55%">Product (Code - Name)</th>
+                                          <th class="text-center" width="15%">Unit Price</th>
+                                          <th class="text-center" width="10%">Quantity</th>
+                                          <th class="text-center" width="15%">Subtotal (PHP)</th>
+                                          <th class="text-center" width="5%"><i class="feather icon-trash"></i></th>
                                         </tr>
                                       </thead>
                                       <tbody>
                                         
                                       </tbody>
+                                      <tfoot>
+                                        <tr>
+                                          <th class="text-center text-muted text-sm">[Product (Code - Name)]</th>
+                                          <th class="text-center text-muted text-sm">[Unit Price]</th>
+                                          <th class="text-center text-muted text-sm">[Quantity]</th>
+                                          <th class="text-right font-weight-bold"><span class="mr-3">Total</span><span class="sales_total"></span></th>
+                                          <th class="text-center text-muted"><i class="feather icon-trash"></i></th>
+                                        </tr>
+                                      </tfoot>
                                     </table>
                                   </div>
                               </div>
@@ -145,12 +155,11 @@
                           <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-
                                     <label>Status</label>
                                     <div class="position-relative has-icon-left">
                                       <select name="status" class="form-control select2 update_select" placeholder="Select Status">
-                                        <option value="pending">Pending</option>
                                         <option value="completed">Completed</option>
+                                        <option value="pending">Pending</option>
                                         <option value="canceled">Canceled</option>
                                       </select>
                                       <div class="form-control-position"> 
@@ -164,13 +173,24 @@
                                     <label>Payment Status</label>
                                     <div class="position-relative has-icon-left">
                                       <select name="payment_status" class="form-control select2 update_select" placeholder="Select Status">
-                                        <option value="unpaid">Unpaid</option>
+                                        <option value="pending">Pending</option>
                                         <option value="due">Due</option>
                                         <option value="partial">Partial</option>
                                         <option value="paid">Paid</option>
                                       </select>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-credit-card"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Paid Amount</label>
+                                    <div class="position-relative has-icon-left">
+                                      <input type="number" name="paid" class="form-control update_input" value="0">
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-dollar-sign"></i>
                                       </div>
                                     </div>
                                 </div>
@@ -182,7 +202,7 @@
                           <div class="col-6">
                            <div class="col-12">
                                 <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
-                                <button id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
+                                <button type="reset" id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
                             </div>
                           </div>
                         </div>
@@ -198,15 +218,17 @@
 </section>
 <!-- // Basic Floating Label Form section end -->
 @endsection
-@section('vendor-script')
-  <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
-@endsection
 @section('myscript')
 <script type="text/javascript">
     jQuery(document).ready(function($) {
         reloadSales();
 
-
+        $(window).keydown(function(event){
+          if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+          }
+        });
 
         function reloadSales() {
           var sales = JSON.parse(localStorage.getItem("sales"));
@@ -214,7 +236,13 @@
             $.each(sales, function(index, value){
                 $('input[name='+index+']').val(value);
                 $('select[name='+index+']').val(value).trigger('change');
-                $('.datepicker').daterangepicker('setDate', null);
+                $('.datepicker').daterangepicker({
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    minYear: 1901,
+                    maxYear: parseInt(moment().format('YYYY'),10),
+                    setDate: null
+                });
             });
           }
           else {
@@ -223,10 +251,10 @@
           }
           var items = JSON.parse(localStorage.getItem("items"));
           var html = '';
-          $("#sku_tables tbody").html(html);
+          $("#sales_item_tables tbody").html(html);
           $.each(items, function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
-            var price = (data.custom_price)?data.custom_price:data.price;
+            var price = data.price;
             var sub_total = price * qty;
             html += '<tr data-id="'+i+'">'+
                       '<td>'+
@@ -236,41 +264,63 @@
                             '<h5 class="mt-0">'+data.name+'</h5>'+
                             ((data.brand)?data.brand+'<br>':'')+
                             data.code+
-                            '<input type="hidden" name="item['+i+'][image]" value="'+data.image+'" />'+
-                            '<input type="hidden" name="item['+i+'][name]" value="'+data.name+'" />'+
-                            '<input type="hidden" name="item['+i+'][brand]" value="'+data.brand+'" />+'+
-                            '<input type="hidden" name="item['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="sales_item_array['+i+'][image]" value="'+data.image+'" />'+
+                            '<input type="hidden" name="sales_item_array['+i+'][name]" value="'+data.name+'" />'+
+                            '<input type="hidden" name="sales_item_array['+i+'][brand]" value="'+data.brand+'" />+'+
+                            '<input type="hidden" name="sales_item_array['+i+'][code]" value="'+data.code+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
                       '<td class="text-right p-4">'+
                         // '<label class="label-price">'+data.price+'</label>'+
-                        '<input type="number" name="item['+i+'][price]" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
+                        '<input type="hidden" name="sales_item_array['+i+'][real_unit_price]" value="'+data.price+'" />'+
+                        '<input type="number" name="sales_item_array['+i+'][price]" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
                       '</td>'+
                       '<td>'+
                       '<div class="input-group">'+
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="item['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity" value="'+qty+'">'+
+                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
                       '</div>'+
                       '</td>'+
 
-                      '<td class="text-right"><label class="sub_total">'+sub_total+'</label></td>'+
+                      '<td class="text-right"><label class="sub_total">'+addCommas(sub_total.toFixed(2))+'</label></td>'+
                       '<td><i class="feather icon-x remove_sku" style="cursor: pointer;"></i></td>'+
                     '</tr>';
           });
-          $("#sku_tables tbody").append(html);
+          $("#sales_item_tables tbody").append(html);
+          recalculateTotal();
         }
 
         function recalculate(tr) {
           var quantity = tr.find('input.sku_input_quantity').val();
           var price = tr.find('input.sku_input_price').val();
           var sub_total = price * quantity;
-          tr.find('.sub_total').html(sub_total);
+          tr.find('.sub_total').html(addCommas(sub_total.toFixed(2)));
+          recalculateTotal();
+        }
+
+        function recalculateTotal() {
+          var total = 0;
+          $("#sales_item_tables > tbody > tr").each(function() {
+            var i = $(this).data('id');
+            var qty = ($(this).find('input.sku_input_price').val())?$(this).find('input.sku_input_price').val():1;
+            var price = $(this).find('input.sku_input_quantity').val();
+            var sub_total = price * qty;
+            total += sub_total;
+          })
+          $(".sales_total").html(addCommas(total.toFixed(2)));
+        }
+
+
+        function addCommas(x) {
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
         }
 
         // Set the Options for "Bloodhound" suggestion engine
@@ -322,10 +372,7 @@
               items = JSON.parse(localStorage.getItem("items"));            
             }
             var i = datum.id;
-            if(items[i]) {
-              items[i]['quantity']++;
-            }
-            else {
+            if(!items[i]) {
               items[i] = {};
               items[i]['id']  = datum.id;
               items[i]['code']  = datum.code;
@@ -336,6 +383,11 @@
               items[i]['quantity']  = 1;
               items[i]['max_quantity']  = datum.quantity;
               items[i]['image']  = datum.image;
+            }
+            else if(items[i]['quantity'] < datum.quantity) {
+              items[i]['quantity']++;
+            }
+            else {
             }
             localStorage.setItem("items", JSON.stringify(items));
             reloadSales();
@@ -348,7 +400,7 @@
             }
             var name = $(this).attr('name');
             sales[name] = $(this).find('option:selected').val();
-            localStorage.setItem("sales", JSON.stringify(sales));
+            localStorage.setItem("sales", JSON.stringify(sales)); 
         });
 
         $(document).on('change', '.update_input', function() {
@@ -426,6 +478,81 @@
 
         $('.select2').select2();
 
+        $('select[name=customer_id]').on('change', function() {
+            var selected = $(this).find('option:selected').val();
+            if(selected == 'add_new') {
+              $.ajax({
+                url :  "{{ route('customer.addCustomerModal') }}",
+                type: "POST",
+                success: function (response) {
+                  if(response) {
+                    $(".view_modal").html(response).modal('show');
+                  }
+                }
+              });
+              $(this).val('').trigger('change');
+            } 
+        });
+
+    });
+
+
+    $(function() {
+      var button = 'save';
+      $('input[type="submit"]').on('click', function(){
+           button = this.name;
+      });
+      $(".form").submit(function(e) {
+        e.preventDefault(); 
+        
+        if($('.btn_save').prop('disabled') == true){
+          return false;
+        }
+         $('.btn_save').prop('disabled', true);
+          $.ajax({
+            url : $(this).attr('action'),
+            type : 'POST',
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            success: function(result){  
+              console.log(result);
+              if(result.success == true){
+                toastr.success(result.msg);
+                $('.error').remove();
+                $("#sale_reset").trigger('click');
+                setTimeout(function(){
+                    window.location.replace(result.redirect);
+                }, 1500);
+              }else{
+                if(result.msg){
+                  toastr.error(result.msg);
+                }
+                 $('.error').remove();
+                    $.each(result.error, function(index, val){
+                      var elem = $('[name="'+ index +'"]');
+                      if(index == 'sales_item_array') {
+                        $('#sales_item_tables').after('<label class="text-danger error">Order Items are required to make a sale, Please add an item.</label>');
+                      }
+                      else if(elem.hasClass('select2-hidden-accessible')) {
+                        new_elem = elem.parent().find('span.select2.select2-container')
+                        new_elem.after('<label class="text-danger error">' + val + '</label>');
+                      }
+                      else {
+                        elem.after('<label class="text-danger error">' + val + '</label>');
+                      }
+                    });
+              }
+              $('.btn_save').prop('disabled', false);
+               },
+              error: function(jqXhr, json, errorThrown){
+                console.log(jqXhr);
+                console.log(json);
+                console.log(errorThrown);
+                $('.btn_save').prop('disabled', false);
+              }
+          });
+      });
     });
 </script>
 @endsection

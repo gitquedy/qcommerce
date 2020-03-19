@@ -23,14 +23,14 @@ class CreateSalesTable extends Migration
             $table->string('customer_last_name');
             $table->date('date');
             $table->string('reference_no');
-            $table->string('note');
+            $table->text('note')->nullable();
             $table->string('status');
             $table->float('total', 10, 2);
-            $table->float('discount', 10, 2);
+            $table->float('discount', 10, 2)->default(0);
             $table->float('grand_total', 10, 2);
             $table->float('paid', 10, 2);
             $table->string('payment_status');
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by');
             $table->timestamps();
         });
