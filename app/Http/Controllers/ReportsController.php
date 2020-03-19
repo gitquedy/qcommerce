@@ -171,7 +171,7 @@ class ReportsController extends Controller
                 if($daterange[0] == $daterange[1]){
                     $orderItems->whereDate('order_item.created_at', [$daterange[0]]);
                 }else{
-                    $orderItems->whereBetween('order_item.created_at', [$daterange[0], $daterange[1]]);
+                    $orderItems->whereDate('order_item.created_at', '>=', $daterange[0])->whereDate('order_item.created_at', '<=', $daterange[1]);
                 }
                 
             }

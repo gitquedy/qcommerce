@@ -91,7 +91,7 @@ class OrderController extends Controller
                 if($daterange[0] == $daterange[1]){
                     $orders->whereDate('created_at', [$daterange[0]]);
                 }else{
-                    $orders->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                    $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
                 }
             }
            
@@ -460,7 +460,8 @@ class OrderController extends Controller
                     if($daterange[0] == $daterange[1]){
                         $orders = $orders->whereDate('created_at', [$daterange[0]]);
                     }else{
-                        $orders = $orders->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                        $orders = $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+                        
                     }
                 }
                 $data[$status] = $orders->where('status', $status)->count();
@@ -473,7 +474,7 @@ class OrderController extends Controller
                     if($daterange[0] == $daterange[1]){
                         $orders = $orders->whereDate('created_at', [$daterange[0]]);
                     }else{
-                        $orders = $orders->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                        $orders = $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
                     }
                 }
                 $data[$status] = $orders->where('status', $status)->count();
@@ -486,8 +487,8 @@ class OrderController extends Controller
                 $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);
                 $data['shopee_total'] = $data['shopee_total']->whereDate('created_at', [$daterange[0]]);
             }else{
-                $data['lazada_total'] = $data['lazada_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
-                $data['shopee_total'] = $data['shopee_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+                $data['shopee_total'] = $data['shopee_total']->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
             }
         }
         $data['lazada_total'] = $data['lazada_total']->count();
