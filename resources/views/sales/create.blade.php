@@ -33,9 +33,16 @@
          height: 100%;
      }
 
-     /*.list-group-item.tt-suggestion.tt-selectable:hover {
-         background-color: #007fff;
-     }*/
+
+     input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+    }
+
+     .form-control[readonly] {
+         background-color: transparent;
+      }
 </style>
 @endsection
 @section('content')
@@ -49,14 +56,14 @@
               </div>
               <div class="card-content">
                   <div class="card-body">
-                      <form action="{{ action('SalesController@store') }}" method="POST" class="form" enctype="multipart/form-data">
+                      <form action="{{ action('SalesController@store') }}" method="POST" id="add_sale_form" class="form" enctype="multipart/form-data">
                           @csrf
-                        <div class="row">
+                          <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="date" class="form-control" name="date" placeholder="Date">
+                                      <input type="text" class="form-control datepicker update_input" name="date" value="{{date('m/d/Y')}}" readonly>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-calendar"></i>
                                       </div>
@@ -67,7 +74,7 @@
                                 <div class="form-group">
                                     <label>Referencce No.</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="text" class="form-control" name="reference_no" placeholder="Reference No.">
+                                      <input type="text" class="form-control update_input" name="reference_no" placeholder="Reference No.">
                                       <div class="form-control-position"> 
                                         <i class="feather icon-hash"></i>
                                       </div>
@@ -78,8 +85,8 @@
                                 <div class="form-group">
                                     <label>Customer</label>
                                     <div class="position-relative has-icon-left">
-                                      <select name="customer_id" class="form-control" placeholder="Select Customer">
-                                        <option value=""></option>
+                                      <select name="customer_id" class="form-control select2 update_select" placeholder="Select Customer">
+                                        <option value="" disabled selected></option>
                                         @forelse($customers as $customer)
                                         <option value="{{ $customer->id }}">{{ $customer->formatName() }}</option>
                                         @empty
@@ -113,9 +120,9 @@
                           <div class="row">
                             <div class="col-md-12">
                               <div class="form-group">
-                                  <label>Order Items</label>
+                                  <label>Order Items</label>  
                                   <div class="table-responsive">
-                                    <table class="table data-list-view" id="sku_tables">
+                                    <table class="table" id="sku_tables">
                                       <thead>
                                         <tr>
                                           <th width="55%">Product (Code - Name)</th>
@@ -138,18 +145,34 @@
                           <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
+
                                     <label>Status</label>
-                                    <select name="status" class="form-control" placeholder="Select Status">
-                                      <option value=""></option>
-                                    </select>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="status" class="form-control select2 update_select" placeholder="Select Status">
+                                        <option value="pending">Pending</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="canceled">Canceled</option>
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-activity"></i>
+                                      </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Payment Status</label>
-                                    <select name="status" class="form-control" placeholder="Select Status">
-                                      <option value=""></option>
-                                    </select>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="payment_status" class="form-control select2 update_select" placeholder="Select Status">
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="due">Due</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="paid">Paid</option>
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-credit-card"></i>
+                                      </div>
+                                    </div>
                                 </div>
                             </div>
                           </div>
@@ -158,8 +181,8 @@
                         <div class="row">
                           <div class="col-6">
                            <div class="col-12">
-                                {{-- <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save"> --}}
-                               <!--  <button type="reset" class="btn btn-outline-warning mr-1 mb-1">Reset --> </button>
+                                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
+                                <button id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
                             </div>
                           </div>
                         </div>
@@ -181,9 +204,23 @@
 @section('myscript')
 <script type="text/javascript">
     jQuery(document).ready(function($) {
-        reloadTable();
+        reloadSales();
 
-        function reloadTable() {
+
+
+        function reloadSales() {
+          var sales = JSON.parse(localStorage.getItem("sales"));
+          if(sales) {
+            $.each(sales, function(index, value){
+                $('input[name='+index+']').val(value);
+                $('select[name='+index+']').val(value).trigger('change');
+                $('.datepicker').daterangepicker('setDate', null);
+            });
+          }
+          else {
+            $('#add_sale_form').trigger('reset').trigger('change');
+            $('.select2').trigger('change');
+          }
           var items = JSON.parse(localStorage.getItem("items"));
           var html = '';
           $("#sku_tables tbody").html(html);
@@ -199,21 +236,25 @@
                             '<h5 class="mt-0">'+data.name+'</h5>'+
                             ((data.brand)?data.brand+'<br>':'')+
                             data.code+
+                            '<input type="hidden" name="item['+i+'][image]" value="'+data.image+'" />'+
+                            '<input type="hidden" name="item['+i+'][name]" value="'+data.name+'" />'+
+                            '<input type="hidden" name="item['+i+'][brand]" value="'+data.brand+'" />+'+
+                            '<input type="hidden" name="item['+i+'][code]" value="'+data.code+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
                       '<td class="text-right p-4">'+
-                        '<label class="label-price">'+data.price+'</label>'+
-                        '<input type="hidden" name="price" class="form-control text-right" value="'+data.price+'">'+
+                        // '<label class="label-price">'+data.price+'</label>'+
+                        '<input type="number" name="item['+i+'][price]" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
                       '</td>'+
                       '<td>'+
                       '<div class="input-group">'+
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
-                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
+                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="quantity" min="1" max="'+data.quantity+'" class="form-control text-right change_sku" value="'+qty+'">'+
+                        '<input type="number" name="item['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
-                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
+                          '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
                       '</div>'+
                       '</td>'+
@@ -226,11 +267,12 @@
         }
 
         function recalculate(tr) {
-          var quantity = tr.find('input[name=quantity]').val();
-          var price = tr.find('input[name=price]').val();
+          var quantity = tr.find('input.sku_input_quantity').val();
+          var price = tr.find('input.sku_input_price').val();
           var sub_total = price * quantity;
           tr.find('.sub_total').html(sub_total);
         }
+
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
@@ -292,10 +334,31 @@
               items[i]['cost']  = datum.cost;
               items[i]['price']  = datum.price;
               items[i]['quantity']  = 1;
+              items[i]['max_quantity']  = datum.quantity;
               items[i]['image']  = datum.image;
             }
             localStorage.setItem("items", JSON.stringify(items));
-            reloadTable();
+            reloadSales();
+        });
+
+        $(document).on('change', '.update_select', function() {
+            var sales = {};
+            if(localStorage.getItem("sales")) {
+              sales = JSON.parse(localStorage.getItem("sales"));            
+            }
+            var name = $(this).attr('name');
+            sales[name] = $(this).find('option:selected').val();
+            localStorage.setItem("sales", JSON.stringify(sales));
+        });
+
+        $(document).on('change', '.update_input', function() {
+            var sales = {};
+            if(localStorage.getItem("sales")) {
+              sales = JSON.parse(localStorage.getItem("sales"));            
+            }
+            var name = $(this).attr('name');
+            sales[name] = $(this).val();
+            localStorage.setItem("sales", JSON.stringify(sales));
         });
 
         $(document).on('change', '.change_sku', function() {
@@ -310,14 +373,17 @@
         });
 
         $(document).on('click', '.update_sku', function() {
+            var id = $(this).closest('tr').data('id');
             var change = $(this).data('change');
             var action = $(this).data('action')?$(this).data('action'):null;
-            var id = $(this).closest('tr').data('id');
-            var input = $(this).closest('tr').find('input[name='+change+']');
+            var input = $(this).closest('tr').find('input.sku_input_'+change);
             var val = input.val();
             switch(action) {
               case 'add': 
-                  val++;
+                var max = input.attr('max');
+                  if(val < max) {
+                    val++;
+                  }
                 break;
               case 'subtract':
                   if(val > 1) {
@@ -342,9 +408,24 @@
             var items = JSON.parse(localStorage.getItem("items"));
             delete items[id];
             localStorage.setItem("items", JSON.stringify(items));
-            reloadTable();
+            reloadSales();
         });
+
+        $('.datepicker').daterangepicker({
+          singleDatePicker: true,
+          showDropdowns: true,
+          minYear: 1901,
+          maxYear: parseInt(moment().format('YYYY'),10)
+        });
+
+        $("#sale_reset").on('click', function() {
+            localStorage.removeItem("items");
+            localStorage.removeItem("sales");
+            reloadSales();
+        });
+
+        $('.select2').select2();
+
     });
 </script>
-<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 @endsection

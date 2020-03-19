@@ -49,7 +49,7 @@
               </label>
               @foreach($statuses as $status)
                 <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
-                  <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucwords(str_replace("_"," ", $status)) }}
+                  <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucfirst(strtolower(str_replace("_"," ", $status))) }}
                   <span id="badge_{{ $status }}" class="badge badge-secondary"></span>
                 </label>
               @endforeach
