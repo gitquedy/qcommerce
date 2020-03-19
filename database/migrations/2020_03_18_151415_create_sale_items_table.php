@@ -21,6 +21,7 @@ class CreateSaleItemsTable extends Migration
             $table->foreign('sku_id')->references('id')->on('sku')->onDelete('cascade');
             $table->string('sku_code');
             $table->string('sku_name');
+            $table->string('image')->nullable();
             $table->float('unit_price', 10, 2);
             $table->integer('quantity');
             $table->float('discount', 10, 2);

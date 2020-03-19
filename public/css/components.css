@@ -3947,7 +3947,7 @@ input[type=month].form-control {
 
 .select2-container--classic .select2-selection--single,
 .select2-container--default .select2-selection--single {
-  min-height: 38px;
+  min-height: calc(1.25em + 1.4rem + 1px);
   padding: 5px;
   border: 1px solid rgba(0, 0, 0, 0.2);
 }

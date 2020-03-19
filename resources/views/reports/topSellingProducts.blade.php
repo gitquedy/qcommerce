@@ -5,7 +5,7 @@
 @section('vendor-style')
         <!-- vednor css files -->
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/charts/apexcharts.css')) }}">
-        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
+        {{-- <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}"> --}}
 @endsection
 @section('content')
 <div class="row">
@@ -79,8 +79,8 @@
 @section('vendor-script')
         <!-- vednor files -->
         <script src="{{ asset(mix('vendors/js/charts/apexcharts.min.js')) }}"></script>
-        <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script>
-        <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
+        {{-- <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script> --}}
+        {{-- <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script> --}}
         <script src="{{ asset('js/scripts/reports/daterange.js') }}"></script>
 
 @endsection
