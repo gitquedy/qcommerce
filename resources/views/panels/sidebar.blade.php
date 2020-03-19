@@ -110,11 +110,7 @@
                 </li>
             @endif
 
-            <li class="nav-item  ">
-                <a >
-                    <span class="menu-title" data-i18n="nav.order"></span>
-                </a>
-            </li>
+            <hr>
             
             <li class="nav-item  ">
                 <a >
@@ -251,7 +247,7 @@
                 </li>
             @endif -->
 
-
+            <hr>
             <li class="nav-item  ">
                 <a >
                     <span class="menu-title" data-i18n="nav.order">POS</span>
