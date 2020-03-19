@@ -12,8 +12,6 @@ use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
 class AuthController extends Controller
 {
     public function register(Request $request){
-
-        $data = (object)[];
         $validation = [
             'name' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],

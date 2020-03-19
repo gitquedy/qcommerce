@@ -6,7 +6,7 @@
 <div class="main-menu menu-fixed {{($configData['theme'] === 'light') ? "menu-light" : "menu-dark"}} menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row" style="flex-wrap:nowrap;">
-            <li class="nav-item mr-auto"><a class="navbar-brand" href="{{ route('dashboard') }}">
+            <li class="nav-item mr-auto active"><a class="navbar-brand" href="{{ route('dashboard') }}">
         <div class="brand-logo"></div>
                     <div class="brand-text-logo"></div>
                     {{-- <h2 class="brand-text mb-0">{{ env('APP_NAME') }}</h2> --}}
@@ -24,7 +24,7 @@
                 </a>
             </li> 
 
-            <li class="nav-item  ">
+            <li class="nav-item {{ $request->segment(1) == '' ? 'active' : '' }}">
                 <a href="{{route('dashboard')}}">
                     <i class="feather icon-home"></i>
                     <span class="menu-title" data-i18n="nav.order">Dashboard</span>
@@ -34,19 +34,19 @@
             
 
             @can('shop.manage')
-                <li class="nav-item  ">
+                <li class="nav-item">
                     <a href="">
                         <i class="feather icon-shopping-bag"></i>
                         <span class="menu-title" data-i18n="">Shops</span>
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'shop' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('/shop')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List Shop</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'shop' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{url('/shop/create')}}">
                                 <i class="feather icon-plus"></i>
                                 <span class="menu-title" data-i18n="">Add Shop</span>
@@ -57,7 +57,7 @@
             @endcan
             
             @can('product.manage')
-                <li class="nav-item  ">
+                <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
                     <a href="{{url('/product')}}?site=lazada">
                         <i class="feather icon-package "></i>
                         <span class="menu-title" data-i18n="">Products</span>
@@ -66,7 +66,7 @@
             @endcan
             
             @can('order.manage')
-                <li class="nav-item  ">
+                <li class="nav-item {{ $request->segment(1) == 'order' && $request->segment(2) == '' ? 'active' : '' }}">
                     <a href="{{url('/order')}}?site=lazada&status=pending">
                         <i class="feather icon-shopping-cart"></i>
                         <span class="menu-title" data-i18n="">Orders</span>
@@ -76,14 +76,14 @@
             @endcan
 
             @if( $request->user()->can('returnRecon.manage') || $request->user()->can('payoutRecon.manage') || $request->user()->can('shippingFeeRecon.manage'))
-                <li class="nav-item  ">
+                <li class="nav-item ">
                     <a href="">
                         <i class="feather icon-briefcase "></i>
                         <span class="menu-title" data-i18n="">Reconciliation</span>
                     </a>
                     <ul class="menu-content">
                         @can('shippingFeeRecon.manage')
-                            <li class="">
+                            <li class="{{ $request->segment(1) == 'order' && $request->segment(2) == 'reconciliation' && $request->segment(3) == 'shippingFee' ? 'active' : '' }}">
                                 <a href="{{url('/order/reconciliation/shippingFee')}}?tab=all">
                                     <i class="feather icon-circle"></i>
                                     <span class="menu-title" data-i18n="">Shipping Fee</span>
@@ -91,7 +91,7 @@
                             </li>
                         @endcan
                         @can('payoutRecon.manage')
-                            <li class="">
+                            <li class="{{ $request->segment(1) == 'order' && $request->segment(2) == 'reconciliation' && $request->segment(3) == 'payout' ? 'active' : '' }}">
                                 <a href="{{url('/order/reconciliation/payout')}}?tab=all">
                                     <i class="feather icon-circle"></i>
                                     <span class="menu-title" data-i18n="">Payout</span>
@@ -99,7 +99,7 @@
                             </li>
                         @endcan
                         @can('returnRecon.manage')
-                            <li class="">
+                            <li class="{{ $request->segment(1) == 'order' && $request->segment(2) == 'reconciliation' && $request->segment(3) == 'returned' ? 'active' : '' }}">
                                 <a href="{{url('/order/reconciliation/returned')}}?tab=all">
                                     <i class="feather icon-circle"></i>
                                     <span class="menu-title" data-i18n="">Failed Delivery Return</span>
@@ -113,25 +113,25 @@
             <hr>
             
             <li class="nav-item  ">
-                <a >
+                <a href="#">
                     <span class="menu-title" data-i18n="nav.order">Inventory</span>
                 </a>
             </li>
             
             @can('sku.manage')
-                <li class="nav-item  ">
-                    <a href="">
+                <li class="nav-item">
+                    <a href="#">
                         <i class="feather icon-package"></i>
                         <span class="menu-title" data-i18n="">SKU</span>
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('/sku')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List of SKU</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{route('sku.create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add new SKU</span>
@@ -142,7 +142,7 @@
             @endcan
 
             @can('barcode.manage')
-            <li class="nav-item  ">
+            <li class="nav-item {{ $request->segment(1) == 'barcode' && $request->segment(2) == '' ? 'active' : '' }}">
                 <a href="{{url('/barcode')}}">
                     <i class="feather icon-hash"></i>
                     <span class="menu-title" data-i18n="nav.order">Barcode</span>
@@ -151,20 +151,20 @@
             @endcan
 
             @can('supplier.manage')
-                <li class="nav-item  ">
+                <li class="nav-item">
                     <a href="">
                         <i class="feather icon-truck"></i>
                         <span class="menu-title" data-i18n="">Suppliers</span>
                         
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'supplier' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('/supplier')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List of Suppliers</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'supplier' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{route('supplier.create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add new Supplier</span>
@@ -182,25 +182,25 @@
                         
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'outofstock' ? 'active' : '' }}">
                             <a href="{{route('reports.outOfStock')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Out of Stock</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'productalert' ? 'active' : '' }}">
                             <a href="{{route('reports.productAlert')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Product Alert</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'dailySales' ? 'active' : '' }}">
                             <a href="{{ action('ReportsController@dailySales') }}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Daily Sales</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'topSellingProducts' ? 'active' : '' }}">
                             <a href="{{ action('ReportsController@topSellingProducts') }}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Top Selling Products</span>
@@ -211,7 +211,7 @@
             @endcan
             
             @can('user.manage')
-                <li class="nav-item  ">
+                <li class="nav-item {{ $request->segment(1) == 'user' ? 'active' : '' }}">
                     <a href="{{url('/user')}}">
                         <i class="feather icon-users"></i>
                         <span class="menu-title" data-i18n="">User Management</span>
@@ -255,19 +255,19 @@
             </li>
 
             {{-- @can('sales.manage') --}}
-                <li class="nav-item  ">
+                <li class="nav-item ">
                     <a href="">
                         <i class="feather icon-dollar-sign"></i>
                         <span class="menu-title" data-i18n="">Sales</span>
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'sales' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('sales')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List Sales</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'sales' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{url('sales/create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add Sales</span>
@@ -278,19 +278,19 @@
             {{-- @endcan --}}
 
             {{-- @can('customer.manage') --}}
-                <li class="nav-item  ">
+                <li class="nav-item">
                     <a href="">
                         <i class="feather icon-user"></i>
                         <span class="menu-title" data-i18n="">Customers</span>
                     </a>
                     <ul class="menu-content">
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'customer' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('customer')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List Customer</span>
                             </a>
                         </li>
-                        <li class="">
+                        <li class="{{ $request->segment(1) == 'customer' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{url('customer/create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add Customer</span>
