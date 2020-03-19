@@ -69,7 +69,7 @@
             { data: 'dateFormat', name: 'dateFormat', orderable: true},
             { data: 'total_orders', name: 'total_orders'},
             { data: 'total_quantity', name: 'total_quantity'},
-            { data: 'saleFormat', name: 'total_price'},
+            { data: 'total_sales', name: 'total_sales'},
         ];
   var table_route = {
           url: '{{ action("ReportsController@dailySales") }}',

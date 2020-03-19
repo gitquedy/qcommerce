@@ -7,6 +7,7 @@ use App\Products;
 use App\Category;
 use App\Brand;
 use App\Shop;
+use App\Order;
 use App\Supplier;
 use Illuminate\Http\Request;
 use App\Lazop;
@@ -204,30 +205,29 @@ class ReportsController extends Controller
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
                }
                $shop_ids = $shops->pluck('id')->toArray();
-                $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
-                ->join('order', 'order.id', '=', 'order_item.order_id')
-                ->select(DB::raw('DATE(order_item.created_at) as date'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'), DB::raw('COUNT(order.id) as total_orders'))
+                $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id')
+                ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->orderBy('date', 'desc')
                 ->groupBy('date');
                 $daterange = explode('/', $request->get('daterange'));
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
-                        $orderItems->whereDate('order_item.created_at', [$daterange[0]]);
+                        $order->whereDate('order.created_at', [$daterange[0]]);
                     }else{
-                        $orderItems->whereDate('order_item.created_at', '>=', $daterange[0])->whereDate('order_item.created_at', '<=', $daterange[1]);
+                        $order->whereDate('order.created_at', '>=', $daterange[0])->whereDate('order.created_at', '<=', $daterange[1]);
                     }
                 }
-                return Datatables::eloquent($orderItems)
-                    ->addColumn('dateFormat', function(OrderItem $orderItem) {
-                            return Utilities::format_date($orderItem->date, 'M d,Y');
+                return Datatables::eloquent($order)
+                    ->addColumn('dateFormat', function(Order $order) {
+                            return Utilities::format_date($order->date, 'M d,Y');
                         })
-                    ->addColumn('saleFormat', function(OrderItem $orderItem) {
-                            return 'PHP ' . number_format($orderItem->total_price, 2);
+                    ->addColumn('total_sales', function(Order $order) {
+                            return 'PHP ' . number_format($order->total_price, 2);
                         })
                     ->make(true);
              }
-            
+             
             return view('reports.dailySales', [
                 'breadcrumbs' => $breadcrumbs,
                 'all_shops' => $all_shops,
