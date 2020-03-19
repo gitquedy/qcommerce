@@ -143,9 +143,9 @@ class SkuController extends Controller
             'quantity' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
         ]);
-        if ($validator->fails()) {
-            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        // }
         $sku = new Sku();
         $sku->business_id = Auth::user()->business_id;
         $sku->code = $request->code;

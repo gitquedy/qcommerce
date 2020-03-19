@@ -33,7 +33,7 @@
       <div class="col-xl-3 col-md-6 col-sm-12">
         <div class="card">
           <div class="card-content">
-            <img class="card-img-top img-fluid" src="{{ $sku->products->first() ? explode(',',$sku->products->first()->Images)[0] : asset('images/pages/content-img-1.jpg') }}"
+            <img class="card-img-top img-fluid" src="{{ $sku->products->first() ? explode(',',$sku->products->first()->Images)[0] : asset('images/pages/no-img.jpg') }}"
               alt="Card image cap">
             <div class="card-body">
               <h5>{{ $sku->code }} - {{ $sku->name }}</h5>
@@ -43,7 +43,7 @@
                     <th>Cost</th>
                     <th>Price</th>
                     <th>Quanity</th>
-                    <th>Alert Quantity</th>
+                    <th>Alert Qty</th>
                   </tr>
                 </thead>
                 <tbody>
