@@ -168,7 +168,12 @@ class ReportsController extends Controller
 
             $daterange = explode('/', $request->get('daterange'));
             if(count($daterange) == 2){
-                $orderItems->whereBetween('order_item.created_at', [$daterange[0], $daterange[1]]);
+                if($daterange[0] == $daterange[1]){
+                    $orderItems->whereDate('order_item.created_at', [$daterange[0]]);
+                }else{
+                    $orderItems->whereBetween('order_item.created_at', [$daterange[0], $daterange[1]]);
+                }
+                
             }
 
            $orderItems = $orderItems->get();
