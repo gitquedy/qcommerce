@@ -30,8 +30,8 @@ class CreateSalesTable extends Migration
             $table->float('grand_total', 10, 2);
             $table->float('paid', 10, 2);
             $table->string('payment_status');
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by');
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
         });
     }
