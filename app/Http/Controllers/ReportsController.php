@@ -165,6 +165,53 @@ class ReportsController extends Controller
                 ->whereIn('products.shop_id', $shop_ids)
                 ->groupBy('order_item.product_id')
                 ->orderBy('total_quantity', 'desc')->take($no_of_products);
+
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                $orderItems->whereBetween('order_item.created_at', [$daterange[0], $daterange[1]]);
+            }
+
+           $orderItems = $orderItems->get();
+
+            $data = ['count' => 0];
+            foreach($orderItems as $orderItem){
+                $sku = $orderItem->product->SellerSku;
+                $data['report'][$sku]['seller_sku'] = $orderItem->product->SellerSku;
+                $data['report'][$sku]['product_name'] = $orderItem->product->name;
+                $data['report'][$sku]['total_price'] =  $orderItem->total_price;
+                $data['report'][$sku]['total_quantity'] =  $orderItem->total_quantity;
+
+                $data['count'] += 1;
+            }
+            return $data;
+        }
+        return view('reports.topSellingProducts', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+        ]);
+    }
+    public function dailySales(Request $request){
+        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Reports"], ['name'=>"Daily Sales"]];
+       $all_shops = $request->user()->business->shops;
+
+        if (request()->ajax()) {
+            $shops = $request->user()->business->shops();
+            if($request->get('shop') != null){
+               $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+            }
+            $shop_ids = $shops->pluck('id');
+
+            $no_of_products = 5;
+            if($request->get('no_of_products') != null){
+                $no_of_products = $request->get('no_of_products');
+            }
+
+            $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
+                ->join('order', 'order.id', '=', 'order_item.order_id')
+                ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                ->whereIn('products.shop_id', $shop_ids)
+                ->groupBy('order_item.product_id')
+                ->orderBy('total_quantity', 'desc')->take($no_of_products);
                 
                 
            if($request->get('timings')=="Today"){
@@ -212,16 +259,6 @@ class ReportsController extends Controller
         return view('reports.topSellingProducts', [
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
-        ]);
-    }
-    public function dailySales(Request $request){
-        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Reports"], ['name'=>"Daily Sales"]];
-        if ( request()->ajax()) {
-            return Datatables::eloquent($Sku)
-            ->make(true);
-        }
-        return view('reports.dailySales', [
-            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 }

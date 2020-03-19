@@ -1,26 +1,25 @@
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Top Selling Products')
+@section('title', 'Daily Sales')
 
 @section('vendor-style')
         <!-- vednor css files -->
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/charts/apexcharts.css')) }}">
-        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
 @endsection
 @section('content')
 <div class="row">
   <div class="col-12">
-    @include('reports.components.shopFilter')
-    @include('reports.components.dateFilter')
-    
+    @include('order.components.shopFilter')
+    @include('order.components.dateFilter')
     <input type="hidden" id="no_of_products" name="no_of_products" class="selectFilter">
-    <div class="btn-group mb-1 hidden">
+    <div class="btn-group mb-1">
     <div class="dropdown">
       <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
        <i class="fa fa-dropbox"></i> No. of Products
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        {{-- <a class="dropdown-item filter_btn" href="#" data-target="no_of_products" data-type="single" data-value="10">10</a> --}}
+        {{-- <a class="dropdown-item filter_btn" href="#" data-target="no_of_products" data-type="single" data-value="5">5</a> --}}
+        <a class="dropdown-item filter_btn" href="#" data-target="no_of_products" data-type="single" data-value="10">10</a>
         <a class="dropdown-item filter_btn" href="#" data-target="no_of_products" data-type="single" data-value="20">20</a>
         <a class="dropdown-item filter_btn" href="#" data-target="no_of_products" data-type="single" data-value="30">30</a>
       </div>
@@ -65,6 +64,7 @@
                           </tr>
                       </thead>
                       <tbody>
+
                       </tbody>
                   </table>
               </div>
@@ -79,27 +79,23 @@
 @section('vendor-script')
         <!-- vednor files -->
         <script src="{{ asset(mix('vendors/js/charts/apexcharts.min.js')) }}"></script>
-        <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script>
-        <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
-        <script src="{{ asset('js/scripts/reports/daterange.js') }}"></script>
-
 @endsection
 @section('myscript')
-
         <!-- Page js files -->
          <script src="{{ asset('js/scripts/reports/colors.js') }}"></script>
-
          
         <script type="text/javascript">
           function getParams(){
-            var $params = '?shop=' + $("#shop").val() + '&daterange=' + $("#daterange").val() + "&no_of_products=" + $("#no_of_products").val();
+            var $params = '?shop=' + $("#shop").val() + '&timings=' + $("#timings").val() + "&no_of_products=" + $("#no_of_products").val();
             return $params;
           }
-          var url = "{{ action('ReportsController@topSellingProducts')  }}";
+          var url = "{{ action('ReportsController@dailySales')  }}";
         </script>
         <script src="{{ asset('js/scripts/reports/topSellingProduct.js') }}"></script>
         <script src="{{ asset('js/scripts/reports/filter.js') }}"></script>
         <script type="text/javascript"></script>
+
+
         <script type="text/javascript">
           $(document).ready(function(){
             getChart();
