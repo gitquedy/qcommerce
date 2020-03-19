@@ -483,15 +483,15 @@ class OrderController extends Controller
         $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP']);
         if(count($daterange) == 2){
             if($daterange[0] == $daterange[1]){
-                $orders = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);
-                $orders = $data['shopee_total']->whereDate('created_at', [$daterange[0]]);
+                $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);
+                $data['shopee_total'] = $data['shopee_total']->whereDate('created_at', [$daterange[0]]);
             }else{
-                $orders = $data['lazada_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
-                $orders = $data['shopee_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                $data['lazada_total'] = $data['lazada_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
+                $data['shopee_total'] = $data['shopee_total']->whereBetween('created_at', [$daterange[0], $daterange[1]]);
             }
         }
         $data['lazada_total'] = $data['lazada_total']->count();
-        $data['lazada_total'] = $data['shopee_total']->count();
+        $data['shopee_total'] = $data['shopee_total']->count();
         return response()->json(['data' => $data]); 
     }
 }
