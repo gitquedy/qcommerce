@@ -154,7 +154,7 @@ class ReportsController extends Controller
             }
             $shop_ids = $shops->pluck('id');
 
-            $no_of_products = 5;
+            $no_of_products = 10;
             if($request->get('no_of_products') != null){
                 $no_of_products = $request->get('no_of_products');
             }
