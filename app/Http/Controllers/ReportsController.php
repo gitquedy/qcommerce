@@ -162,7 +162,7 @@ class ReportsController extends Controller
 
             $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
                 ->join('order', 'order.id', '=', 'order_item.order_id')
-                ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                ->select('order_item.product_id', DB::raw('ROUND(SUM(order.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('products.shop_id', $shop_ids)
                 ->groupBy('order_item.product_id')
                 ->orderBy('total_quantity', 'desc')->take($no_of_products);
@@ -205,8 +205,8 @@ class ReportsController extends Controller
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
                }
                $shop_ids = $shops->pluck('id')->toArray();
-                $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id')
-                ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id', 'left')
+                ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->orderBy('date', 'desc')
                 ->groupBy('date');

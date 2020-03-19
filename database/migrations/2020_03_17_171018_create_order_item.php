@@ -24,7 +24,8 @@ class CreateOrderItem extends Migration
             $table->float('price', 10, 2);
             $table->float('quantity', 10, 2);
 
-            $table->timestamps();
+            $table->string('created_at');
+            $table->string('updated_at');
         });
     }
 
