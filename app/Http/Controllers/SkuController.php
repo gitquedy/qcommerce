@@ -469,7 +469,7 @@ class SkuController extends Controller
           foreach ($result as &$r) {
               $products = Products::where('seller_sku_id', $r->id)->first();
                 if($products){
-                   $r->image = $products->Images;
+                   $r['image'] = $products->Images;
                 }
           }
           return response()->json($result);

@@ -202,11 +202,40 @@ class SalesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Customer  $customer
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        $sales = Sales::findOrFail($id);
+        if($sales->business_id != Auth::user()->business_id){
+            abort(401, 'You don\'t have access to edit this customer');
+        }
+        try {
+            DB::beginTransaction();
+            $sales->delete();
+            DB::commit();
+            $output = ['success' => 1,
+                        'msg' => 'Sale successfully deleted!'
+                    ];
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+
+
+    public function delete(Sales $sales, Request $request){
+      if($sales->business_id != Auth::user()->business_id){
+          abort(401, 'You don\'t have access to edit this sales');
+      }
+        $action = action('SalesController@destroy', $sales->id);
+        $title = 'Sale ' . $sales->reference_no;
+        return view('layouts.delete', compact('action' , 'title'));
     }
 }
