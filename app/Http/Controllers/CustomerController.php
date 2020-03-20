@@ -21,7 +21,8 @@ class CustomerController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customer"], ['name'=>"Customer List"]
         ];
         if ( request()->ajax()) {
-           $customer = Customer::orderBy('updated_at', 'desc');
+            $user = Auth::user();
+           $customer = Customer::where('business_id', $user->business_id)->orderBy('updated_at', 'desc');
            // return $customer->get();
             return Datatables($customer)
             ->addColumn('customer_name', function(Customer $customer) {
@@ -69,7 +70,7 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(),[
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customer',
+            'email' => 'nullable|string|email|max:255|unique:customer',
             'phone' => 'nullable',
             'price_group' => 'required',
             'address' => 'nullable',
@@ -144,9 +145,9 @@ class CustomerController extends Controller
        $validator = Validator::make($request->all(),[
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customer,email,'.$customer->id,
+            'email' => 'nullable|email|max:255|unique:customer',
             'phone' => 'nullable',
-            'price_group' => 'required',
+            'price_group' => 'nullable',
             'address' => 'nullable',
         ]);
 
@@ -211,5 +212,57 @@ class CustomerController extends Controller
         $action = action('CustomerController@destroy', $customer->id);
         $title = 'customer ' . $customer->fullName();
         return view('layouts.delete', compact('action' , 'title'));
+    }
+
+    public function addCustomerModal() {
+        $business_id = Auth::user()->business_id;
+        $title = "this SKU";
+        return view('customer.modal.addCustomer');
+    }
+
+    public function addCustomerAjax(Request $request) {
+        $validator = Validator::make($request->all(),[
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255|unique:customer',
+            'phone' => 'nullable',
+            'price_group' => 'nullable',
+            'address' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        $user = Auth::user();
+        try {
+            $data = $request->all();
+            $data = new Customer;
+            $data->first_name = $request->first_name;
+            $data->last_name = $request->last_name;
+            $data->email = $request->email;
+            $data->phone = $request->phone;
+            $data->price_group = $request->price_group;
+            $data->address = $request->address;
+            $data->business_id = $user->business_id;
+            DB::beginTransaction();
+            
+            if ($data->save()) {
+                $output = ['success' => 1,
+                    'customer' => $data,
+                    'msg' => 'Customer added successfully!',
+                    'redirect' => action('CustomerController@index')
+                ];
+                DB::commit();
+            }
+
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
     }
 }

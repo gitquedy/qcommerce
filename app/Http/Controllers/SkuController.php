@@ -75,6 +75,9 @@ class SkuController extends Controller
                             if($products){
                                return  $products->Images;
                             }
+                            else {
+                                return asset('images/pages/no-img.jpg');
+                            }
                         })
             ->addColumn('products_count', function(Sku $SKSU) {
                             return Products::where('seller_sku_id', $SKSU->id)->get()->count();
@@ -470,6 +473,9 @@ class SkuController extends Controller
               $products = Products::where('seller_sku_id', $r->id)->first();
                 if($products){
                    $r->image = $products->Images;
+                }
+                else {
+                    $r->image = asset('images/pages/no-img.jpg');
                 }
           }
           return response()->json($result);

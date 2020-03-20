@@ -83,12 +83,12 @@
             { data: 'date', name: 'date' },
             { data: 'reference_no', name: 'reference_no' },
             { data: 'customer_name', name: 'customer_name' },
-            { data: 'status', name: 'status' },
-            { data: 'grand_total', name: 'grand_total' },
-            { data: 'paid', name: 'paid' },
-            { data: 'balance', name: 'balance' },
-            { data: 'payment_status', name: 'payment_status' },
-            { data: 'action', name: 'action' },
+            { data: 'status', name: 'status', class: 'text-right' },
+            { data: 'grand_total', name: 'grand_total', class: 'text-right' },
+            { data: 'paid', name: 'paid', class: 'text-right' },
+            { data: 'balance', name: 'balance', class: 'text-right' },
+            { data: 'payment_status', name: 'payment_status', class: 'text-center' },
+            { data: 'action', name: 'action', class: 'text-center' },
             
         ];
   var table_route = {

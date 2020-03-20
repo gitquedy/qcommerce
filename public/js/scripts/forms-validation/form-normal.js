@@ -4,7 +4,8 @@ $(function() {
        button = this.name;
   });
   $(".form").submit(function(e) {
-    e.preventDefault();
+    e.preventDefault(); 
+    
     if($('.btn_save').prop('disabled') == true){
       return false;
     }
@@ -38,7 +39,17 @@ $(function() {
             }
              $('.error').remove();
                 $.each(result.error, function(index, val){
-                $('[name="'+ index +'"]').after('<label class="text-danger error">' + val + '</label>');
+                  var elem = $('[name="'+ index +'"]');
+                  if(index == 'sales_item_array') {
+                    $('#sales_item_tables').after('<label class="text-danger error">Order Items are required to make a sale, Please add an item.</label>');
+                  }
+                  else if(elem.hasClass('select2-hidden-accessible')) {
+                    new_elem = elem.parent().find('span.select2.select2-container')
+                    new_elem.after('<label class="text-danger error">' + val + '</label>');
+                  }
+                  else {
+                    elem.after('<label class="text-danger error">' + val + '</label>');
+                  }
                 });
           }
           $('.btn_save').prop('disabled', false);
