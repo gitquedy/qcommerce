@@ -40,6 +40,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('shop:syncShippingDetails')
                  ->weeklyOn(1, '2:00')
                  ->appendOutputTo('storage/logs/cron_syncShippingDetails.log');
+        $schedule->command('shop:syncLazadaPayout')
+                 ->weeklyOn(1, '2:00')
+                 ->appendOutputTo('storage/logs/cron_syncLazadaPayout.log');
     }
 
     /**

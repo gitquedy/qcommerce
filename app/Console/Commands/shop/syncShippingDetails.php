@@ -41,7 +41,7 @@ class syncShippingDetails extends Command
     {
         $shops = Shop::get();
         foreach($shops as $shop){
-            $shop->syncShippingDetails(Carbon::now()->subDays(7)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
+            $shop->syncShippingDetails(Carbon::now()->subDays(8)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
             echo 'Sync Shipping Details Successfully ' .  date('d-m-Y H:i:s') . PHP_EOL;
         }
     }

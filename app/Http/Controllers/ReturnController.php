@@ -39,36 +39,18 @@ class ReturnController extends Controller
 
              if($request->get('tab') == 'not_confirm'){
               $orders->where('returned', false);
-             }
-
-             if($request->get('tab') == 'confirm'){
+             } else if($request->get('tab') == 'confirm'){
               $orders->where('returned', true);
              }
              
-             if($request->get('timings')=="Today"){
-                 $orders->whereDate('created_at', '=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="Yesterday"){
-                  $date=date_create();
-                  date_modify($date,"-1 days");
-                 $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-             }
-             if($request->get('timings')=="Last_7_days"){
-                  $date=date_create();
-                  date_modify($date,"-7 days");
-                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="This_Month"){
-                  $orders->where('created_at', '>=', date("Y-m-01"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="Last_30_days"){
-                  $date=date_create();
-                  date_modify($date,"-30 days");
-                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
+             $daterange = explode('/', $request->get('daterange'));
+              if(count($daterange) == 2){
+                  if($daterange[0] == $daterange[1]){
+                      $orders->whereDate('created_at', [$daterange[0]]);
+                  }else{
+                      $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+                  }
+              }
              
               return Datatables::eloquent($orders)
                   ->addColumn('idDisplay', function(Order $order) {
@@ -112,11 +94,26 @@ class ReturnController extends Controller
     }
 
     public function headers(Request $request){
-      $shops = $request->user()->business->shops;
+      $shops = $request->user()->business->shops();
+      if($request->get('shop') != ''){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
       $shops_id = $shops->pluck('id')->toArray();
+
+      $daterange = explode('/', $request->get('daterange'));
+      $unconfirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', false);
+      $confirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', true);
+
+      if($daterange[0] == $daterange[1]){
+          $unconfirmed = $unconfirmed->whereDate('created_at', [$daterange[0]]);
+          $confirmed = $confirmed->whereDate('created_at', [$daterange[0]]);
+      }else{
+          $unconfirmed = $unconfirmed->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+          $confirmed = $confirmed->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+      }
       $data = [
-        'unconfirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', false)->count(),
-        'confirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', true)->count(),
+        'unconfirmed' => $unconfirmed->count(),
+        'confirmed' => $confirmed->count(),
       ];
       $data['total'] = $data['unconfirmed'] + $data['confirmed'];
       return response()->json(['data' => $data]);

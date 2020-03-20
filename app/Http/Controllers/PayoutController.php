@@ -11,6 +11,7 @@ use App\Utilities;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use App\LazadaPayout;
 
 class PayoutController extends Controller
 {
@@ -21,85 +22,65 @@ class PayoutController extends Controller
      */
     public function index(Request $request)
     {
-      $breadcrumbs = [
-          // ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
-      ];
+      $breadcrumbs = [];
       $shops = $request->user()->business->shops;
       $shops_id = $shops->pluck('id')->toArray();
 
       if ( request()->ajax()) {
-
              $shops = $request->user()->business->shops;
              if($request->get('shop') != ''){
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
              }
-             $shops_id = $shops->pluck('id')->toArray();
+             $shop_ids = $shops->pluck('id')->toArray();
 
-             $orders = Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesforDelivered())->orderBy('updated_at', 'desc');
-
-             if($request->get('tab') == 'not_confirm'){
-              $orders->where('payout', false);
-             }
+             $payout = LazadaPayout::whereIn('shop_id', $shop_ids);
 
              if($request->get('tab') == 'confirm'){
-              $orders->where('payout', true);
+               $payout->where('reconciled', true);
+             }elseif ($request->get('tab') == 'not_confirm') {
+               $payout->where('reconciled', false);
              }
+
+             $daterange = explode('/', $request->get('daterange'));
+              if(count($daterange) == 2){
+                  if($daterange[0] == $daterange[1]){
+                      $payout->whereDate('created_at', [$daterange[0]]);
+                  }else{
+                      $payout->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+                  }
+              }
              
-             if($request->get('timings')=="Today"){
-                 $orders->whereDate('created_at', '=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="Yesterday"){
-                  $date=date_create();
-                  date_modify($date,"-1 days");
-                 $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-             }
-             if($request->get('timings')=="Last_7_days"){
-                  $date=date_create();
-                  date_modify($date,"-7 days");
-                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="This_Month"){
-                  $orders->where('created_at', '>=', date("Y-m-01"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
-             if($request->get('timings')=="Last_30_days"){
-                  $date=date_create();
-                  date_modify($date,"-30 days");
-                  $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                  $orders->where('created_at', '<=', date('Y-m-d'));
-             }
-             
-              return Datatables::eloquent($orders)
-                  ->addColumn('idDisplay', function(Order $order) {
-                              return $order->getImgAndIdDisplay();
-                                  })
-                  ->addColumn('actions', function(Order $order) {
-                              $text = $order->payout == true ? 'Unconfirm' : 'Confirm';
-                              $disabled =  $order->payout == true ? '' : '';
+              return Datatables::eloquent($payout)
+              ->addColumn('paidDisplay', function(LazadaPayout $payout) {
+                            return $payout->getPaidStatusDisplay();
+                })
+              ->addColumn('reconciledDisplay', function(LazadaPayout $payout) {
+                            return $payout->getReconciledStatusDisplay();
+                })
+              ->addColumn('shopDisplay', function(LazadaPayout $payout) {
+                            return $payout->shop->getImgSiteDisplay();
+                })
+              ->editColumn('closing_balance', function(LazadaPayout $payout) {
+                            return number_format($payout->closing_balance, 2) . ' PHP';
+                })
+
+              ->addColumn('actions', function(LazadaPayout $payout) {
+                              $text = $payout->reconciled == true ? 'Unconfirm' : 'Confirm';
+                              $disabled =  $payout->reconciled == true ? '' : '';
                     return  '<div class="btn-group dropup mr-1 mb-1">
-                                 <button type="button" class="btn btn-primary order_view_details" data-order_id="'. $order->OrderID() .'" data-action="'.route('barcode.viewBarcode').'" >View detail</button>
+                                 <button type="button" class="btn btn-primary modal_button" data-href="'. action("PayoutController@show", $payout->id) .'"> View detail</button>
                                   <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                                   <span class="sr-only">Toggle Dropdown</span></button>
                                   <div class="dropdown-menu">
-                                      <a class="dropdown-item confirm'. $disabled .'" href="#" data-text="Are you sure to ' . $text . ' ' . $order->OrderID() .' payout?" data-text=""  data-href="'. action('PayoutController@payoutReconcileSingle', $order->id) .'"><i class="fa fa-check aria-hidden="true"></i> '. $text .'</a>
+                                    <a class="dropdown-item confirm'. $disabled .'" href="#" data-href="'. action('PayoutController@show', $payout->id) .'"><i class="fa fa-eye aria-hidden="true"></i>View Details</a>
+                                      <a class="dropdown-item confirm'. $disabled .'" href="#" data-text="Are you sure to ' . $text . ' ' . $payout->statement_number .' payout?" data-text="" data-href="'. action('PayoutController@payoutReconcileSingle', $payout->id) .'"><i class="fa fa-check aria-hidden="true"></i> '. $text .'</a>
                                   </div></div>';
-                              })
-                  ->addColumn('statusText', function(Order $order) {
-                                  $class = $order->payout == true ? 'text-primary' : 'text-danger';
-                                  $text = $order->payout == true ? 'Confirmed' : 'Unconfirmed';
-                                  return '<span class="'. $class .' font-medium-1 text-bold-400">' . $text .'</span>';
-                                  })
-                  ->addColumn('created_at_formatted', function(Order $order) {
-                              return Utilities::format_date($order->created_at, 'M. d,Y H:i A');
-                                  })
-                  ->addColumn('updated_at_formatted', function(Order $order) {
-                                  $created = new Carbon($order->updated_at);
-                                  $now = Carbon::now();
-                                  return  $created->diffForHumans();
-                                  })
-                  ->rawColumns(['actions', 'shop', 'idDisplay', 'statusText'])
-                  ->make(true);
+                 })
+              ->editColumn('created_at', function(LazadaPayout $payout) {
+                            return Carbon::parse($payout->created_at)->format('M d, Y');
+              })
+              ->rawColumns(['paidDisplay', 'reconciledDisplay', 'shopDisplay', 'actions'])
+              ->make(true);
           }
           
           return view('order.reconciliation.payout.index', [
@@ -109,11 +90,27 @@ class PayoutController extends Controller
     }
 
     public function headers(Request $request){
-      $shops = $request->user()->business->shops;
+      $shops = $request->user()->business->shops();
+      if($request->get('shop') != ''){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
       $shops_id = $shops->pluck('id')->toArray();
+
+      $daterange = explode('/', $request->get('daterange'));
+      $unconfirmed = LazadaPayout::whereIn('shop_id', $shops_id)->where('reconciled', false);
+      $confirmed = LazadaPayout::whereIn('shop_id', $shops_id)->where('reconciled', true);
+
+      if($daterange[0] == $daterange[1]){
+          $unconfirmed = $unconfirmed->whereDate('created_at', [$daterange[0]]);
+          $confirmed = $confirmed->whereDate('created_at', [$daterange[0]]);
+      }else{
+          $unconfirmed = $unconfirmed->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+          $confirmed = $confirmed->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+      }
+
       $data = [
-        'unconfirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesforDelivered())->where('payout', false)->count(),
-        'confirmed' => Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesforDelivered())->where('payout', true)->count(),
+        'unconfirmed' => $unconfirmed->count(),
+        'confirmed' => $confirmed->count(),
       ];
       $data['total'] = $data['unconfirmed'] + $data['confirmed'];
       return response()->json(['data' => $data]);
@@ -122,23 +119,21 @@ class PayoutController extends Controller
     public function payoutReconcile(Request $request){
         $ids = explode(',',$request->get('ids'));
         $status = $request->get('action', 'Confirm') == 'Confirm' ? 1 : 0;
-        Order::whereIn('id', $ids)->orWhereIn('ordersn', $ids)->update(['payout' => $status]);
+        LazadaPayout::whereIn('id', $ids)->update(['reconciled' => $status]);
         return response()->json(['success' => 1, 'msg' => 'Payout Reconciliation successfully updated']);
     }
 
-    public function payoutReconcileSingle(Order $order){
+    public function payoutReconcileSingle(LazadaPayout $LazadaPayout){
         try {
-          $text = $order->payout == true ? 'unconfirmed' : 'confirmed';
-            if($order->payout == true){
-              $order->update(['payout' => false]);
+          $text = $LazadaPayout->reconciled == true ? 'unconfirmed' : 'confirmed';
+            if($LazadaPayout->reconciled == true){
+              $LazadaPayout->update(['reconciled' => false]);
             }else{
-              $order->update(['payout' => true]);
+              $LazadaPayout->update(['reconciled' => true]);
             }
-
               $output = ['success' => 1,
-                  'msg' => 'Order '. $order->orderID() .' successfully '. $text . ' payout',
+                  'msg' => 'Order '. $LazadaPayout->statement_number .' successfully '. $text . ' payout',
               ];
-            
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
+use App\LazadaPayout;
 use App\Order;
 use App\OrderItem;
 use App\Products;
@@ -135,7 +136,7 @@ class Shop extends Model
         try {
             if($this->site == 'lazada'){
                 $order_ids = array();
-                foreach (array(7,8) as $trans_type) {
+                foreach (array(13,7,8) as $trans_type) {
                     $lazada_payout_fees = [];
                     $c = new LazopClient(UrlConstants::getPH(),Lazop::get_api_key(),Lazop::get_api_secret());
                     $r = new LazopRequest('/finance/transaction/detail/get','GET');
@@ -522,6 +523,21 @@ class Shop extends Model
 
     public function getImgSiteDisplayWithFullName(){
         return '<img src="'.asset('images/shop/30x30/'. $this->site.'.png').'" class="m-0" alt="'. $this->site .'" style="width:15px; height:15px"> ' . '<span style="padding-left: 5px;font-size:13px">'. $this->name .' ('. $this->short_name .')</span>';
+    }
+
+
+    public function syncLazadaPayout($date = '2018-01-01'){
+        if($this->site == 'lazada'){
+            $c = $this->lazadaGetClient();
+            $r = new LazopRequest('/finance/payout/status/get', 'GET');
+            $r->addApiParam('created_after', $date);
+            $result = $c->execute($r, $this->access_token);
+            $data = json_decode($result, true);
+            foreach($data['data'] as $payout){
+                $payout['shop_id'] = $this->id;
+                LazadaPayout::updateOrCreate(['shop_id' => $payout['shop_id'], 'statement_number' => $payout['statement_number']],$payout);
+            }
+        }
     }
 }
 
