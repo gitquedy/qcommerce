@@ -69,7 +69,7 @@ class AuthController extends Controller
         $data = $request->only(['email', 'password']);
         if(! auth()->attempt($data)){
             return ResponseBuilder::asError(401)
-                  ->withDebugData(['error' => ['email' => 'Invalid Credentials']])
+                  ->withDebugData(null)
                   ->withMessage('Invalid Credentials')
                   ->build();
         }
