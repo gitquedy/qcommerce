@@ -170,25 +170,9 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Payment Status</label>
-                                    <div class="position-relative has-icon-left">
-                                      <select name="payment_status" class="form-control select2 update_select" placeholder="Select Status">
-                                        <option value="pending">Pending</option>
-                                        <option value="due">Due</option>
-                                        <option value="partial">Partial</option>
-                                        <option value="paid">Paid</option>
-                                      </select>
-                                      <div class="form-control-position"> 
-                                        <i class="feather icon-credit-card"></i>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label>Paid Amount</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="number" name="paid" class="form-control update_input" value="0">
+                                      <input type="number" name="paid" class="form-control update_input check_max_quantity" value="0" max="0">
                                       <div class="form-control-position"> 
                                         <i class="feather icon-dollar-sign"></i>
                                       </div>
@@ -281,7 +265,7 @@
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity" value="'+qty+'">'+
+                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
@@ -313,6 +297,7 @@
             var sub_total = price * qty;
             total += sub_total;
           })
+          $("input[name=paid]").attr('max', total).trigger('change');
           $(".sales_total").html(addCommas(total.toFixed(2)));
         }
 
@@ -422,6 +407,15 @@
             items[id][name] = val;
             localStorage.setItem("items", JSON.stringify(items));
             recalculate($(this).closest('tr'));
+        });
+
+
+        $(document).on('keyup change blur', '.check_max_quantity', function() {
+            var max = parseInt($(this).attr('max'));
+            var val = parseInt($(this).val());
+            if(val > max) {
+              $(this).val(max).trigger('change');
+            }
         });
 
         $(document).on('click', '.update_sku', function() {

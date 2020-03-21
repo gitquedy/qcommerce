@@ -7,6 +7,8 @@ use Validator;
 use App\Sales;
 use App\SaleItems;
 use App\Customer;
+use App\OrderRef;
+use App\PosSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -97,10 +99,9 @@ class SalesController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'date' => 'required|date',
-            'reference_no' => 'required|string|max:255',
+            'reference_no' => 'nullable|string|max:255',
             'customer_id' => 'required',
             'status' => 'required',
-            'payment_status' => 'required',
             'note' => 'nullable|string|max:255',
             'sales_item_array' => 'required|array',
         ]);
@@ -112,6 +113,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
+            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales = new Sales;
             $sales->business_id = $user->business_id;
@@ -119,17 +121,28 @@ class SalesController extends Controller
             $sales->customer_first_name = $customer->first_name;
             $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
-            $sales->reference_no = $request->reference_no;
+            $sales->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_so();
             $sales->note = $request->note;
             $sales->status = $request->status;
             $sales->discount = ($request->discount)?$request->discount:0;
             $sales->paid = $request->paid;
-            $sales->payment_status = $request->payment_status;
             $sales->created_by = $user->id;
             foreach ($request->sales_item_array as $item) {
                 $sub_total = $item['price'] * $item['quantity'];
                 $total+= $sub_total;
             }
+
+            if($total == $request->paid) {
+                $payment_status = "paid";
+            }
+            else if($request->paid == 0) {
+                $payment_status = "pending";
+            }
+            else if($request->paid > 0 && $request->paid < $total) {
+                $payment_status = "partial";
+            }
+
+            $sales->payment_status = $payment_status;
             $sales->total = $total;
             $sales->grand_total = $total - $request->discount;
             $sales->save();
@@ -148,7 +161,10 @@ class SalesController extends Controller
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
             }
-            SaleItems::insert($sales_item);
+            $sales_items_query = SaleItems::insert($sales_items);
+            if (!$request->reference_no) {
+                $increment = OrderRef::where('pos_settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
+            }
             $output = ['success' => 1,
                 'msg' => 'Sale added successfully!',
                 'redirect' => action('SalesController@index')
@@ -184,7 +200,14 @@ class SalesController extends Controller
      */
     public function edit($id)
     {
-        //
+
+        $sales = Sales::findOrFail($id);
+        $customers = Customer::where('business_id', Auth::user()->business_id)->get();
+        if($sales->business_id != Auth::user()->business_id){
+          abort(401, 'You don\'t have access to edit this sales');
+        }
+        // print json_encode($sales->items);die();
+        return view('sales.edit', compact('sales', 'customers'));
     }
 
     /**
@@ -196,7 +219,95 @@ class SalesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $sales = Sales::findOrFail($id);
+        if($sales->business_id != Auth::user()->business_id){
+          abort(401, 'You don\'t have access to edit this customer');
+        }
+
+        $validator = Validator::make($request->all(),[
+            'date' => 'required|date',
+            'reference_no' => 'nullable|string|max:255',
+            'customer_id' => 'required',
+            'status' => 'required',
+            'note' => 'nullable|string|max:255',
+            'sales_item_array' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        try {
+            DB::beginTransaction();
+            $user = Auth::user();
+            $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
+            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
+            $total = 0;
+            $sales->business_id = $user->business_id;
+            $sales->customer_id = $request->customer_id;
+            $sales->customer_first_name = $customer->first_name;
+            $sales->customer_last_name = $customer->last_name;
+            $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
+            if ($request->reference_no) {
+                $sales->reference_no = $request->reference_no;
+            }
+            $sales->note = $request->note;
+            $sales->status = $request->status;
+            $sales->discount = ($request->discount)?$request->discount:0;
+            $sales->paid = $request->paid;
+            $sales->updated_by = $user->id;
+
+            //future :: return all stocks then delete
+                //return stocks code here
+            SaleItems::where('sales_id', $sales->id)->delete();
+            foreach ($request->sales_item_array as $item) {
+                $sub_total = $item['price'] * $item['quantity'];
+                $total+= $sub_total;
+            }
+
+            if($total == $request->paid) {
+                $payment_status = "paid";
+            }
+            else if($request->paid == 0) {
+                $payment_status = "pending";
+            }
+            else if($request->paid > 0 && $request->paid < $total) {
+                $payment_status = "partial";
+            }
+
+            $sales->payment_status = $payment_status;
+            $sales->total = $total;
+            $sales->grand_total = $total - $request->discount;
+            $sales->save();
+            $sales_items = [];
+            foreach ($request->sales_item_array as $id => $item) {
+                $sales_item = [];
+                $sales_item['sales_id'] = $sales->id;
+                $sales_item['sku_id'] = $id;
+                $sales_item['sku_code'] = $item['code'];
+                $sales_item['sku_name'] = $item['name'];
+                $sales_item['image'] = $item['image'];
+                $sales_item['unit_price'] = $item['price'];
+                $sales_item['quantity'] = $item['quantity'];
+                $sales_item['discount'] = 0;
+                $sales_item['subtotal'] = $item['price'] * $item['quantity'];
+                $sales_item['real_unit_price'] = $item['real_unit_price'];
+                $sales_items[] = $sales_item;
+            }
+            SaleItems::insert($sales_items);
+            $output = ['success' => 1,
+                'msg' => 'Sale updated successfully!',
+                'redirect' => action('SalesController@index')
+            ];
+            DB::commit();
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
     }
 
     /**

@@ -299,6 +299,24 @@
                     </ul>
                 </li>
             {{-- @endcan --}}
+
+            {{-- @can('pos.settings') --}}
+                <li class="nav-item">
+                    <a href="">
+                        <i class="feather icon-settings"></i>
+                        {{-- <i class="feather icon-sliders"></i> --}}
+                        <span class="menu-title" data-i18n="">POS Settings</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'possettings' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('possettings')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            {{-- @endcan --}}
             
         </ul>
     </div>

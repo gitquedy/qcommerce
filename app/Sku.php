@@ -37,10 +37,6 @@ class Sku extends Model
 	public function products(){
 		return $this->hasMany(Products::class, 'seller_sku_id', 'id');
 	}
-	
-    
-    
-    
     
     
     

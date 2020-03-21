@@ -130,6 +130,11 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 	// });
 
+	// Route::group(['middleware' => 'permission:possettings.manage'], function()
+	// {
+		Route::resource('/possettings', 'PosSettingsController');
+	// });
+
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
 		Route::get('/reports/', 'ReportsController@index')->name('reports.index');
