@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Return Reconciliation')
+@section('title', 'Failed Delivery Return')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
@@ -24,16 +25,14 @@
           <div class="col-sm-12 shop_filter">
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
-                <p>Total Returned Orders</p>
+                <p>Total Failed Delivery Orders</p>
                 <p class="text-warning text-bold-400 font-large-1"><span id="header_total">0</span> Orders</p>
               </label>
-              
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="not_confirm"  {{ $request->get('tab') == 'not_confirm' ? 'checked' : '' }}>
                 <p>Unconfirmed Return</p>
                 <p class="text-warning text-bold-400 font-large-1"><span id="header_unconfirmed">0</span> Orders</p>
               </label>
-              
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="confirm"  {{ $request->get('tab') == 'confirm' ? 'checked' : '' }}>
                 <p>Confirmed Return</p>
@@ -45,7 +44,7 @@
         <div class="row">
           <div class="col-12">
             @include('order.components.shopFilter')
-            @include('order.components.dateFilter')
+            @include('reports.components.dateFilter')
             <div class="btn-group" id="chip_area_shop"></div>
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
@@ -101,14 +100,21 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+  <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script>
+  <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
+  <script src="{{ asset('js/scripts/reports/daterangeOneYear.js') }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
   <script type="text/javascript">
+    function getParams(){
+      var $params = "?shop=" + $("#shop").val() + "&daterange=" + $("#daterange").val();
+      return $params;
+    }
     function getHeaders(){
         $.ajax({
         method: "GET",
-        url: "{{ action('ReturnController@headers')  }}",
+        url: "{{ action('ReturnController@headers')  }}" + getParams(),
         success: function success(result) {
             $('#header_total').html(result.data.total);
             $('#header_unconfirmed').html(result.data.unconfirmed);
@@ -134,7 +140,7 @@
           url: '{{ action("ReturnController@index") }}',
           data: function (data) {
                 data.shop = $("#shop").val();
-                data.timings = $("#timings").val();
+                data.daterange = $("#daterange").val();
                 data.tab = $('input[name="tab"]:checked').val();
             }
         };

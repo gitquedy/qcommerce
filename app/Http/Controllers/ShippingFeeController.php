@@ -31,31 +31,26 @@ class ShippingFeeController extends Controller
                                 ->where('shipping_fee_reconciled','!=',0)
                                 ->with('seller_payout_fees')
                                 ->with('customer_payout_fees')
-                                ->orderBy('order.updated_at', 'desc');     
-                 if($request->get('timings')=="Today"){
-                    $orders->whereDate('created_at', '=', date('Y-m-d'));
+                                ->orderBy('order.updated_at', 'desc');
+
+                if($request->get('tab') == 'pending'){
+                  $orders->where('shipping_fee_reconciled', 1);
+                 } else if($request->get('tab') == 'filed'){
+                  $orders->where('shipping_fee_reconciled', 2);
+                 }else if($request->get('tab') == 'resolved'){
+                  $orders->where('shipping_fee_reconciled', 3);
                  }
-                 if($request->get('timings')=="Yesterday"){
-                      $date=date_create();
-                      date_modify($date,"-1 days");
-                     $orders->whereDate('created_at', '=', date_format($date,"Y-m-d"));
-                 }
-                 if($request->get('timings')=="Last_7_days"){
-                      $date=date_create();
-                      date_modify($date,"-7 days");
-                      $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                      $orders->where('created_at', '<=', date('Y-m-d'));
-                 }
-                 if($request->get('timings')=="This_Month"){
-                      $orders->where('created_at', '>=', date("Y-m-01"));
-                      $orders->where('created_at', '<=', date('Y-m-d'));
-                 }
-                 if($request->get('timings')=="Last_30_days"){
-                      $date=date_create();
-                      date_modify($date,"-30 days");
-                      $orders->where('created_at', '>=', date_format($date,"Y-m-d"));
-                      $orders->where('created_at', '<=', date('Y-m-d'));
-                 }
+
+                $daterange = explode('/', $request->get('daterange'));
+                if(count($daterange) == 2){
+                    if($daterange[0] == $daterange[1]){
+                        $orders->whereDate('created_at', [$daterange[0]]);
+                    }else{
+                        $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+                    }
+                }
+
+                 
 	            return Datatables::eloquent($orders)
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
@@ -125,13 +120,41 @@ class ShippingFeeController extends Controller
     }
 
     public function headers(Request $request){
-      $shops = $request->user()->business->shops;
+      $shops = $request->user()->business->shops();
+      if($request->get('shop') != ''){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
       $shops_id = $shops->pluck('id')->toArray();
+      
+      $daterange = explode('/', $request->get('daterange'));
+
+      $pending = Order::whereIn('shop_id', $shops_id);
+      $filed = Order::whereIn('shop_id', $shops_id);
+      $resolved = Order::whereIn('shop_id', $shops_id);
+      $total = Order::whereIn('shop_id', $shops_id);
+
+
+      if($daterange[0] == $daterange[1]){
+          $pending = $pending->whereDate('created_at', [$daterange[0]]);
+          $filed = $filed->whereDate('created_at', [$daterange[0]]);
+          $resolved = $resolved->whereDate('created_at', [$daterange[0]]);
+          $total = $total->whereDate('created_at', [$daterange[0]]);
+      }else{
+          $pending = $pending->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+          $filed = $filed->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+          $resolved = $resolved->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+          $total = $total->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
+      }
+      $pending = $pending->where('shipping_fee_reconciled', 1)->count();
+      $filed = $filed->where('shipping_fee_reconciled', 2)->count();
+      $resolved = $resolved->where('shipping_fee_reconciled', 3)->count();
+      $total = $total->where('shipping_fee_reconciled', '!=', 0)->count();
+
       $data = [
-        'pending' => Order::whereIn('shop_id', $shops_id)->where('shipping_fee_reconciled', 1)->count(),
-        'filed' => Order::whereIn('shop_id', $shops_id)->where('shipping_fee_reconciled', 2)->count(),
-        'resolved' => Order::whereIn('shop_id', $shops_id)->where('shipping_fee_reconciled', 3)->count(),
-        'total' => Order::whereIn('shop_id', $shops_id)->where('shipping_fee_reconciled', '!=', 0)->count(),
+        'pending' => $pending,
+        'filed' => $filed,
+        'resolved' => $resolved,
+        'total' => $total,
       ];
       return response()->json(['data' => $data]);
     }

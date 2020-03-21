@@ -176,8 +176,10 @@ Route::group(['middleware' => 'auth'], function()
 	{
 		Route::get('/order/reconciliation/payout', 'PayoutController@index')->name('order.returnReconciliation');
 		Route::post('/order/reconciliation/payout/reconcile', 'PayoutController@payoutReconcile');
-		Route::get('/order/reconciliation/payout/reconcileSingle/{order}', 'PayoutController@payoutReconcileSingle');
+		Route::get('/order/reconciliation/payout/reconcileSingle/{LazadaPayout}', 'PayoutController@payoutReconcileSingle');
 		Route::get('/order/reconciliation/payout/headers', 'PayoutController@headers');
+		Route::get('/order/reconciliation/payout/{payout}', 'PayoutController@show');
+		
 	});
 
 	// Shipping fee Reconciliation

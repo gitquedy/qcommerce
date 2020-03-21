@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
@@ -51,7 +52,7 @@
         <div class="row">
           <div class="col-12">
             @include('order.components.shopFilter')
-            @include('order.components.dateFilter')
+            @include('reports.components.dateFilter')
             <div class="btn-group" id="chip_area_shop"></div>
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
@@ -119,14 +120,21 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+  <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script>
+  <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
+  <script src="{{ asset('js/scripts/reports/daterangeOneYear.js') }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
   <script type="text/javascript">
     function getHeaders(){
+      function getParams(){
+        var $params = "?shop=" + $("#shop").val() + "&daterange=" + $("#daterange").val();
+        return $params;
+      }
         $.ajax({
         method: "GET",
-        url: "{{ action('ShippingFeeController@headers')  }}",
+        url: "{{ action('ShippingFeeController@headers')  }}" + getParams(),
         success: function success(result) {
             $('#header_total').html(result.data.total);
             $('#header_pending').html(result.data.pending);
@@ -159,7 +167,7 @@
           url: '{{ route('shippingfee.index') }}',
           data: function (data) {
                 data.shop = $("#shop").val();
-                data.timings = $("#timings").val();
+                data.daterange = $("#daterange").val();
                 data.tab = $('input[name="tab"]:checked').val();
             }
   };

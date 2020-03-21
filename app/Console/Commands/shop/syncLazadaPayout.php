@@ -6,21 +6,21 @@ use Illuminate\Console\Command;
 use App\Shop;
 use Carbon\Carbon;
 
-class syncFirstTime extends Command
+class syncLazadaPayout extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'shop:syncfirst';
+    protected $signature = 'shop:syncLazadaPayout';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Sync Shop for the first time';
+    protected $description = 'syncLazadaPayout';
 
     /**
      * Create a new command instance.
@@ -39,16 +39,11 @@ class syncFirstTime extends Command
      */
     public function handle()
     {
-        $shops = Shop::where('is_first_time', true)->get();
+        $shops = Shop::where('site', 'lazada')->get();
         foreach($shops as $shop){
-            $shop->syncShopeeProducts();
-            $shop->syncLazadaProducts();
-            $shop->syncOrders();
-            $shop->syncLazadaPayout();
-            $shop->syncShippingDetails(Carbon::now()->subDays(30)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
+            $shop->syncLazadaPayout(Carbon::now()->subDays(30)->format('Y-m-d'));
             $shop->touch();
-            $shop->update(['is_first_time', false]);
+            echo 'Synced Lazada Payout Successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
         }
-         echo 'Synced orders and products for first time successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
     }
 }

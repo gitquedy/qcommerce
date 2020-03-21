@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
@@ -24,7 +25,7 @@
           <div class="col-sm-12 shop_filter">
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
-                <p>Total Delivered Orders</p>
+                <p>Total Payout</p>
                 <p class="text-warning text-bold-400 font-large-1"><span id="header_total">0</span> Orders</p>
               </label>
               
@@ -45,7 +46,7 @@
         <div class="row">
           <div class="col-12">
             @include('order.components.shopFilter')
-            @include('order.components.dateFilter')
+            @include('reports.components.dateFilter')
             <div class="btn-group" id="chip_area_shop"></div>
             <div class="btn-group" id="chip_area_timings"></div>
           </div>
@@ -74,12 +75,12 @@
         <thead>
           <tr>
             <th>For Checkbox</th>
-            <th>Order Number</th>
-            <!-- <th>Shop</th> -->
-            <th>Created At</th>
-            <th>Last Update</th>
+            <th>Shop</th>
+            <th>Date</th>
+            <th>Statement Number</th>
             <th>Amount</th>
-            <th>Status</th>
+            <th>Paid Status</th>
+            <th>Reconciled</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -101,15 +102,22 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+  <script src="{{ asset('vendors/js/moment/moment.min.js') }}"></script>
+  <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
+  <script src="{{ asset('js/scripts/reports/daterangeOneYear.js') }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
+    function getParams(){
+      var $params = "?shop=" + $("#shop").val() + "&daterange=" + $("#daterange").val();
+      return $params;
+    }
     function getHeaders(){
         $.ajax({
         method: "GET",
-        url: "{{ action('PayoutController@headers')  }}",
+        url: "{{ action('PayoutController@headers')  }}" + getParams(),
         success: function success(result) {
             $('#header_total').html(result.data.total);
             $('#header_unconfirmed').html(result.data.unconfirmed);
@@ -119,22 +127,21 @@
       }
   </script>
   <script type="text/javascript">
-     var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
-            { data: id, name: id, orderable : false},
-            { data: 'idDisplay', name: 'idDisplay'},
-            // { data: 'shop', name: 'shop.short_name'},
-            { data: 'created_at_formatted', name: 'created_at_formatted' },
-            { data: 'updated_at_formatted', name: 'updated_at_formatted' },
-            { data: 'price', name: 'price' },
-            { data: 'statusText', name: 'statusText' },
+            { data: 'id', name: 'id', orderable : false},
+            { data: 'shopDisplay', name: 'shopDisplay'},
+            { data: 'created_at', name: 'created_at'},
+            { data: 'statement_number', name: 'statement_number'},
+            { data: 'closing_balance', name: 'closing_balance'},
+            { data: 'paidDisplay', name: 'paidDisplay' },
+            { data: 'reconciledDisplay', name: 'reconciledDisplay' },
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {
           url: '{{ action("PayoutController@index") }}',
           data: function (data) {
                 data.shop = $("#shop").val();
-                data.timings = $("#timings").val();
+                data.daterange = $("#daterange").val();
                 data.tab = $('input[name="tab"]:checked').val();
             }
         };
@@ -155,7 +162,6 @@
 <script type="text/javascript">
     $(document).ready(function(){
       getHeaders(); // on load get headers
-
       $('input[name="tab"]').change(function(){
         var tab = $('input[name="tab"]:checked').val();
         url = "{{ action('PayoutController@index')}}?tab=" + tab;
@@ -199,21 +205,6 @@
       }
     });
   });
-
-  $(document).on('click', '.chip-closeable',function() {
-        var target = $(this).data('target');
-        if($(this).data('type') == "multiple") {
-          var value = $("#"+target).val().split(',');
-          const index = value.indexOf($(this).data('value').toString());
-          if (index > -1) {
-            value.splice(index, 1);
-          }
-          $("#"+target).val(value.join(',')).trigger('change');
-        }
-        else {
-          $("#"+target).val('').trigger('change');
-        }
-      });
 });
   </script>
 @endsection
