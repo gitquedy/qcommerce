@@ -17,6 +17,7 @@ class CreateShopeePayoutFees extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('shop_id');
             $table->foreign('shop_id')->references('id')->on('shop')->onDelete('cascade');
+            $table->text('transaction_ids');
             $table->string('payout_date');
             $table->float('amount', 15, 2);
             $table->integer('reconciled')->default(0);

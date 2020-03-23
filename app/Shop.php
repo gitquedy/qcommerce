@@ -580,13 +580,20 @@ class Shop extends Model
                 $transaction['shop_id'] = $this->id;
                 $record = ShopeePayout::where('payout_date', $transaction['payout_date'])->where('shop_id', $this->id)->first();
                 if($record == null){
+                    $transaction['transaction_ids'] = $transaction['transaction_id'];
                     ShopeePayout::create($transaction);
                 }else{
-                    $record->update(['amount' => $record->amount + $transaction['amount']]);
+                    $transaction_ids = explode(',', $record->transaction_ids);
+                    if(! in_array($transaction['transaction_id'], $transaction_ids)){
+                        $transaction_ids = explode(',', $record->transaction_ids);
+                        $transaction_ids[] = $transaction['transaction_id'];
+                        $transaction_ids = implode(',', $transaction_ids);
+                        $record->update(['amount' => $record->amount + $transaction['amount'], 'transaction_ids' => $transaction_ids]);
                 }
             }
+            } // foreach
             return $transaction_list;
-        } 
+        }
     }
 }
 

@@ -8,7 +8,7 @@ class ShopeePayout extends Model
 {
     protected $table = 'shopee_payout_fees';
 
-    protected $fillable = ['shop_id', 'payout_date', 'amount', 'reconciled', 'created_at','updated_at'];
+    protected $fillable = ['shop_id', 'payout_date', 'amount', 'reconciled', 'created_at','updated_at', 'transaction_ids'];
 
     public $timestamps = false;
 
