@@ -92,7 +92,7 @@
                         @endcan
                         @can('payoutRecon.manage')
                             <li class="{{ $request->segment(1) == 'order' && $request->segment(2) == 'reconciliation' && $request->segment(3) == 'payout' ? 'active' : '' }}">
-                                <a href="{{url('/order/reconciliation/payout')}}?tab=all">
+                                <a href="{{ action('PayoutController@indexLaz') }}?tab=all">
                                     <i class="feather icon-circle"></i>
                                     <span class="menu-title" data-i18n="">Payout</span>
                                 </a>

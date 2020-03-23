@@ -23,22 +23,34 @@
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12 shop_filter">
+              <a href="{{ action('PayoutController@indexLaz') }}?tab=all" class="btn btn-lg btn-outline-primary mb-1 {{ $request->segment(4) == 'laz' ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
+                Lazada
+              </a>
+              <a href="{{ action('PayoutController@indexShopee') }}?tab=all" class="btn btn-lg btn-outline-primary mb-1 {{ $request->segment(4) == 'shopee' ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
+                Shopee
+              </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 shop_filter">
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'all' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="all"  {{ $request->get('tab') == 'all' ? 'checked' : '' }}>
                 <p>Total Payout</p>
-                <p class="text-warning text-bold-400 font-large-1"><span id="header_total">0</span> Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_total">0</span> Payouts</p>
               </label>
               
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'not_confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="not_confirm"  {{ $request->get('tab') == 'not_confirm' ? 'checked' : '' }}>
                 <p>Unconfirmed Payout</p>
-                <p class="text-warning text-bold-400 font-large-1"><span id="header_unconfirmed">0</span> Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_unconfirmed">0</span> Payouts</p>
               </label>
               
               <label class="btn btn-lg round btn-outline-primary {{ $request->get('tab') == 'confirm' ? 'active' : '' }}">
                 <input type="radio" name="tab" value="confirm"  {{ $request->get('tab') == 'confirm' ? 'checked' : '' }}>
                 <p>Confirmed Payout</p>
-                <p class="text-warning text-bold-400 font-large-1"><span id="header_confirmed">0</span> Orders</p>
+                <p class="text-warning text-bold-400 font-large-1"><span id="header_confirmed">0</span> Payouts</p>
               </label>
           </div>
         </div>
@@ -62,21 +74,21 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Confirm">Confirm Payout</a>
-            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcile') }}" data-action="Unconfirm">Unconfirm Payout</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcileLaz') }}" data-action="Confirm">Confirm Payout</a>
+            <a class="dropdown-item reconcile" data-href="{{ action('PayoutController@payoutReconcileLaz') }}" data-action="Unconfirm">Unconfirm Payout</a>
           </div>
         </div>
-      </div>
     </div>
 
     {{-- DataTable starts --}}
+      </div>
     <div class="table-responsive">
       <table class="table data-list-view">
         <thead>
           <tr>
             <th>For Checkbox</th>
             <th>Shop</th>
-            <th>Date</th>
+            <th>Payout Date</th>
             <th>Statement Number</th>
             <th>Amount</th>
             <th>Paid Status</th>
@@ -117,7 +129,7 @@
     function getHeaders(){
         $.ajax({
         method: "GET",
-        url: "{{ action('PayoutController@headers')  }}" + getParams(),
+        url: "{{ action('PayoutController@headersLaz')  }}" + getParams(),
         success: function success(result) {
             $('#header_total').html(result.data.total);
             $('#header_unconfirmed').html(result.data.unconfirmed);
@@ -138,7 +150,7 @@
             { data: 'actions', name: 'actions', orderable : false },
         ]; 
   var table_route = {
-          url: '{{ action("PayoutController@index") }}',
+          url: '{{ action("PayoutController@indexLaz") }}',
           data: function (data) {
                 data.shop = $("#shop").val();
                 data.daterange = $("#daterange").val();
@@ -150,7 +162,6 @@
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
-    $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
   }
   function draw_callback_function(settings){
     getHeaders();
@@ -164,7 +175,7 @@
       getHeaders(); // on load get headers
       $('input[name="tab"]').change(function(){
         var tab = $('input[name="tab"]:checked').val();
-        url = "{{ action('PayoutController@index')}}?tab=" + tab;
+        url = "{{ action('PayoutController@indexLaz')}}?tab=" + tab;
         window.location.href = url;
       });
       $(".select2").select2({
