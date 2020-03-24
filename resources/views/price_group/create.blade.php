@@ -68,9 +68,11 @@
                                   <td class="text-right p-4">
                                     <input type="number" name="item_array[{{$item->id}}][price]" class="form-control text-right input_price" data-original="{{$item->price}}" value="{{$item->price}}" disabled>
                                   </td>
-                                  <td class="text-center">
+                                   <td class="text-center">
                                     <div class="custom-control custom-switch custom-control-inline">
                                       <input type="checkbox" class="custom-control-input sku_switch" data-sku_id="{{$item->id}}" id="sku_switch_{{$item->id}}">
+                                      <label class="custom-control-label" for="sku_switch_{{$item->id}}">
+                                      </label>
                                     </div>
                                   </td>
                                 </tr>
@@ -108,7 +110,8 @@
         tr.find('.input_price').attr('disabled', false);
       }
       else {
-        tr.find('.input_price').attr('disabled', true); 
+        var orig = tr.find('.input_price').data('original');
+        tr.find('.input_price').val(orig).attr('disabled', true); 
       }
   });
 </script>
