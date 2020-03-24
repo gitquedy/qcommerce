@@ -58,7 +58,7 @@ class BarcodeController extends Controller
             $items_sku = [];
             $shop = Shop::whereId($order->shop_id)->get()->first();
             if($order->site == 'lazada'){
-                $code = $order->id;
+                $code = $order->ordersn;
                 $api_key = Lazop::get_api_key();
                 $api_secret = Lazop::get_api_secret();
                 $accessToken = $shop->access_token;
@@ -131,7 +131,7 @@ class BarcodeController extends Controller
 
     public function packedItems(Request $request) {
         $result = false;
-        $order = Order::whereId($request->order_id)->first();
+        $order = Order::where('id',$request->order_id)->first();
         if($order->packed == 0){
             $order->packed = 1;
             $order->save();

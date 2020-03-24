@@ -164,9 +164,9 @@
   </script>
   <!-- datatables -->
   <script type="text/javascript">
-     var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
+     // var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
-            { data: id, name: id, orderable : false},
+            { data: 'ordersn', name: 'ordersn', orderable : false},
             { data: 'idDisplay', name: 'idDisplay'},
             { data: 'created_at_formatted', name: 'created_at' },
             { data: 'updated_at_at_human_read', name: 'updated_at_at_human_read' },

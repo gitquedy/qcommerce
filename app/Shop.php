@@ -79,13 +79,13 @@ class Shop extends Model
                         unset($order['address_billing']);
                         unset($order['address_shipping']);
                         unset($order['order_number']);
-                        $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
+                        $order = array_merge($order, ['ordersn' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
                         unset($order['order_id']);     
                         $record = Order::updateOrCreate(
-                        ['id' => $order['id']], $order);
+                        ['ordersn' => $order['ordersn']], $order);
                         $c = $this->lazadaGetClient();
                         $r = new LazopRequest("/order/items/get",'GET');
-                        $r->addApiParam("order_id", $order['id']);
+                        $r->addApiParam("order_id", $order['ordersn']);
                         $response = $c->execute($r, $this->access_token);
                         $data = json_decode($response, true);
                         $item_ids = [];
@@ -186,7 +186,6 @@ class Shop extends Model
                         }
                     }
                 }
-                // dd($order_ids);
                 $overcharge_ids = array();
                 foreach ($order_ids as $id) {
                     $seller = ShippingFee::whereOrderNo($id)->where('trans_type', 7)->first();
@@ -199,7 +198,7 @@ class Shop extends Model
                         }
                     }
                 }
-                $overcharge = Order::whereIn('id', $overcharge_ids)->where('shipping_fee_reconciled', 0)->update(['shipping_fee_reconciled' => 1]);
+                $overcharge = Order::whereIn('ordersn', $overcharge_ids)->where('shipping_fee_reconciled', 0)->update(['shipping_fee_reconciled' => 1]);
             } else if($this->site == 'shopee'){
                 // code
             }

@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'id', 'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout'
+		    	'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout'
 			];
 
     public $timestamps = false;
@@ -68,9 +68,9 @@ class Order extends Model
                         <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                         <span class="sr-only">Toggle Dropdown</span></button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item confirm '. $disabled['ready_to_ship'] .'" href="#" data-href="'. action('OrderController@readyToShip', [$order_id]) .'" data-text="Are you sure to mark '. $order_id .' as ready to ship?" data-text="This Action is irreversible."><i class="fa fa-truck aria-hidden="true""></i> Ready to Ship</a>
-                            <a class="dropdown-item '. $disabled['print_shipping_label'] .'" href="'.route('order.print_shipping',array('id'=>$order_id)).'"><i class="fa fa-print aria-hidden="true""></i> Print Shipping Label</a>
-                            <a class="dropdown-item confirm '. $disabled['cancel'] .'" href="#" data-href="'. action('OrderController@cancel', [$order_id]) .'" data-text="Are you sure to mark '. $order_id .' as canceled?" data-text="This Action is irreversible." data-input="textarea" data-placeholder="Type your reason here..."><i class="fa fa-window-close-o aria-hidden="true""></i> Cancel Order</a>
+                            <a class="dropdown-item confirm '. $disabled['ready_to_ship'] .'" href="#" data-href="'. action('OrderController@readyToShip', [$order_id]) .'" data-text="Are you sure to mark '. $this->ordersn .' as ready to ship?" data-text="This Action is irreversible."><i class="fa fa-truck aria-hidden="true""></i> Ready to Ship</a>
+                            <a class="dropdown-item '. $disabled['print_shipping_label'] .'" href="'.route('order.print_shipping',array('id'=>$this->id)).'"><i class="fa fa-print aria-hidden="true""></i> Print Shipping Label</a>
+                            <a class="dropdown-item confirm '. $disabled['cancel'] .'" href="#" data-href="'. action('OrderController@cancel', [$order_id]) .'" data-text="Are you sure to mark '. $this->ordersn .' as canceled?" data-text="This Action is irreversible." data-input="textarea" data-placeholder="Type your reason here..."><i class="fa fa-window-close-o aria-hidden="true""></i> Cancel Order</a>
                         </div></div>';
         }else{
             $disabled = ['print_shipping_label' => 'disabled', 'cancel' => 'disabled', 'ready_to_ship' => 'disabled'];
@@ -128,7 +128,7 @@ class Order extends Model
     public function getOrderDetails(){
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/get','GET');
-        $r->addApiParam('order_id', $this->id);
+        $r->addApiParam('order_id', $this->ordersn);
         $result =  $c->execute($r, $this->shop->access_token);
         return json_decode($result, true);
     }
@@ -136,7 +136,7 @@ class Order extends Model
     public function getOrderItems(){
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
         $r = new LazopRequest('/order/items/get','GET');
-        $r->addApiParam('order_id', $this->id);
+        $r->addApiParam('order_id', $this->ordersn);
         $result =  $c->execute($r, $this->shop->access_token);
         return json_decode($result, true);
     }
@@ -342,10 +342,9 @@ class Order extends Model
     
     
     public static function get_order_items($order_id=""){
-        
         $item_ids = array();
         
-        $order = Order::find($order_id);
+        $order = Order::where('ordersn', $order_id)->first();
         $access_token = "";
         
         if($order){
@@ -374,7 +373,6 @@ class Order extends Model
     
     
     public static function get_shipping_level($order_id=""){
-        
         $ati = $_COOKIE['_ati'];
         
         $args = Order::get_order_items($order_id);
@@ -442,7 +440,7 @@ class Order extends Model
 
     public function getImgAndIdDisplay(){
         // return  $this->shop->getImgSiteDisplay();
-    return '<div class="text-primary font-medium-2 text-bold-600">'. $this->OrderID() .' </div>' . $this->shop->getImgSiteDisplay();
+    return '<div class="text-primary font-medium-2 text-bold-600">'. $this->ordersn .' </div>' . $this->shop->getImgSiteDisplay();
     }
 
     public function OrderID(){
