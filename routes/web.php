@@ -73,7 +73,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 		Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
-		Route::get('/sku/search/{search?}', 'SkuController@search')->name('sku.search');
+		Route::get('/sku/search/{search?}/{customer?}', 'SkuController@search')->name('sku.search');
 	});
 
 	Route::group(['middleware' => 'permission:supplier.manage'], function()
@@ -130,9 +130,13 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 	// });
 
-	// Route::group(['middleware' => 'permission:possettings.manage'], function()
+	// Route::group(['middleware' => 'permission:settings.manage'], function()
 	// {
-		Route::resource('/possettings', 'PosSettingsController');
+		Route::resource('/settings', 'SettingsController');
+
+		Route::resource('/price_group', 'PriceGroupController');
+		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
+		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
 
 	Route::group(['middleware' => 'permission:report.manage'], function()

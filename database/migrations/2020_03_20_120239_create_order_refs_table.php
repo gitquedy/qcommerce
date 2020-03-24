@@ -15,8 +15,8 @@ class CreateOrderRefsTable extends Migration
     {
         Schema::create('order_refs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('pos_settings_id');
-            $table->foreign('pos_settings_id')->references('id')->on('pos_settings')->onDelete('cascade');
+            $table->unsignedBigInteger('settings_id');
+            $table->foreign('settings_id')->references('id')->on('settings')->onDelete('cascade');
             $table->integer('so')->default(1);
             $table->integer('qu')->default(1);
             $table->integer('po')->default(1);

@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Sku;
 use App\Products;
 use App\Category;
+use App\Customer;
 use App\Brand;
 use App\Shop;
 use App\Supplier;
+use App\PriceGroupItemPrice;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -466,7 +468,7 @@ class SkuController extends Controller
 
     }
 
-     public function search($search)
+     public function search($search, $customer_id)
     {
           $result = Sku::where('name', 'LIKE', '%'. $search. '%')->orWhere('code', 'LIKE', '%'. $search. '%')->get();
           foreach ($result as &$r) {
@@ -476,6 +478,15 @@ class SkuController extends Controller
                 }
                 else {
                     $r->image = asset('images/pages/no-img.jpg');
+                }
+                if ($customer_id != 'none') {
+                    $customer = Customer::where('business_id', Auth::user()->business_id)->where('id', $customer_id)->first();
+                    $price_group_item = PriceGroupItemPrice::where('price_group_id', $customer->price_group)->where('sku_id', $r->id)->first();
+                    $r->price_group_item = $customer->price_group;
+                    if($price_group_item) {
+                        $r->price = $price_group_item->price;
+                        $r->customer = $customer;
+                    }
                 }
           }
           return response()->json($result);

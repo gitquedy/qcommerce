@@ -17,8 +17,8 @@ class CreateSalesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
-            $table->unsignedBigInteger('customer_id');
-            $table->foreign('customer_id')->references('id')->on('customer');
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
             $table->string('customer_first_name');
             $table->string('customer_last_name');
             $table->date('date');

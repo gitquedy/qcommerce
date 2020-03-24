@@ -8,7 +8,7 @@ use App\Sales;
 use App\SaleItems;
 use App\Customer;
 use App\OrderRef;
-use App\PosSettings;
+use App\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +29,12 @@ class SalesController extends Controller
            // return $sales->get();
             return Datatables($sales)   
             ->addColumn('customer_name', function(Sales $sales) {
-                return $sales->customer->formatName();
+                if($sales->customer_id) {
+                    return $sales->customer->formatName();
+                }
+                else {
+                    return $sales->customer_last_name.', '.$sales->customer_first_name;
+                }
             })   
             ->addColumn('balance', function(Sales $sales) {
                 return number_format($sales->grand_total - $sales->paid, 2);
@@ -113,7 +118,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
-            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales = new Sales;
             $sales->business_id = $user->business_id;
@@ -163,7 +168,7 @@ class SalesController extends Controller
             }
             $sales_items_query = SaleItems::insert($sales_items);
             if (!$request->reference_no) {
-                $increment = OrderRef::where('pos_settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
+                $increment = OrderRef::where('settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
             }
             $output = ['success' => 1,
                 'msg' => 'Sale added successfully!',
@@ -240,7 +245,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
-            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
@@ -320,7 +325,7 @@ class SalesController extends Controller
     {
         $sales = Sales::findOrFail($id);
         if($sales->business_id != Auth::user()->business_id){
-            abort(401, 'You don\'t have access to edit this customer');
+            abort(401, 'You don\'t have access to edit this sale');
         }
         try {
             DB::beginTransaction();

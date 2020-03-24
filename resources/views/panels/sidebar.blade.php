@@ -305,13 +305,19 @@
                     <a href="">
                         <i class="feather icon-settings"></i>
                         {{-- <i class="feather icon-sliders"></i> --}}
-                        <span class="menu-title" data-i18n="">POS Settings</span>
+                        <span class="menu-title" data-i18n="">Settings</span>
                     </a>
                     <ul class="menu-content">
-                        <li class="{{ $request->segment(1) == 'possettings' && $request->segment(2) == '' ? 'active' : '' }}">
-                            <a href="{{url('possettings')}}">
+                        <li class="{{ $request->segment(1) == 'settings' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('settings')}}">
                                 <i class="feather icon-circle"></i>
-                                <span class="menu-title" data-i18n="">Settings</span>
+                                <span class="menu-title" data-i18n="">General Settings</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'price_group' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('price_group')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Price Groups</span>
                             </a>
                         </li>
                     </ul>

@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Customer Management')
+@section('title', 'Price Groups')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -17,20 +17,6 @@
 
 @section('content')
 <section id="data-list-view" class="data-list-view-header">
-<!--     <div class="action-btns d-none">
-      <div class="btn-dropdown mr-1 mb-1">
-        <div class="btn-group dropdown actions-dropodown">
-          <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Actions
-          </button>
-          <div class="dropdown-menu">
-           
-          </div>
-        </div>
-      </div>
-    </div> -->
-
     {{-- DataTable starts --}}
     <div class="table-responsive">
       <table class="table data-list-view">
@@ -38,10 +24,7 @@
           <tr>
             <th>For Checkbox</th>
             <th>Name</th>
-            <th>Email</th>
-            <th>Price Group</th>
-            <th>Last Update</th>
-            <th>Action</th>
+            <th width="10%">Action</th>
           </tr>
         </thead>
       </table>
@@ -76,21 +59,19 @@
      var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
-            { data: 'customer_name', name: 'customer_name' },
-            { data: 'email', name: 'email' },
-            { data: 'price_group_name', name: 'price_group_name' },
-            { data: 'updated_at', name: 'updated_at' },
+            { data: 'name', name: 'name' },
             { data: 'action', name: 'action' },
+            
         ];
   var table_route = {
-          url: '{{ route('customer.index') }}',
+          url: '{{ route('price_group.index') }}',
           data: function (data) {
             }
         };
   var buttons = [
           { text: "<i class='feather icon-plus'></i> Add New",
             action: function() {
-                window.location = '{{ route('customer.create') }}';
+                window.location = '{{ route('price_group.create') }}';
             },
             className: "btn-outline-primary margin-r-10"}
             ];
