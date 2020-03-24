@@ -186,6 +186,7 @@
                           <br>
                           <br>
                           <div class="row">
+                            @if($sales->status == 'pending')
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Status</label>
@@ -201,6 +202,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Paid Amount</label>
@@ -218,8 +220,10 @@
                         <div class="row">
                           <div class="col-6">
                            <div class="col-12">
+                            @if($sales->status == 'pending')
                                 <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
                                 <button type="reset" id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
+                            @endif
                             </div>
                           </div>
                         </div>

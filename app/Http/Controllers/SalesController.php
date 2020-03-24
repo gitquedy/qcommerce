@@ -165,6 +165,44 @@ class SalesController extends Controller
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
+
+                if($request->status == 'completed' && FALSE) {
+                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
+                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+                    $Shop_array = array();
+                    foreach($all_shops as $all_shopsVAL){
+                        $Shop_array[] = $all_shopsVAL->id;
+                    }
+                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
+                    if($sku){
+                        $sku->quantity -= $item['quantity'];
+                        $result = $sku->save();
+                        foreach ($Sku_prod as $prod) {
+                            $shop_id = $prod->shop_id;
+                            $access_token = Shop::find($shop_id)->access_token;
+
+                            $prod = Products::where('id', $prod->id)->first();
+                            $prod->quantity = $sku->quantity;
+                            $prod->save();
+                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                                <Request>
+                                    <Product>
+                                        <Skus>
+                                            <Sku>
+                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                                <quantity>'.$sku->quantity.'</quantity>
+                                            </Sku>
+                                        </Skus>
+                                    </Product>
+                                </Request>';
+                            if(env('lazada_sku_sync', true)){
+                                if($prod->site == 'lazada'){
+                                    $response = Products::product_update($access_token,$xml);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             $sales_items_query = SaleItems::insert($sales_items);
             if (!$request->reference_no) {
@@ -225,6 +263,7 @@ class SalesController extends Controller
     public function update(Request $request, $id)
     {
         $sales = Sales::findOrFail($id);
+        $old_status = $sales->status;
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
@@ -297,6 +336,44 @@ class SalesController extends Controller
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
+
+                if($old_status != 'completed' && $request->status == 'completed' && FALSE) {
+                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
+                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+                    $Shop_array = array();
+                    foreach($all_shops as $all_shopsVAL){
+                        $Shop_array[] = $all_shopsVAL->id;
+                    }
+                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
+                    if($sku){
+                        $sku->quantity -= $item['quantity'];
+                        $result = $sku->save();
+                        foreach ($Sku_prod as $prod) {
+                            $shop_id = $prod->shop_id;
+                            $access_token = Shop::find($shop_id)->access_token;
+
+                            $prod = Products::where('id', $prod->id)->first();
+                            $prod->quantity = $sku->quantity;
+                            $prod->save();
+                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                                <Request>
+                                    <Product>
+                                        <Skus>
+                                            <Sku>
+                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                                <quantity>'.$sku->quantity.'</quantity>
+                                            </Sku>
+                                        </Skus>
+                                    </Product>
+                                </Request>';
+                            if(env('lazada_sku_sync', true)){
+                                if($prod->site == 'lazada'){
+                                    $response = Products::product_update($access_token,$xml);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             SaleItems::insert($sales_items);
             $output = ['success' => 1,
