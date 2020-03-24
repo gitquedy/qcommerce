@@ -45,6 +45,7 @@ class syncFirstTime extends Command
             $shop->syncLazadaProducts();
             $shop->syncOrders();
             $shop->syncLazadaPayout();
+            $shop->syncShopeePayout();
             $shop->syncShippingDetails(Carbon::now()->subDays(30)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
             $shop->touch();
             $shop->update(['is_first_time', false]);

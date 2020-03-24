@@ -36,4 +36,10 @@ class LazadaPayout extends Model
 	    }
 	    return $html;         
     }
+
+    public function getPaymentFee(){
+        return ($this->item_revenue + $this->shipment_fee_credit) - $this->shipment_fee;
+    }
 }
+
+

@@ -178,12 +178,24 @@ Route::group(['middleware' => 'auth'], function()
 	// Payout Reconciliation
 	Route::group(['middleware' => 'permission:payoutRecon.manage'], function()
 	{
-		Route::get('/order/reconciliation/payout', 'PayoutController@index')->name('order.returnReconciliation');
-		Route::post('/order/reconciliation/payout/reconcile', 'PayoutController@payoutReconcile');
-		Route::get('/order/reconciliation/payout/reconcileSingle/{LazadaPayout}', 'PayoutController@payoutReconcileSingle');
-		Route::get('/order/reconciliation/payout/headers', 'PayoutController@headers');
-		Route::get('/order/reconciliation/payout/{payout}', 'PayoutController@show');
+		//lazada
+		Route::get('/order/reconciliation/payout/laz', 'PayoutController@indexLaz');
+		Route::get('/order/reconciliation/payout/laz/headers', 'PayoutController@headersLaz');
+		Route::post('/order/reconciliation/payout/laz/reconcile', 'PayoutController@payoutReconcileLaz');
+		Route::get('/order/reconciliation/payout/laz/reconcileSingle/{LazadaPayout}', 'PayoutController@payoutReconcileSingleLaz');
+
+
 		
+		
+		Route::get('/order/reconciliation/payout/laz/{LazadaPayout}', 'PayoutController@showLaz');
+
+		// shopee
+
+		
+		Route::get('/order/reconciliation/payout/shopee', 'PayoutController@indexShopee');
+		Route::get('/order/reconciliation/payout/shopee/headers', 'PayoutController@headersShopee');
+		Route::post('/order/reconciliation/payout/shopee/reconcile', 'PayoutController@payoutReconcileShopee');
+		Route::get('/order/reconciliation/payout/shopee/reconcileSingle/{ShopeePayout}', 'PayoutController@payoutReconcileSingleShopee');
 	});
 
 	// Shipping fee Reconciliation
@@ -341,4 +353,3 @@ Route::group(['middleware' => 'auth'], function()
 Auth::routes();
 
 Route::post('/login/validate', 'Auth\LoginController@validate_api');
-Route::get('/encode_all_tracking_code', 'OrderController@encode_all_tracking_code')->name('order.encode_all_tracking_code');

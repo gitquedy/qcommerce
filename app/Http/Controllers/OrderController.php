@@ -250,7 +250,7 @@ class OrderController extends Controller
                     ];
             }else{
                 $output = ['success' => 1,
-                    'msg' => 'Orders '. $order->id .' Ready to Ship',
+                    'msg' => 'Orders '. $order->ordersn .' Ready to Ship',
                 ];
             }
             
@@ -282,7 +282,7 @@ class OrderController extends Controller
               }else{
                   if(!$error){
                     $output = ['success' => 1,
-                        'msg' => 'Orders '. $order->id .' Ready to Ship',
+                        'msg' => 'Orders '. $order->ordersn .' Ready to Ship',
                     ];
                   }
               }
@@ -304,8 +304,8 @@ class OrderController extends Controller
             $order = Order::where('id', "=", $order_id)->first();
             if($order->site == 'lazada'){
               $order->update(['printed' => true]);
-
-              $Result = Order::get_shipping_level($order_id);
+              // dd($order->ordersn);
+              $Result = Order::get_shipping_level($order->ordersn);
               $jsOBJ = json_decode($Result);
               
               if($jsOBJ->code==0){
@@ -332,17 +332,13 @@ class OrderController extends Controller
     }
     
     public function print_shipping_mass(Request $request){
-        
-        
-        
         $ids = json_decode($request->ids);
-        
         foreach($ids as $orderVAL){
             $order = Order::where('id', "=", $orderVAL)->first();
             $order->printed = true;
             $order->save();
 
-            $Result =    Order::get_shipping_level($orderVAL);
+            $Result =    Order::get_shipping_level($order->ordersn);
             $jsOBJ = json_decode($Result);
             
             if($jsOBJ->code==0){
@@ -356,45 +352,6 @@ class OrderController extends Controller
             }
             
         }
-        
-
-        
-    }
-
-
-
-    public function encode_all_tracking_code() {
-      $orders = Order::where(function($query){$query->where('tracking_no','=', '')->orWhereNull('tracking_no');})->where('status', '!=', 'pending')->with('shop')->get();
-      $total_count = 0;
-      $total_success = 0;
-      $total_blank = 0;
-      $total_failed = 0;
-      foreach ($orders as $order) {
-        echo "<br>--Updatting Order:".$order->id;
-        if($order->shop) {
-          $items = $order->getOrderItems();
-          if (isset($items['data'])) {
-            $item_ids = $order->getItemIds($items);
-            $tracking_code = ($items['data'][0]['tracking_code'])?$items['data'][0]['tracking_code']:'';
-            $o = Order::where('id', $order->id)->first();
-            $o->tracking_no = $tracking_code;
-            $o->save();
-            echo "  --   Tracking No:".$tracking_code;
-            if($tracking_code){
-              $total_success++;
-            }
-            else {
-              $total_blank++;
-            }
-          }
-        }
-        else {
-          echo "  --   Failed Shop not found";
-          $total_failed++;
-        }
-        $total_count++;
-      }
-      echo "<br><br>----Done <h1>Total Count: $total_count</h1><h3>With Tracking No: $total_success</h3><h3>Blank: $total_blank</h3><h3>Failed: $total_failed</h3>";
     }
 
     public function printPackingList(Request $request){
@@ -407,7 +364,7 @@ class OrderController extends Controller
           $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
           // die(var_dump($product->id));
           $r = new LazopRequest('/order/items/get','GET');
-          $r->addApiParam('order_id', $product->id);
+          $r->addApiParam('order_id', $product->ordersn);
           $result = $c->execute($r,$product->shop->access_token);
           $item = json_decode($result, true);
           if($item['code'] == 0){

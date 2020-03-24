@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\LazadaPayout;
+use App\ShopeePayout;
 use App\Order;
 use App\OrderItem;
 use App\Products;
@@ -78,13 +79,13 @@ class Shop extends Model
                         unset($order['address_billing']);
                         unset($order['address_shipping']);
                         unset($order['order_number']);
-                        $order = array_merge($order, ['id' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
+                        $order = array_merge($order, ['ordersn' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
                         unset($order['order_id']);     
                         $record = Order::updateOrCreate(
-                        ['id' => $order['id']], $order);
+                        ['ordersn' => $order['ordersn']], $order);
                         $c = $this->lazadaGetClient();
                         $r = new LazopRequest("/order/items/get",'GET');
-                        $r->addApiParam("order_id", $order['id']);
+                        $r->addApiParam("order_id", $order['ordersn']);
                         $response = $c->execute($r, $this->access_token);
                         $data = json_decode($response, true);
                         $item_ids = [];
@@ -185,7 +186,6 @@ class Shop extends Model
                         }
                     }
                 }
-                // dd($order_ids);
                 $overcharge_ids = array();
                 foreach ($order_ids as $id) {
                     $seller = ShippingFee::whereOrderNo($id)->where('trans_type', 7)->first();
@@ -198,7 +198,7 @@ class Shop extends Model
                         }
                     }
                 }
-                $overcharge = Order::whereIn('id', $overcharge_ids)->where('shipping_fee_reconciled', 0)->update(['shipping_fee_reconciled' => 1]);
+                $overcharge = Order::whereIn('ordersn', $overcharge_ids)->where('shipping_fee_reconciled', 0)->update(['shipping_fee_reconciled' => 1]);
             } else if($this->site == 'shopee'){
                 // code
             }
@@ -537,6 +537,61 @@ class Shop extends Model
                 $payout['shop_id'] = $this->id;
                 LazadaPayout::updateOrCreate(['shop_id' => $payout['shop_id'], 'statement_number' => $payout['statement_number']],$payout);
             }
+        }
+    }
+
+    public function syncShopeePayout($date = '2018-01-01'){
+        if($this->site == 'shopee'){
+            $client = $this->shopeeGetClient();
+            $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+5 day');
+            $transaction_list  = [];
+            $created_before_increment = 1;
+            foreach($dates as $date){
+                $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
+                $created_before_increment += 1;
+                $more = true;
+                $offset = 0;
+                while($more){
+                    $params = [
+                        'create_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
+                        'create_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
+                        'pagination_entries_per_page' => 100,
+                        'pagination_offset' => $offset,
+                        'transaction_type' => 'ESCROW_VERIFIED_ADD'
+                    ];
+                    $offset += 100;
+                    $result = $client->shop->getTransactionList($params)->getData();
+                    if(isset($result['transaction_list'])){
+                        $more = $result['has_more'];
+                        if(count($result['transaction_list']) > 0){
+                            foreach($result['transaction_list'] as $transaction){
+                                $transaction_list[] = $transaction;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach($transaction_list as $transaction){
+                $transaction['created_at'] = Carbon::createFromTimestamp($transaction['create_time'])->toDateTimeString();
+                $transaction['updated_at'] = Carbon::createFromTimestamp($transaction['create_time'])->toDateTimeString();
+                $created_at = Carbon::parse($transaction['create_time'])->startOfWeek();
+                $transaction['payout_date'] = $created_at->format('M d, Y') . ' - ' . $created_at->addWeek()->format('M d, Y');
+                $transaction['shop_id'] = $this->id;
+                $record = ShopeePayout::where('payout_date', $transaction['payout_date'])->where('shop_id', $this->id)->first();
+                if($record == null){
+                    $transaction['transaction_ids'] = $transaction['transaction_id'];
+                    ShopeePayout::create($transaction);
+                }else{
+                    $transaction_ids = explode(',', $record->transaction_ids);
+                    if(! in_array($transaction['transaction_id'], $transaction_ids)){
+                        $transaction_ids = explode(',', $record->transaction_ids);
+                        $transaction_ids[] = $transaction['transaction_id'];
+                        $transaction_ids = implode(',', $transaction_ids);
+                        $record->update(['amount' => $record->amount + $transaction['amount'], 'transaction_ids' => $transaction_ids]);
+                }
+            }
+            } // foreach
+            return $transaction_list;
         }
     }
 }
