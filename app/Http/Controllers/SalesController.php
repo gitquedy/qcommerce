@@ -63,13 +63,16 @@ class SalesController extends Controller
                 }
             })
             ->addColumn('action', function(Sales $sales) {
-                    $actions = '<div class="btn-group dropup mr-1 mb-1">
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-                    Action<span class="sr-only">Toggle Dropdown</span></button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                        <a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
-                    </div></div>';
+                    $delete = '';
+                    if ($sales->status != 'completed') {
+                        $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
+                    }
+
+                    $add_payment = '';
+                    if($sales->payment_status != 'paid') {
+                        $add_payment = '<a class="dropdown-item add_payment" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-money aria-hidden="true""></i> Add Payment</a>';
+                    }
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$add_payment.'<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>'.$delete.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action','status'])

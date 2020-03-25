@@ -130,6 +130,14 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 	// });
 
+	// Route::group(['middleware' => 'permission:payment.manage'], function()
+	// {
+		Route::resource('/payment', 'PaymentController');
+		Route::get('/payment/delete/{paymment}', 'PaymentController@delete');
+		Route::post('/payment/addPaymentModal/{sales}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
+		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');
+	// });
+
 	// Route::group(['middleware' => 'permission:settings.manage'], function()
 	// {
 		Route::resource('/settings', 'SettingsController');

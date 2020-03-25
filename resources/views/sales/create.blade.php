@@ -34,7 +34,7 @@
      }
 
 
-     input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
         display: none;
         -webkit-appearance: none;

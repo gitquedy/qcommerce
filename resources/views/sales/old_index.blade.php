@@ -9,7 +9,6 @@
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
-        <link rel="stylesheet" href="{{ asset('vendors/css/daterangepicker/daterangepicker.css') }}">
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
@@ -18,7 +17,6 @@
 
 @section('content')
 <section id="data-list-view" class="data-list-view-header">
-
     {{-- DataTable starts --}}
     <div class="table-responsive">
       <table class="table data-list-view">
@@ -41,7 +39,6 @@
     {{-- DataTable ends --}}
   </section>
   {{-- Data list view end --}}
-  
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
@@ -51,32 +48,14 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
-  <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
-  <script type="text/javascript">
-    function getParams(){
-            var $params = "?site={{ $request->get('site') }}" + "&daterange=" + $("#daterange").val();
-            return $params;
-          }
-    function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('OrderController@headers')  }}" + getParams(),
-        success: function success(result) {     
-            $.each(result.data, function (i, item) {
-              $('#badge_' + i).html(item);
-            });
-          },
-        });     
-      }
-  </script>
   <!-- datatables -->
   <script type="text/javascript">
-  var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}";
+  var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
             { data: 'date', name: 'date' },
@@ -110,19 +89,18 @@
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
-<script type="text/javascript">
-    $(document).on('click', '.add_payment', function(e) {
-        e.preventDefault();
+<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+<script>
+    $(document).on('click', '.add_payment', function() {
         $.ajax({
             url: $(this).data('action'),
             method: "POST",
-            data: {},
+            data: {sales_id:$(this).data('order_id')},
             success:function(result)
             {
                 $('.view_modal').html(result).modal();
             }
         });
     });
-</script> 
-<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+</script>
 @endsection

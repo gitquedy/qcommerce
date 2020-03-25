@@ -286,12 +286,6 @@ $(document).ready(function () {
         $("#"+target).val($(this).data('value')).trigger('change');
       }
   });
-  
-  
-//   $(document).click(function(event){
-//  console.log(event);
-// });
-
 
 
 
