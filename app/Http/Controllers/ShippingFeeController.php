@@ -49,8 +49,6 @@ class ShippingFeeController extends Controller
                         $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
                     }
                 }
-
-                 
 	            return Datatables::eloquent($orders)
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();

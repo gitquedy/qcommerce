@@ -50,7 +50,7 @@
             <div class="col-md-6">
               <div classs="form-group">
                   <label>Model</label>
-                  <input type="text" class="form-control" name="model" value="{!! $product_details->data->attributes->model !!}">
+                  <input type="text" class="form-control" name="model" value="{!! (isset($product_details->data->attributes->model))?$product_details->data->attributes->model:'' !!}">
               </div>
            </div>
           </div><br>
@@ -90,7 +90,7 @@
             <div class="col-md-4">
               <div classs="form-group">
                 <label>Color Family</label>
-                <input type="text" class="form-control" name="color_family" value="{!! $product_details->data->skus[0]->color_family !!}">
+                <input type="text" class="form-control" name="color_family" value="{!! isset($product_details->data->skus[0]->color_family)?$product_details->data->skus[0]->color_family:'' !!}">
               </div>
             </div>
           </div><br>
@@ -128,7 +128,7 @@
                   <div class="image_uploader">
                       <div class="inner_card flex">
                           <div id="sortable" class="upload_items flex">
-                            @foreach(explode("|",$product->Images) as $img)
+                              @foreach(explode("|",$product->Images) as $img)
                                 <div class="image_divr ui-state-default">
                                   <img draggable="false" src="{{ $img }}" class="product_image">
                                   <input type="hidden" value="{{ $img }} " name="Image[]">

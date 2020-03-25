@@ -29,6 +29,7 @@ class CreateProductsTable extends Migration
             $table->text('Images')->nullable();
             $table->string('Url')->nullable();
             $table->float('price', 15, 2)->nullable();
+            $table->float('special_price', 15, 2)->nullable();
             $table->string('Status')->nullable();
             $table->integer('seen')->nullable()->default(0);
             $table->timestamps();
