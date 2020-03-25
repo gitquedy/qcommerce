@@ -166,7 +166,7 @@ class SalesController extends Controller
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
 
-                if($request->status == 'completed' && FALSE) {
+                if($request->status == 'completed') {
                     $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
                     $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
                     $Shop_array = array();
@@ -337,7 +337,7 @@ class SalesController extends Controller
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
 
-                if($old_status != 'completed' && $request->status == 'completed' && FALSE) {
+                if($old_status != 'completed' && $request->status == 'completed') {
                     $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
                     $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
                     $Shop_array = array();
