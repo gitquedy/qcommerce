@@ -164,6 +164,7 @@ class ReportsController extends Controller
                 ->join('order', 'order.id', '=', 'order_item.order_id')
                 ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('products.shop_id', $shop_ids)
+                ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->groupBy('order_item.product_id')
                 ->orderBy('total_quantity', 'desc')->take($no_of_products);
 
@@ -208,6 +209,7 @@ class ReportsController extends Controller
                 $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id', 'left')
                 ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('order.shop_id', $shop_ids)
+                ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->orderBy('date', 'desc')
                 ->groupBy('date');
                 $daterange = explode('/', $request->get('daterange'));
