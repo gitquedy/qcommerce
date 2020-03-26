@@ -73,13 +73,14 @@ class Shop extends Model
                              $status = $order['statuses'][1];
                         }
                         $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
+                        $order['ordersn'] => $order['order_id'];
                         $order['printed'] = $printed;
                         $order['price'] = Order::tofloat($order['price']);
                         unset($order['statuses']);
                         unset($order['address_billing']);
                         unset($order['address_shipping']);
                         unset($order['order_number']);
-                        $order = array_merge($order, ['ordersn' => $order['order_id'], 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
+                        $order = array_merge($order, 'status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
                         unset($order['order_id']);     
                         $record = Order::updateOrCreate(
                         ['ordersn' => $order['ordersn']], $order);
