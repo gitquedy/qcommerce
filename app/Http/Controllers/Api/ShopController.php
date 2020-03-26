@@ -55,11 +55,13 @@ class ShopController extends Controller
         $shop_ids = $shops->pluck('id')->toArray();
 
         if($request->get('total_sales_today')){
-            $user->totalSalesToday = $user->totalSalesToday($shop_ids);
+            $user->hourlySalesToday = $user->totalSalesToday($shop_ids);
+            $user->totalSalesToday = array_sum($user->hourlySalesToday);
         }
 
         if($request->get('total_orders_today')){
-            $user->totalOrdersToday = $user->totalOrdersToday($shop_ids);
+            $user->hourlyOrdersToday = $user->totalOrdersToday($shop_ids);
+            $user->totalOrdersToday = array_sum($user->hourlyOrdersToday);
         }
 
         if($request->get('current_pending_orders')){
@@ -67,7 +69,8 @@ class ShopController extends Controller
         }
 
         if($request->get('total_monthly_sales')){
-            $user->totalMonthlySales = $user->totalMonthlySales($shop_ids);
+            $user->monthlySales = $user->totalMonthlySales($shop_ids);
+            $user->totalMonthlySales = array_sum($user->monthlySales);
         }
 
         $data = ['user' => $request->user(), 'shops' => $shops];
