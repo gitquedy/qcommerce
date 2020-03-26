@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Business;
+use App\Settings;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -71,6 +72,12 @@ class RegisterController extends Controller
         $business = Business::create([
              'name' => $data['name'],
              'location' => $data['location'],
+        ]);
+        $settings = Settings::create([
+            'business_id' => $business->id,
+        ]);
+        $order_refs = OrderRef::create([
+            'settings_id' => $settings->id,
         ]);
         $user = User::create([
             'business_id' => $business->id,

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Validator;
-use App\PosSettings;
+use App\Settings;
 use App\OrderRef;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class PosSettingsController extends Controller
+class SettingsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,13 +19,13 @@ class PosSettingsController extends Controller
     public function index()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"POS Settings"], ['name'=>"Order Reference"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Settings"], ['name'=>"General Settings"]
         ];
        
-        $PosSettings = PosSettings::where('business_id', Auth::user()->business_id)->first();
-        return view('possettings.index', [
+        $Settings = Settings::where('business_id', Auth::user()->business_id)->first();
+        return view('settings.index', [
             'breadcrumbs' => $breadcrumbs,
-            'order_ref' => $PosSettings,
+            'settings' => $Settings,
         ]);
     }
 
@@ -47,16 +47,16 @@ class PosSettingsController extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(),[
             'sales_prefix' => 'required|string|max:255',
-            'quote_prefix' => 'required|string|max:255',
-            'purchase_prefix' => 'required|string|max:255',
-            'transfer_prefix' => 'required|string|max:255',
-            'delivery_prefix' => 'required|string|max:255',
-            'payment_prefix' => 'required|string|max:255',
-            'return_prefix' => 'required|string|max:255',
+            // 'quote_prefix' => 'required|string|max:255',
+            // 'purchase_prefix' => 'required|string|max:255',
+            // 'transfer_prefix' => 'required|string|max:255',
+            // 'delivery_prefix' => 'required|string|max:255',
+            // 'payment_prefix' => 'required|string|max:255',
+            // 'return_prefix' => 'required|string|max:255',
         ]);
+        
 
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
@@ -64,16 +64,17 @@ class PosSettingsController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $pos = PosSettings::where('business_id', $user->business_id)->first();
-            $data = $request->except(['_token']);
+            $data = $request->except(['_token', 'store_type']);
+
+            $q = Settings::where('business_id', $user->business_id)->first();
             foreach ($data as $col => $val) {
-                $pos->$col = $val;
+                $q->$col = $val;
             }
-            $pos->save();
+            $q->save();
 
             $output = ['success' => 1,
-                'msg' => 'POS Settings updated successfully!',
-                'redirect' => action('PosSettingsController@index')
+                'msg' => 'Settings updated successfully!',
+                'redirect' => action('SettingsController@index')
             ];
             DB::commit();
           
@@ -91,10 +92,10 @@ class PosSettingsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\PosSettings  $posSettings
+     * @param  \App\Settings  $Settings
      * @return \Illuminate\Http\Response
      */
-    public function show(PosSettings $posSettings)
+    public function show(Settings $Settings)
     {
         //
     }
@@ -102,10 +103,10 @@ class PosSettingsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\PosSettings  $posSettings
+     * @param  \App\Settings  $Settings
      * @return \Illuminate\Http\Response
      */
-    public function edit(PosSettings $posSettings)
+    public function edit(Settings $Settings)
     {
         //
     }
@@ -114,10 +115,10 @@ class PosSettingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PosSettings  $posSettings
+     * @param  \App\Settings  $Settings
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PosSettings $posSettings)
+    public function update(Request $request, Settings $Settings)
     {
         //
     }
@@ -125,11 +126,12 @@ class PosSettingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\PosSettings  $posSettings
+     * @param  \App\Settings  $Settings
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PosSettings $posSettings)
+    public function destroy(Settings $Settings)
     {
         //
     }
+
 }

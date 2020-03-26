@@ -174,6 +174,7 @@
   var buttons = [];
   function created_row_function(row, data, dataIndex){
     $(row).attr('data-id', JSON.parse(data.id));
+    $(row).attr('data-action', "{{route('barcode.viewBarcode')}}");
   }
   var aLengthMenu = [[4, 10, 15, 20],[4, 10, 15, 20]];
   var pageLength = 10;

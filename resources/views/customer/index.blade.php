@@ -39,6 +39,7 @@
             <th>For Checkbox</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Price Group</th>
             <th>Last Update</th>
             <th>Action</th>
           </tr>
@@ -77,9 +78,9 @@
             { data: id, name: id, orderable : false},
             { data: 'customer_name', name: 'customer_name' },
             { data: 'email', name: 'email' },
+            { data: 'price_group_name', name: 'price_group_name' },
             { data: 'updated_at', name: 'updated_at' },
             { data: 'action', name: 'action' },
-            
         ];
   var table_route = {
           url: '{{ route('customer.index') }}',

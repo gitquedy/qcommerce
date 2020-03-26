@@ -34,7 +34,7 @@
      }
 
 
-     input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
         display: none;
         -webkit-appearance: none;
@@ -311,8 +311,11 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%QUERY%',
-                wildcard: '%QUERY%'
+                url: '{{ route('sku.search') }}/%QUERY%/%CID%',
+                replace: function(url, query) {
+                    $cid = ($('#select_customer').val())?$('#select_customer').val():'none';
+                    return url.replace('%QUERY%', query).replace('%CID%', $cid);
+                }
             },
             datumTokenizer: Bloodhound.tokenizers.whitespace('search_product'),
             queryTokenizer: Bloodhound.tokenizers.whitespace

@@ -136,7 +136,7 @@
                                       </thead>
                                       <tbody>
                                         @foreach($sales->items as $item)
-                                        <tr data-id="{{$item->id}}">
+                                        <tr data-id="{{$item->sku_id}}">
                                           <td>
                                             <div class="media">
                                               <img src="{{$item->image}}" alt="No Image Available" class="d-flex mr-1 product_image">
@@ -186,6 +186,7 @@
                           <br>
                           <br>
                           <div class="row">
+                            @if($sales->status == 'pending')
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Status</label>
@@ -201,6 +202,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Paid Amount</label>
@@ -218,8 +220,10 @@
                         <div class="row">
                           <div class="col-6">
                            <div class="col-12">
+                            @if($sales->status == 'pending')
                                 <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
                                 <button type="reset" id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
+                            @endif
                             </div>
                           </div>
                         </div>
@@ -389,8 +393,11 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%QUERY%',
-                wildcard: '%QUERY%'
+                url: '{{ route('sku.search') }}/%QUERY%/%CID%',
+                replace: function(url, query) {
+                    $cid = ($('#select_customer').val())?$('#select_customer').val():'none';
+                    return url.replace('%QUERY%', query).replace('%CID%', $cid);
+                }
             },
             datumTokenizer: Bloodhound.tokenizers.whitespace('search_product'),
             queryTokenizer: Bloodhound.tokenizers.whitespace
@@ -399,20 +406,19 @@
         $(".search-input").typeahead({
             hint: true,
             highlight: true,
-            minLength: 1
+            minLength: 1,
         }, {
             source: engine.ttAdapter(),
-
-            // This will be appended to "tt-dataset-" to form the class name of the suggestion menu.
             name: 'search-input',
-
-            // the key from the array we want to display (name,id,email,etc...)
             templates: {
                 empty: [
                     '<div class="list-group search-results-dropdown"><div class="list-group-item">Nothing found.</div></div>'
                 ],
                 header: [
                     '<ul class="list-group search-results-dropdown w-100">'
+                ],
+                footer: [
+                    '</ul>'
                 ],
                 suggestion: function (data) {
                     return '<li class="list-group-item list-group-item-action w-100">'+
@@ -434,7 +440,16 @@
             if(localStorage.getItem("edit_items")) {
               items = JSON.parse(localStorage.getItem("edit_items"));            
             }
+            if(localStorage.getItem("original_edit_items")) {
+              original_items = JSON.parse(localStorage.getItem("original_edit_items"));            
+            }
             var i = datum.id;
+            if(original_items[i]) {
+              var add_qty = original_items[i]['quantity'];
+            }else {
+              var add_qty = 0;
+            }
+
             if(!items[i]) {
               items[i] = {};
               items[i]['id']  = datum.id;
@@ -447,7 +462,7 @@
               items[i]['max_quantity']  = datum.quantity;
               items[i]['image']  = datum.image;
             }
-            else if(items[i]['quantity'] < datum.quantity) {
+            else if(items[i]['quantity'] < (parseInt(datum.quantity) + parseInt(add_qty))) {
               items[i]['quantity']++;
             }
             else {

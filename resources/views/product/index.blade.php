@@ -135,6 +135,7 @@
             <th>Image</th>
             <th>Name</th>
             <th>Price</th>
+            <th>Special Price</th>
             <th>Available</th>
             <th>Status</th>
             <th>Actions</th>
@@ -194,6 +195,10 @@
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
+            { data: 'special_price', name: 'special_price', render: function(data) {
+                  return (data)?data:0;
+                }
+            },
             { data: 'quantity', name: 'quantity'},
             { data: 'status_display', name: 'status_display'},
             { data: 'action', name: 'action', orderable : false}

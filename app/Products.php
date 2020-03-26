@@ -18,7 +18,7 @@ class Products extends Model
 {
     protected $table = 'products';
     
-    protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','Images','Status', 'Url','quantity','created_at','updated_at'];
+    protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at'];
     
     public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
 
@@ -55,6 +55,7 @@ class Products extends Model
                     'SellerSku' => $product_details['skus'][0]['SellerSku'],
                     'item_id' => $product_details['item_id'],
                     'price' =>  $product_details['skus'][0]['price'],
+                    'special_price' =>  $product_details['skus'][0]['special_price'],
                     'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
                     'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],

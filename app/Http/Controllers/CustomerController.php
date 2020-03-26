@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Validator;
 use App\Customer;
+use App\PriceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +26,15 @@ class CustomerController extends Controller
            $customer = Customer::where('business_id', $user->business_id)->orderBy('updated_at', 'desc');
            // return $customer->get();
             return Datatables($customer)
+            ->addColumn('price_group_name', function(Customer $customer) {
+                if($customer->price_group != 0) {
+                  $name = $customer->price_group_data->name;
+                }
+                else {
+                  $name = "Default";
+                }
+                return $name;
+            })
             ->addColumn('customer_name', function(Customer $customer) {
                 return $customer->formatName();
             })
@@ -38,7 +48,7 @@ class CustomerController extends Controller
                     </div></div>';
                     return $actions;
              })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'price_group_data1'])
             ->make(true);
         }
         return view('customer.index', [
@@ -56,7 +66,8 @@ class CustomerController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customers List"], ['name'=>"Add Customer"]
         ];
-        return view('customer.create', compact('breadcrumbs'));
+        $price_group = PriceGroup::where('business_id', Auth::user()->business_id)->get();
+        return view('customer.create', compact('breadcrumbs', 'price_group'));
     }
 
     /**
@@ -125,8 +136,11 @@ class CustomerController extends Controller
         if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
-
-        return view('customer.edit', compact('customer'));
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customers List"], ['name'=>"Edit Customer"]
+        ];
+        $price_group = PriceGroup::where('business_id', Auth::user()->business_id)->get();
+        return view('customer.edit', compact('customer', 'breadcrumbs', 'price_group'));
     }
 
     /**
@@ -145,7 +159,7 @@ class CustomerController extends Controller
        $validator = Validator::make($request->all(),[
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:customer',
+            'email' => 'nullable|email|max:255|unique:customer,email,'.$customer->id,
             'phone' => 'nullable',
             'price_group' => 'nullable',
             'address' => 'nullable',
@@ -217,7 +231,9 @@ class CustomerController extends Controller
     public function addCustomerModal() {
         $business_id = Auth::user()->business_id;
         $title = "this SKU";
-        return view('customer.modal.addCustomer');
+
+        $price_group = PriceGroup::where('business_id', Auth::user()->business_id)->get();
+        return view('customer.modal.addCustomer', compact('price_group'));
     }
 
     public function addCustomerAjax(Request $request) {

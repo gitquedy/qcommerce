@@ -8,7 +8,7 @@ use App\Sales;
 use App\SaleItems;
 use App\Customer;
 use App\OrderRef;
-use App\PosSettings;
+use App\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +29,12 @@ class SalesController extends Controller
            // return $sales->get();
             return Datatables($sales)   
             ->addColumn('customer_name', function(Sales $sales) {
-                return $sales->customer->formatName();
+                if($sales->customer_id) {
+                    return $sales->customer->formatName();
+                }
+                else {
+                    return $sales->customer_last_name.', '.$sales->customer_first_name;
+                }
             })   
             ->addColumn('balance', function(Sales $sales) {
                 return number_format($sales->grand_total - $sales->paid, 2);
@@ -58,13 +63,16 @@ class SalesController extends Controller
                 }
             })
             ->addColumn('action', function(Sales $sales) {
-                    $actions = '<div class="btn-group dropup mr-1 mb-1">
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-                    Action<span class="sr-only">Toggle Dropdown</span></button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
-                        <a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
-                    </div></div>';
+                    $delete = '';
+                    if ($sales->status != 'completed') {
+                        $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
+                    }
+
+                    $add_payment = '';
+                    if($sales->payment_status != 'paid') {
+                        $add_payment = '<a class="dropdown-item add_payment" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-money aria-hidden="true""></i> Add Payment</a>';
+                    }
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$add_payment.'<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>'.$delete.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action','status'])
@@ -113,7 +121,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
-            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales = new Sales;
             $sales->business_id = $user->business_id;
@@ -160,10 +168,48 @@ class SalesController extends Controller
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
+
+                if($request->status == 'completed') {
+                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
+                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+                    $Shop_array = array();
+                    foreach($all_shops as $all_shopsVAL){
+                        $Shop_array[] = $all_shopsVAL->id;
+                    }
+                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
+                    if($sku){
+                        $sku->quantity -= $item['quantity'];
+                        $result = $sku->save();
+                        foreach ($Sku_prod as $prod) {
+                            $shop_id = $prod->shop_id;
+                            $access_token = Shop::find($shop_id)->access_token;
+
+                            $prod = Products::where('id', $prod->id)->first();
+                            $prod->quantity = $sku->quantity;
+                            $prod->save();
+                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                                <Request>
+                                    <Product>
+                                        <Skus>
+                                            <Sku>
+                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                                <quantity>'.$sku->quantity.'</quantity>
+                                            </Sku>
+                                        </Skus>
+                                    </Product>
+                                </Request>';
+                            if(env('lazada_sku_sync', true)){
+                                if($prod->site == 'lazada'){
+                                    $response = Products::product_update($access_token,$xml);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             $sales_items_query = SaleItems::insert($sales_items);
             if (!$request->reference_no) {
-                $increment = OrderRef::where('pos_settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
+                $increment = OrderRef::where('settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
             }
             $output = ['success' => 1,
                 'msg' => 'Sale added successfully!',
@@ -220,6 +266,7 @@ class SalesController extends Controller
     public function update(Request $request, $id)
     {
         $sales = Sales::findOrFail($id);
+        $old_status = $sales->status;
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
@@ -240,7 +287,7 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
-            $genref = PosSettings::where('business_id', Auth::user()->business_id)->first();
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
@@ -292,6 +339,44 @@ class SalesController extends Controller
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
+
+                if($old_status != 'completed' && $request->status == 'completed') {
+                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
+                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+                    $Shop_array = array();
+                    foreach($all_shops as $all_shopsVAL){
+                        $Shop_array[] = $all_shopsVAL->id;
+                    }
+                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
+                    if($sku){
+                        $sku->quantity -= $item['quantity'];
+                        $result = $sku->save();
+                        foreach ($Sku_prod as $prod) {
+                            $shop_id = $prod->shop_id;
+                            $access_token = Shop::find($shop_id)->access_token;
+
+                            $prod = Products::where('id', $prod->id)->first();
+                            $prod->quantity = $sku->quantity;
+                            $prod->save();
+                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                                <Request>
+                                    <Product>
+                                        <Skus>
+                                            <Sku>
+                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                                <quantity>'.$sku->quantity.'</quantity>
+                                            </Sku>
+                                        </Skus>
+                                    </Product>
+                                </Request>';
+                            if(env('lazada_sku_sync', true)){
+                                if($prod->site == 'lazada'){
+                                    $response = Products::product_update($access_token,$xml);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             SaleItems::insert($sales_items);
             $output = ['success' => 1,
@@ -320,7 +405,7 @@ class SalesController extends Controller
     {
         $sales = Sales::findOrFail($id);
         if($sales->business_id != Auth::user()->business_id){
-            abort(401, 'You don\'t have access to edit this customer');
+            abort(401, 'You don\'t have access to edit this sale');
         }
         try {
             DB::beginTransaction();

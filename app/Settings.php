@@ -7,9 +7,9 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Utilities;
 
-class PosSettings extends Model
+class Settings extends Model
 {
-	protected $table = 'pos_settings';
+	protected $table = 'settings';
     /**
      * The attributes that are mass assignable.
      *
@@ -21,9 +21,8 @@ class PosSettings extends Model
 
     
     public function order_ref(){
-        return $this->belongsTo(OrderRef::class, 'id', 'pos_settings_id');
+        return $this->belongsTo(OrderRef::class, 'id', 'settings_id');
     }
-
 
     public function getReference_so() {
         return $this->sales_prefix.sprintf('%04d', $this->order_ref->so);

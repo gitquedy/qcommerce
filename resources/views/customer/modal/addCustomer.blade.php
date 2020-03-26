@@ -63,8 +63,10 @@
                 <label>Price Group</label>
                 <div class="position-relative has-icon-left">
                   <select name="price_group" id="price_group" class="form-control select2" placeholder="Price Group">
-                    <option value="" selected disabled></option>
-                    <option value="0">None</option>
+                      <option value="0">Default</option>
+                      @foreach($price_group as $pg)
+                      <option value="{{$pg->id}}">{{$pg->name}}</option>
+                      @endforeach
                   </select>
                   <div class="form-control-position"> 
                     <i class="feather icon-users"></i>

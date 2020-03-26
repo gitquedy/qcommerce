@@ -37,4 +37,8 @@ class Customer extends Model
     public function fullName(){
         return $this->first_name . ' ' . $this->last_name;
     }
+    
+    public function price_group_data(){
+        return $this->hasOne(PriceGroup::class, 'id', 'price_group');
+    }
 }
