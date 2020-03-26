@@ -80,4 +80,5 @@
   $(document).on('click', '.chip-closeable',function () {
     $(this).closest('.chip').remove();
   })
+
 })(window, document, jQuery);

@@ -21,6 +21,7 @@ class CreatePaymentsTable extends Migration
             $table->date('date');
             $table->string('payment_type');
             $table->string('cheque_no')->nullable();
+            $table->string('gift_card_no')->nullable();
             $table->string('cc_no')->nullable();
             $table->string('cc_holder')->nullable();
             $table->string('cc_month')->nullable();
@@ -29,7 +30,7 @@ class CreatePaymentsTable extends Migration
             $table->float('amount', 10, 2);
             $table->text('attachment')->nullable();
             $table->string('status');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
             $table->timestamps();

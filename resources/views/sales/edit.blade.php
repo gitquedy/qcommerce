@@ -203,27 +203,14 @@
                                 </div>
                             </div>
                             @endif
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Paid Amount</label>
-                                    <div class="position-relative has-icon-left">
-                                      <input type="number" name="paid" class="form-control update_input check_max_quantity" value="{{$sales->paid}}" max="0">
-                                      <div class="form-control-position"> 
-                                        <i class="feather icon-dollar-sign"></i>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
                           </div>
                     <div class="form-group col-12">
                     </div>
                         <div class="row">
                           <div class="col-6">
                            <div class="col-12">
-                            @if($sales->status == 'pending')
                                 <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
                                 <button type="reset" id="sale_reset" class="btn btn-danger mr-1 mb-1">Reset </button>
-                            @endif
                             </div>
                           </div>
                         </div>
@@ -333,7 +320,7 @@
                             data.code+
                             '<input type="hidden" name="sales_item_array['+i+'][image]" value="'+data.image+'" />'+
                             '<input type="hidden" name="sales_item_array['+i+'][name]" value="'+data.name+'" />'+
-                            '<input type="hidden" name="sales_item_array['+i+'][brand]" value="'+data.brand+'" />+'+
+                            '<input type="hidden" name="sales_item_array['+i+'][brand]" value="'+data.brand+'" />'+
                             '<input type="hidden" name="sales_item_array['+i+'][code]" value="'+data.code+'" />'+
                           '</div>'+
                         '</div>'+

@@ -29,26 +29,26 @@ class Settings extends Model
     }
 
     public function getReference_qu() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->qu);
+        return $this->quote_prefix.sprintf('%04d', $this->order_ref->qu);
     }
 
     public function getReference_po() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->po);
+        return $this->purchase_prefix.sprintf('%04d', $this->order_ref->po);
     }
 
     public function getReference_tr() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->tr);
+        return $this->transfer_prefix.sprintf('%04d', $this->order_ref->tr);
     }
 
     public function getReference_do() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->do);
+        return $this->delivery_prefix.sprintf('%04d', $this->order_ref->do);
     }
 
     public function getReference_pay() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->pay);
+        return $this->payment_prefix.sprintf('%04d', $this->order_ref->pay);
     }
 
     public function getReference_re() {
-        return $this->sales_prefix.sprintf('%04d', $this->order_ref->re);
+        return $this->return_prefix.sprintf('%04d', $this->order_ref->re);
     }
 }

@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Validator;
+use App\Sku;
+use App\Shop;
 use App\Sales;
 use App\SaleItems;
+use App\Products;
+use App\Payment;
 use App\Customer;
 use App\OrderRef;
 use App\Settings;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -63,16 +68,26 @@ class SalesController extends Controller
                 }
             })
             ->addColumn('action', function(Sales $sales) {
-                    $delete = '';
-                    if ($sales->status != 'completed') {
-                        $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
+                    $view = '<a class="dropdown-item" href="#"><i class="fa fa-eye aria-hidden="true""></i> View (WIP)</a>';
+                    if($sales->payment_status != 'paid') {
+                        $add_payment = '<a class="dropdown-item add_payment" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar aria-hidden="true""></i> Add Payment</a>';
+                    }
+                    else {
+                        $add_payment = '';
                     }
 
-                    $add_payment = '';
-                    if($sales->payment_status != 'paid') {
-                        $add_payment = '<a class="dropdown-item add_payment" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-money aria-hidden="true""></i> Add Payment</a>';
+                    if ($sales->status == 'pending') {
+                        $edit = '<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>';
                     }
-                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$add_payment.'<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>'.$delete.'</div></div>';
+                    else {
+                        $edit = '';
+                    }
+                        // $edit = '<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>';
+                    $view_paymments = '<a class="dropdown-item" href="#"><i class="fa fa-money aria-hidden="true""></i> View Payments (WIP)</a>';
+
+                    $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
+
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_paymments.$edit.$delete.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action','status'])
@@ -111,7 +126,18 @@ class SalesController extends Controller
             'customer_id' => 'required',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
+            'paid' => 'nullable',
             'sales_item_array' => 'required|array',
+            'payment_reference_no' => 'nullable',
+            'payment_type' => Rule::requiredIf($request->paid > 0),
+            'gift_card_no' => Rule::requiredIf($request->payment_type == 'gift_certificate' && $request->paid > 0),
+            'cc_no' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_holder' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_type' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_month' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_year' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque' && $request->paid > 0),
+            'payment_note' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -169,47 +195,35 @@ class SalesController extends Controller
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
 
-                if($request->status == 'completed') {
-                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
-                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
-                    $Shop_array = array();
-                    foreach($all_shops as $all_shopsVAL){
-                        $Shop_array[] = $all_shopsVAL->id;
-                    }
-                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
-                    if($sku){
-                        $sku->quantity -= $item['quantity'];
-                        $result = $sku->save();
-                        foreach ($Sku_prod as $prod) {
-                            $shop_id = $prod->shop_id;
-                            $access_token = Shop::find($shop_id)->access_token;
-
-                            $prod = Products::where('id', $prod->id)->first();
-                            $prod->quantity = $sku->quantity;
-                            $prod->save();
-                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                                <Request>
-                                    <Product>
-                                        <Skus>
-                                            <Sku>
-                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                                <quantity>'.$sku->quantity.'</quantity>
-                                            </Sku>
-                                        </Skus>
-                                    </Product>
-                                </Request>';
-                            if(env('lazada_sku_sync', true)){
-                                if($prod->site == 'lazada'){
-                                    $response = Products::product_update($access_token,$xml);
-                                }
-                            }
-                        }
-                    }
-                }
+            }
+            if($request->status == 'completed') {
+                $this->syncStocks($request->sales_item_array);   
             }
             $sales_items_query = SaleItems::insert($sales_items);
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
+            }
+            if($request->paid) {
+                $payment = new Payment;
+                $payment->sales_id = $sales->id;
+                $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
+                $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
+                $payment->amount = $request->paid;
+                $payment->payment_type = $request->payment_type;
+                $payment->gift_card_no = $request->gift_card_no;
+                $payment->cc_no = $request->cc_no;
+                $payment->cc_holder = $request->cc_holder;
+                $payment->cc_type = $request->cc_type;
+                $payment->cc_month = $request->cc_month;
+                $payment->cc_year = $request->cc_year;
+                $payment->cheque_no = $request->cheque_no;
+                $payment->status = 'received';
+                $payment->note = $request->note;
+                $payment->created_by = $user->id;
+                $payment->save();
+                if (!$request->payment_reference_no) {
+                    $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
+                }
             }
             $output = ['success' => 1,
                 'msg' => 'Sale added successfully!',
@@ -340,43 +354,13 @@ class SalesController extends Controller
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
 
-                if($old_status != 'completed' && $request->status == 'completed') {
-                    $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
-                    $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
-                    $Shop_array = array();
-                    foreach($all_shops as $all_shopsVAL){
-                        $Shop_array[] = $all_shopsVAL->id;
-                    }
-                    $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
-                    if($sku){
-                        $sku->quantity -= $item['quantity'];
-                        $result = $sku->save();
-                        foreach ($Sku_prod as $prod) {
-                            $shop_id = $prod->shop_id;
-                            $access_token = Shop::find($shop_id)->access_token;
-
-                            $prod = Products::where('id', $prod->id)->first();
-                            $prod->quantity = $sku->quantity;
-                            $prod->save();
-                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                                <Request>
-                                    <Product>
-                                        <Skus>
-                                            <Sku>
-                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                                <quantity>'.$sku->quantity.'</quantity>
-                                            </Sku>
-                                        </Skus>
-                                    </Product>
-                                </Request>';
-                            if(env('lazada_sku_sync', true)){
-                                if($prod->site == 'lazada'){
-                                    $response = Products::product_update($access_token,$xml);
-                                }
-                            }
-                        }
-                    }
-                }
+            }
+            if($old_status != 'completed' && $request->status == 'completed') {
+                $this->syncStocks($request->sales_item_array);
+            }
+            else {
+                $this->returnStocks($sales->items);
+                $this->syncStocks($request->sales_item_array);
             }
             SaleItems::insert($sales_items);
             $output = ['success' => 1,
@@ -404,6 +388,9 @@ class SalesController extends Controller
     public function destroy($id)
     {
         $sales = Sales::findOrFail($id);
+        if ($sales->status == 'completed') {
+            $this->returnStocks($sales->items);
+        }
         if($sales->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this sale');
         }
@@ -424,8 +411,6 @@ class SalesController extends Controller
         return response()->json($output);
     }
 
-
-
     public function delete(Sales $sales, Request $request){
       if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this sales');
@@ -434,4 +419,86 @@ class SalesController extends Controller
         $title = 'Sale ' . $sales->reference_no;
         return view('layouts.delete', compact('action' , 'title'));
     }
+
+    public function syncStocks($items) {
+        $user = Auth::user();
+        $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+        $Shop_array = array();
+        foreach($all_shops as $all_shopsVAL){
+            $Shop_array[] = $all_shopsVAL->id;
+        }
+        foreach ($items as $id => $item) {
+            $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
+            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
+            if($sku){
+                $sku->quantity -= $item['quantity'];
+                $result = $sku->save();
+                foreach ($Sku_prod as $prod) {
+                    $shop_id = $prod->shop_id;
+                    $access_token = Shop::find($shop_id)->access_token;
+
+                    $prod = Products::where('id', $prod->id)->first();
+                    $prod->quantity = $sku->quantity;
+                    $prod->save();
+                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                        <Request>
+                            <Product>
+                                <Skus>
+                                    <Sku>
+                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                        <quantity>'.$sku->quantity.'</quantity>
+                                    </Sku>
+                                </Skus>
+                            </Product>
+                        </Request>';
+                    if(env('lazada_sku_sync', true)){
+                        if($prod->site == 'lazada'){
+                            $response = Products::product_update($access_token,$xml);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function returnStocks($items) {
+        $user = Auth::user();
+        $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
+        $Shop_array = array();
+        foreach($all_shops as $all_shopsVAL){
+            $Shop_array[] = $all_shopsVAL->id;
+        }
+        foreach ($items as $item) {
+            $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $item->sku_id)->first();
+            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$item->sku_id)->orderBy('updated_at', 'desc')->get();
+            if($sku){
+                $sku->quantity += $item->quantity;
+                $result = $sku->save();
+                foreach ($Sku_prod as $prod) {
+                    $shop_id = $prod->shop_id;
+                    $access_token = Shop::find($shop_id)->access_token;
+
+                    $prod = Products::where('id', $prod->id)->first();
+                    $prod->quantity = $sku->quantity;
+                    $prod->save();
+                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                        <Request>
+                            <Product>
+                                <Skus>
+                                    <Sku>
+                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                        <quantity>'.$sku->quantity.'</quantity>
+                                    </Sku>
+                                </Skus>
+                            </Product>
+                        </Request>';
+                    if(env('lazada_sku_sync', true)){
+                        if($prod->site == 'lazada'){
+                            $response = Products::product_update($access_token,$xml);
+                        }
+                    }
+                }
+            }
+        }
+    } 
 }
