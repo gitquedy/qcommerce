@@ -60,6 +60,8 @@ Route::group(['middleware' => 'auth'], function()
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
 	{
+		Route::get('/sku/import/', 'SkuController@import')->name('sku.import');
+		Route::post('/sku/import/', 'SkuController@submitImport')->name('sku.submitImport');
 		Route::resource('/sku', 'SkuController');
 		Route::get('/sku/create/', 'SkuController@create')->name('sku.create');
 		Route::post('/sku/add/', 'SkuController@add')->name('sku.add');

@@ -137,6 +137,12 @@
                                 <span class="menu-title" data-i18n="">Add new SKU</span>
                             </a>
                         </li>
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'import' ? 'active' : '' }}">
+                            <a href="{{route('sku.import')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Import SKU</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             @endcan
