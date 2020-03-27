@@ -117,6 +117,7 @@ class Handler extends ExceptionHandler
         $response['status'] = $statusCode;
 
         return ResponseBuilder::asError($statusCode)
+          ->withHttpCode($statuscode)
           ->withDebugData(null)
           ->withMessage($response['message'])
           ->build();
@@ -126,6 +127,7 @@ class Handler extends ExceptionHandler
     {
         if ($request->expectsJson()) {
             return ResponseBuilder::asError(401)
+              ->withHttpCode(401)
               ->withDebugData(null)
               ->withMessage('Unauthenticated')
               ->build();
