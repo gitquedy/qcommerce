@@ -41,4 +41,8 @@ class Customer extends Model
     public function price_group_data(){
         return $this->hasOne(PriceGroup::class, 'id', 'price_group');
     }
+    
+    public function sales(){
+        return $this->hasMany(Sales::class, 'customer_id', 'id');
+    }
 }

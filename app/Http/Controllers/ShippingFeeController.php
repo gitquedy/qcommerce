@@ -53,13 +53,28 @@ class ShippingFeeController extends Controller
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                             })
+                ->addColumn('payment_period', function (Order $order) {
+                            if (!isset($order->seller_payout_fees)) {
+                              return "--";
+                            }
+                            return $order->seller_payout_fees->statement;
+                })
                 ->addColumn('shipping_by_customer', function (Order $order) {
+                            if (!isset($order->customer_payout_fees)) {
+                              return "--";
+                            }
                             return number_format($order->customer_payout_fees->amount);
                 })
                 ->addColumn('shipping_by_seller', function (Order $order) {
+                            if (!isset($order->seller_payout_fees)) {
+                              return "--";
+                            }
                             return number_format(abs($order->seller_payout_fees->amount));
                 })
                 ->addColumn('overcharge', function (Order $order) {
+                            if (!isset($order->seller_payout_fees) || !isset($order->customer_payout_fees)) {
+                              return "--";
+                            }
                             return number_format(abs($order->seller_payout_fees->amount) - $order->customer_payout_fees->amount);
                 })
                 // ->addColumn('action', function(Order $order) {

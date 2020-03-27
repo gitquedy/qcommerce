@@ -38,6 +38,15 @@ class CustomerController extends Controller
             ->addColumn('customer_name', function(Customer $customer) {
                 return $customer->formatName();
             })
+            ->addColumn('balance', function(Customer $customer) {
+                $balance = 0;
+                foreach ($customer->sales as $sale) {
+                    if (in_array($sale->payment_status, ['pending', 'partial']) && $sale->status == 'completed') {
+                      $balance += $sale->grand_total - $sale->paid;
+                    }
+                }
+                return number_format($balance, 2);
+            })
             ->addColumn('action', function(Customer $customer) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">

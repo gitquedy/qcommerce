@@ -41,6 +41,7 @@
             <th>Email</th>
             <th>Price Group</th>
             <th>Last Update</th>
+            <th>Balance</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -80,6 +81,7 @@
             { data: 'email', name: 'email' },
             { data: 'price_group_name', name: 'price_group_name' },
             { data: 'updated_at', name: 'updated_at' },
+            { data: 'balance', name: 'balance' },
             { data: 'action', name: 'action' },
         ];
   var table_route = {

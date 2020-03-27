@@ -155,7 +155,7 @@
                 className:'dt-checkboxes-cell'
             },
             { data: 'idDisplay', name: 'idDisplay' ,orderable : false},
-            { data: 'seller_payout_fees.statement', name: 'seller_payout_fees.statement' },
+            { data: 'payment_period', name: 'payment_period' },
             { data: 'shipping_fee', name: 'shipping_fee' },
             { data: 'shipping_by_customer', name: 'shipping_by_customer' },
             { data: 'shipping_by_seller', name: 'shipping_by_seller' },
