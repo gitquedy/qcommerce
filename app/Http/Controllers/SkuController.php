@@ -543,7 +543,7 @@ class SkuController extends Controller
 
     public function import() {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"SKU  Create"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Import SKU"]
         ];
         return view('sku.import', [
             'breadcrumbs' => $breadcrumbs

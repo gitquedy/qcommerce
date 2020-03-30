@@ -148,6 +148,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
+	Route::resource('/plan', 'PlanController');
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{

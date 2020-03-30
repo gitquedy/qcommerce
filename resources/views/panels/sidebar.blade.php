@@ -329,6 +329,22 @@
                     </ul>
                 </li>
             {{-- @endcan --}}
+
+
+                <li class="nav-item">
+                    <a href="">
+                        <i class="feather icon-list"></i>
+                        <span class="menu-title" data-i18n="">Plan (Temp)</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'plan' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('plan')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Plan</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             
         </ul>
     </div>
