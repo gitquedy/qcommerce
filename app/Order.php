@@ -40,11 +40,11 @@ class Order extends Model
     }
 
     public function customer_payout_fees() {
-        return $this->hasOne(ShippingFee::class, 'order_no', 'id')->where('trans_type', 8);
+        return $this->hasOne(ShippingFee::class, 'order_no', 'ordersn')->where('trans_type', 8);
     }
 
     public function seller_payout_fees() {
-        return $this->hasOne(ShippingFee::class, 'order_no', 'id')->where('trans_type', 7);
+        return $this->hasOne(ShippingFee::class, 'order_no', 'ordersn')->where('trans_type', 7);
     }
 
 	public function getActionsDropdown(){
