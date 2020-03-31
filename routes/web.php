@@ -16,19 +16,42 @@
 
 Route::group(['middleware' => 'auth'], function()
 {
+	Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function(){
+		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
+	});
+
+	Route::group(['prefix' => 'paypal'], function(){
+		Route::post('payment/{package}', 'PayPalController@payment')->name('paypal.payment');
+		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
+		Route::get('payment/success{billing}', 'PayPalController@success')->name('paypal.payment.success');
+	});
+
+
+
+
 	Route::get('/', 'DashboardController@index')->name('dashboard');
 	
 	//Own(Anyone can access)
-	Route::get('/user/edit_profile/', 'UserController@editProfile')->name('user.editProfile');
+	// Route::get('/user/edit_profile/', 'UserController@editProfile')->name('user.editProfile');
+	Route::get('/user/settings', 'UserController@settings')->name('user.settings');
 	Route::post('/user/update_profile/', 'UserController@updateProfile')->name('user.updateProfile');
-	Route::get('/user/change_password/', 'UserController@changePassword')->name('user.changePassword');
+	// Route::get('/user/change_password/', 'UserController@changePassword')->name('user.changePassword');
 	Route::post('/user/update_password/', 'UserController@updatePassword')->name('user.updatePassword');
+
+	
 
 	//Ajax
 	Route::post('ajax/get_notification', 'AjaxController@get_notification')->name('ajax_get_notification');
 	Route::get('/lazop/receive', 'LazopController@receive')->name('lazop.receive');
 	Route::get('/shop/shopeeGetLogistics/{shop}', 'ShopController@shopeeGetLogistics');
 	Route::post('/barcode/view_barcode', 'BarcodeController@viewBarcode')->name('barcode.viewBarcode');
+
+
+	//application
+	Route::get('/application', 'ApplicationController@index');
+	Route::get('/application/{package}', 'ApplicationController@show');
+
+
 
 	Route::group(['middleware' => 'permission:shop.manage'], function()
 	{

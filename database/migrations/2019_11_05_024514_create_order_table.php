@@ -20,7 +20,7 @@ class CreateOrderTable extends Migration
             $table->unsignedBigInteger('shop_id');
             $table->foreign('shop_id')->references('id')->on('shop')->onDelete('cascade');
 
-            $table->string('ordersn')->nullable();
+            $table->string('ordersn');
             $table->string('tracking_no')->nullable();
             $table->string('site')->nullable();
             $table->string('customer_last_name')->nullable();

@@ -109,8 +109,7 @@
                             <div class="user-nav d-sm-flex d-none"><span class="user-name text-bold-600">{{ Auth::user()->formatName() }}</span><span class="user-status">Available</span></div><span><img class="round" src="{{ asset('images/profile/profile-picture/'.Auth::user()->picture) }}" alt="avatar" height="40" width="40" /></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('user.editProfile') }}"><i class="feather icon-user"></i> Edit Profile</a>
-                            <a class="dropdown-item" href="{{ route('user.changePassword') }}"><i class="feather icon-lock"></i>Change Password</a>
+                            <a class="dropdown-item" href="{{ action('UserController@settings') }}"><i class="feather icon-settings"></i>Account Settings</a>
                             <div class="dropdown-divider"></div><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); 
                       document.getElementById('logout-form').submit();"><i class="feather icon-power"></i> Logout</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

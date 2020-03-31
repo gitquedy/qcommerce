@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2018 (64-Bit) -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="70.6118mm" height="70.6118mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 7061.18 7061.18"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str3 {stroke:#4050CE;stroke-width:70.56;stroke-miterlimit:22.9256}
+    .str2 {stroke:#4050CE;stroke-width:70.56;stroke-miterlimit:22.9256}
+    .str1 {stroke:#4050CE;stroke-width:112.89;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:22.9256}
+    .str0 {stroke:#4050CE;stroke-width:112.89;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:22.9256}
+    .str4 {stroke:#4050CE;stroke-width:123.47;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:22.9256}
+    .fil0 {fill:none}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" x="-0.01" y="-0.01" width="7061.19" height="7061.19"/>
+  <g>
+   <path class="fil0 str0" d="M2770.31 1198.18c0,0 765.72,-33.89 759.36,597.07 -611.61,155.01 -759.36,-597.07 -759.36,-597.07z"/>
+  </g>
+  <g>
+   <path class="fil0 str0" d="M3529.8 1783.95c2.85,-619.27 759.35,-585.77 759.35,-585.77 0,0 -147.61,752.08 -759.35,597.07 0,-3.77 0,-7.53 0,-11.3z"/>
+  </g>
+  <g>
+   <path class="fil0 str0" d="M3544.46 2687.8c0,-954.74 1163.78,-903.33 1163.78,-903.33 0,0 -226.3,1152.59 -1163.78,915.14 0,-3.89 0,-7.92 0,-11.81z"/>
+  </g>
+  <g>
+   <path class="fil0 str0" d="M3529.8 2702.99l0 0.26c-925.14,221.74 -1149.22,-918.78 -1149.22,-918.78 0,0 1014.98,-44.79 1149.22,726.77 0.13,0 0,0.12 0,0.12 0,0.52 0,0.52 0,1.17l0 189.81 0 0.65z"/>
+  </g>
+  <g>
+   <line class="fil0 str1" x1="3529.72" y1="1611.49" x2="3529.72" y2= "3372.5" />
+  </g>
+  <g>
+   <path class="fil0 str2" d="M2512.66 4560.22c-29.54,-124.17 -59.07,-248.35 -88.59,-372.53 -24.87,-104.02 -192.01,-87.84 -167.01,17.32 29.53,124.17 59.06,248.35 88.59,372.52 24.73,102.89 192,87.85 167.01,-17.31z"/>
+  </g>
+  <g>
+   <path class="fil0 str3" d="M2600.06 4963.34c-8.92,-35.45 -17.85,-70.91 -26.68,-105.59 -7.5,-30.07 -48.75,-43.48 -75.33,-33.21 -31.86,12.47 -40.8,44.47 -33.21,75.32 8.92,35.46 17.85,70.92 26.68,105.6 7.5,30.06 48.75,43.47 75.33,33.21 32.56,-13.35 40.71,-45.26 33.21,-75.33z"/>
+  </g>
+  <g>
+   <polygon class="fil0 str4" points="5067.26,3886.15 4601.82,5974.46 2434.14,5974.46 1968.23,3886.15 "/>
+  </g>
+  <g>
+   <path class="fil0 str4" d="M5165.1 3372.5c141.87,0 256.87,115 256.87,256.87 0,141.87 -115,256.78 -256.87,256.78l-97.85 0 -3099.02 0 -108.52 0c-141.87,0 -256.87,-114.91 -256.87,-256.78 0,-70.98 28.77,-135.2 75.17,-181.6 46.5,-46.5 110.72,-75.27 181.7,-75.27l1649.93 0 1655.46 0z"/>
+  </g>
+ </g>
+</svg>

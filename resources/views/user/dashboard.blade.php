@@ -1,6 +1,5 @@
-
+@inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
-
 @section('title', 'Dashboard')
 
 @section('vendor-style')
