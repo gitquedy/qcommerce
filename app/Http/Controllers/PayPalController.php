@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Billing;
 use App\Package;
+use App\Plan;
 use DB;
    
 class PayPalController extends Controller
@@ -15,24 +16,24 @@ class PayPalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function payment(Package $package, Request $request)
+    public function payment(Plan $plan, Request $request)
     {
         try {
             $invoice_no = Billing::getNextInvoiceNumber();
 	        $data = [];
-	        $price = $package->price;
+	        $price = $plan->monthly_cost;
 	        $data['items'] = [
 	            [
-	                'name' => $package->name,
+	                'name' => $plan->name,
 	                'price' => $price,
-	                'desc'  =>   $package->name . ' 1  month subscription for qcommerce.com',
+	                'desc'  =>   $plan->name . ' 1  month subscription for qcommerce.com',
 	                'qty' => 1
 	            ]
 	        ];
 
 	        $billing = Billing::create([
 	        	'business_id' => $request->user()->business_id,
-	        	'package_id' => $package->id,
+	        	'plan_id' => $plan->id,
 	        	'invoice_no' => $invoice_no
 	        ]);
 
@@ -90,7 +91,9 @@ class PayPalController extends Controller
      */
     public function success(Request $request, Billing $billing)
     {
+        $provider = new ExpressCheckout;
         $response = $provider->getExpressCheckoutDetails($request->token);
+        dd($response);
   
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
             dd('Your payment was successfully. You can create success page here.');

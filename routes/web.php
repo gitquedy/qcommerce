@@ -21,7 +21,7 @@ Route::group(['middleware' => 'auth'], function()
 	});
 
 	Route::group(['prefix' => 'paypal'], function(){
-		Route::post('payment/{package}', 'PayPalController@payment')->name('paypal.payment');
+		Route::post('payment/{plan}', 'PayPalController@payment')->name('paypal.payment');
 		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
 		Route::get('payment/success{billing}', 'PayPalController@success')->name('paypal.payment.success');
 	});
@@ -171,7 +171,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
-	Route::resource('/plan', 'PlanController');
+	Route::resource('/plan', 'PlanController')->only(['index', 'show']);
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{

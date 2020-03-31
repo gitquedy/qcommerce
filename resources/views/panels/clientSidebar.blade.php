@@ -112,10 +112,10 @@
                         <span class="menu-title" data-i18n="">Applications</span>
                     </a>
                     <ul class="menu-content">
-                            <li class="{{ $request->segment(1) == 'application' && $request->segment(2) == '' ? 'active' : '' }}">
-                                <a href="{{ action('ApplicationController@index') }}">
+                            <li class="{{ $request->segment(1) == 'plan' && $request->segment(2) == '' ? 'active' : '' }}">
+                                <a href="{{ action('PlanController@index') }}">
                                     <i class="feather icon-circle"></i>
-                                    <span class="menu-title" data-i18n="">App Store</span>
+                                    <span class="menu-title" data-i18n="">Plan Store</span>
                                 </a>
                             </li>
                     </ul>

@@ -20,8 +20,8 @@ class CreateBillingTable extends Migration
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
 
-            $table->unsignedBigInteger('package_id');
-            $table->foreign('package_id')->references('id')->on('package')->onDelete('cascade');
+            $table->unsignedBigInteger('plan_id');
+            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             
             $table->tinyInteger('paid_status')->default(0);
             

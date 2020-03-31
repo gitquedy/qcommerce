@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Plan Management')
+@section('title', 'Plan Store')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -138,7 +138,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <button type="button" class="btn btn-primary my-2 Subscribe_Btn" data-id="{{$plan->id}}" >Subscribe</button>
+                      <a href="{{ action('PlanController@show', $plan->id) }}" class="btn btn-primary my-2" data-id="{{$plan->id}}" >Subscribe</a>
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>

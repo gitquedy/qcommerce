@@ -4,13 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Plan;
 
 class Billing extends Model
 {
 
 	protected $table = 'billing';
 
-	protected $fillable = ['invoice_no', 'business_id', 'package_id', 'paid_status', 'payment_transaction_id', 'payment_type'];    
+	protected $fillable = ['invoice_no', 'business_id', 'plan_id', 'paid_status', 'payment_transaction_id', 'payment_type'];    
 
     public static function getNextInvoiceNumber(){
     	//get last record
@@ -28,5 +29,9 @@ class Billing extends Model
 		}
 		
 		return $nextInvoiceNumber;
+    }
+
+    public function plan(){
+    	return $this->belongsTo(Plan::class, 'plan_id', 'id');
     }
 }
