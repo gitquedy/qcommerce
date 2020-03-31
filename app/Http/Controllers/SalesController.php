@@ -31,7 +31,6 @@ class SalesController extends Controller
         ];
         if ( request()->ajax()) {
            $sales = Sales::orderBy('updated_at', 'desc');
-           // return $sales->get();
             return Datatables($sales)   
             ->addColumn('customer_name', function(Sales $sales) {
                 if($sales->customer_id) {
@@ -70,7 +69,7 @@ class SalesController extends Controller
             ->addColumn('action', function(Sales $sales) {
                     $view = '<a class="dropdown-item" href="#"><i class="fa fa-eye aria-hidden="true""></i> View (WIP)</a>';
                     if($sales->payment_status != 'paid') {
-                        $add_payment = '<a class="dropdown-item add_payment" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar aria-hidden="true""></i> Add Payment</a>';
+                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar aria-hidden="true""></i> Add Payment</a>';
                     }
                     else {
                         $add_payment = '';
@@ -82,12 +81,11 @@ class SalesController extends Controller
                     else {
                         $edit = '';
                     }
-                        // $edit = '<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>';
-                    $view_paymments = '<a class="dropdown-item" href="#"><i class="fa fa-money aria-hidden="true""></i> View Payments (WIP)</a>';
+                    $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal', $sales->id).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
 
                     $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
 
-                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_paymments.$edit.$delete.'</div></div>';
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_payments.$edit.$delete.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action','status'])

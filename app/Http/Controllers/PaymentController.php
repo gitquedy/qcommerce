@@ -90,6 +90,12 @@ class PaymentController extends Controller
         //
     }
 
+    public function viewPaymentModal(Sales $sales, Request $request) {
+        $business_id = Auth::user()->business_id;
+        $payments = Payment::where('sales_id', $sales->id)->get();
+        return view('payment.modal.viewPayment', compact('sales','payments'));
+    }
+
     public function addPaymentModal(Sales $sales, Request $request) {
         $business_id = Auth::user()->business_id;
         return view('payment.modal.addPayment', compact('sales'));

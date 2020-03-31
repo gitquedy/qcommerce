@@ -10,7 +10,7 @@
 var table = '';
 $(document).ready(function () {
   "use strict";
-     table = $(".data-list-view").DataTable({
+    table = $(".data-list-view").DataTable({
         processing: true,
         serverSide: false,
         ajax: table_route,

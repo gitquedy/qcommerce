@@ -111,7 +111,7 @@
   var pageLength = 20;
 </script>
 <script type="text/javascript">
-    $(document).on('click', '.add_payment', function(e) {
+    $(document).on('click', '.toggle_view_modal', function(e) {
         e.preventDefault();
         $.ajax({
             url: $(this).data('action'),
