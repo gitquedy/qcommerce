@@ -81,7 +81,7 @@ class PayPalController extends Controller
     {
     	$billing->delete();
     	$request->session()->flash('flash_success', 'Successfully cancelled');
-        return redirect(action('ApplicationController@index'));
+        return redirect(action('PlanController@index'));
     }
 
     /**
