@@ -23,6 +23,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use Helper;
 use Auth;
+use App\Imports\SkuImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SkuController extends Controller
 {
@@ -140,8 +142,8 @@ class SkuController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            // 'brand' => 'nullable',
-            // 'category' => 'nullable',
+            'brand' => 'nullable',
+            'category' => 'nullable',
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
@@ -537,6 +539,36 @@ class SkuController extends Controller
                     ];
         echo json_encode($output);
         
+    }
+
+    public function import() {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Import SKU"]
+        ];
+        return view('sku.import', [
+            'breadcrumbs' => $breadcrumbs
+            ]);
+    }
+
+    public function submitImport(Request $request) {
+        try {
+            DB::beginTransaction();
+            if(Excel::import(new SkuImport,request()->file('file'))) {
+                $output = ['success' => 1,
+                    'msg' => 'SKU Imported successfully!',
+                    'redirect' => action('SkuController@index')
+                ];
+            }
+            DB::commit();
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => 'Sorry something went wrong, please check sku data and try again.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
     }
 
 }

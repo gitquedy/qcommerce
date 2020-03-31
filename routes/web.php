@@ -83,6 +83,8 @@ Route::group(['middleware' => 'auth'], function()
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
 	{
+		Route::get('/sku/import/', 'SkuController@import')->name('sku.import');
+		Route::post('/sku/import/', 'SkuController@submitImport')->name('sku.submitImport');
 		Route::resource('/sku', 'SkuController');
 		Route::get('/sku/create/', 'SkuController@create')->name('sku.create');
 		Route::post('/sku/add/', 'SkuController@add')->name('sku.add');
@@ -169,6 +171,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
+	Route::resource('/plan', 'PlanController');
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
