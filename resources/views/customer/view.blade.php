@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Edit Customer')
+@section('title', 'View Customer')
 
 @section('content')
 <section id="floating-label-layouts">
