@@ -123,8 +123,8 @@
                     <td class="text-right">{{number_format($sales->discount,2)}}</td>
                   </tr>
                   <tr>
-                    <th colspan="3" class="text-right">Grand Total:</th>
-                    <th class="text-right">{{number_format($sales->grand_total,2)}}</th>
+                    <th colspan="3" class="text-right"><h3>Grand Total:</h3></th>
+                    <th class="text-right"><h3>{{number_format($sales->grand_total,2)}}</h3></th>
                   </tr>
                 </tbody>
               </table>
