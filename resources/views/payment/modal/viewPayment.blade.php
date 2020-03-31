@@ -35,7 +35,7 @@
               </tr>
             @empty
               <tr>
-                <td class="text-center" colspan="6">No Payment Data</td>
+                <td class="text-center" colspan="5">No Payment Data</td>
               </tr>
             @endforelse
           </tbody>

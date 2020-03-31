@@ -153,6 +153,7 @@ Route::group(['middleware' => 'auth'], function()
 	// {
 		Route::resource('/sales', 'SalesController');
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
+		Route::post('/sales/viewSalesModal/{sales}', 'SalesController@viewSalesModal')->name('sales.viewSalesModal');
 	// });
 
 	// Route::group(['middleware' => 'permission:payment.manage'], function()

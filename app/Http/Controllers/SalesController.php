@@ -67,23 +67,23 @@ class SalesController extends Controller
                 }
             })
             ->addColumn('action', function(Sales $sales) {
-                    $view = '<a class="dropdown-item" href="#"><i class="fa fa-eye aria-hidden="true""></i> View (WIP)</a>';
+                    $view = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('SalesController@viewSalesModal', $sales->id).'"><i class="fa fa-eye" aria-hidden="true"></i> View Sale</a>';
                     if($sales->payment_status != 'paid') {
-                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar aria-hidden="true""></i> Add Payment</a>';
+                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
                     }
                     else {
                         $add_payment = '';
                     }
 
                     if ($sales->status == 'pending') {
-                        $edit = '<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>';
+                        $edit = '<a class="dropdown-item" href="'. action('SalesController@edit', $sales->id) .'"><i class="fa fa-edit" aria-hidden="true"></i> Edit</a>';
                     }
                     else {
                         $edit = '';
                     }
                     $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal', $sales->id).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
 
-                    $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>';
+                    $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
 
                     $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_payments.$edit.$delete.'</div></div>';
                     return $actions;
@@ -499,4 +499,12 @@ class SalesController extends Controller
             }
         }
     } 
+
+
+
+    public function viewSalesModal(Sales $sales, Request $request) {
+        $business_id = Auth::user()->business_id;
+        $payments = Payment::where('sales_id', $sales->id)->get();
+        return view('sales.modal.viewSales', compact('sales','payments'));
+    }
 }
