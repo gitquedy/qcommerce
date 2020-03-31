@@ -86,7 +86,7 @@
             { data: 'grand_total', name: 'grand_total', class: 'text-right' },
             { data: 'paid', name: 'paid', class: 'text-right' },
             { data: 'balance', name: 'balance', class: 'text-right' },
-            { data: 'payment_status', name: 'payment_status', class: 'text-center' },
+            { data: 'payment_status', name: 'payment_status', class: 'text-center text-capitalize' },
             { data: 'action', name: 'action', class: 'text-center' },
             
         ];
