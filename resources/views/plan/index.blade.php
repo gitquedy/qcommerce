@@ -41,7 +41,7 @@
     return ($value)?$value:'Unlimited';
   }
   function boolean_to_text($value) {
-    return ($value)?'<span class="text-success"><i class="feather icon-check"></i></span>':'<span class="text-danger"><i class="feather icon-x"></i></span>';
+    return ($value)?'<h3 class="text-success"><i class="feather icon-check"></i></h3>':'<h3 class="text-danger"><i class="feather icon-x"></i></h3>';
   }
 
   $full_cols = count($plans) +1;
