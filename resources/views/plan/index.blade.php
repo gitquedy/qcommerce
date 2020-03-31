@@ -87,7 +87,7 @@
           <input type="radio" name="billling_type" id="Monthly" autocomplete="off" checked value="Monthly"> Monthly
         </label>
         <label class="btn btn-lg btn-outline-primary">
-          <input type="radio" name="billling_type" id="Annualy" autocomplete="off" value="Annualy"> Annualy
+          <input type="radio" name="billling_type" id="Annually" autocomplete="off" value="Annually"> Annually
         </label>
       </div>
     </div>
@@ -128,7 +128,7 @@
                           <span>{!!count_or_free($plan->monthly_cost)!!}</span>
                         @endif
                       </div>
-                      <div class="billling_type Annualy" style="display: none">
+                      <div class="billling_type Annually" style="display: none">
                         @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost)
                           <span class="text-secondary">{!!count_or_free($plan->yearly_cost, true)!!}</span>
                           <br>
@@ -352,7 +352,7 @@
                           <span>{!!count_or_free($plan->monthly_cost)!!}</span>
                         @endif
                       </div>
-                      <div class="billling_type Annualy" style="display: none">
+                      <div class="billling_type Annually" style="display: none">
                         @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost)
                           <span class="text-secondary">{!!count_or_free($plan->yearly_cost, true)!!}</span>
                           <br>
@@ -362,7 +362,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <button type="button" class="btn btn-primary my-2 Subscribe_Btn" data-id="{{$plan->id}}" >Subscribe</button>
+                      <a href="{{ action('PlanController@show', $plan->id) }}" class="btn btn-primary my-2" data-id="{{$plan->id}}" >Subscribe
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
