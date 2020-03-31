@@ -52,6 +52,7 @@ class CustomerController extends Controller
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item" href="'. action('CustomerController@show', $customer->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View (<i>WIP</i>)</a>
                         <a class="dropdown-item" href="'. action('CustomerController@edit', $customer->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                         <a class="dropdown-item modal_button " href="#" data-href="'. action('CustomerController@delete', $customer->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
                     </div></div>';
@@ -131,7 +132,10 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        //
+       $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customers List"], ['name'=>"View Customer"]
+        ];
+        return view('customer.view', compact('breadcrumbs', 'customer'));
     }
 
     /**
