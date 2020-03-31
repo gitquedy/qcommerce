@@ -66,6 +66,26 @@ class SalesController extends Controller
                         break;
                 }
             })
+            ->editColumn('payment_status', function(Sales $sales) {
+                switch ($sales->payment_status) {
+                    case 'paid':
+                            return '<span class="badge badge-pill badge-success">Paid</span>';
+                        break;
+                    case 'pending':
+                            return '<span class="badge badge-pill badge-warning">Pending</span>';
+                        break;
+                    case 'partial':
+                            return '<span class="badge badge-pill badge-info">Partial</span>';
+                        break;
+                    case 'due':
+                            return '<span class="badge badge-pill badge-danger">Due</span>';
+                        break;
+                    
+                    default:
+                            return '<span class="badge badge-pill badge-secondary">Unknown</span>';
+                        break;
+                }
+            })
             ->addColumn('action', function(Sales $sales) {
                     $view = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('SalesController@viewSalesModal', $sales->id).'"><i class="fa fa-eye" aria-hidden="true"></i> View Sale</a>';
                     if($sales->payment_status != 'paid') {
@@ -88,7 +108,7 @@ class SalesController extends Controller
                     $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_payments.$edit.$delete.'</div></div>';
                     return $actions;
              })
-            ->rawColumns(['action','status'])
+            ->rawColumns(['action','status','payment_status'])
             ->make(true);
         }
         return view('sales.index', [

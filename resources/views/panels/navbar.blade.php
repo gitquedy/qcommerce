@@ -110,7 +110,8 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{{ action('UserController@settings') }}"><i class="feather icon-settings"></i>Account Settings</a>
-                            <div class="dropdown-divider"></div><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); 
+                            <a class="dropdown-item" href="{{ action('PlanController@index') }}"><i class="feather icon-command"></i>Upgrade Plan</a>
+                            <div class="dropdown-divider"></div><a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                       document.getElementById('logout-form').submit();"><i class="feather icon-power"></i> Logout</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf

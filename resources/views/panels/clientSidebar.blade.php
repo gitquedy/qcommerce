@@ -106,7 +106,7 @@
             @endif
 
 
-                <li class="nav-item ">
+              {{--   <li class="nav-item ">
                     <a href="">
                         <i class="feather icon-command "></i>
                         <span class="menu-title" data-i18n="">Applications</span>
@@ -119,7 +119,7 @@
                                 </a>
                             </li>
                     </ul>
-                </li>
+                </li> --}}
 
             <hr>
             
@@ -146,6 +146,12 @@
                             <a href="{{route('sku.create')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">Add new SKU</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'import' ? 'active' : '' }}">
+                            <a href="{{route('sku.import')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Import SKU</span>
                             </a>
                         </li>
                     </ul>
