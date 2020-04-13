@@ -47,12 +47,17 @@ class CustomerController extends Controller
                 }
                 return number_format($balance, 2);
             })
+            ->addColumn('total_deposits', function(Customer $customer) {
+                return number_format($customer->available_deposit());
+            })
             ->addColumn('action', function(Customer $customer) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="'. action('CustomerController@show', $customer->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View (<i>WIP</i>)</a>
+                        <a class="dropdown-item" href="'. action('CustomerController@show', $customer->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
+                        <a class="dropdown-item toggle_view_modal" href="" data-action="'.action('DepositController@viewDepositModal', $customer->id).'"><i class="fa fa-list" aria-hidden="true"></i> List Deposit</a>
+                        <a class="dropdown-item toggle_view_modal" href="" data-action="'.action('DepositController@addDepositModal', $customer->id).'"><i class="fa fa-plus" aria-hidden="true"></i> Add Deposit</a>
                         <a class="dropdown-item" href="'. action('CustomerController@edit', $customer->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                         <a class="dropdown-item modal_button " href="#" data-href="'. action('CustomerController@delete', $customer->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
                     </div></div>';
@@ -243,8 +248,6 @@ class CustomerController extends Controller
 
     public function addCustomerModal() {
         $business_id = Auth::user()->business_id;
-        $title = "this SKU";
-
         $price_group = PriceGroup::where('business_id', Auth::user()->business_id)->get();
         return view('customer.modal.addCustomer', compact('price_group'));
     }

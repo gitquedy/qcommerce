@@ -104,6 +104,7 @@ class PaymentController extends Controller
     public function addPaymentAjax(Request $request) {
         $validator = Validator::make($request->all(),[
             'sales_id' => 'required',
+            'customer_id' => 'required',
             'date' => 'required|date|max:255',
             'reference_no' => 'nullable',
             'amount' => 'required|numeric|min:0',
@@ -127,6 +128,7 @@ class PaymentController extends Controller
             $data = new Payment;
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $data->sales_id = $request->sales_id;
+            $data->customer_id = $request->customer_id;
             $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
             $data->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_pay();
             $data->amount = $request->amount;

@@ -317,6 +317,29 @@
                 </li>
             {{-- @endcan --}}
 
+            {{-- @can('deposit.manage') --}}
+                <li class="nav-item">
+                    <a href="">
+                        <i class="feather icon-menu"></i>
+                        <span class="menu-title" data-i18n="">Deposits</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'deposit' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('deposit')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List Deposit</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'deposit' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{url('deposit/create')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add Deposit</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            {{-- @endcan --}}
+
             {{-- @can('pos.settings') --}}
                 <li class="nav-item">
                     <a href="">

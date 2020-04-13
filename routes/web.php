@@ -149,6 +149,15 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/customer/addCustomerAjax', 'CustomerController@addCustomerAjax')->name('customer.addCustomerAjax');
 	// });
 
+	// Route::group(['middleware' => 'permission:deposit.manage'], function()
+	// {
+		Route::resource('/deposit', 'DepositController');
+		Route::get('/deposit/delete/{deposit}', 'DepositController@delete');
+		Route::post('/deposit/viewDepositModal/{customer}', 'DepositController@viewDepositModal')->name('deposit.viewDepositModal');
+		Route::post('/deposit/addDepositModal/{customer}', 'DepositController@addDepositModal')->name('deposit.addDepositModal');
+		Route::post('/deposit/addDepositAjax', 'DepositController@addDepositAjax')->name('deposit.addDepositAjax');
+	// });
+
 	// Route::group(['middleware' => 'permission:sales.manage'], function()
 	// {
 		Route::resource('/sales', 'SalesController');
