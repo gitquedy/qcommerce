@@ -318,7 +318,7 @@
             {{-- @endcan --}}
 
             {{-- @can('deposit.manage') --}}
-                <li class="nav-item">
+               {{--  <li class="nav-item">
                     <a href="">
                         <i class="feather icon-menu"></i>
                         <span class="menu-title" data-i18n="">Deposits</span>
@@ -337,7 +337,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
             {{-- @endcan --}}
 
             {{-- @can('pos.settings') --}}

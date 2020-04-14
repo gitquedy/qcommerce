@@ -6,6 +6,7 @@ use Auth;
 use Validator;
 use App\Sales;
 use App\Payment;
+use App\Customer;
 use App\Settings;
 use App\OrderRef;
 use Illuminate\Validation\Rule;
@@ -118,9 +119,14 @@ class PaymentController extends Controller
             'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque'),
             'note' => 'nullable',
         ]);
-
+        if ($request->customer_id) {
+            $customer = Customer::findOrFail($request->customer_id);
+        }
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        elseif ($request->payment_type == 'deposit' && $request->amount > $customer->available_deposit()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => ['amount' => ['Insufficient Deposit balance']]]);
         }
         $user = Auth::user();
         try {

@@ -48,7 +48,7 @@ class CustomerController extends Controller
                 return number_format($balance, 2);
             })
             ->addColumn('total_deposits', function(Customer $customer) {
-                return number_format($customer->available_deposit());
+                return number_format($customer->available_deposit(), 2);
             })
             ->addColumn('action', function(Customer $customer) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">

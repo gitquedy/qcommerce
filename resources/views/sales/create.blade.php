@@ -210,6 +210,7 @@
                                     <option value="gift_certificate">Gift Card</option>
                                     <option value="credit_card">Credit Card</option>
                                     <option value="cheque">Cheque</option>
+                                    <option value="deposit">Deposit</option>
                                     <option value="other">Other</option>
                                   </select>
                                   <div class="form-control-position"> 

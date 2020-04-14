@@ -17,7 +17,7 @@ $(".form").submit(function(e) {
           }
            $('.error').remove();
               $.each(result.error, function(index, val){
-              $('[id="'+ index +'"]').after('<label class="text-danger error">' + val + '</label>');
+              $('[name="'+ index +'"]').after('<label class="text-danger error">' + val + '</label>');
               });
         }
         $('.btn_save').prop('disabled', false);
