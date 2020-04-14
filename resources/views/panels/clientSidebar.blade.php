@@ -227,14 +227,6 @@
                 </li>
             @endcan
             
-            @can('user.manage')
-                <li class="nav-item {{ $request->segment(1) == 'user' ? 'active' : '' }}">
-                    <a href="{{url('/user')}}">
-                        <i class="feather icon-users"></i>
-                        <span class="menu-title" data-i18n="">User Management</span>
-                    </a>
-                </li>
-            @endif
 
             
             <!-- @if($request->user()->can('category.manage') || $request->user()->can('brand.manage'))

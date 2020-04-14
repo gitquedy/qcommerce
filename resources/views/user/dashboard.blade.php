@@ -197,7 +197,7 @@
                           Today
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem3">
-                            <a class="dropdown-item"  onclick="refresh_pie(this,'Today')" >Today</a>
+                          <a class="dropdown-item"  onclick="refresh_pie(this,'Today')" >Today</a>
                           <a class="dropdown-item" onclick="refresh_pie(this,'Yesterday')">Yesterday</a>
                           <a class="dropdown-item" onclick="refresh_pie(this,'Last_7_Days')">Last 7 Days</a>
                           <a class="dropdown-item" onclick="refresh_pie(this,'Last_30_Days')">Last 30 Days</a>
