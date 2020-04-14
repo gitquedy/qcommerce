@@ -15,7 +15,7 @@
     <h4 class="modal-title" id="modal-title">View Sales {{$sales->reference_no}}</h4>
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body"  id="print_div">
     <section class="card">
         <div class="card-content">
           <div class="card-body">
@@ -38,17 +38,17 @@
                           @php
                           switch ($sales->status) {
                               case 'completed':
-                                      echo '<span class="badge badge-success">Complete</span>';
+                                      echo '<span class="badge badge-success no-print ">Complete</span><span class="d-none d-print-block">Complete</span>';
                                   break;
                               case 'pending':
-                                      echo '<span class="badge badge-warning">Pending</span>';
+                                      echo '<span class="badge badge-warning no-print ">Pending</span><span class="d-none d-print-block">Pending</span>';
                                   break;
                               case 'canceled':
-                                      echo '<span class="badge badge-danger">Canceled</span>';
+                                      echo '<span class="badge badge-danger no-print ">Canceled</span><span class="d-none d-print-block">Canceled</span>';
                                   break;
                               
                               default:
-                                      echo '<span class="badge badge-secondary">Unknown</span>';
+                                      echo '<span class="badge badge-secondary no-print ">Unknown</span><span class="d-none d-print-block">Unknown</span>';
                                   break;
                           }
                           @endphp
@@ -166,11 +166,25 @@
       {{-- DataTable ends --}}
     </section>
     <div class="modal-footer">
+      <button type="button" id="print_btn" class="btn btn-outline-primary no-print">Print</button>
       <button type="button" class="btn btn-default no-print" data-dismiss="modal">Close</button>
     </div>
   </div>
 </div>
 <script>
+    $("#print_btn").on('click', function() {
+        $("#print_div").printThis({ 
+            debug: false,              
+            importCSS: true,             
+            importStyle: true,         
+            printContainer: true,
+            pageTitle: "Print Sale",             
+            removeInline: false,        
+            printDelay: 333,            
+            header: null,             
+            formValues: true          
+        }); 
+    });
     $(".data-list-view-modal").DataTable({
         processing: true,
         serverSide: false,
@@ -211,4 +225,6 @@
             $(".dt-buttons .btn").removeClass("btn-secondary")
         }
     });
+
 </script>
+<script src="{{ asset('js/scripts/printThis/printThis.js') }}"></script>

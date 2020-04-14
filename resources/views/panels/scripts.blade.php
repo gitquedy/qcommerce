@@ -17,7 +17,7 @@
                     name: "ccc"
                   },
                   function(data, status){
-                      
+                      console.log(data);
                        try {
                               var json_obj = JSON.parse(data);
                             }
@@ -37,12 +37,15 @@
                 if(main_data.total>0){
                     $('#notification_count').html(main_data.total);
                     $('#notification_count_sub').html(main_data.total+" New");
+                    let src = '{{asset('file/notification.mp3')}}';
+                    let audio = new Audio(src);
+                    audio.play()
                 }else{
                     $('#notification_count').html("");
                     $('#notification_count_sub').html("NO");
                 }
                 
-                var not_string = '';
+                var not_string = '<div id="sound"></div>';
                 
                 if(main_data.orders>0){
                 
@@ -58,7 +61,6 @@
                 }
                 
                 if(main_data.total_new_products>0){
-                
                    not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=lazada">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><i class="feather icon-package font-medium-5 primary"></i></div>'+
@@ -68,14 +70,14 @@
                                             '<time class="media-meta" >'+main_data.last_product_time+'</time></small>'+
                                     '</div>'+
                                 '</a>';
-                }             
+                }          
                 $('#notification_area').html(not_string);
             }
             $(document).ready(function(){
               notification();
-              setInterval(function(){ notification() }, 10000);    
+              setInterval(function(){ notification() }, 10000); 
             });
-            
+
         </script>
 @if($configData['blankPage'] == false)
         <script src="{{ asset(mix('js/scripts/customizer.js')) }}"></script>
