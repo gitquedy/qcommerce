@@ -39,7 +39,7 @@
                     $('#notification_count_sub').html(main_data.total+" New");
                     let src = '{{asset('file/notification.mp3')}}';
                     let audio = new Audio(src);
-                    audio.play()
+                    // audio.play()
                 }else{
                     $('#notification_count').html("");
                     $('#notification_count_sub').html("NO");
