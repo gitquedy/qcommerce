@@ -10,7 +10,7 @@
         <script src="{{ asset('vendors/js/printThis/printThis.js') }}"></script>
         <script src="{{ asset('vendors/js/forms/extended/typeahead/typeahead.bundle.min.js') }}"></script>
         <script>
-            var last_notification_count = 0;
+            var last_notification_count = "first";
 
             function notification(){
              
@@ -19,7 +19,6 @@
                     name: "ccc"
                   },
                   function(data, status){
-                      console.log(data);
                        try {
                               var json_obj = JSON.parse(data);
                             }
@@ -36,7 +35,7 @@
             }     
             
             function notification_refresh(main_data){
-                if(last_notification_count < main_data.total) {
+                if(last_notification_count != "first" && last_notification_count < main_data.total) {
                     let src = '{{asset('file/notification.mp3')}}';
                     let audio = new Audio(src);
                     audio.play();
