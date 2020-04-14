@@ -10,6 +10,8 @@
         <script src="{{ asset('vendors/js/printThis/printThis.js') }}"></script>
         <script src="{{ asset('vendors/js/forms/extended/typeahead/typeahead.bundle.min.js') }}"></script>
         <script>
+            var last_notification_count = 0;
+
             function notification(){
              
                  $.post("{{route('ajax_get_notification')}}",
@@ -34,16 +36,20 @@
             }     
             
             function notification_refresh(main_data){
+                if(last_notification_count < main_data.total) {
+                    let src = '{{asset('file/notification.mp3')}}';
+                    let audio = new Audio(src);
+                    audio.play();
+                }
+                last_notification_count = main_data.total;
                 if(main_data.total>0){
                     $('#notification_count').html(main_data.total);
                     $('#notification_count_sub').html(main_data.total+" New");
-                    let src = '{{asset('file/notification.mp3')}}';
-                    let audio = new Audio(src);
-                    // audio.play()
                 }else{
                     $('#notification_count').html("");
                     $('#notification_count_sub').html("NO");
                 }
+
                 
                 var not_string = '<div id="sound"></div>';
                 
