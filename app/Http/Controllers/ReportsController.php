@@ -8,6 +8,7 @@ use App\Category;
 use App\Brand;
 use App\Shop;
 use App\Order;
+use App\Sales;
 use App\Supplier;
 use Illuminate\Http\Request;
 use App\Lazop;
@@ -178,18 +179,52 @@ class ReportsController extends Controller
                 
             }
 
-           $orderItems = $orderItems->get();
+            $pos_sales = Sales::where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled');
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $pos_sales->where('date', [$daterange[0]]);
+                }else{
+                    $pos_sales->where('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
+                }
+                
+            }
 
+           $orderItems = $orderItems->get();
+           $pos_sales = $pos_sales->get();
             $data = ['count' => 0];
+            $report = [];
             foreach($orderItems as $orderItem){
                 $sku = $orderItem->product->SellerSku;
-                $data['report'][$sku]['seller_sku'] = $orderItem->product->SellerSku;
-                $data['report'][$sku]['product_name'] = $orderItem->product->name;
-                $data['report'][$sku]['total_price'] =  $orderItem->total_price;
-                $data['report'][$sku]['total_quantity'] =  $orderItem->total_quantity;
+                $report[$sku]['seller_sku'] = $orderItem->product->SellerSku;
+                $report[$sku]['product_name'] = $orderItem->product->name;
+                $report[$sku]['total_price'] =  $orderItem->total_price;
+                $report[$sku]['total_quantity'] =  $orderItem->total_quantity;
 
                 $data['count'] += 1;
             }
+            foreach($pos_sales as $pos_sale){
+
+                foreach ($pos_sale->items as $key => $sale_items) {
+                    $sku = $sale_items->sku_code;
+                    if(isset($report[$sku])) {
+                        $report[$sku]['total_price'] +=  $sale_items->subtotal;
+                        $report[$sku]['total_quantity'] +=  $sale_items->quantity;
+                    }
+                    else {
+                        $report[$sku]['seller_sku'] = $sale_items->sku_code;
+                        $report[$sku]['product_name'] = $sale_items->sku_name;
+                        $report[$sku]['total_price'] =  $sale_items->subtotal;
+                        $report[$sku]['total_quantity'] =  $sale_items->quantity;
+                    }
+                    $data['count'] += $sale_items->quantity;;
+                }
+            }
+            uasort($report, function ($a, $b) {
+                return $b['total_quantity'] <=> $a['total_quantity'];
+            });
+            // print json_encode($report);die();
+            $data['report'] = array_slice($report, 0, 10, true);
+            // $data['report'] = $report;
             return $data;
         }
         return view('reports.topSellingProducts', [
