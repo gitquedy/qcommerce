@@ -163,7 +163,7 @@ class ReportsController extends Controller
             $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
                 ->join('order', 'order.id', '=', 'order_item.order_id')
                 ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
-                ->whereIn('products.shop_id', $shop_ids)
+                ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->groupBy('order_item.product_id')
                 ->orderBy('total_quantity', 'desc')->take($no_of_products);
