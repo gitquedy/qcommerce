@@ -17,13 +17,13 @@ class CreateDepositsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
-            $table->unsignedBigInteger('customer_id')->nullable();
-            $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
+            $table->unsignedBigInteger('plan_id');
+            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->date('date');
             $table->string('reference_no');
             $table->text('note')->nullable();
             $table->float('amount', 10, 2);
-            $table->integer('created_by')->;
+            $table->integer('created_by');
             $table->integer('updated_by')->nullable();
             $table->timestamps();
         });

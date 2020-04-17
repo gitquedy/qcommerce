@@ -21,12 +21,30 @@ class PayPalController extends Controller
         try {
             $invoice_no = Billing::getNextInvoiceNumber();
 	        $data = [];
-	        $price = $plan->monthly_cost;
+            $billing_period = $request->billing;
+            if($billing_period == 'Monthly') {
+                $duration = "month";
+                if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
+                $price = $plan->promo_monthly_cost;
+                }
+                else {
+                $price = $plan->monthly_cost;
+                }
+            }
+            elseif($billing_period == 'Annually') {
+                $duration = "year";
+                if ($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost) {
+                $price = $plan->promo_yearly_cost;
+                }
+                else {
+                $price = $plan->yearly_cost;
+                }
+            }
 	        $data['items'] = [
 	            [
 	                'name' => $plan->name,
 	                'price' => $price,
-	                'desc'  =>   $plan->name . ' 1  month subscription for qcommerce.com',
+	                'desc'  =>   $plan->name . ' 1 '.$duration.' subscription for qcommerce.com',
 	                'qty' => 1
 	            ]
 	        ];
@@ -34,6 +52,7 @@ class PayPalController extends Controller
 	        $billing = Billing::create([
 	        	'business_id' => $request->user()->business_id,
 	        	'plan_id' => $plan->id,
+                'billing' => $billing_period,
 	        	'invoice_no' => $invoice_no
 	        ]);
 
@@ -93,8 +112,24 @@ class PayPalController extends Controller
     {
         $provider = new ExpressCheckout;
         $response = $provider->getExpressCheckoutDetails($request->token);
-        dd($response);
-  
+        print json_encode($response);die();
+
+        $startdate = Carbon::now()->toAtomString();
+        $profile_desc = !empty($data['subscription_desc']) ?
+                    $data['subscription_desc'] : $data['invoice_description'];
+        $data = [
+            'PROFILESTARTDATE' => $startdate,
+            'DESC' => $profile_desc,
+            'BILLINGPERIOD' => 'Month', // Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
+            'BILLINGFREQUENCY' => 1, // 
+            'AMT' => 10, // Billing amount for each billing cycle
+            'CURRENCYCODE' => 'USD', // Currency code 
+            'TRIALBILLINGPERIOD' => 'Day',  // (Optional) Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
+            'TRIALBILLINGFREQUENCY' => 10, // (Optional) set 12 for monthly, 52 for yearly 
+            'TRIALTOTALBILLINGCYCLES' => 1, // (Optional) Change it accordingly
+            'TRIALAMT' => 0, // (Optional) Change it accordingly
+        ];
+        $response = $provider->createRecurringPaymentsProfile($data, $token);
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
             dd('Your payment was successfully. You can create success page here.');
         }

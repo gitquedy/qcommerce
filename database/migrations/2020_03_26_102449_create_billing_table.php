@@ -22,7 +22,7 @@ class CreateBillingTable extends Migration
 
             $table->unsignedBigInteger('plan_id');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            
+            $table->string('billing');
             $table->tinyInteger('paid_status')->default(0);
             
             $table->string('payment_transaction_id')->nullable();

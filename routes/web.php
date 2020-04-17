@@ -183,6 +183,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
 	Route::resource('/plan', 'PlanController')->only(['index', 'show']);
+	Route::get('/plan/subscribe/{plan}/{billing?}', 'PlanController@subscribe');
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
