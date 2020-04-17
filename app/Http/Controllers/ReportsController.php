@@ -241,13 +241,13 @@ class ReportsController extends Controller
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
                }
                $shop_ids = $shops->pluck('id')->toArray();
+                $daterange = explode('/', $request->get('daterange'));
                 $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id', 'left')
                 ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->orderBy('date', 'desc')
                 ->groupBy('date');
-                $daterange = explode('/', $request->get('daterange'));
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
                         $order->whereDate('order.created_at', [$daterange[0]]);
@@ -255,12 +255,28 @@ class ReportsController extends Controller
                         $order->whereDate('order.created_at', '>=', $daterange[0])->whereDate('order.created_at', '<=', $daterange[1]);
                     }
                 }
+
                 return Datatables::eloquent($order)
+                    ->editColumn('total_orders', function($order) {
+                            $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get()->count();
+                            return $order->total_orders + $sales;
+                        })
+                    ->editColumn('total_quantity', function($order) {
+                            $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
+                            $count = 0;
+                            foreach ($sales as $sale) {
+                                foreach ($sale->items as $item) {
+                                    $count += $item->quantity;
+                                }
+                            }
+                            return $order->total_quantity + $count;
+                        })
                     ->addColumn('dateFormat', function(Order $order) {
                             return Utilities::format_date($order->date, 'M d,Y');
                         })
                     ->addColumn('total_sales', function(Order $order) {
-                            return 'PHP ' . number_format($order->total_price, 2);
+                            $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
+                            return 'PHP ' . number_format($order->total_price + $sales->total, 2);
                         })
                     ->make(true);
              }
