@@ -228,7 +228,7 @@ class Order extends Model
             }
             elseif ($r->site == 'shopee') {
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
-                $total += (float) str_replace(",","",$r->total_price);
+                $total += (float) str_replace(",","",$r->price);
             }
         }
 
