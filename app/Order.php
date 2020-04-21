@@ -183,7 +183,7 @@ class Order extends Model
     public static function get_dashboard_shop_performance($shop, $type="") {
         $query = DB::table('order');
         $query->where('shop_id',$shop);
-        $query->where('status', '!=', 'canceled');
+        $query->whereNotIn('status', Order::statusNotIncludedInSales());
         // CANCELLED = shopee
         // canceled = Lazada 
 
