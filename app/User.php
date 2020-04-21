@@ -97,7 +97,7 @@ use Notifiable, HasRoles;
             if($iteration == 25){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
             $iteration++;
         }
 
