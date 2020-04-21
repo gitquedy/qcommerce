@@ -58,8 +58,8 @@ class DashboardController extends Controller
                 $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
             }
             elseif ($monthlyVAL->site == 'shopee') {
-                $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $monthlyVAL->id)->first();
-                $monthly_sales += (float) str_replace(",","",$items->total_price);
+                // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $monthlyVAL->id)->first();
+                $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
             }
         }
 
@@ -79,8 +79,8 @@ class DashboardController extends Controller
                 $today_sales += (float) str_replace(",","",$todayVAL->price);
             }
             elseif ($todayVAL->site == 'shopee') {
-                $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $todayVAL->id)->first();
-                $today_sales += (float) str_replace(",","",$items->total_price);
+                // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $todayVAL->id)->first();
+                $today_sales += (float) str_replace(",","",$todayVAL->total_price);
             }
         }
 
@@ -142,8 +142,8 @@ class DashboardController extends Controller
                         $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                     }
                     elseif ($two_monthVAL->site == 'shopee') {
-                        $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
-                        $daily_total += (float) str_replace(",","",$items->total_price);
+                        // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->total_price);
                     }
                     // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                 }
@@ -170,8 +170,8 @@ class DashboardController extends Controller
                         $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                     }
                     elseif ($two_monthVAL->site == 'shopee') {
-                        $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
-                        $daily_total += (float) str_replace(",","",$items->total_price);
+                        // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->total_price);
                     }
                     // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                 }

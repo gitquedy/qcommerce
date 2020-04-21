@@ -188,35 +188,37 @@ class Order extends Model
         // canceled = Lazada 
 
         if($type=='today'){
-            $query->whereDate('created_at',"=",date('Y-m-d'));
+            $query->whereDate('created_at', Carbon::today());
         }
         if($type=='yesterday'){
-            $query->whereDate('created_at',"=", date('Y-m-d', strtotime("-1 day")));
+            // $query->whereDate('created_at',"=", date('Y-m-d', strtotime("-1 day")));
+            $query->whereDate('created_at', Carbon::today()->subDays(1));
         }
 
         if($type=='week'){
-            $date = date('Y-m-d');
-            $ts = strtotime($date);
-            $start_t = (date('w', $ts) == 0) ? $ts : strtotime('last sunday', $ts);
-            $end_t = strtotime('next saturday', $start_t);
-            $start = date("Y-m-d", $start_t);
-            $end = date("Y-m-d", $end_t);
-            $query->where('created_at', '>=', $start);
-            $query->where('created_at', '<=', $end);
+            // $date = date('Y-m-d');
+            // $ts = strtotime($date);
+            // $start_t = (date('w', $ts) == 0) ? $ts : strtotime('last sunday', $ts);
+            // $end_t = strtotime('next saturday', $start_t);
+            // $start = date("Y-m-d", $start_t);
+            // $end = date("Y-m-d", $end_t);
+            // $query->where('created_at', '>=', $start);
+            // $query->where('created_at', '<=', $end);
+            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
         }
 
         if($type=='month'){
-            $start = date('Y-m-01');
+            // $start = date('Y-m-01');
             
-            $date=date_create($start);
+            // $date=date_create($start);
             
-            date_modify($date,"+1 month");
+            // date_modify($date,"+1 month");
             
-            $end = date_format($date,"Y-m-d");
+            // $end = date_format($date,"Y-m-d");
             
-              $query->where('created_at', '>=', $start);
-              $query->where('created_at', '<=', $end);
-            
+            //   $query->where('created_at', '>=', $start);
+            //   $query->where('created_at', '<=', $end);
+              $query->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString());
         }
 
         $result = $query->get();
@@ -270,23 +272,29 @@ class Order extends Model
         if($status!=""){
            $query->where('status','=',$status); 
         }
+
+        $query->whereNotIn('status', Order::statusNotIncludedInSales());
         
         if($type=='month'){
-            $start = date('Y-m-01');
+            // $start = date('Y-m-01');
             
-            $date=date_create($start);
+            // $date=date_create($start);
             
-            date_modify($date,"+1 month");
+            // date_modify($date,"+1 month");
             
-            $end = date_format($date,"Y-m-d");
+            // $end = date_format($date,"Y-m-d");
             
-              $query->where('created_at', '>=', $start);
-              $query->where('created_at', '<=', $end);
+            //   $query->where('created_at', '>=', $start);
+            //   $query->where('created_at', '<=', $end);
+
+              $query->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString());
             
         }
         
         if($type=='today'){
-            $query->whereDate('created_at',"=",date('Y-m-d'));
+            // $query->whereDate('created_at',"=",date('Y-m-d'));
+
+            $query->whereDate('created_at', Carbon::today());
         }
         
         if($type=="two_month"){
