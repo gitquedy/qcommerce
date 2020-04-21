@@ -32,4 +32,11 @@ class PlanController extends Controller
         ];
         return view('plan.show', compact('plan', 'breadcrumbs'));
     }
+
+    public function subscribe(Plan $plan, $billing){
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Payment"]
+        ];
+        return view('plan.show', compact('plan', 'breadcrumbs', 'billing'));
+    }
 }

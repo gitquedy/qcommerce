@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Order;
+use App\OrderItem;
 use App\Shop;
+use App\Sales;
 use App\Products;
 use App\Sku;
 use Helper;
@@ -31,6 +33,17 @@ class DashboardController extends Controller
             $shop->shop_info_data_week = Order::get_dashboard_shop_performance($shop->id,'week');
             $shop->shop_info_data_month = Order::get_dashboard_shop_performance($shop->id,'month');
         }
+        $Shop_Index = count($Shop);
+        $Shop[$Shop_Index] = (object)[];
+        $Shop[$Shop_Index]->id = "POS";
+        $Shop[$Shop_Index]->name = "Qcommerce POS";
+        $Shop[$Shop_Index]->short_name ="POS";
+        $Shop[$Shop_Index]->site = "qcommerce";
+        $Shop[$Shop_Index]->active = 1;
+        $Shop[$Shop_Index]->shop_info_data_today = Sales::get_dashboard_performance('today');
+        $Shop[$Shop_Index]->shop_info_data_yesterday = Sales::get_dashboard_performance('yesterday');
+        $Shop[$Shop_Index]->shop_info_data_week = Sales::get_dashboard_performance('week');
+        $Shop[$Shop_Index]->shop_info_data_month = Sales::get_dashboard_performance('month');
         // print json_encode($Shop);die();
         $colour = Helper::get_colours();
         
@@ -41,31 +54,54 @@ class DashboardController extends Controller
         $monthly = Order::get_dashboard_orders('','month');
         $monthly_sales = 0;
         foreach($monthly as $monthlyVAL){
-            $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
+            if ($monthlyVAL->site == 'lazada') {
+                $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
+            }
+            elseif ($monthlyVAL->site == 'shopee') {
+                $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $monthlyVAL->id)->first();
+                $monthly_sales += (float) str_replace(",","",$items->total_price);
+            }
         }
-        
+
+        $pos_monthly = Sales::get_dashboard_sales('', 'month');
+        foreach($pos_monthly as $monthlyVAL){
+            $monthly_sales += (float) str_replace(",","",$monthlyVAL->grand_total);
+        }
         /* Today */
         
         
         $today = Order::get_dashboard_orders('','today');
-
+        // print json_encode($today);die();
         $today_sales = 0;
         
         foreach($today as $todayVAL){
-            $today_sales += (float) str_replace(",","",$todayVAL->price);
+            if ($todayVAL->site == 'lazada') {
+                $today_sales += (float) str_replace(",","",$todayVAL->price);
+            }
+            elseif ($todayVAL->site == 'shopee') {
+                $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $todayVAL->id)->first();
+                $today_sales += (float) str_replace(",","",$items->total_price);
+            }
+        }
+
+        $pos_today = Sales::get_dashboard_sales('', 'today');
+        foreach($pos_today as $todayVAL){
+            $today_sales += (float) str_replace(",","",$todayVAL->grand_total);
         }
         
     
-        $today_order_count = count($today);
+        $today_order_count = count($today) + count($pos_today);
         
         /* pending */
         
         
         $shipped = Order::get_dashboard_orders('pending','');
-        $shipped_counter = count($shipped);
+        $pos_pending = Sales::get_dashboard_sales('pending', '');
+        $shipped_counter = count($shipped) + count($pos_pending);
         
         /* comperision  */
         $two_month = Order::get_dashboard_orders('','two_month');
+        $pos_two_month = Sales::get_dashboard_sales('','two_month');
         
         $pre_month_days = 0;
         $current_month_days =0;
@@ -102,9 +138,23 @@ class DashboardController extends Controller
             foreach($two_month as $two_monthVAL){
                 $rec_date = date('Y-m-d',strtotime($two_monthVAL->created_at));
                 if($rec_date==$pre_rangeVAL){
-                    $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                    if ($two_monthVAL->site == 'lazada') {
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                    }
+                    elseif ($two_monthVAL->site == 'shopee') {
+                        $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                        $daily_total += (float) str_replace(",","",$items->total_price);
+                    }
+                    // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                 }
             }
+            foreach($pos_two_month as $pos_two_monthVAL){
+                $rec_date = date('Y-m-d',strtotime($pos_two_monthVAL->date));
+                if($rec_date==$pre_rangeVAL){
+                    $daily_total += (float) str_replace(",","",$pos_two_monthVAL->grand_total);
+                }
+            }
+
             $key = (float) date('d',strtotime($pre_rangeVAL));
             if(isset($combine_chart['pre'][$key])){
                 $combine_chart['pre'][$key] = $daily_total;
@@ -116,7 +166,20 @@ class DashboardController extends Controller
             foreach($two_month as $two_monthVAL){
                 $rec_date = date('Y-m-d',strtotime($two_monthVAL->created_at));
                 if($rec_date==$current_rangeVAL){
-                    $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                     if ($two_monthVAL->site == 'lazada') {
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                    }
+                    elseif ($two_monthVAL->site == 'shopee') {
+                        $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                        $daily_total += (float) str_replace(",","",$items->total_price);
+                    }
+                    // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                }
+            }
+            foreach($pos_two_month as $pos_two_monthVAL){
+                $rec_date = date('Y-m-d',strtotime($pos_two_monthVAL->date));
+                if($rec_date==$current_rangeVAL){
+                    $daily_total += (float) str_replace(",","",$pos_two_monthVAL->grand_total);
                 }
             }
             $key = (float) date('d',strtotime($current_rangeVAL));
@@ -128,6 +191,7 @@ class DashboardController extends Controller
         /* Last 6 Month  */
         
         $last_6_month = Order::get_dashboard_orders('','last_6_month');
+        $pos_last_6_month = Sales::get_dashboard_sales('','last_6_month');
         
         
         $six_month_data = array();
@@ -145,6 +209,14 @@ class DashboardController extends Controller
                 $match_date = date('Y-m',strtotime(date_format($date,"Y-m-d")));
                 if($record_date==$match_date){
                     $total_of_the_month += (float) str_replace(",","",$last_6_monthVAL->price);
+                }
+            }
+            foreach($pos_last_6_month as $pos_last_6_monthVAL){
+                
+                $record_date = date('Y-m',strtotime($pos_last_6_monthVAL->date));
+                $match_date = date('Y-m',strtotime(date_format($date,"Y-m-d")));
+                if($record_date==$match_date){
+                    $total_of_the_month += (float) str_replace(",","",$pos_last_6_monthVAL->grand_total);
                 }
             }
             
@@ -232,6 +304,10 @@ class DashboardController extends Controller
     	            $today_order++;
     	        }
     	    }
+
+            foreach($pos_today as $pos_todayVAL){
+                    $today_order++;
+            }
     	    
     	    
     	    foreach($monthly as $monthlyVAL){
@@ -250,12 +326,26 @@ class DashboardController extends Controller
     	            
     	            if($rec_dt==$yesterday_date){
     	                    $yesterday_orders++;
-    	                }
-    	            
-    	            
-    	            
+    	                } 
     	        }
     	    }
+            foreach($pos_monthly as $pos_monthlyVAL){
+                    $rec_dt = date('Y-m-d',strtotime($pos_monthlyVAL->date));
+                    
+                    $monthly_order++;
+                    foreach($week_range as $weekDAte){
+                        
+                        $wmtch = $weekDAte;
+                        if($wmtch==$rec_dt){
+                            $last_7_days_order++;
+                        }
+                        
+                    }
+                    
+                    if($rec_dt==$yesterday_date){
+                        $yesterday_orders++;
+                    } 
+            }
     	    
     	    
     	    foreach($last_6_month as $last_6_monthVAL){
@@ -270,6 +360,15 @@ class DashboardController extends Controller
     	            
     	        }
     	    }
+            foreach($pos_last_6_month as $pos_last_6_monthVAL){
+                foreach($last_30_range as $last_30_rangeVAL){
+                    $rec_dtcc = date('Y-m-d',strtotime($pos_last_6_monthVAL->date));
+                    $wmtchcc = $last_30_rangeVAL;
+                    if($rec_dtcc==$wmtchcc){
+                        $last_30_days_order++;
+                    }
+                }
+            }
     	    $Shop_pie[$ShopVAL->id]['today'] = $today_order;
     	    $Shop_pie[$ShopVAL->id]['monthly'] = $monthly_order;
     	    $Shop_pie[$ShopVAL->id]['last7'] = $last_7_days_order;
@@ -278,6 +377,8 @@ class DashboardController extends Controller
             $Shop_pie[$ShopVAL->id]['name'] = $ShopVAL->name . ' (' . ucfirst($ShopVAL->site) . ')';
     	}
     	
+
+        
     	
        // die(var_dump(['monthly_sales' => number_format($monthly_sales),
        //      'today_sales' =>number_format($today_sales),

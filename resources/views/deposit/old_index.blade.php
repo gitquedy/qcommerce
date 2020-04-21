@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Customer Management')
+@section('title', 'Sales Management')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -17,32 +17,20 @@
 
 @section('content')
 <section id="data-list-view" class="data-list-view-header">
-<!--     <div class="action-btns d-none">
-      <div class="btn-dropdown mr-1 mb-1">
-        <div class="btn-group dropdown actions-dropodown">
-          <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Actions
-          </button>
-          <div class="dropdown-menu">
-           
-          </div>
-        </div>
-      </div>
-    </div> -->
-
     {{-- DataTable starts --}}
     <div class="table-responsive">
       <table class="table data-list-view">
         <thead>
           <tr>
             <th>For Checkbox</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Price Group</th>
-            <th>Last Update</th>
+            <th>Date</th>
+            <th>Reference No</th>
+            <th>Customer</th>
+            <th>Sales Status</th>
+            <th>Grand Total</th>
+            <th>Paid</th>
             <th>Balance</th>
-            <th>Deposit</th>
+            <th>Payment Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -51,13 +39,6 @@
     {{-- DataTable ends --}}
   </section>
   {{-- Data list view end --}}
-  
-  
-  <form action="{{route('order.print_shipping_mass')}}" method="post" id="mass_print_form">
-      @csrf
-      <input type="hidden" id="mass_print_val" name="ids">
-  </form>
-  
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
@@ -67,7 +48,6 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
-  <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
 @endsection
@@ -75,26 +55,29 @@
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
-     var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
+  var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: id, name: id, orderable : false},
+            { data: 'date', name: 'date' },
+            { data: 'reference_no', name: 'reference_no' },
             { data: 'customer_name', name: 'customer_name' },
-            { data: 'email', name: 'email' },
-            { data: 'price_group_name', name: 'price_group_name' },
-            { data: 'updated_at', name: 'updated_at' },
-            { data: 'balance', name: 'balance' },
-            { data: 'total_deposits', name: 'total_deposits' },
-            { data: 'action', name: 'action' },
+            { data: 'status', name: 'status', class: 'text-right' },
+            { data: 'grand_total', name: 'grand_total', class: 'text-right' },
+            { data: 'paid', name: 'paid', class: 'text-right' },
+            { data: 'balance', name: 'balance', class: 'text-right' },
+            { data: 'payment_status', name: 'payment_status', class: 'text-center' },
+            { data: 'action', name: 'action', class: 'text-center' },
+            
         ];
   var table_route = {
-          url: '{{ route('customer.index') }}',
+          url: '{{ route('sales.index') }}',
           data: function (data) {
             }
         };
   var buttons = [
           { text: "<i class='feather icon-plus'></i> Add New",
             action: function() {
-                window.location = '{{ route('customer.create') }}';
+                window.location = '{{ route('sales.create') }}';
             },
             className: "btn-outline-primary margin-r-10"}
             ];
@@ -106,19 +89,18 @@
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
-<script type="text/javascript">
-    $(document).on('click', '.toggle_view_modal', function(e) {
-        e.preventDefault();
+<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+<script>
+    $(document).on('click', '.add_payment', function() {
         $.ajax({
             url: $(this).data('action'),
             method: "POST",
-            data: {},
+            data: {sales_id:$(this).data('order_id')},
             success:function(result)
             {
                 $('.view_modal').html(result).modal();
             }
         });
     });
-</script> 
-<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+</script>
 @endsection

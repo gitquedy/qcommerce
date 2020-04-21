@@ -11,7 +11,7 @@ class Billing extends Model
 
 	protected $table = 'billing';
 
-	protected $fillable = ['invoice_no', 'business_id', 'plan_id', 'paid_status', 'payment_transaction_id', 'payment_type'];    
+	protected $fillable = ['invoice_no', 'business_id', 'plan_id', 'billing', 'paid_status', 'payment_transaction_id', 'payment_type'];    
 
     public static function getNextInvoiceNumber(){
     	//get last record

@@ -20,6 +20,7 @@
   <div class="card-content">
     <form action="{{ action('PayPalController@payment', $plan->id) }}" method="POST" class="form" enctype="multipart/form-data">
       @csrf
+      <input type="hidden" name="billing" value="{{$billing}}">
       <div class="card-body">
         <div class="row">
           <div class="col-md-4">
@@ -32,7 +33,25 @@
           <div class="col-md-4">
             <div class="form-group">
               <label>Price:</label>
-              <input type="text" name="" class="form-control" disabled="disabled" value="PHP {{ $plan->monthly_cost }}">
+              @php 
+              if($billing == 'Monthly') {
+                if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
+                  $total = $plan->promo_monthly_cost;
+                }
+                else {
+                  $total = $plan->monthly_cost;
+                }
+              }
+              elseif($billing == 'Annually') {
+                if ($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost) {
+                  $total = $plan->promo_yearly_cost;
+                }
+                else {
+                  $total = $plan->yearly_cost;
+                }
+              }
+              @endphp
+              <input type="text" name="" class="form-control" disabled="disabled" value="PHP {{ $total }}">
             </div>
           </div>
         </div>

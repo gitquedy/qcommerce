@@ -45,4 +45,26 @@ class Customer extends Model
     public function sales(){
         return $this->hasMany(Sales::class, 'customer_id', 'id');
     }
+    
+    public function payments(){
+        return $this->hasMany(Payment::class, 'customer_id', 'id');
+    }
+
+    public function available_deposit(){
+        $total_payment_by_deposit = 0;
+        foreach ($this->payments as $pays) {
+          if($pays->payment_type == "deposit") {
+            $total_payment_by_deposit += $pays->amount;
+          }
+        }
+        $total_deposits = 0;
+        foreach ($this->deposits as $dep) {
+            $total_deposits += $dep->amount;
+        }
+        return $total_deposits - $total_payment_by_deposit;
+    }
+
+    public function deposits(){
+        return $this->hasMany(Deposit::class, 'customer_id', 'id');
+    }
 }

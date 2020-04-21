@@ -157,9 +157,14 @@ class SalesController extends Controller
             'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque' && $request->paid > 0),
             'payment_note' => 'nullable',
         ]);
-
+        if ($request->customer_id) {
+            $customer = Customer::findOrFail($request->customer_id);
+        }
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        elseif ($request->payment_type == 'deposit' && $request->paid > $customer->available_deposit()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => ['paid' => ['Insufficient Deposit balance']]]);
         }
         try {
             DB::beginTransaction();
@@ -224,6 +229,7 @@ class SalesController extends Controller
             if($request->paid) {
                 $payment = new Payment;
                 $payment->sales_id = $sales->id;
+                $payment->customer_id = $sales->customer_id;
                 $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
                 $payment->amount = $request->paid;

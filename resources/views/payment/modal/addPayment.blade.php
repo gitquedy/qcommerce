@@ -12,6 +12,7 @@
   	<div class="modal-header">
 		<h4 class="modal-title" id="modal-title">Add Payment for {{$sales->reference_no}}</h4>
     <input type="hidden" name="sales_id" value="{{$sales->id}}">
+    <input type="hidden" name="customer_id" value="{{$sales->customer_id}}">
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
 	<div class="modal-body">
@@ -64,6 +65,7 @@
                       <option value="gift_certificate">Gift Card</option>
                       <option value="credit_card">Credit Card</option>
                       <option value="cheque">Cheque</option>
+                      <option value="deposit">Deposit</option>
                       <option value="other">Other</option>
                     </select>
                     <div class="form-control-position"> 

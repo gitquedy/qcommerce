@@ -223,7 +223,13 @@ class Order extends Model
         $total = 0;
         
         foreach($result as $r) {
-            $total += self::tofloat($r->price);
+            if ($r->site == 'lazada') {
+                $total += (float) str_replace(",","",$r->price);
+            }
+            elseif ($r->site == 'shopee') {
+                $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
+                $total += (float) str_replace(",","",$items->total_price);
+            }
         }
 
 

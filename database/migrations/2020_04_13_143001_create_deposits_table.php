@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBillingTable extends Migration
+class CreateDepositsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,18 @@ class CreateBillingTable extends Migration
      */
     public function up()
     {
-        Schema::create('billing', function (Blueprint $table) {
+        Schema::create('deposits', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('invoice_no');
-            //fk
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
-
             $table->unsignedBigInteger('plan_id');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->string('billing');
-            $table->tinyInteger('paid_status')->default(0);
-            
-            $table->string('payment_transaction_id')->nullable();
-            $table->string('payment_type')->nullable();
-
+            $table->date('date');
+            $table->string('reference_no');
+            $table->text('note')->nullable();
+            $table->float('amount', 10, 2);
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
         });
     }
@@ -39,6 +36,6 @@ class CreateBillingTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('billing');
+        Schema::dropIfExists('deposits');
     }
 }

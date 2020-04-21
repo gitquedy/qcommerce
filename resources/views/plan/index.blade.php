@@ -59,19 +59,19 @@
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Current Plan:</label>
-                  <h4 id="current_plan">Super Plan</h4>
+                  <h4 id="current_plan">FREE</h4>
                 </div>
               </li>
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Billing Cycle:</label>
-                  <h4 id="billing_cycle">Every day</h4>
+                  <h4 id="billing_cycle"></h4>
                 </div>
               </li>
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Promocode:</label>
-                  <p><span class="badge badge-secondary" id="promocode">SAMPLEPROMO001</span></p>
+                  <p><span class="badge badge-secondary" id="promocode"></span></p>
                 </div>
               </li>
             </ul>
@@ -138,7 +138,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@show', $plan->id) }}" class="btn btn-primary my-2" data-id="{{$plan->id}}" >Subscribe</a>
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Subscribe</a>
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -362,7 +362,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@show', $plan->id) }}" class="btn btn-primary my-2" data-id="{{$plan->id}}" >Subscribe
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Subscribe
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -393,18 +393,17 @@
 @section('myscript')
 <script type="text/javascript">
   $(document).ready(function() {
+
     $(document).on('change', 'input[name=billling_type]', function() {
       var val = $(this).val();
       $('.billing_text').html(val);
       $('.billling_type').hide();
       $('.billling_type.'+val).show('fast');
+      $('.Subscribe_Btn').attr('href', $('.Subscribe_Btn').data('href')+"/"+val);
+      $('.Subscribe_Btn').each(function( index,element ){
+        $(element).attr('href', $(element).data('href')+"/"+val);
+      });
     });
-
-    $(document).on('click', '.Subscribe_Btn', function() {
-      var billling_type = $('input[name=billling_type]:checked').val();
-      alert("Plan ID: "+$(this).data('id')+" Billing Type: "+billling_type);
-    })
-
   });
 </script>
 @endsection

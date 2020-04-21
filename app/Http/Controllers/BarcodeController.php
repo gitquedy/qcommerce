@@ -94,11 +94,11 @@ class BarcodeController extends Controller
                             'sku' => $sku,
                             'pic' => '',
                             'name' => $item['item_name'],
-                            'qty' => 1,
+                            'qty' => $item['variation_quantity_purchased'],
                         );
                     }
                     else {
-                        $items[$sku]['qty'] += 1;
+                        $items[$sku]['qty'] += $item['variation_quantity_purchased'];
                     }
                 }
             }else{

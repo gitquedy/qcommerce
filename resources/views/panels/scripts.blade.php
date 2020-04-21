@@ -10,6 +10,8 @@
         <script src="{{ asset('vendors/js/printThis/printThis.js') }}"></script>
         <script src="{{ asset('vendors/js/forms/extended/typeahead/typeahead.bundle.min.js') }}"></script>
         <script>
+            var last_notification_count = "first";
+
             function notification(){
              
                  $.post("{{route('ajax_get_notification')}}",
@@ -17,7 +19,6 @@
                     name: "ccc"
                   },
                   function(data, status){
-                      
                        try {
                               var json_obj = JSON.parse(data);
                             }
@@ -34,6 +35,12 @@
             }     
             
             function notification_refresh(main_data){
+                if(last_notification_count != "first" && last_notification_count < main_data.total) {
+                    let src = '{{asset('file/notification.mp3')}}';
+                    let audio = new Audio(src);
+                    audio.play();
+                }
+                last_notification_count = main_data.total;
                 if(main_data.total>0){
                     $('#notification_count').html(main_data.total);
                     $('#notification_count_sub').html(main_data.total+" New");
@@ -41,8 +48,9 @@
                     $('#notification_count').html("");
                     $('#notification_count_sub').html("NO");
                 }
+
                 
-                var not_string = '';
+                var not_string = '<div id="sound"></div>';
                 
                 if(main_data.orders>0){
                 
@@ -58,7 +66,6 @@
                 }
                 
                 if(main_data.total_new_products>0){
-                
                    not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=lazada">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><i class="feather icon-package font-medium-5 primary"></i></div>'+
@@ -68,14 +75,14 @@
                                             '<time class="media-meta" >'+main_data.last_product_time+'</time></small>'+
                                     '</div>'+
                                 '</a>';
-                }             
+                }          
                 $('#notification_area').html(not_string);
             }
             $(document).ready(function(){
               notification();
-              setInterval(function(){ notification() }, 10000);    
+              setInterval(function(){ notification() }, 10000); 
             });
-            
+
         </script>
 @if($configData['blankPage'] == false)
         <script src="{{ asset(mix('js/scripts/customizer.js')) }}"></script>
