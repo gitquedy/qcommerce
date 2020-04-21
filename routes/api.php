@@ -33,6 +33,8 @@ Route::group([
       Route::get('shop/getDashboardDetails/', 'Api\ShopController@getDashboardDetails');
       Route::resource('shop', 'Api\ShopController');
       Route::resource('order', 'Api\OrderController');
+      Route::resource('product', 'Api\ProductController');
+      Route::get('product/constant/statuses', 'Api\ProductController@statuses');
       Route::get('order/constant/statuses', 'Api\OrderController@statuses');
       Route::get('order/index/headers', 'Api\OrderController@headers');
   });

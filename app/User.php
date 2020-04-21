@@ -120,7 +120,9 @@ use Notifiable, HasRoles;
 
     public function currentPendingOrders($shop_ids){
         $data = 0;
-        $data = Order::whereIn('shop_id', $shop_ids)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
+        // $data = Order::whereIn('shop_id', $shop_ids)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
+
+        $data = Order::whereIn('shop_id', $shop_ids)->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
         return $data;
     }
 
