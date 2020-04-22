@@ -152,7 +152,7 @@ class PayPalController extends Controller
             $data = [
                 'PROFILESTARTDATE' => $startdate,
                 'DESC' => $request->desc,
-                'BILLINGPERIOD' => 'Day',//$billing->billing_period, // Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
+                'BILLINGPERIOD' => $billing->billing_period, // Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
                 'BILLINGFREQUENCY' => 1, // 
                 'AMT' => $billing->amount, // Billing amount for each billing cycle
                 'CURRENCYCODE' => 'PHP', // Currency code 
@@ -181,19 +181,5 @@ class PayPalController extends Controller
             ];
         }
         return response()->json($output);
-    }
-
-    public function postNotify(Request $request)
-    {
-        $provider = new ExpressCheckout;
-        
-        $request->merge(['cmd' => '_notify-validate']);
-        $post = $request->all();        
-        
-        $response = (string) $provider->verifyIPN($post);
-        
-        if ($response === 'VERIFIED') {
-
-        }                            
     }
 }

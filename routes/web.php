@@ -13,6 +13,7 @@
 
 
 // Route url
+
 Route::group(['middleware' => 'auth'], function()
 {
 	Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function(){
@@ -24,7 +25,6 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
 		Route::get('payment/success/{billing}', 'PayPalController@success')->name('paypal.payment.success');
 		Route::post('payment/confirm/{billing}', 'PayPalController@confirm')->name('paypal.payment.confirm');
-		Route::post('ipn/notify','PayPalController@postNotify');
 	});
 
 
@@ -401,4 +401,6 @@ Route::group(['middleware' => 'auth'], function()
 // Route::get('/auth-lock-screen', 'AuthenticationController@lock_screen');
 Auth::routes();
 
+Route::get('/ipn/test', 'Api\IpnController@test')->name('ipn.test');
+Route::post('ipn/notify','Api\IpnController@postNotify');
 Route::post('/login/validate', 'Auth\LoginController@validate_api');
