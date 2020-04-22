@@ -192,8 +192,8 @@ class PayPalController extends Controller
         
         $response = (string) $provider->verifyIPN($post);
         
-        if ($response === 'VERIFIED') {                      
-            print json_encode($post);
+        if ($response === 'VERIFIED') {
+
         }                            
-    }  
+    }
 }
