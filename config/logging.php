@@ -89,6 +89,12 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+
+        'ipnlog' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/paypal_ipn.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

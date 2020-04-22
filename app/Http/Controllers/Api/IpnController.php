@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\ExpressCheckout;
+use Log;
 
 class IpnController extends Controller
 {
@@ -16,10 +17,9 @@ class IpnController extends Controller
         $post = $request->all();        
         
         $response = (string) $provider->verifyIPN($post);
-        // $response = 'VERIFIED';
+        $response = 'VERIFIED';
         if ($response === 'VERIFIED') {
-            \Log::useDailyFiles('storage/paypal_ipn/ipn_logs.txt');
-            \Log::info("PAYPAL IPN :: Date:" . date("Y-m-d H:i:s"). " Message:" . json_encode($post));
+            Log::channel('ipnlog')->info(json_encode($post));
         }                            
     }  
 
