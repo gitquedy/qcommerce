@@ -18,7 +18,8 @@ class IpnController extends Controller
         $response = (string) $provider->verifyIPN($post);
         // $response = 'VERIFIED';
         if ($response === 'VERIFIED') {
-            print json_encode($post);die();
+            file_put_contents("ipn_data_content.txt", serialize($data));
+            // print json_encode($post);die();
         }                            
     }  
 
