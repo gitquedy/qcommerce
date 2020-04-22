@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Auth;
 use App\Plan;
 use Illuminate\Http\Request;
+use Srmklive\PayPal\Services\ExpressCheckout;
+use App\Billing;
 
 class PlanController extends Controller
 {
@@ -38,5 +40,29 @@ class PlanController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Payment"]
         ];
         return view('plan.show', compact('plan', 'breadcrumbs', 'billing'));
+    }
+
+    public function confirm(Request $request, Billing $billing){
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Payment"]
+        ];
+        $provider = new ExpressCheckout;
+        $response = $provider->getExpressCheckoutDetails($request->token);
+        // print json_encode($response);die();
+        $billing->payer_id = $response['PAYERID'];
+        $billing->payer_firstname = $response['FIRSTNAME'];
+        $billing->payer_lastname = $response['LASTNAME'];
+        $billing->payer_email = $response['EMAIL'];
+        $billing->country_code = $response['COUNTRYCODE'];
+        $billing->save();
+        // print json_encode($response);die();
+        return view('plan.confirm', compact('breadcrumbs', 'response', 'billing'));
+    }
+
+    public function success() {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Success Payment"]
+        ];
+        return view('plan.success', compact('breadcrumbs'));
     }
 }

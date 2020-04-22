@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
   
+use Auth;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Billing;
 use App\Package;
 use App\Plan;
+use Carbon\Carbon;
 use DB;
    
 class PayPalController extends Controller
@@ -23,28 +25,29 @@ class PayPalController extends Controller
 	        $data = [];
             $billing_period = $request->billing;
             if($billing_period == 'Monthly') {
-                $duration = "month";
+                $billing_period = "Month";
                 if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
-                $price = $plan->promo_monthly_cost;
+                    $price = $plan->promo_monthly_cost;
                 }
                 else {
-                $price = $plan->monthly_cost;
+                    $price = $plan->monthly_cost;
                 }
             }
             elseif($billing_period == 'Annually') {
-                $duration = "year";
+                $billing_period = "Year";
                 if ($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost) {
-                $price = $plan->promo_yearly_cost;
+                    $price = $plan->promo_yearly_cost;
                 }
                 else {
-                $price = $plan->yearly_cost;
+                    $price = $plan->yearly_cost;
                 }
             }
+            $desc = '1 '.$billing_period.' '.$plan->name.' Plan subscription on Qcommerce.';
 	        $data['items'] = [
 	            [
 	                'name' => $plan->name,
 	                'price' => $price,
-	                'desc'  =>   $plan->name . ' 1 '.$duration.' subscription for qcommerce.com',
+	                'desc'  => $desc,
 	                'qty' => 1
 	            ]
 	        ];
@@ -52,19 +55,20 @@ class PayPalController extends Controller
 	        $billing = Billing::create([
 	        	'business_id' => $request->user()->business_id,
 	        	'plan_id' => $plan->id,
-                'billing' => $billing_period,
+                'billing_period' => $billing_period,
+                'amount' => $price,
 	        	'invoice_no' => $invoice_no
 	        ]);
 
 	        $data['invoice_id'] = $invoice_no;
-	        $data['invoice_description'] = "Order #{$data['invoice_id']} Invoice";
-	        $data['return_url'] = action('PayPalController@success', $billing->id);
+	        $data['invoice_description'] = $desc;
+	        $data['return_url'] = action('PlanController@confirm', $billing->id);
 	        $data['cancel_url'] = action('PayPalController@cancel', $billing->id);
 	        $data['total'] = $price;
 	  
 	        $provider = new ExpressCheckout;
 	  
-	        $response = $provider->setExpressCheckout($data);
+	        // $response = $provider->setExpressCheckout($data);
 	  
 	        $response = $provider->setExpressCheckout($data, true);
 	        if($response['paypal_link'] != null){
@@ -73,10 +77,11 @@ class PayPalController extends Controller
                             'redirect' => $response['paypal_link']
                         ];
             }else{
+                // $billing->delete();
             	\Log::emergency("Paypal Response:". implode(', ', $response));
             	$output = ['success' => 0,
                     'msg' => 'Sorry something went wrong, please try again later.',
-                    'redirect' => action('ApplicationController@show', $package->id)
+                    'redirect' => action('ApplicationController@show', $plan->id)
                 ];
             }
           
@@ -112,28 +117,83 @@ class PayPalController extends Controller
     {
         $provider = new ExpressCheckout;
         $response = $provider->getExpressCheckoutDetails($request->token);
-        print json_encode($response);die();
-
-        $startdate = Carbon::now()->toAtomString();
-        $profile_desc = !empty($data['subscription_desc']) ?
-                    $data['subscription_desc'] : $data['invoice_description'];
-        $data = [
-            'PROFILESTARTDATE' => $startdate,
-            'DESC' => $profile_desc,
-            'BILLINGPERIOD' => 'Month', // Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
-            'BILLINGFREQUENCY' => 1, // 
-            'AMT' => 10, // Billing amount for each billing cycle
-            'CURRENCYCODE' => 'USD', // Currency code 
-            'TRIALBILLINGPERIOD' => 'Day',  // (Optional) Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
-            'TRIALBILLINGFREQUENCY' => 10, // (Optional) set 12 for monthly, 52 for yearly 
-            'TRIALTOTALBILLINGCYCLES' => 1, // (Optional) Change it accordingly
-            'TRIALAMT' => 0, // (Optional) Change it accordingly
-        ];
-        $response = $provider->createRecurringPaymentsProfile($data, $token);
-        if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
-            dd('Your payment was successfully. You can create success page here.');
-        }
-  
-        dd('Something is wrong.');
+        return redirect()->route('plan.confirm', ['response' => $response]);
     }
+
+    public function confirm(Request $request, Billing $billing) {
+        $data['items'] = [
+            [ 
+                'name' => $billing->plan->name,
+                'price' => $billing->amount,
+                'desc'  =>   $request->desc,
+                'qty' => 1
+            ]
+        ];
+        $data['total'] = $billing->amount;
+        $data['invoice_id'] = $billing->invoice_id;
+        $data['invoice_description'] = $request->desc;
+        $data['return_url'] = '';
+        $data['cancel_url'] = '';
+
+        $provider = new ExpressCheckout;
+        $response = $provider->doExpressCheckoutPayment($data, $request->token, $request->payer_id);
+        if(in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
+            $old_billing = Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->where('id', '!=', $billing->id)->first();
+            if($old_billing) {
+                $response = $provider->cancelRecurringPaymentsProfile($old_billing->profile_id);
+                $old_billing->paid_status = 3;
+                $old_billing->save();
+            }
+
+            $billing->paid_status = 1;
+            $billing->payment_transaction_id = $response['PAYMENTINFO_0_TRANSACTIONID'];
+
+            $startdate = Carbon::now()->toAtomString();
+            $data = [
+                'PROFILESTARTDATE' => $startdate,
+                'DESC' => $request->desc,
+                'BILLINGPERIOD' => 'Day',//$billing->billing_period, // Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
+                'BILLINGFREQUENCY' => 1, // 
+                'AMT' => $billing->amount, // Billing amount for each billing cycle
+                'CURRENCYCODE' => 'PHP', // Currency code 
+            ];
+            $response = $provider->createRecurringPaymentsProfile($data, $request->token);
+            if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
+                 $billing->profile_id = $response['PROFILEID'];
+                 $billing->save();
+                 $output = ['success' => 1,
+                        'msg' => 'Your payment was successfully. '.$request->desc,
+                       'redirect' => action('PlanController@success')
+                    ];
+            }
+            else {
+                $output = ['success' => 0,
+                    'msg' => $response['L_LONGMESSAGE0'],
+                    'redirect' => action('PlanController@confirm', $billing->id)
+                ];
+            }
+
+        }
+        else {
+            $output = ['success' => 0,
+                'msg' => 'Sorry something went wrong, please try again later.',
+                'redirect' => action('PlanController@confirm', $billing->id)
+            ];
+        }
+        return response()->json($output);
+    }
+
+    public function postNotify(Request $request)
+    {
+        $provider = new ExpressCheckout;
+        
+        $request->merge(['cmd' => '_notify-validate']);
+        $post = $request->all();        
+        
+        $response = (string) $provider->verifyIPN($post);
+        
+        if ($response === 'VERIFIED') {                      
+            print json_encode($post);
+        }                            
+    }  
 }

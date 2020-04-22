@@ -12,7 +12,28 @@
 @endsection
 
 @section('content')
-
+@php 
+  function count_or_free($value, $strike = false) {
+    if($value) {
+      if ($strike) {
+        $output = '<del><small>PHP '.number_format($value, 2).'</small></del>';
+      }
+      else {
+        $output = '<h2 style="color:inherit"><small>PHP</small> '.number_format($value, 2).'</h2 style="color:inherit">';
+      }
+    }
+    else {
+      $output = '<h2 style="color:inherit">FREE</h2>';
+    }
+    return $output;
+  }
+  function count_or_unlimited($value) {
+    return ($value)?number_format($value):'Unlimited';
+  }
+  function boolean_to_text($value) {
+    return ($value)?'<span class="text-success"><i class="feather icon-check"></i></span>':'<span class="text-danger"><i class="feather icon-x"></i></span>';
+  }
+@endphp
 <section class="card">
   <div class="card-header">
     <h4 class="card-title">Payment</h4>
@@ -22,44 +43,77 @@
       @csrf
       <input type="hidden" name="billing" value="{{$billing}}">
       <div class="card-body">
-        <div class="row">
-          <div class="col-md-4">
+        <div class="row text-center">
+          <div class="col-md-3">
             <div class="form-group">
-              <label>Plan Name:</label>
-              <input type="text" name="" class="form-control" disabled="disabled" value="{{ $plan->name }}">
+              <h1>{{$plan->name}}</h1>
+              <h1 class="display-1 text-primary"><i class="feather icon-{{$plan->icon}}"></i></h1>
+                @if($billing == 'Monthly')
+                  @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost)
+                    <span class="text-secondary">{!!count_or_free($plan->monthly_cost, true)!!}</span>
+                    <br>
+                    <span class="text-success">{!!count_or_free($plan->promo_monthly_cost)!!}</span>
+                  @else
+                    <span>{!!count_or_free($plan->monthly_cost)!!}</span>
+                  @endif
+                  <p><b>Billed <span class="billing_text">Monthly</span></b></p>
+                @elseif($billing == 'Annually')
+                  @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost)
+                    <span class="text-secondary">{!!count_or_free($plan->yearly_cost, true)!!}</span>
+                    <br>
+                    <span class="text-success">{!!count_or_free($plan->promo_yearly_cost)!!}</span>
+                  @else
+                    <span>{!!count_or_free($plan->yearly_cost)!!}</span>
+                  @endif
+                  <p><b>Billed <span class="billing_text">Annually</span></b></p>
+                @endif
+            </div>
+            <div class="form-group">
+              <label for="">Promocode</label>
+              <input type="text" class="form-control" name="promocode" disabled="">
             </div>
           </div>
-
-          <div class="col-md-4">
-            <div class="form-group">
-              <label>Price:</label>
-              @php 
-              if($billing == 'Monthly') {
-                if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
-                  $total = $plan->promo_monthly_cost;
-                }
-                else {
-                  $total = $plan->monthly_cost;
-                }
-              }
-              elseif($billing == 'Annually') {
-                if ($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost) {
-                  $total = $plan->promo_yearly_cost;
-                }
-                else {
-                  $total = $plan->yearly_cost;
-                }
-              }
-              @endphp
-              <input type="text" name="" class="form-control" disabled="disabled" value="PHP {{ $total }}">
-            </div>
+          <div class="col-md-3">
+            <ul class="list-group">
+              <li class="list-group-item">Order Processing : <b>{!!count_or_unlimited($plan->order_processing)!!}</b></li>
+              <li class="list-group-item">Sales Channels : <b>{{$plan->sales_channels}}</b></li>
+              <li class="list-group-item">No. of Users : <b>{!!count_or_unlimited($plan->users)!!}</b></li>
+              <li class="list-group-item">Accounts/Marketplace : <b>{!!count_or_unlimited($plan->accounts_marketplace)!!}</b></li>
+              <li class="list-group-item">Return reconciliation : <b>{!!boolean_to_text($plan->return_recon)!!}</b></li>
+              <li class="list-group-item">Payment reconciliation : <b>{!!boolean_to_text($plan->payment_recon)!!}</b></li>
+              <li class="list-group-item">Shipping overcharge reconciliation : <b>{!!boolean_to_text($plan->shipping_overcharge_recon)!!}</b></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <ul class="list-group">
+              <li class="list-group-item"><b>INVENTORY</b></li>
+              <li class="list-group-item">Inventory Management : <b>{!!boolean_to_text($plan->inventory_management)!!}</b></li>
+              <li class="list-group-item">Sync inventory : <b>{!!boolean_to_text($plan->sync_inventory)!!}</b></li>
+              <li class="list-group-item">No. of Warehouse : <b>{!!count_or_unlimited($plan->no_of_warehouse)!!}</b></li>
+              <li class="list-group-item">Stock Transfer : <b>{!!boolean_to_text($plan->stock_transfer)!!}</b></li>
+              <li class="list-group-item">Purchase Orders : <b>{!!boolean_to_text($plan->purchase_orders)!!}</b></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <ul class="list-group">
+              <li class="list-group-item"><b>OFFLINE SALES</b></li>
+              <li class="list-group-item">Add Sales : <b>{!!boolean_to_text($plan->add_sales)!!}</b></li>
+              <li class="list-group-item">Customers Management : <b>{!!boolean_to_text($plan->customers_management)!!}</b></li>
+            </ul>
+            <ul class="list-group">
+              <li class="list-group-item"><b>REPORTS</b></li>
+              <li class="list-group-item">Stock Alert Monitoring : <b>{!!boolean_to_text($plan->stock_alert_monitoring)!!}</b></li>
+              <li class="list-group-item">Out of Stock : <b>{!!boolean_to_text($plan->out_of_stock)!!}</b></li>
+              <li class="list-group-item">Daily Sales : <b>{!!boolean_to_text($plan->daily_sales)!!}</b></li>
+              <li class="list-group-item">Top Selling Products : <b>{!!boolean_to_text($plan->top_selling_products)!!}</b></li>
+            </ul>
           </div>
         </div>
         <div class="form-group col-12"></div>
         <div class="row">
           <div class="col-6">
            <div class="col-12">
-                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Proceed to Paypal Checkout">
+                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribe">
                <!--  <button type="reset" class="btn btn-outline-warning mr-1 mb-1">Reset --> 
             </div>
           </div>

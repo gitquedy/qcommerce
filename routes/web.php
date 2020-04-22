@@ -23,7 +23,9 @@ Route::group(['middleware' => 'auth'], function()
 	Route::group(['prefix' => 'paypal'], function(){
 		Route::post('payment/{plan}', 'PayPalController@payment')->name('paypal.payment');
 		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
-		Route::get('payment/success{billing}', 'PayPalController@success')->name('paypal.payment.success');
+		Route::get('payment/success/{billing}', 'PayPalController@success')->name('paypal.payment.success');
+		Route::post('payment/confirm/{billing}', 'PayPalController@confirm')->name('paypal.payment.confirm');
+		Route::post('ipn/notify','PayPalController@postNotify');
 	});
 
 
@@ -182,8 +184,10 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
+	Route::get('/plan/success', 'PlanController@success')->name('plan.success');
 	Route::resource('/plan', 'PlanController')->only(['index', 'show']);
 	Route::get('/plan/subscribe/{plan}/{billing?}', 'PlanController@subscribe');
+	Route::get('/plan/confirm/{billing}', 'PlanController@confirm')->name('plan.confirm');
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{
