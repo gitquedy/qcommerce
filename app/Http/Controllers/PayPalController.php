@@ -140,14 +140,13 @@ class PayPalController extends Controller
         if(in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
             $old_billing = Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->where('id', '!=', $billing->id)->first();
             if($old_billing) {
-                $response = $provider->cancelRecurringPaymentsProfile($old_billing->profile_id);
+                $response_old = $provider->cancelRecurringPaymentsProfile($old_billing->profile_id);
                 $old_billing->paid_status = 3;
                 $old_billing->save();
             }
 
             $billing->paid_status = 1;
             $billing->payment_transaction_id = $response['PAYMENTINFO_0_TRANSACTIONID'];
-
             $startdate = Carbon::now()->toAtomString();
             $data = [
                 'PROFILESTARTDATE' => $startdate,
@@ -156,6 +155,10 @@ class PayPalController extends Controller
                 'BILLINGFREQUENCY' => 1, // 
                 'AMT' => $billing->amount, // Billing amount for each billing cycle
                 'CURRENCYCODE' => 'PHP', // Currency code 
+                'TRIALBILLINGPERIOD' => $billing->billing_period,  // (Optional) Can be 'Day', 'Week', 'SemiMonth', 'Month', 'Year'
+                'TRIALBILLINGFREQUENCY' => 1, // (Optional) set 12 for monthly, 52 for yearly 
+                'TRIALTOTALBILLINGCYCLES' => 1, // (Optional) Change it accordingly
+                'TRIALAMT' => 0, // (Optional) Change it accordingly
             ];
             $response = $provider->createRecurringPaymentsProfile($data, $request->token);
             if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {

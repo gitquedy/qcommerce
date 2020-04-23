@@ -16,17 +16,21 @@ class Billing extends Model
     public static function getNextInvoiceNumber(){
     	//get last record
 		$record = Billing::latest()->first();
-		
+		$debug = "";
+		if (env('APP_DEBUG')) {
+			$debug = "DEBUG";
+		}
 		if($record){
 			$expNum = explode('-', $record->invoice_no);
 			if (Carbon::now()->format('Y-m') == Carbon::parse($record->created_at)->format('Y-m')){
 				$nextInvoiceNumber = $expNum[0]. '-' . $expNum[1] . '-' . ($expNum[2] + 1);
 			} else {
-			    $nextInvoiceNumber = date('Y-m').'-1';
+			    $nextInvoiceNumber = $debug.date('Y-m').'-1';
 			}
 		}else{
-			$nextInvoiceNumber = date('Y-m').'-1';
+			$nextInvoiceNumber = $debug.date('Y-m').'-1';
 		}
+		
 		
 		return $nextInvoiceNumber;
     }

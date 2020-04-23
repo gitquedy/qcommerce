@@ -24,8 +24,9 @@ class CreateBillingTable extends Migration
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->string('billing_period');
             $table->float('amount', 10, 2);
-            $table->tinyInteger('paid_status')->default(0)->comment('0 = unpaid, 1 = paid, 2 = failed, 3 = cancelled');
-            
+            $table->tinyInteger('paid_status')->default(0)->comment('0=unpaid, 1=paid, 2=failed, 3=cancelled, 4=suspended');
+            $table->date('payment_date')->nullable();
+            $table->date('next_paymment_date')->nullable();
             $table->string('payment_transaction_id')->nullable();
             $table->string('profile_id')->nullable();
             $table->string('payer_id')->nullable();

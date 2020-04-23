@@ -1,3 +1,6 @@
+<h1>DATE : {{Carbon\Carbon::now()->toAtomString()}}</h1>
+
+
 <form target="_new" method="post" action="{{action('Api\IpnController@postNotify')}}">
 	<input name="mc_gross" type="hidden" value="500.00" />
 	<input name="custom" type="hidden" value="some custom data" />

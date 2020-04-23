@@ -48,14 +48,12 @@ class PlanController extends Controller
         ];
         $provider = new ExpressCheckout;
         $response = $provider->getExpressCheckoutDetails($request->token);
-        // print json_encode($response);die();
         $billing->payer_id = $response['PAYERID'];
         $billing->payer_firstname = $response['FIRSTNAME'];
         $billing->payer_lastname = $response['LASTNAME'];
         $billing->payer_email = $response['EMAIL'];
         $billing->country_code = $response['COUNTRYCODE'];
         $billing->save();
-        // print json_encode($response);die();
         return view('plan.confirm', compact('breadcrumbs', 'response', 'billing'));
     }
 
