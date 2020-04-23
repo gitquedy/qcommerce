@@ -38,7 +38,7 @@
     return $output;
   }
   function count_or_unlimited($value) {
-    return ($value)?$value:'Unlimited';
+    return ($value)?number_format($value):'Unlimited';
   }
   function boolean_to_text($value) {
     return ($value)?'<h3 class="text-success"><i class="feather icon-check"></i></h3>':'<h3 class="text-danger"><i class="feather icon-x"></i></h3>';
@@ -138,7 +138,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Subscribe</a>
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan</a>
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -362,7 +362,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Subscribe
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>

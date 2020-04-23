@@ -22,11 +22,17 @@ class CreateBillingTable extends Migration
 
             $table->unsignedBigInteger('plan_id');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->string('billing');
-            $table->tinyInteger('paid_status')->default(0);
+            $table->string('billing_period');
+            $table->float('amount', 10, 2);
+            $table->tinyInteger('paid_status')->default(0)->comment('0 = unpaid, 1 = paid, 2 = failed, 3 = cancelled');
             
             $table->string('payment_transaction_id')->nullable();
-            $table->string('payment_type')->nullable();
+            $table->string('profile_id')->nullable();
+            $table->string('payer_id')->nullable();
+            $table->string('payer_firstname')->nullable();
+            $table->string('payer_lastname')->nullable();
+            $table->string('payer_email')->nullable();
+            $table->string('country_code')->nullable();
 
             $table->timestamps();
         });
