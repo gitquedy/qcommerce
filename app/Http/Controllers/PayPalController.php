@@ -145,6 +145,7 @@ class PayPalController extends Controller
                 $old_billing->save();
             }
 
+            $billing->billing_period = "Day";; //DEBUG ONLY
             $billing->paid_status = 1;
             $billing->payment_transaction_id = $response['PAYMENTINFO_0_TRANSACTIONID'];
             $startdate = Carbon::now()->toAtomString();
