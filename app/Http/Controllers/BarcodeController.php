@@ -131,7 +131,7 @@ class BarcodeController extends Controller
 
     public function packedItems(Request $request) {
         $result = false;
-        $order = Order::where('id',$request->order_id)->first();
+        $order = Order::where('id',$request->order_id)->orWhere('ordersn', $input)->first();
         if($order->packed == 0){
             $order->packed = 1;
             $order->save();
