@@ -7,6 +7,7 @@ use App\Plan;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Billing;
+use App\Business;
 
 class PlanController extends Controller
 {
@@ -22,9 +23,11 @@ class PlanController extends Controller
         ];
         $user = Auth::user();
         $plans = Plan::where('status', 1)->get();
+        $business = Business::where('id', Auth::user()->business_id)->first();
         return view('plan.index', [
             'breadcrumbs' => $breadcrumbs,
             'plans' => $plans,
+            'billing' => $business->subscription(),
         ]);
     }
 
@@ -39,7 +42,8 @@ class PlanController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Payment"]
         ];
-        return view('plan.show', compact('plan', 'breadcrumbs', 'billing'));
+        $business = Business::where('id', Auth::user()->business_id)->first();
+        return view('plan.show', compact('plan', 'breadcrumbs', 'billing', 'business'));
     }
 
     public function confirm(Request $request, Billing $billing){

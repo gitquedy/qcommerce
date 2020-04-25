@@ -48,7 +48,7 @@
             <div class="form-group">
               <h1>{{$plan->name}}</h1>
               <h1 class="display-1 text-primary"><i class="feather icon-{{$plan->icon}}"></i></h1>
-                @if($billing == 'Monthly')
+                @if($billing == 'Month')
                   @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost)
                     <span class="text-secondary">{!!count_or_free($plan->monthly_cost, true)!!}</span>
                     <br>
@@ -57,7 +57,7 @@
                     <span>{!!count_or_free($plan->monthly_cost)!!}</span>
                   @endif
                   <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                @elseif($billing == 'Annually')
+                @elseif($billing == 'Year')
                   @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->yearly_cost != $plan->promo_yearly_cost)
                     <span class="text-secondary">{!!count_or_free($plan->yearly_cost, true)!!}</span>
                     <br>
@@ -70,7 +70,13 @@
             </div>
             <div class="form-group">
               <label for="">Promocode</label>
-              <input type="text" class="form-control" name="promocode" disabled="">
+              {{-- <input type="text" class="form-control" name="promocode" disabled=""> --}}
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Promocode" aria-label="Promocode" aria-describedby="apply-button">
+                <div class="input-group-append">
+                  <button class="btn btn-primary apply_promocode" type="button">Apply</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-md-3">
@@ -113,13 +119,31 @@
         <div class="row">
           <div class="col-6">
            <div class="col-12">
-                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribe">
+                @if($business->subscription()->plan->id == $plan->id && $billing == $business->subscription()->billing_period)
+                    <h3>You are currently subscribed to this plan.</h3>
+                @elseif($business->subscription()->plan->id == $plan->id && $billing != $business->subscription()->billing_period)
+                    @if($business->subscription()->billing_period == "Year")
+                      <h3>You are currently subscribed to this plan with Annual billing cycle.</h3>
+                      <br>
+                      <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Change Billing Cycle to Monthly">
+                    @elseif($business->subscription()->billing_period == "Month")
+                      <h3>You are currently subscribed to this plan with Monthly billing cycle.</h3>
+                      <br>
+                      <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Change Billing Cycle to Yearly">
+                    @else
+                    --
+                    @endif
+                @elseif($business->subscription() && $business->subscription()->plan->monthly_cost > $plan->monthly_cost);
+                    <h3>You are currently subscribed to a higher plan.</h3>
+                @else
+                    <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribed">
+                @endif
+                </form>
                <!--  <button type="reset" class="btn btn-outline-warning mr-1 mb-1">Reset --> 
             </div>
           </div>
         </div>
       </div>
-    </form>
   </div>
 @endsection
 
