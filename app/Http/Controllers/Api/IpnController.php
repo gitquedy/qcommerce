@@ -18,7 +18,7 @@ class IpnController extends Controller
         $post = $request->all();        
         
         $response = (string) $provider->verifyIPN($post);
-        $response = 'VERIFIED'; //Debug Only
+        // $response = 'VERIFIED'; //Debug Only
         if ($response === 'VERIFIED') {
             Log::channel('ipnlog')->info(json_encode($post));
             return $this->switch($post);
@@ -39,30 +39,30 @@ class IpnController extends Controller
                     return $billing->save();
                 }
                 break;
-            // case 'recurring_payment_profile_created':
-            //     $billing = Billing::where('payer_id', $post['payer_id'])->first();
-            //         $billing->payer_firstname = $post['first_name'];
-            //         $billing->payer_lastname = $post['last_name'];
-            //         $billing->payer_email = $post['payer_email'];
-            //         $billing->profile_id = $post['recurring_payment_id'];
-            //         return $billing->save();
-            //     break;
-            // case 'recurring_payment_profile_cancel':
-            //     $billing = Billing::where('payer_id', $post['payer_id'])->first();
-            //         $billing->payment_date = null;
-            //         $billing->next_payment_date = null;
-            //         $billing->paid_status == 3;
-            //         return $billing->save();
-            //     break;
-            // case 'recurring_payment':
-            //     $billing = Billing::where('payer_id', $post['payer_id'])->first();
-            //         $billing->payer_firstname = $post['first_name'];
-            //         $billing->payer_lastname = $post['last_name'];
-            //         $billing->payer_email = $post['payer_email'];
-            //         $billing->payment_date = date("Y-m-d H:i:s", strtotime($post['payment_date']));
-            //         $billing->next_payment_date = date("Y-m-d H:i:s", strtotime($post['next_payment_date']));
-            //         return $billing->save();
-            //     break;
+            case 'recurring_payment_profile_created':
+                $billing = Billing::where('payer_id', $post['payer_id'])->first();
+                    $billing->payer_firstname = $post['first_name'];
+                    $billing->payer_lastname = $post['last_name'];
+                    $billing->payer_email = $post['payer_email'];
+                    $billing->profile_id = $post['recurring_payment_id'];
+                    return $billing->save();
+                break;
+            case 'recurring_payment_profile_cancel':
+                $billing = Billing::where('payer_id', $post['payer_id'])->first();
+                    $billing->payment_date = null;
+                    $billing->next_payment_date = null;
+                    $billing->paid_status == 3;
+                    return $billing->save();
+                break;
+            case 'recurring_payment':
+                $billing = Billing::where('payer_id', $post['payer_id'])->first();
+                    $billing->payer_firstname = $post['first_name'];
+                    $billing->payer_lastname = $post['last_name'];
+                    $billing->payer_email = $post['payer_email'];
+                    $billing->payment_date = date("Y-m-d H:i:s", strtotime($post['payment_date']));
+                    $billing->next_payment_date = date("Y-m-d H:i:s", strtotime($post['next_payment_date']));
+                    return $billing->save();
+                break;
             // case 'recurring_payment_skipped':
             //     $billing = Billing::where('payer_id', $post['payer_id'])->first();
             //         $billing->payer_firstname = $post['first_name'];
