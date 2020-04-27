@@ -52,6 +52,9 @@
       <div class="card">
         <div class="card-header">
           <h4 class="card-title">Plan Details</h4>
+          @if(isset($billing))
+            <button id="cancel_subscription" class="btn btn-sm btn-outline-danger pull-right" data-href="{{action('PlanController@cancel')}}" data-id="{{$billing->id}}">Cancel Plan</button>
+          @endif
         </div>
         <div class="card-content">
           <div class="card-body">
@@ -92,14 +95,9 @@
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Start Date:</label>
-                  <h4>{{(isset($billing->created_at))?date("F d, Y", strtotime($billing->created_at)):'--'}}</h4>
+                  <h4 id="start_date">{{(isset($billing->created_at))?date("F d, Y", strtotime($billing->created_at)):'--'}}</h4>
                 </div>
               </li>
-              @if(isset($billing))
-              <li class="list-inline-item">
-                <button class="btn btn-danger cancel_plan">Cancel Plan</button>
-              </li>
-              @endif
             </ul>
           </div>
         </div>
@@ -431,6 +429,54 @@
         $(element).attr('href', $(element).data('href')+"/"+val);
       });
     });
+
+    $('#cancel_subscription').on('click', function() {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-lg btn-block btn-outline-danger disabled confirm_cancal_subscription_button',
+          cancelButton: 'btn btn-lg btn-block btn-primary'
+        },
+        buttonsStyling: false,
+        onOpen: (swalWithBootstrapButtons) => {
+          setTimeout(function() {
+            $('.confirm_cancal_subscription_button').removeClass('disabled');
+          }, 2000);
+        }
+      })
+
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to cancel your subscription?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        reverseButtons: true,
+        showCancelButton: true,
+        focusConfirm: false,
+        focusCancel: true,
+        confirmButtonText: 'Yes, Cancel my subscription!',
+        cancelButtonText: 'No, Keep my subscription!'
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+              url: $(this).data('href'),
+              method: "POST",
+              data: {id:$(this).data('id')},
+              success:function(result)
+              {
+                Swal.fire(
+                  'Done!',
+                  'Your subscription has been canceled.',
+                  'success'
+                );
+                $("#current_plan").html("FREE");
+                $("#billing_cycle").html("N\\A");
+                $("#promocode").html("None");
+                $("#start_date").html("--");
+              }
+          });
+        }
+      })
+    });
+
   });
 </script>
 @endsection

@@ -149,7 +149,6 @@ class PayPalController extends Controller
                 $old_billing->save();
             }
 
-            $billing->billing_period = "Day";; //DEBUG ONLY
             $billing->paid_status = 1;
             $billing->payment_date = date("Y-m-d H:i:s");
             $billing->next_payment_date = date("Y-m-d H:i:s", strtotime('+ 1'.$billing->billing_period,strtotime('+1day')));
@@ -173,7 +172,7 @@ class PayPalController extends Controller
                  $billing->save();
                  $output = ['success' => 1,
                         'msg' => 'Your payment was successfully. '.$request->desc,
-                       'redirect' => action('PlanController@success')
+                       'redirect' => action('PlanController@index')
                     ];
             }
             else {

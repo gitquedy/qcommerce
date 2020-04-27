@@ -119,9 +119,9 @@
         <div class="row">
           <div class="col-6">
            <div class="col-12">
-                @if($business->subscription()->plan->id == $plan->id && $billing == $business->subscription()->billing_period)
+                @if($business->subscription() !== NULL && $business->subscription()->plan->id == $plan->id && $billing == $business->subscription()->billing_period)
                     <h3>You are currently subscribed to this plan.</h3>
-                @elseif($business->subscription()->plan->id == $plan->id && $billing != $business->subscription()->billing_period)
+                @elseif($business->subscription() !== NULL && $business->subscription()->plan->id == $plan->id && $billing != $business->subscription()->billing_period)
                     @if($business->subscription()->billing_period == "Year")
                       <h3>You are currently subscribed to this plan with Annual billing cycle.</h3>
                       <br>
@@ -133,7 +133,7 @@
                     @else
                     --
                     @endif
-                @elseif($business->subscription() && $business->subscription()->plan->monthly_cost > $plan->monthly_cost);
+                @elseif($business->subscription() !== NULL &&  $business->subscription()->plan->monthly_cost > $plan->monthly_cost);
                     <h3>You are currently subscribed to a higher plan.</h3>
                 @else
                     <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribed">

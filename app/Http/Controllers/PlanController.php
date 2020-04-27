@@ -61,10 +61,16 @@ class PlanController extends Controller
         return view('plan.confirm', compact('breadcrumbs', 'response', 'billing'));
     }
 
-    public function success() {
-        $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('PlanController@index'), 'name'=>"Plan List"], ['name'=>"Success Payment"]
-        ];
-        return view('plan.success', compact('breadcrumbs'));
+    public function cancel(Request $request) {
+
+        $billing = Billing::whereId($request->id)->first();
+        $billing->paid_status = 3;
+
+        $provider = new ExpressCheckout;
+        $response = $provider->cancelRecurringPaymentsProfile($billing->profile_id);
+        if($response) {
+            $billing->save();
+        }
+        return true;
     }
 }
