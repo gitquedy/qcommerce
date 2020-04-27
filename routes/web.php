@@ -20,6 +20,9 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
 	});
 
+	Route::resource('/promocode', 'PromocodeController');
+
+
 	Route::group(['prefix' => 'paypal'], function(){
 		Route::post('payment/{plan}', 'PayPalController@payment')->name('paypal.payment');
 		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
