@@ -59,21 +59,47 @@
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Current Plan:</label>
-                  <h4 id="current_plan">FREE</h4>
+                  <h4 id="current_plan">
+                    {{isset($billing->plan->name)?$billing->plan->name:'FREE'}}
+                  </h4>
                 </div>
               </li>
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Billing Cycle:</label>
-                  <h4 id="billing_cycle"></h4>
+                  <h4 id="billing_cycle">
+                    @if(isset($billing->billing_period))
+                      @if($billing->billing_period=="Month")
+                        Monthly
+                      @elseif($billing->billing_period=="Year")
+                        Annually
+                      @else
+                        {{$billing->billing_period}}
+                      @endif
+                    @else
+                      N/A
+                    @endif
+                  </h4>
                 </div>
               </li>
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Promocode:</label>
-                  <p><span class="badge badge-secondary" id="promocode"></span></p>
+                  <p><span class="badge badge-secondary" id="promocode">
+                    {{(isset($billing->promocode) && $billing->promocode != '')?$billing->promocode:'None'}}</span></p>
                 </div>
               </li>
+              <li class="list-inline-item">
+                <div class="label mx-2">
+                  <label>Start Date:</label>
+                  <h4>{{(isset($billing->created_at))?date("F d, Y", strtotime($billing->created_at)):'--'}}</h4>
+                </div>
+              </li>
+              @if(isset($billing))
+              <li class="list-inline-item">
+                <button class="btn btn-danger cancel_plan">Cancel Plan</button>
+              </li>
+              @endif
             </ul>
           </div>
         </div>
@@ -84,10 +110,10 @@
     <div class="col-md-12 text-center">
       <div class="btn-group btn-group-toggle" data-toggle="buttons">
         <label class="btn btn-lg btn-outline-primary active">
-          <input type="radio" name="billling_type" id="Monthly" autocomplete="off" checked value="Monthly"> Monthly
+          <input type="radio" name="billling_type" id="Monthly" data-period="Monthly" autocomplete="off" checked value="Month"> Monthly
         </label>
         <label class="btn btn-lg btn-outline-primary">
-          <input type="radio" name="billling_type" id="Annually" autocomplete="off" value="Annually"> Annually
+          <input type="radio" name="billling_type" id="Annually" data-period="Annually" autocomplete="off" value="Year"> Annually
         </label>
       </div>
     </div>
@@ -138,7 +164,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan</a>
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan</a>
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -362,7 +388,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Monthly" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -395,10 +421,11 @@
   $(document).ready(function() {
 
     $(document).on('change', 'input[name=billling_type]', function() {
+      var period = $(this).data('period');
       var val = $(this).val();
-      $('.billing_text').html(val);
+      $('.billing_text').html(period);
       $('.billling_type').hide();
-      $('.billling_type.'+val).show('fast');
+      $('.billling_type.'+period).show('fast');
       $('.Subscribe_Btn').attr('href', $('.Subscribe_Btn').data('href')+"/"+val);
       $('.Subscribe_Btn').each(function( index,element ){
         $(element).attr('href', $(element).data('href')+"/"+val);

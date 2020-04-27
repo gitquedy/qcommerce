@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 use App\Shop;
+use Auth;
 
 
 class Business extends Model
@@ -23,5 +24,9 @@ class Business extends Model
 	public function shops(){
 		return $this->hasMany(Shop::class, 'business_id', 'id');
 	}
+
+    public function subscription() {
+    	return Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->first();
+    }
 
 }
