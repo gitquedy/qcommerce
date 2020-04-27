@@ -41,6 +41,11 @@ class OrderController extends Controller
         }
         $shop_ids = $shops->pluck('id')->toArray();
         $orders = Order::whereIn('shop_id',$shop_ids);
+
+        if($request->get('site')){
+            $orders = $orders->where('site', $request->get('site'));
+        }
+        
         if($request->get('status')){
             $orders = $orders->where('status', $request->get('status'));
         }
