@@ -113,8 +113,8 @@ class OrderController extends Controller
                                       <div class="media">
                                         <img src="'.$image.'" alt="No Image Available" class="d-flex mr-1 product_image">
                                         <div class="media-body">
-                                          <h5 class="mt-0">'.$name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
-                                          <p>['.$sku.']</p>
+                                          <h6 class="mt-0">'.$name.'<span class="pull-right">x'.$item->quantity.'</span></h6>
+                                          <p><small>['.$sku.']</small></p>
                                         </div>
                                       </div>';
                               }

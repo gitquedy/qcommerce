@@ -222,7 +222,7 @@
   var pageLength = 20;
 
   function format ( d ) {
-    var html = '<div class="card mb-0 border border-secondary"><div class="card-body  w-50 ">'+d.item_list+'</div></div>';
+    var html = '<div class="card mb-0 border border-secondary"><div class="card-body w-50 py-1">'+d.item_list+'</div></div>';
     return html;
   }
 </script>
