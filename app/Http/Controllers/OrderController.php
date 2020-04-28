@@ -96,6 +96,24 @@ class OrderController extends Controller
             }
            
             return Datatables::eloquent($orders)
+                ->addColumn('item_list', function(Order $order) {
+                              $item_list = '';
+                              foreach ($order->products as $item) {
+                                $item_list .= '
+                                <div class="card mb-1">
+                                  <div class="card-body">
+                                    <div class="media">
+                                      <img src="'.$item->product->Images.'" alt="No Image Available" class="d-flex mr-1 product_image">
+                                      <div class="media-body">
+                                        <h5 class="mt-0">'.$item->product->name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
+                                        <p>['.$item->product->SkuId.']</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>';
+                              }
+                              return $item_list;
+                                  })
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                                   })
@@ -114,7 +132,7 @@ class OrderController extends Controller
                 ->addColumn('updated_at_at_human_read', function(Order $order) {
                             return Carbon::parse($order->updated_at)->diffForHumans();
                                 })
-                ->rawColumns(['actions', 'idDisplay'])
+                ->rawColumns(['actions', 'item_list', 'idDisplay'])
                 ->make(true);
          }
         
