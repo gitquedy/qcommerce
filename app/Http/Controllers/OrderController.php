@@ -100,33 +100,23 @@ class OrderController extends Controller
                               $item_list = '';
                               foreach ($order->products as $item) {
                                 if(isset($item->product)) {
-                                  $item_list .= '
-                                  <div class="card mb-1">
-                                    <div class="card-body">
-                                      <div class="media">
-                                        <img src="'.$item->product->Images.'" alt="No Image Available" class="d-flex mr-1 product_image">
-                                        <div class="media-body">
-                                          <h5 class="mt-0">'.$item->product->name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
-                                          <p>['.$item->product->SkuId.']</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>';
+                                  $image = $item->product->Images;
+                                  $name = $item->product->name;
+                                  $sku = $item->product->SkuId;
                                 }
                                 else {
-                                  $item_list .= '
-                                  <div class="card mb-1">
-                                    <div class="card-body">
-                                      <div class="media">
-                                        <img src="'.asset('images/pages/no-img.jpg').'" alt="No Image Available" class="d-flex mr-1 product_image">
-                                        <div class="media-body">
-                                          <h5 class="mt-0"> Missing Product : '.$item->product_id.'<span class="pull-right">x'.$item->quantity.'</span></h5>
-                                          <p>[Missing Product]</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>';
+                                  $image = asset('images/pages/no-img.jpg');
+                                  $name = 'Missing Product : '.$item->product_id;
+                                  $sku = 'Missing Product';
                                 }
+                                $item_list .= '
+                                      <div class="media">
+                                        <img src="'.$image.'" alt="No Image Available" class="d-flex mr-1 product_image">
+                                        <div class="media-body">
+                                          <h5 class="mt-0">'.$name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
+                                          <p>['.$sku.']</p>
+                                        </div>
+                                      </div>';
                               }
                               return $item_list;
                                   })

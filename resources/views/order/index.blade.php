@@ -17,7 +17,7 @@
 
         <style>
           .product_image{
-              width:70px;
+              width:40px;
               height:auto;
           }
         </style>
@@ -222,35 +222,9 @@
   var pageLength = 20;
 
   function format ( d ) {
-    var html = d.item_list;
+    var html = '<div class="card mb-0 border border-secondary"><div class="card-body  w-50 ">'+d.item_list+'</div></div>';
     return html;
   }
-
-
-  // $('.data-list-view').find('tbody').on('click', 'tr', function () {
-  //       var tr = $(this).closest('tr');
-  //       var td = $(this).closest('td');
-  //       var row = table.row(tr);
-
-  //       console.log(tr);
-  //       console.log(td);
-  //       console.log(row);
-
-  //       if(row.child.isShown())
-  //       {
-  //           // This row is already open - close it
-  //           row.child.hide();
-  //           tr.removeClass('shown');
-  //           td.removeClass('shown');
-  //       }
-  //       else
-  //       {
-  //           // Open this row
-  //           row.child(format(row.data())).show();
-  //           tr.addClass('shown');
-  //           td.addClass('shown');
-  //       }
-  //   });
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
