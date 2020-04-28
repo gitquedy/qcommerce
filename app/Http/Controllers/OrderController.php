@@ -99,18 +99,34 @@ class OrderController extends Controller
                 ->addColumn('item_list', function(Order $order) {
                               $item_list = '';
                               foreach ($order->products as $item) {
-                                $item_list .= '
-                                <div class="card mb-1">
-                                  <div class="card-body">
-                                    <div class="media">
-                                      <img src="'.$item->product->Images.'" alt="No Image Available" class="d-flex mr-1 product_image">
-                                      <div class="media-body">
-                                        <h5 class="mt-0">'.$item->product->name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
-                                        <p>['.$item->product->SkuId.']</p>
+                                if(isset($item->product)) {
+                                  $item_list .= '
+                                  <div class="card mb-1">
+                                    <div class="card-body">
+                                      <div class="media">
+                                        <img src="'.$item->product->Images.'" alt="No Image Available" class="d-flex mr-1 product_image">
+                                        <div class="media-body">
+                                          <h5 class="mt-0">'.$item->product->name.'<span class="pull-right">x'.$item->quantity.'</span></h5>
+                                          <p>['.$item->product->SkuId.']</p>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                </div>';
+                                  </div>';
+                                }
+                                else {
+                                  $item_list .= '
+                                  <div class="card mb-1">
+                                    <div class="card-body">
+                                      <div class="media">
+                                        <img src="" alt="No Image Available" class="d-flex mr-1 product_image">
+                                        <div class="media-body">
+                                          <h5 class="mt-0"> Item ID: '.$item->id.'<span class="pull-right">x?</span></h5>
+                                          <p>[Error Item]</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>';
+                                }
                               }
                               return $item_list;
                                   })
