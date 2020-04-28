@@ -47,6 +47,9 @@ $(function() {
                     new_elem = elem.parent().find('span.select2.select2-container')
                     new_elem.after('<label class="text-danger error">' + val + '</label>');
                   }
+                  else if(elem.parent().hasClass('input-group')) {
+                    elem.parent().after('<label class="text-danger error">' + val + '</label>');
+                  }
                   else {
                     elem.after('<label class="text-danger error">' + val + '</label>');
                   }

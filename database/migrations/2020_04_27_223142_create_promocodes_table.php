@@ -18,7 +18,7 @@ class CreatePromocodesTable extends Migration
             $table->string('code')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('uses')->unsigned()->nullable();
+            $table->integer('uses')->unsigned()->default(0);
             $table->integer('max_uses')->unsigned()->nullable();
             $table->integer('max_uses_business')->unsigned()->nullable();
             $table->integer('discount_amount'); 

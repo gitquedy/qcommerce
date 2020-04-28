@@ -21,6 +21,7 @@ Route::group(['middleware' => 'auth'], function()
 	});
 
 	Route::resource('/promocode', 'PromocodeController');
+	Route::get('/promocode/delete/{promocode}', 'PromocodeController@delete');
 
 
 	Route::group(['prefix' => 'paypal'], function(){
