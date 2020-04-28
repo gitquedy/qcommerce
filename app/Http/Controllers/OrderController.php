@@ -118,10 +118,10 @@ class OrderController extends Controller
                                   <div class="card mb-1">
                                     <div class="card-body">
                                       <div class="media">
-                                        <img src="" alt="No Image Available" class="d-flex mr-1 product_image">
+                                        <img src="'.asset('images/pages/no-img.jpg').'" alt="No Image Available" class="d-flex mr-1 product_image">
                                         <div class="media-body">
-                                          <h5 class="mt-0"> Item ID: '.$item->id.'<span class="pull-right">x?</span></h5>
-                                          <p>[Error Item]</p>
+                                          <h5 class="mt-0"> Missing Product : '.$item->product_id.'<span class="pull-right">x?</span></h5>
+                                          <p>[Missing Product]</p>
                                         </div>
                                       </div>
                                     </div>
