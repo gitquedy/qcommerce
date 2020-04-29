@@ -32,9 +32,9 @@ class Sales extends Model
         if($status!=""){
            $query->where('status','=',$status); 
         }
-        else {
-            $query->where('status', '!=', 'canceled');
-        }
+        // else {
+        //     $query->where('status', '!=', 'canceled');
+        // }
         
         if($type=='month'){
             $start = date('Y-m-01');

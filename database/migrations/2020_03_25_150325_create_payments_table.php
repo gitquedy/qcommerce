@@ -17,7 +17,7 @@ class CreatePaymentsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('sales_id');
             $table->foreign('sales_id')->references('id')->on('sales')->onDelete('cascade');
-            $table->unsignedBigInteger('customer_id')->after('sales_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable();
             $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
             $table->string('reference_no');
             $table->date('date');
