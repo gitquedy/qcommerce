@@ -44,6 +44,10 @@ class ProductController extends Controller
         if($request->get('status')){
             $products = $products->where('Status', $request->get('status'));
         }
+
+        if($request->get('site')){
+            $products = $products->where('site', $request->get('site'));
+        }
         if($request->get('created_from') && $request->get('created_to')){
             $products = $products->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
         }
