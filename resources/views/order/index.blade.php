@@ -14,6 +14,13 @@
 @section('mystyle')
         {{-- Page css files --}}
         <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
+
+        <style>
+          .product_image{
+              width:40px;
+              height:auto;
+          }
+        </style>
 @endsection
 
 @section('content')
@@ -105,7 +112,6 @@
           <tr>
             <th>For Checkbox</th>
             <th> {{ $request->get('site') == 'shopee' ?  'Order SN' : 'Order Number'  }}</th>
-            <!-- <th>Seller</th> -->
             <th>Order Date</th>
             <th>Last Update</th>
             <th>Payment Method</th>
@@ -115,6 +121,7 @@
             <th>Actions</th>
           </tr>
         </thead>
+        <tbody></tbody>
       </table>
     </div>
     {{-- DataTable ends --}}
@@ -161,12 +168,24 @@
           },
         });     
       }
+
+    function showAllChild() {
+        $('.data-list-view').DataTable().rows().every(function(){
+            // If row has details collapsed
+            if(!this.child.isShown()){
+                // Open this row
+                this.child(format(this.data())).show();
+                $(this.node()).addClass('shown');
+            }
+        });
+    }
   </script>
   <!-- datatables -->
   <script type="text/javascript">
      // var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}"
   var columnns = [
             { data: 'ordersn', name: 'ordersn', orderable : false},
+            // { data: 'item_list', name: 'item_list'},
             { data: 'idDisplay', name: 'idDisplay'},
             { data: 'created_at_formatted', name: 'created_at' },
             { data: 'updated_at_at_human_read', name: 'updated_at_at_human_read' },
@@ -197,12 +216,19 @@
   }
   function draw_callback_function(settings){
     getHeaders();
+    showAllChild();
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
+
+  function format ( d ) {
+    var html = '<div class="card mb-0 border border-secondary"><div class="card-body w-50 py-1">'+d.item_list+'</div></div>';
+    return html;
+  }
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
+
     $(document).ready(function(){
       var str = $('#status').val(); 
       hideShippingStatus(str);

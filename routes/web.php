@@ -20,6 +20,10 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
 	});
 
+	Route::resource('/promocode', 'PromocodeController');
+	Route::get('/promocode/delete/{promocode}', 'PromocodeController@delete');
+
+
 	Route::group(['prefix' => 'paypal'], function(){
 		Route::post('payment/{plan}', 'PayPalController@payment')->name('paypal.payment');
 		Route::get('cancel/{billing}', 'PayPalController@cancel')->name('paypal.payment.cancel');
@@ -183,10 +187,10 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
 	// });
-	Route::get('/plan/success', 'PlanController@success')->name('plan.success');
 	Route::resource('/plan', 'PlanController')->only(['index', 'show']);
 	Route::get('/plan/subscribe/{plan}/{billing?}', 'PlanController@subscribe');
 	Route::get('/plan/confirm/{billing}', 'PlanController@confirm')->name('plan.confirm');
+	Route::post('/plan/cancel', 'PlanController@cancel')->name('plan.cancel');
 
 	Route::group(['middleware' => 'permission:report.manage'], function()
 	{

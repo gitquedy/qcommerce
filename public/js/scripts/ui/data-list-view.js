@@ -165,20 +165,20 @@ $(document).ready(function () {
       });
   });
 
-  $(".data-list-view").on("dblclick", "tbody tr", function () {
-    var id = $(this).data('id');
-    $.ajax({
-        url: $(this).data('action'),
-        method: "POST",
-        data: {data:$(this).data('id')},
-        success:function(result)
-        {
-          if(typeof id !== 'undefined'){
-            $('.view_modal').html(result).modal();
-          }
-        }
-    });
-  });
+  // $(".data-list-view").on("dblclick", "tbody tr", function () {
+  //   var id = $(this).data('id');
+  //   $.ajax({
+  //       url: $(this).data('action'),
+  //       method: "POST",
+  //       data: {data:$(this).data('id')},
+  //       success:function(result)
+  //       {
+  //         if(typeof id !== 'undefined'){
+  //           $('.view_modal').html(result).modal();
+  //         }
+  //       }
+  //   });
+  // });
 
   $(".column-select").on('change', function () {
     var value = $(this).find('option:selected').val();

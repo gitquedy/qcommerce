@@ -1,7 +1,57 @@
 <h1>DATE : {{Carbon\Carbon::now()->toAtomString()}}</h1>
 
-
+{{-- Cart --}}
 <form target="_new" method="post" action="{{action('Api\IpnController@postNotify')}}">
+<input name="ipn_track_id" type="hidden" value="ee6049d51b230" />
+<input name="mc_gross" type="hidden" value="350.00" />
+<input name="invoice" type="hidden" value="DEBUG2020-04-1" />
+<input name="protection_eligibility" type="hidden" value="Ineligible" />
+<input name="item_number1" type="hidden" value=null />
+<input name="payer_id" type="hidden" value="RPUPAYBF4J3Z4" />
+<input name="tax" type="hidden" value="0.00" />
+<input name="payment_date" type="hidden" value="01:07:41 Apr 23, 2020 PDT" />
+<input name="payment_status" type="hidden" value="Completed" />
+<input name="charset" type="hidden" value="windows-1252" />
+<input name="mc_shipping" type="hidden" value="0.00" />
+<input name="mc_handling" type="hidden" value="0.00" />
+<input name="first_name" type="hidden" value="Bryan" />
+<input name="mc_fee" type="hidden" value="25.15" />
+<input name="notify_version" type="hidden" value="3.9" />
+<input name="custom" type="hidden" value=null />
+<input name="payer_status" type="hidden" value="verified" />
+<input name="business" type="hidden" value="xenzen09-facilitator@gmail.com" />
+<input name="num_cart_items" type="hidden" value="1" />
+<input name="verify_sign" type="hidden" value="APjphyKKDgwnG696XYsnOUDT-kvkAfnfPhWIMpNuXG839dgjAH8K3RaL" />
+<input name="payer_email" type="hidden" value="xenzen09-buyer@gmail.com" />
+<input name="tax1" type="hidden" value="0.00" />
+<input name="txn_id" type="hidden" value="0E148071LA584741B" />
+<input name="payment_type" type="hidden" value="instant" />
+<input name="last_name" type="hidden" value="Buyer" />
+<input name="item_name1" type="hidden" value="SME" />
+<input name="receiver_email" type="hidden" value="xenzen09-facilitator@gmail.com" />
+<input name="payment_fee" type="hidden" value=null />
+<input name="shipping_discount" type="hidden" value="0.00" />
+<input name="quantity1" type="hidden" value="1" />
+<input name="insurance_amount" type="hidden" value="0.00" />
+<input name="receiver_id" type="hidden" value="TNC3XEGRGTB7J" />
+<input name="txn_type" type="hidden" value="cart" />
+<input name="discount" type="hidden" value="0.00" />
+<input name="mc_gross_1" type="hidden" value="350.00" />
+<input name="mc_currency" type="hidden" value="PHP" />
+<input name="residence_country" type="hidden" value="US" />
+<input name="test_ipn" type="hidden" value="1" />
+<input name="shipping_method" type="hidden" value="Default" />
+<input name="transaction_subject" type="hidden" value="1 Month SME Plan subscription on Qcommerce." />
+<input name="payment_gross" type="hidden" value=null />
+<input name="ipn_track_id" type="hidden" value="643c35211ed18" />
+<input name="cmd" type="hidden" value="_notify-validate" />
+  <input type="submit"/>
+</form>
+
+
+
+{{-- ///Recurring Payment --}}
+{{-- <form target="_new" method="post" action="{{action('Api\IpnController@postNotify')}}">
 <input name="mc_gross" type="hidden" value="5000.00" />
 <input name="outstanding_balance" type="hidden" value="0.00" />
 <input name="period_type" type="hidden" value="Regular" />
@@ -42,7 +92,7 @@
 <input name="time_created" type="hidden" value="02:29:34 Apr 21, 2020 PDT" />
 <input name="ipn_track_id" type="hidden" value="ee6049d51b230" />
   <input type="submit"/>
-</form>
+</form> --}}
 
 
 

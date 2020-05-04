@@ -25,6 +25,14 @@
                 <span class="menu-title" data-i18n="nav.order">Dashboard</span>
             </a>
         </li>  
+
+        <li class="{{ $request->segment(1) == 'promocode' ? 'active' : '' }}">
+            <a href="{{url('/promocode')}}">
+                <i class="feather icon-plus"></i>
+                <span class="menu-title" data-i18n="">Promocode</span>
+            </a>
+        </li>
+        
     </ul>
 </div>
 </div>

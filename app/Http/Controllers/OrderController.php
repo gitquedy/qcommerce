@@ -96,6 +96,30 @@ class OrderController extends Controller
             }
            
             return Datatables::eloquent($orders)
+                ->addColumn('item_list', function(Order $order) {
+                              $item_list = '';
+                              foreach ($order->products as $item) {
+                                if(isset($item->product)) {
+                                  $image = $item->product->Images;
+                                  $name = $item->product->name;
+                                  $sku = $item->product->SkuId;
+                                }
+                                else {
+                                  $image = asset('images/pages/no-img.jpg');
+                                  $name = 'Missing Product : '.$item->product_id;
+                                  $sku = 'Missing Product';
+                                }
+                                $item_list .= '
+                                      <div class="media">
+                                        <img src="'.$image.'" alt="No Image Available" class="d-flex mr-1 product_image">
+                                        <div class="media-body">
+                                          <h6 class="mt-0">'.$name.'<span class="pull-right">x'.$item->quantity.'</span></h6>
+                                          <p><small>['.$sku.']</small></p>
+                                        </div>
+                                      </div>';
+                              }
+                              return $item_list;
+                                  })
                 ->addColumn('idDisplay', function(Order $order) {
                               return $order->getImgAndIdDisplay();
                                   })
@@ -114,7 +138,7 @@ class OrderController extends Controller
                 ->addColumn('updated_at_at_human_read', function(Order $order) {
                             return Carbon::parse($order->updated_at)->diffForHumans();
                                 })
-                ->rawColumns(['actions', 'idDisplay'])
+                ->rawColumns(['actions', 'item_list', 'idDisplay'])
                 ->make(true);
          }
         
