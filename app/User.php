@@ -44,6 +44,10 @@ use Notifiable, HasRoles;
         'email_verified_at' => 'datetime',
     ];
 
+    // public function permissions(){
+    //     return $this->hasMany(Permission::class, 'model_id', 'id');
+    // }
+
     public static function ownerPermissions(){
         $permissions = Permission::all();
         return $permissions;

@@ -28,21 +28,46 @@ Route::group([
     'middleware' => 'auth:api'
   ], function() {
       // Route::get('logout', 'AuthController@logout');
-      Route::get('user', 'Api\AuthController@user');
-      Route::get('shop/create/links', 'Api\ShopController@links');
-      Route::get('shop/getDashboardDetails/', 'Api\ShopController@getDashboardDetails');
-      Route::resource('shop', 'Api\ShopController');
-      Route::resource('order', 'Api\OrderController');
+
+      // stand alone (without permission)
+    Route::group(['prefix' => 'user'], function()
+    {
+      Route::get('', 'Api\AuthController@user');
+      Route::get('permissions', 'Api\User\UserController@permission');
+    });
+    Route::get('shop/getDashboardDetails/', 'Api\ShopController@getDashboardDetails');
+
+    //end stand alone (without permission)
+
+    Route::group(['middleware' => 'permission:shop.manage'], function()
+      {
+        Route::resource('shop', 'Api\ShopController');
+
+        Route::get('shop/create/links', 'Api\ShopController@links');
+      });
+
+    Route::group(['middleware' => 'permission:order.manage'], function()
+    {
+        Route::resource('order', 'Api\OrderController');
+        Route::get('order/constant/statuses', 'Api\OrderController@statuses');
+        Route::get('order/index/headers', 'Api\OrderController@headers');
+    });
+
+
+    Route::group(['middleware' => 'permission:product.manage'], function()
+    {
       Route::resource('product', 'Api\ProductController');
       Route::get('product/constant/statuses', 'Api\ProductController@statuses');
-      Route::get('order/constant/statuses', 'Api\OrderController@statuses');
-      Route::get('order/index/headers', 'Api\OrderController@headers');
+    });
+
+  
+      Route::group(['middleware' => 'permission:return.manage', 'prefix' => 'reconciliation/return'], function()
+      {
+
+      });
   });
 
 
-
-// Route::post('/register', 'Api\AuthController@register');
-// Route::post('/login', 'Api\AuthController@login');
 
 
 
