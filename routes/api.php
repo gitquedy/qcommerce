@@ -61,8 +61,11 @@ Route::group([
     });
 
   
-      Route::group(['middleware' => 'permission:return.manage', 'prefix' => 'reconciliation/return'], function()
+      Route::group(['middleware' => 'permission:returnRecon.manage', 'prefix' => 'reconciliation/return'], function()
       {
+        Route::get('', 'Api\Reconciliation\ReturnController@index');
+        Route::get('reconcile', 'Api\Reconciliation\ReturnController@reconcile');
+        
 
       });
   });

@@ -20,6 +20,8 @@ class OrderController extends Controller
     {        
         $validation = [
             'site' => ['required', 'in:lazada,shopee'],
+            'sort_by' => ['in:created_at,updated_at'],
+            'sort_direction' => ['in:ASC,DESC'],
             'per_page' => ['required', 'integer', 'min:1', 'max:100'],
             'created_from' => ['sometimes', 'required' , 'date', 'date_format:Y-m-d'],
             'created_to' => ['required_with:created_from', 'after:created_from' , 'date' , 'date_format:Y-m-d'],
@@ -49,8 +51,14 @@ class OrderController extends Controller
         if($request->get('status')){
             $orders = $orders->where('status', $request->get('status'));
         }
+
         if($request->get('created_from') && $request->get('created_to')){
             $orders = $orders->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+        }
+
+        if($request->get('sort_by')){
+            $sort_direction = $request->get('sort_direction') ? $request->get('sort_direction') : 'desc' ;
+            $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
         }
 
         $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();

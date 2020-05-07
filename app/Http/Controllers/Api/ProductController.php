@@ -22,6 +22,8 @@ class ProductController extends Controller
         $validation = [
             'site' => ['required', 'in:lazada,shopee'],
             'created_from' => ['sometimes', 'required' , 'date', 'date_format:Y-m-d'],
+            'sort_by' => ['in:created_at,updated_at'],
+            'sort_direction' => ['in:ASC,DESC'],
             'created_to' => ['required_with:created_from', 'after:created_from' , 'date' , 'date_format:Y-m-d'],
         ];
 
@@ -50,6 +52,11 @@ class ProductController extends Controller
         }
         if($request->get('created_from') && $request->get('created_to')){
             $products = $products->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+        }
+
+        if($request->get('sort_by')){
+            $sort_direction = $request->get('sort_direction') ? $request->get('sort_direction') : 'desc' ;
+            $products = $products->orderBy($request->get('sort_by'), $sort_direction);
         }
 
         $products = $products->paginate(100)->jsonSerialize();
