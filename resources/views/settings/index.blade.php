@@ -41,7 +41,7 @@
                   <div class="form-group">
                       <label>Quote</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="quote_prefix" placeholder="QUOTE"  disabled value="{{$settings->quote_prefix}}">
+                        <input type="text" class="form-control" name="quote_prefix" placeholder="QUOTE" value="{{$settings->quote_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>
@@ -54,7 +54,7 @@
                   <div class="form-group">
                       <label>Purchase Order</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="purchase_prefix" placeholder="PO"  disabled value="{{$settings->purchase_prefix}}">
+                        <input type="text" class="form-control" name="purchase_prefix" placeholder="PO" value="{{$settings->purchase_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>
@@ -65,7 +65,7 @@
                   <div class="form-group">
                       <label>Transfer</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="transfer_prefix" placeholder="TR"  disabled value="{{$settings->transfer_prefix}}">
+                        <input type="text" class="form-control" name="transfer_prefix" placeholder="TR" value="{{$settings->transfer_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>
@@ -78,7 +78,7 @@
                   <div class="form-group">
                       <label>Delivery</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="delivery_prefix" placeholder="DO"  disabled value="{{$settings->delivery_prefix}}">
+                        <input type="text" class="form-control" name="delivery_prefix" placeholder="DO" value="{{$settings->delivery_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>
@@ -89,7 +89,7 @@
                   <div class="form-group">
                       <label>Payment</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="payment_prefix" placeholder="PAY"  disabled value="{{$settings->payment_prefix}}">
+                        <input type="text" class="form-control" name="payment_prefix" placeholder="PAY" value="{{$settings->payment_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>
@@ -102,7 +102,18 @@
                   <div class="form-group">
                       <label>Return</label>
                       <div class="position-relative has-icon-left">
-                        <input type="text" class="form-control" name="return_prefix" placeholder="SR"  disabled value="{{$settings->return_prefix}}">
+                        <input type="text" class="form-control" name="return_prefix" placeholder="SR" value="{{$settings->return_prefix}}">
+                        <div class="form-control-position"> 
+                          <i class="feather icon-hash"></i>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label>Adjustment</label>
+                      <div class="position-relative has-icon-left">
+                        <input type="text" class="form-control" name="adjustment_prefix" placeholder="ADJ" value="{{$settings->adjustment_prefix}}">
                         <div class="form-control-position"> 
                           <i class="feather icon-hash"></i>
                         </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\User;
 use App\Business;
 use App\Settings;
+use App\Warehouse;
 use App\OrderRef;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -76,6 +77,12 @@ class RegisterController extends Controller
         ]);
         $settings = Settings::create([
             'business_id' => $business->id,
+        ]);
+        $warehoue = Warehouse::create([
+            'business_id' => $business->id,
+            'code' => 'DFLT',
+            'name' => 'Default Warehouse',
+            'address' => $data['location'],
         ]);
         $order_refs = OrderRef::create([
             'settings_id' => $settings->id,

@@ -132,7 +132,7 @@
             @can('sku.manage')
                 <li class="nav-item">
                     <a href="#">
-                        <i class="feather icon-package"></i>
+                        <i class="fa fa-barcode"></i>
                         <span class="menu-title" data-i18n="">SKU</span>
                     </a>
                     <ul class="menu-content">
@@ -157,6 +157,81 @@
                     </ul>
                 </li>
             @endcan
+
+            {{-- @can('warehouse.manage') --}}
+                <li class="nav-item">
+                    <a href="#">
+                        <i class="feather icon-box"></i>
+                        <span class="menu-title" data-i18n="">Warehouse</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'warehouse' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('/warehouse')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List of Warehouse</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'warehouse' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{route('warehouse.create')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add new Warehouse</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            {{-- @endcan --}}
+
+            {{-- @can('adjustment.manage') --}}
+                <li class="nav-item">
+                    <a href="#">
+                        <i class="fa fa-bar-chart"></i>
+                        <span class="menu-title" data-i18n="">Adjustment</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'adjustment' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('/adjustment')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List of Adjustment</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'adjustment' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{route('adjustment.create')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add new Adjustment</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'adjustment' && $request->segment(2) == 'import' ? 'active' : '' }}">
+                            <a href="{{route('adjustment.import')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Import Adjustment</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            {{-- @endcan --}}
+
+            {{-- @can('transfer.manage') --}}
+                <li class="nav-item">
+                    <a href="#">
+                        <i class="fa fa-exchange"></i>
+                        <span class="menu-title" data-i18n="">Transfers</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'transfer' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('/transfer')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List of Transfers</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'transfer' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{route('transfer.create')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add new Transfer</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            {{-- @endcan --}}
 
             @can('barcode.manage')
             <li class="nav-item {{ $request->segment(1) == 'barcode' && $request->segment(2) == '' ? 'active' : '' }}">

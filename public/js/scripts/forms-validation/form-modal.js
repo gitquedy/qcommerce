@@ -1,4 +1,4 @@
-$(".form").submit(function(e) {
+$(".modal .form").submit(function(e) {
   e.preventDefault();
    $('.btn_save').prop('disabled', true);
     $.ajax({
@@ -11,6 +11,9 @@ $(".form").submit(function(e) {
         if(result.success == true){
           toastr.success(result.msg, '' , {positionClass : "toast-top-center", escapeHTML: false});
           $('.view_modal').modal('toggle');
+          if (result.select_id) {
+            $('#'+result.select_id).append('<option value="'+result.option_id+'">'+result.option_name+'</option>').val(result.option_id).trigger('change');
+          }
         }else{
           if(result.msg){
             toastr.error(result.msg);

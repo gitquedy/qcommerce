@@ -24,6 +24,7 @@ class CreateSettingsTable extends Migration
             $table->string('delivery_prefix')->default('DO');
             $table->string('payment_prefix')->default('PAY');
             $table->string('return_prefix')->default('SR');
+            $table->string('adjustment_prefix')->default('ADJ');
             $table->timestamps();
         });
     }

@@ -1,2 +1,2 @@
-code,name,brand,category,supplier,cost,price,quantity,alert_quantity
-SKU001,Sample,Generic,None,Corp.,100,150,10,1
+code,name,brand,category,supplier,cost,price,alert_quantity
+SKU001,Sample,Generic,None,Corp.,100,150,1

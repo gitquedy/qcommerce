@@ -9,6 +9,7 @@ use App\Customer;
 use App\Brand;
 use App\Shop;
 use App\Supplier;
+use App\WarehouseItems;
 use App\PriceGroupItemPrice;
 use Illuminate\Http\Request;
 use App\Lazop;
@@ -147,7 +148,6 @@ class SkuController extends Controller
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
-            'quantity' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
         ]);
         // if ($validator->fails()) {
@@ -162,7 +162,7 @@ class SkuController extends Controller
         $sku->supplier = $request->suppler;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
-        $sku->quantity = $request->quantity;
+        $sku->quantity = 0;
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
@@ -224,7 +224,6 @@ class SkuController extends Controller
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
-            'quantity' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
         ]);
         $sku = Sku::find($request->id);
@@ -235,7 +234,6 @@ class SkuController extends Controller
         $sku->supplier = $request->supplier;
         $sku->cost = $request->cost;
         $sku->price = $request->price;
-        $sku->quantity = $request->quantity;
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
@@ -283,11 +281,11 @@ class SkuController extends Controller
         $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$request->sku)->orderBy('updated_at', 'desc')->get();
         $column = $request->name;
         $sku = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku)->first();
-        if($sku){
+        if($sku && $column != 'quantity'){  //quantity is dependent on warehouse
             $sku->$column = $request->val;
             $result = $sku->save();
 
-            if(in_array($column, array('quantity', 'price'))) {
+            if(in_array($column, array('price'))) {
                 
                 foreach ($Sku_prod as $prod) {
                     $shop_id = $prod->shop_id;
@@ -321,10 +319,10 @@ class SkuController extends Controller
         echo json_encode($result);
     }
 
-    public function syncSkuProducts(Request $request) {
+    public function syncSkuProducts(Request $request) { //action for checkbox on sku table
         $business_id = Auth::user()->business_id;
         $sku = Sku::where('business_id','=',$business_id)->whereIn('id', $request->ids)->get();
-        $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
+        $all_shops = Shop::where('business_id', $business_id)->orderBy('updated_at', 'desc')->get();
         $Shop_array = array();
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
@@ -334,10 +332,13 @@ class SkuController extends Controller
             $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$s->id)->orderBy('updated_at', 'desc')->get();
             foreach ($Sku_prod as $prod) {
                 $shop_id = $prod->shop_id;
-                $access_token = Shop::find($shop_id)->access_token;
+                $Shop = Shop::find($shop_id)->first();
+                $access_token = $Shop->access_token;
+                $warehouse_id = $Shop->warehouse_id;
+                $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $s->id)->first();
                 $prod = Products::where('id', $prod->id)->first();
                 $prod->price = $s->price;
-                $prod->quantity = $s->quantity;
+                $prod->quantity = isset($witem->quantity)?$witem->quantity:0;
                 $prod->save();
                     $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                     <Request>
@@ -372,8 +373,6 @@ class SkuController extends Controller
         ];
 
         if ( request()->ajax()) {
-            $business_id = Auth::user()->business_id;
-
             $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
             $Shop_array = array();
             foreach($all_shops as $all_shopsVAL){
@@ -470,11 +469,27 @@ class SkuController extends Controller
 
     }
 
-     public function search($search, $customer_id)
+    public function search($warehouse = 'none', $search, $customer_id = 'none', $withQTY = false)
     {
-          $result = Sku::where('name', 'LIKE', '%'. $search. '%')->orWhere('code', 'LIKE', '%'. $search. '%')->get();
-          foreach ($result as &$r) {
-              $products = Products::where('seller_sku_id', $r->id)->first();
+        if($warehouse != 'none') {
+            $sku = Sku::where(function($query) use ($search){
+                $query->where('name', 'LIKE', '%'. $search. '%');
+                $query->orWhere('code', 'LIKE', '%'. $search. '%');
+            });
+            $sku->select('sku.*','warehouse_items.quantity');
+            if ($warehouse != 'none') {
+                if ($withQTY) {
+                    $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                    $sku->where('warehouse_items.warehouse_id', $warehouse);
+                    $sku->where('warehouse_items.quantity', '>=', 1);
+                }
+                else {
+                    $sku->leftjoin('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                }
+            }
+            $result = $sku->get();
+            foreach ($result as &$r) {
+                $products = Products::where('seller_sku_id', $r->id)->first();
                 if($products){
                    $r->image = $products->Images;
                 }
@@ -490,8 +505,12 @@ class SkuController extends Controller
                         $r->customer = $customer;
                     }
                 }
-          }
-          return response()->json($result);
+            }
+        }
+        else {
+            $result = [];
+        }
+        return response()->json($result);
             
     } 
     

@@ -24,15 +24,29 @@
                           <div class="form-body">
                               <div class="row">
                                   <div class="col-6">
-                                      <div class="col-sm-12 data-field-col">
+                                      <div class="form-group">
                                           <label for="data-name">Shop Name</label>
                                           <input type="text" class="form-control" name="name" placeholder="Shop Name">
                                       </div>
                                   </div>
                                   <div class="col-6">
-                                      <div class="col-sm-12 data-field-col">
+                                      <div class="form-group">
                                           <label for="data-name">Short Name</label>
                                           <input type="text" class="form-control" name="short_name" placeholder="Short Name">
+                                      </div>
+                                  </div>
+                                  <div class="col-6">
+                                      <div class="form-group">
+                                          <label>Warehouse</label>
+                                          <select name="warehouse_id" id="select_warehouse" class="form-control select2" placeholder="Select Warehouse">
+                                            <option value="" disabled selected></option>
+                                            <option value="add_new">Add New Warehouse</option>
+                                            @forelse($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                            @empty
+                                            <option value="" disabled="">Please Add Warehouse</option>
+                                            @endforelse
+                                          </select>
                                       </div>
                                   </div>
                                   <div class="form-group col-12">
@@ -59,4 +73,28 @@
 @section('vendor-script')
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
-
+@section('myscript')
+<script>
+  $(document).ready(function() {
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%'
+        });
+        $('select[name=warehouse_id]').on('change', function() {
+            var selected = $(this).find('option:selected').val();
+            if(selected == 'add_new') {
+              $.ajax({
+                url :  "{{ route('warehouse.addWarehouseModal') }}",
+                type: "POST",
+                success: function (response) {
+                  if(response) {
+                    $(".view_modal").html(response).modal('show');
+                  }
+                }
+              });
+              $(this).val('').trigger('change');
+            } 
+        });
+  });
+</script>
+@endsection

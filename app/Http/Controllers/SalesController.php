@@ -11,6 +11,7 @@ use App\SaleItems;
 use App\Products;
 use App\Payment;
 use App\Customer;
+use App\Warehouse;
 use App\OrderRef;
 use App\Settings;
 use Illuminate\Validation\Rule;
@@ -126,8 +127,9 @@ class SalesController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales List"], ['name'=>"Add Sales"]
         ];
+        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
-        return view('sales.create', compact('breadcrumbs','customers'));
+        return view('sales.create', compact('breadcrumbs','customers','warehouses'));
     }
 
     /**
@@ -156,6 +158,9 @@ class SalesController extends Controller
             'cc_year' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
             'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque' && $request->paid > 0),
             'payment_note' => 'nullable',
+        ],
+        [
+            'sales_item_array.required' => 'Please add Items.',
         ]);
         if ($request->customer_id) {
             $customer = Customer::findOrFail($request->customer_id);
@@ -175,6 +180,7 @@ class SalesController extends Controller
             $sales = new Sales;
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
+            $sales->warehouse_id = $request->warehouse_id;
             $sales->customer_first_name = $customer->first_name;
             $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
@@ -220,7 +226,7 @@ class SalesController extends Controller
 
             }
             if($request->status == 'completed') {
-                $this->syncStocks($request->sales_item_array);   
+                Sku::syncStocks($request->warehouse_id ,$request->sales_item_array);   
             }
             $sales_items_query = SaleItems::insert($sales_items);
             if (!$request->reference_no) {
@@ -286,12 +292,13 @@ class SalesController extends Controller
     {
 
         $sales = Sales::findOrFail($id);
+        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this sales');
         }
         // print json_encode($sales->items);die();
-        return view('sales.edit', compact('sales', 'customers'));
+        return view('sales.edit', compact('sales', 'customers', 'warehouses'));
     }
 
     /**
@@ -305,6 +312,7 @@ class SalesController extends Controller
     {
         $sales = Sales::findOrFail($id);
         $old_status = $sales->status;
+        $old_warehouse = $sales->warehouse_id;
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
@@ -316,6 +324,9 @@ class SalesController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'sales_item_array' => 'required|array',
+        ],
+        [
+            'sales_item_array.required' => 'Please add Items.',
         ]);
 
         if ($validator->fails()) {
@@ -325,10 +336,10 @@ class SalesController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
-            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
+            $sales->warehouse_id = $request->warehouse_id;
             $sales->customer_first_name = $customer->first_name;
             $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
@@ -338,7 +349,6 @@ class SalesController extends Controller
             $sales->note = $request->note;
             $sales->status = $request->status;
             $sales->discount = ($request->discount)?$request->discount:0;
-            $sales->paid = $request->paid;
             $sales->updated_by = $user->id;
 
             //future :: return all stocks then delete
@@ -380,11 +390,14 @@ class SalesController extends Controller
 
             }
             if($old_status != 'completed' && $request->status == 'completed') {
-                $this->syncStocks($request->sales_item_array);
+                Sku::syncStocks($request->warehouse_id, $request->sales_item_array);
             }
-            else {
-                $this->returnStocks($sales->items);
-                $this->syncStocks($request->sales_item_array);
+            else if($old_status == 'completed' && $request->status == 'completed') {
+                Sku::returnStocks($old_warehouse, $sales->items);
+                Sku::syncStocks($request->warehouse_id, $request->sales_item_array);
+            }
+            else if($old_status == 'completed' && $request->status != 'completed') {
+                 Sku::returnStocks($old_warehouse, $sales->items);
             }
             SaleItems::insert($sales_items);
             $output = ['success' => 1,
@@ -413,7 +426,7 @@ class SalesController extends Controller
     {
         $sales = Sales::findOrFail($id);
         if ($sales->status == 'completed') {
-            $this->returnStocks($sales->items);
+            Sku::returnStocks($sales->warehouse_id, $sales->items);
         }
         if($sales->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this sale');
@@ -443,90 +456,6 @@ class SalesController extends Controller
         $title = 'Sale ' . $sales->reference_no;
         return view('layouts.delete', compact('action' , 'title'));
     }
-
-    public function syncStocks($items) {
-        $user = Auth::user();
-        $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        foreach ($items as $id => $item) {
-            $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $id)->first();
-            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$id)->orderBy('updated_at', 'desc')->get();
-            if($sku){
-                $sku->quantity -= $item['quantity'];
-                $result = $sku->save();
-                foreach ($Sku_prod as $prod) {
-                    $shop_id = $prod->shop_id;
-                    $access_token = Shop::find($shop_id)->access_token;
-
-                    $prod = Products::where('id', $prod->id)->first();
-                    $prod->quantity = $sku->quantity;
-                    $prod->save();
-                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                        <Request>
-                            <Product>
-                                <Skus>
-                                    <Sku>
-                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                        <quantity>'.$sku->quantity.'</quantity>
-                                    </Sku>
-                                </Skus>
-                            </Product>
-                        </Request>';
-                    if(env('lazada_sku_sync', true)){
-                        if($prod->site == 'lazada'){
-                            $response = Products::product_update($access_token,$xml);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function returnStocks($items) {
-        $user = Auth::user();
-        $all_shops = Shop::where('business_id', $user->business_id)->orderBy('updated_at', 'desc')->get();
-        $Shop_array = array();
-        foreach($all_shops as $all_shopsVAL){
-            $Shop_array[] = $all_shopsVAL->id;
-        }
-        foreach ($items as $item) {
-            $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $item->sku_id)->first();
-            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$item->sku_id)->orderBy('updated_at', 'desc')->get();
-            if($sku){
-                $sku->quantity += $item->quantity;
-                $result = $sku->save();
-                foreach ($Sku_prod as $prod) {
-                    $shop_id = $prod->shop_id;
-                    $access_token = Shop::find($shop_id)->access_token;
-
-                    $prod = Products::where('id', $prod->id)->first();
-                    $prod->quantity = $sku->quantity;
-                    $prod->save();
-                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                        <Request>
-                            <Product>
-                                <Skus>
-                                    <Sku>
-                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                        <quantity>'.$sku->quantity.'</quantity>
-                                    </Sku>
-                                </Skus>
-                            </Product>
-                        </Request>';
-                    if(env('lazada_sku_sync', true)){
-                        if($prod->site == 'lazada'){
-                            $response = Products::product_update($access_token,$xml);
-                        }
-                    }
-                }
-            }
-        }
-    } 
-
-
 
     public function viewSalesModal(Sales $sales, Request $request) {
         $business_id = Auth::user()->business_id;

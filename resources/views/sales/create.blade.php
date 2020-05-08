@@ -59,7 +59,7 @@
                       <form action="{{ action('SalesController@store') }}" method="POST" id="add_sale_form" class="form" enctype="multipart/form-data">
                           @csrf
                           <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="position-relative has-icon-left">
@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Referencce No.</label>
                                     <div class="position-relative has-icon-left">
@@ -81,7 +81,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Warehouse</label>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="warehouse_id" id="select_warehouse" class="form-control select2 update_select" placeholder="Select Warehouse">
+                                        <option value="" disabled selected></option>
+                                        <option value="add_new">Add New Warehouse</option>
+                                        @forelse($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                        @empty
+                                        <option value="" disabled="">Please Add Warehouse</option>
+                                        @endforelse
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-box"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Customer</label>
                                     <div class="position-relative has-icon-left">
@@ -91,7 +110,7 @@
                                         @forelse($customers as $customer)
                                         <option value="{{ $customer->id }}">{{ $customer->formatName() }}</option>
                                         @empty
-                                        <option value="" disabled="">Please Add Customeer</option>
+                                        <option value="" disabled="">Please Add Customer</option>
                                         @endforelse
                                       </select>
                                       <div class="form-control-position"> 
@@ -357,7 +376,38 @@
 @section('myscript')
 <script type="text/javascript">
     jQuery(document).ready(function($) {
+        var warehouse_reset = false;
         reloadSales();
+
+        $('#add_prodduct_input').on('focus', function() {
+          var customer = $('#select_customer').val();
+          var warehouse = $('#select_warehouse').val();
+          if(!customer && !warehouse) {
+            alert('Please select customer and warehouse first!');
+            $('#select_warehouse').focus();
+          }
+          else {
+            if(!customer) {
+              alert('Please select customer first!');
+              $('#select_customer').focus();
+            }
+            if(!warehouse) {
+              alert('Please select warehouse first!');
+              $('#select_warehouse').focus();
+            }
+          }
+        });
+
+        $('#select_warehouse').on('change', function() {
+            if (warehouse_reset) {
+              $("#sales_item_tables tbody").html('');
+              localStorage.removeItem("sales_items");
+            }
+        });
+
+        $('#select_warehouse').on('change', function() {
+            $("#adjustment_item_tables tbody").html('');
+        });
 
         $('#payment_type').on('change', function() {
           $('.payment_type_ext').hide('fast');
@@ -372,6 +422,7 @@
         });
 
         function reloadSales() {
+          warehouse_reset = false;
           var sales = JSON.parse(localStorage.getItem("sales"));
           if(sales) {
             $.each(sales, function(index, value){
@@ -390,10 +441,10 @@
             $('#add_sale_form').trigger('reset').trigger('change');
             $('.select2').trigger('change');
           }
-          var items = JSON.parse(localStorage.getItem("items"));
+          var sales_items = JSON.parse(localStorage.getItem("sales_items"));
           var html = '';
           $("#sales_item_tables tbody").html(html);
-          $.each(items, function(i, data) {
+          $.each(sales_items, function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
             var price = data.price;
             var sub_total = price * qty;
@@ -415,14 +466,14 @@
                       '<td class="text-right p-4">'+
                         // '<label class="label-price">'+data.price+'</label>'+
                         '<input type="hidden" name="sales_item_array['+i+'][real_unit_price]" value="'+data.price+'" />'+
-                        '<input type="number" name="sales_item_array['+i+'][price]" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
+                        '<input type="number" name="sales_item_array['+i+'][price]" data-array_name="price" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
                       '</td>'+
                       '<td>'+
                       '<div class="input-group">'+
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
+                        '<input type="number" name="sales_item_array['+i+'][quantity]" data-array_name="quantity" min="1" data-max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
@@ -435,6 +486,7 @@
           });
           $("#sales_item_tables tbody").append(html);
           recalculateTotal();
+          warehouse_reset = true;
         }
 
         function recalculate(tr) {
@@ -468,10 +520,11 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%QUERY%/%CID%',
+                url: '{{ route('sku.search') }}/%WAREHOUSE%/%QUERY%/%CID%/true',
                 replace: function(url, query) {
-                    $cid = ($('#select_customer').val())?$('#select_customer').val():'none';
-                    return url.replace('%QUERY%', query).replace('%CID%', $cid);
+                    var wid = ($('#select_warehouse').val())?$('#select_warehouse').val():'none';
+                    var cid = ($('#select_customer').val())?$('#select_customer').val():'none';
+                    return url.replace('%WAREHOUSE%', wid).replace('%QUERY%', query).replace('%CID%', cid);
                 }
             },
             datumTokenizer: Bloodhound.tokenizers.whitespace('search_product'),
@@ -512,29 +565,29 @@
 
         $(".search-input").on('typeahead:selected', function (event, datum, name) {
             $(this).typeahead("val", "");
-            var items = {};
-            if(localStorage.getItem("items")) {
-              items = JSON.parse(localStorage.getItem("items"));            
+            var sales_items = {};
+            if(localStorage.getItem("sales_items")) {
+              sales_items = JSON.parse(localStorage.getItem("sales_items"));            
             }
             var i = datum.id;
-            if(!items[i]) {
-              items[i] = {};
-              items[i]['id']  = datum.id;
-              items[i]['code']  = datum.code;
-              items[i]['name']  = datum.name;
-              items[i]['brand']  = datum.brand;
-              items[i]['cost']  = datum.cost;
-              items[i]['price']  = datum.price;
-              items[i]['quantity']  = 1;
-              items[i]['max_quantity']  = datum.quantity;
-              items[i]['image']  = datum.image;
+            if(!sales_items[i] && datum.quantity >= 1) {
+              sales_items[i] = {};
+              sales_items[i]['id']  = datum.id;
+              sales_items[i]['code']  = datum.code;
+              sales_items[i]['name']  = datum.name;
+              sales_items[i]['brand']  = datum.brand;
+              sales_items[i]['cost']  = datum.cost;
+              sales_items[i]['price']  = datum.price;
+              sales_items[i]['quantity']  = 1;
+              sales_items[i]['max_quantity']  = datum.quantity;
+              sales_items[i]['image']  = datum.image;
             }
-            else if(items[i]['quantity'] < datum.quantity) {
-              items[i]['quantity']++;
+            else if(sales_items[i]['quantity'] < datum.quantity) {
+              sales_items[i]['quantity']++;
             }
             else {
             }
-            localStorage.setItem("items", JSON.stringify(items));
+            localStorage.setItem("sales_items", JSON.stringify(sales_items));
             reloadSales();
         });
 
@@ -561,20 +614,21 @@
         $(document).on('change', '.change_sku', function() {
             var id = $(this).closest('tr').data('id');
             var input = $(this)
-            var name = $(this).attr('name');
+            var name = $(this).data('array_name');
             var val = $(this).val();
-            var items = JSON.parse(localStorage.getItem("items"));
-            items[id][name] = val;
-            localStorage.setItem("items", JSON.stringify(items));
+            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            sales_items[id][name] = val;
+            localStorage.setItem("sales_items", JSON.stringify(sales_items));
             recalculate($(this).closest('tr'));
         });
 
 
         $(document).on('keyup change blur', '.check_max_quantity', function() {
-            var max = parseInt($(this).attr('max'));
+            var max = parseInt($(this).data('max'));
             var val = parseInt($(this).val());
             if(val > max) {
               $(this).val(max).trigger('change');
+              console.log("check_max_quantity");
             }
         });
 
@@ -586,7 +640,7 @@
             var val = input.val();
             switch(action) {
               case 'add': 
-                var max = input.attr('max');
+                var max = input.data('max');
                   if(val < max) {
                     val++;
                   }
@@ -602,18 +656,18 @@
               default:
                 break;
             }
-            input.val(val);
-            var items = JSON.parse(localStorage.getItem("items"));
-            items[id][change] = val;
-            localStorage.setItem("items", JSON.stringify(items));
+            input.val(val).trigger('change');
+            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            sales_items[id][change] = val;
+            localStorage.setItem("sales_items", JSON.stringify(sales_items));
             recalculate($(this).closest('tr'));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var items = JSON.parse(localStorage.getItem("items"));
-            delete items[id];
-            localStorage.setItem("items", JSON.stringify(items));
+            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            delete sales_items[id];
+            localStorage.setItem("sales_items", JSON.stringify(sales_items));
             reloadSales();
         });
 
@@ -625,7 +679,7 @@
         });
 
         $("#sale_reset").on('click', function() {
-            localStorage.removeItem("items");
+            localStorage.removeItem("sales_items");
             localStorage.removeItem("sales");
             reloadSales();
         });
@@ -640,6 +694,23 @@
             if(selected == 'add_new') {
               $.ajax({
                 url :  "{{ route('customer.addCustomerModal') }}",
+                type: "POST",
+                success: function (response) {
+                  if(response) {
+                    $(".view_modal").html(response).modal('show');
+                  }
+                }
+              });
+              $(this).val('').trigger('change');
+            } 
+        });
+
+        
+        $('select[name=warehouse_id]').on('change', function() {
+            var selected = $(this).find('option:selected').val();
+            if(selected == 'add_new') {
+              $.ajax({
+                url :  "{{ route('warehouse.addWarehouseModal') }}",
                 type: "POST",
                 success: function (response) {
                   if(response) {
@@ -689,7 +760,7 @@
                     $.each(result.error, function(index, val){
                       var elem = $('[name="'+ index +'"]');
                       if(index == 'sales_item_array') {
-                        $('#sales_item_tables').after('<label class="text-danger error">Order Items are required to make a sale, Please add an item.</label>');
+                        $('#sales_item_tables').after('<label class="text-danger error">' + val + '</label>');
                       }
                       else if(elem.hasClass('select2-hidden-accessible')) {
                         new_elem = elem.parent().find('span.select2.select2-container')

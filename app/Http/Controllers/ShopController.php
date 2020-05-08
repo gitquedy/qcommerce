@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Shop;
 use App\Products;
+use App\Warehouse;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -31,11 +33,14 @@ class ShopController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
         if ( request()->ajax()) {
-           $shop = Shop::with('orders')->where('shop.business_id', $request->user()->business_id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
+           $shop = Shop::with('orders')->with('warehouse')->where('shop.business_id', $request->user()->business_id)->select('shop.*')->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
             ->editColumn('site', function(Shop $shop) {
                             return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';
                         })
+            ->addColumn('warehouse_name', function(Shop $shop) {
+                return isset($shop->warehouse->name)?$shop->warehouse->name:'[Deleted Warehouse]';
+            })
             ->addColumn('statusChip', function(Shop $shop) {
                             $html = '';
                             if($shop->active == 1){
@@ -113,8 +118,10 @@ class ShopController extends Controller
             $request->session()->flash('status', 'Invalid parameters.');
             return redirect(action('ShopController@create'));
         }
+        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         return view('shop.form', [
-          'breadcrumbs' => $breadcrumbs
+          'breadcrumbs' => $breadcrumbs,
+          'warehouses' => $warehouses
         ]);
     }
 
@@ -160,6 +167,7 @@ class ShopController extends Controller
                 $data['email'] = $responseData['account'];
                 $data['expires_in'] = Carbon::now()->addDays(6);
                 $data['business_id'] = $request->user()->business_id;
+                $data['business_id'] = $request->warehouse_id;
                 $data['site'] = 'lazada';
                 $shop = Shop::create($data);
                 $output = ['success' => 1,
@@ -195,6 +203,7 @@ class ShopController extends Controller
                     'name' => $data['name'],
                     'short_name' => $data['short_name'],
                     'business_id' => $request->user()->business_id,
+                    'warehouse_id' => $request->warehouse_id,
                 ];
                 $shop = Shop::create($data);
                 $output = ['success' => 1,
@@ -215,13 +224,15 @@ class ShopController extends Controller
     }
 
     public function edit(Shop $shop){
-        return view('shop.edit', compact('shop'));
+        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        return view('shop.edit', compact('shop', 'warehouses'));
     }
 
     public function update(Shop $shop, Request $request){
         $validator = Validator::make($request->all(), [
                 'name' => ['required', 'regex:/^[\pL\s\-]+$/u'],
-                'short_name' => 'required'
+                'short_name' => 'required',
+                'warehouse_id' => 'required'
             ], 
         ['name.regex' => 'Only character\'s are allowed']);
 
@@ -229,7 +240,7 @@ class ShopController extends Controller
             return response()->json(['msg' => 'Please check for errors','error' => $validator->errors()]);
         }
         try {
-            $shop->update($request->only(['short_name', 'name']));
+            $shop->update($request->only(['short_name', 'name', 'warehouse_id']));
 
             $output = ['success' => 1,
                 'msg' => 'Shop updated successfully!',

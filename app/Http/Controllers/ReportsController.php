@@ -66,7 +66,7 @@ class ReportsController extends Controller
                                        return  $products->Images;
                                     }
                                     else {
-                                        return "https://place-hold.it/100&text=No_Image";
+                                        return asset('images/pages/no-img.jpg');
                                     }
                                 })
                     ->addColumn('brand_name', function(Sku $SKSU) {
@@ -117,7 +117,7 @@ class ReportsController extends Controller
                                    return  $products->Images;
                                 }
                                 else {
-                                    return "https://place-hold.it/100&text=No_Image";
+                                    return asset('images/pages/no-img.jpg');
                                 }
                             })
                 ->addColumn('brand_name', function(Sku $SKSU) {

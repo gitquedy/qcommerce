@@ -51,6 +51,7 @@
             <th>ID</th>
             <th>Site</th>
             <th>NAME</th>
+            <th>Warehouse</th>
             <th>Status</th>
             <th>Products</th>
             <th>Pending</th>
@@ -97,6 +98,7 @@
             { data: 'id', name: 'id'},
             { data: 'site', name: 'site', orderable : false, className: 'shop_logo'},
             { data: 'name', name: 'name' },
+            { data: 'warehouse.name', name: 'warehouse.name' },
             { data: 'statusChip', name: 'statusChip' },
             { data: 'products', name: 'products' },
             { data: 'pending_count', name: 'pending_count' },

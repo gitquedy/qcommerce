@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Add Sale')
+@section('title', 'Edit Sale')
 
 @section('mystyle')
 <style>
@@ -60,7 +60,7 @@
                           @method('PUT')
                           @csrf
                           <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="position-relative has-icon-left">
@@ -71,7 +71,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Referencce No.</label>
                                     <div class="position-relative has-icon-left">
@@ -82,7 +82,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Warehouse</label>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="warehouse_id" id="select_warehouse" class="form-control select2 update_select" placeholder="Select Warehouse">
+                                        <option value="" disabled selected></option>
+                                        <option value="add_new">Add New Warehouse</option>
+                                        @forelse($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}" @if($sales->warehouse_id == $warehouse->id) selected @endif>{{ $warehouse->name }}</option>
+                                        @empty
+                                        <option value="" disabled="">Please Add Warehouse</option>
+                                        @endforelse
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-box"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Customer</label>
                                     <div class="position-relative has-icon-left">
@@ -160,7 +179,11 @@
                                               <div class="input-group-prepend d-none d-md-inline-block">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>
                                               </div>
-                                              <input type="number" name="sales_item_array[{{$item->id}}][quantity]" min="1" max="{{$item->sku->quantity + $item->quantity}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
+                                              @php
+                                              $warehouse_item = App\WarehouseItems::where('warehouse_id', $sales->warehouse_id)->where('sku_id', $item->sku_id)->first();
+                                              $max_quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
+                                              @endphp
+                                              <input type="number" name="sales_item_array[{{$item->id}}][quantity]" min="1" data-max="{{$max_quantity}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
                                               <div class="input-group-append d-none d-md-inline-block h-100">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>
                                               </div>
@@ -229,9 +252,36 @@
 @section('myscript')
 <script type="text/javascript">
     jQuery(document).ready(function($) {
-        localStorage.removeItem("edit_items");
+        var warehouse_reset = false;
+        $('#add_prodduct_input').on('focus', function() {
+          var customer = $('#select_customer').val();
+          var warehouse = $('#select_warehouse').val();
+          if(!customer && !warehouse) {
+            alert('Please select customer and warehouse first!');
+            $('#select_warehouse').focus();
+          }
+          else {
+            if(!customer) {
+              alert('Please select customer first!');
+              $('#select_customer').focus();
+            }
+            if(!warehouse) {
+              alert('Please select warehouse first!');
+              $('#select_warehouse').focus();
+            }
+          }
+        });
+
+        $('#select_warehouse').on('change', function() {
+            if (warehouse_reset) {
+              $("#sales_item_tables tbody").html('');
+              localStorage.removeItem("edit_sales_items");
+            }
+        });
+
+        localStorage.removeItem("edit_sales_items");
         localStorage.removeItem("edit_sales");
-        localStorage.removeItem("original_edit_items");
+        localStorage.removeItem("original_edit_sales_items");
         first_run();
         function first_run() {
           $('input.update_input').each(function() {
@@ -254,8 +304,8 @@
           });
           $("#sales_item_tables > tbody > tr").each(function() {
             var items = {};
-            if(localStorage.getItem("edit_items")) {
-              items = JSON.parse(localStorage.getItem("edit_items"));            
+            if(localStorage.getItem("edit_sales_items")) {
+              items = JSON.parse(localStorage.getItem("edit_sales_items"));            
             }
             var i = $(this).data('id');
             if(!items[i]) {
@@ -267,13 +317,14 @@
               items[i]['cost']  = $(this).find('input.original_sku_cost').val();
               items[i]['price']  = $(this).find('input.original_sku_price').val();
               items[i]['quantity']  = $(this).find('input.original_sku_quantity').val();
-              items[i]['max_quantity']  = $(this).find('input.original_sku_quantity').attr("max");
+              items[i]['max_quantity']  = $(this).find('input.original_sku_quantity').data("max");
               items[i]['image']  = $(this).find('img.product_image').attr('src');
             }
-            localStorage.setItem("edit_items", JSON.stringify(items));
-            localStorage.setItem("original_edit_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("original_edit_sales_items", JSON.stringify(items));
             reloadSales();
           })
+          warehouse_reset = true;
         }
 
 
@@ -285,6 +336,7 @@
         });
 
         function reloadSales() {
+          warehouse_reset = false;
           var sales = JSON.parse(localStorage.getItem("edit_sales"));
           if(sales) {
             $.each(sales, function(index, value){
@@ -303,7 +355,7 @@
             $('#add_sale_form').trigger('reset').trigger('change');
             $('.select2').trigger('change');
           }
-          var items = JSON.parse(localStorage.getItem("edit_items"));
+          var items = JSON.parse(localStorage.getItem("edit_sales_items"));
           var html = '';
           $("#sales_item_tables tbody").html(html);
           $.each(items, function(i, data) {
@@ -334,7 +386,7 @@
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
+                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" data-max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
@@ -347,6 +399,7 @@
           });
           $("#sales_item_tables tbody").append(html);
           recalculateTotal();
+          warehouse_reset = true;
         }
 
         function recalculate(tr) {
@@ -380,10 +433,11 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%QUERY%/%CID%',
+                url: '{{ route('sku.search') }}/%WAREHOUSE%/%QUERY%/%CID%/true',
                 replace: function(url, query) {
-                    $cid = ($('#select_customer').val())?$('#select_customer').val():'none';
-                    return url.replace('%QUERY%', query).replace('%CID%', $cid);
+                    var wid = ($('#select_warehouse').val())?$('#select_warehouse').val():'none';
+                    var cid = ($('#select_customer').val())?$('#select_customer').val():'none';
+                    return url.replace('%WAREHOUSE%', wid).replace('%QUERY%', query).replace('%CID%', cid);
                 }
             },
             datumTokenizer: Bloodhound.tokenizers.whitespace('search_product'),
@@ -424,11 +478,11 @@
         $(".search-input").on('typeahead:selected', function (event, datum, name) {
             $(this).typeahead("val", "");
             var items = {};
-            if(localStorage.getItem("edit_items")) {
-              items = JSON.parse(localStorage.getItem("edit_items"));            
+            if(localStorage.getItem("edit_sales_items")) {
+              items = JSON.parse(localStorage.getItem("edit_sales_items"));            
             }
-            if(localStorage.getItem("original_edit_items")) {
-              original_items = JSON.parse(localStorage.getItem("original_edit_items"));            
+            if(localStorage.getItem("original_edit_sales_items")) {
+              original_items = JSON.parse(localStorage.getItem("original_edit_sales_items"));            
             }
             var i = datum.id;
             if(original_items[i]) {
@@ -454,7 +508,7 @@
             }
             else {
             }
-            localStorage.setItem("edit_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items));
             reloadSales();
         });
 
@@ -483,15 +537,15 @@
             var input = $(this)
             var name = $(this).attr('name');
             var val = $(this).val();
-            var items = JSON.parse(localStorage.getItem("edit_items"));
+            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
             items[id][name] = val;
-            localStorage.setItem("edit_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items));
             recalculate($(this).closest('tr'));
         });
 
 
         $(document).on('keyup change blur', '.check_max_quantity', function() {
-            var max = parseInt($(this).attr('max'));
+            var max = parseInt($(this).data('max'));
             var val = parseInt($(this).val());
             if(val > max) {
               $(this).val(max).trigger('change');
@@ -506,7 +560,7 @@
             var val = input.val();
             switch(action) {
               case 'add': 
-                var max = input.attr('max');
+                var max = input.data('max');
                   if(val < max) {
                     val++;
                   }
@@ -522,18 +576,18 @@
               default:
                 break;
             }
-            input.val(val);
-            var items = JSON.parse(localStorage.getItem("edit_items"));
+            input.val(val).trigger('change');
+            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
             items[id][change] = val;
-            localStorage.setItem("edit_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items));
             recalculate($(this).closest('tr'));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var items = JSON.parse(localStorage.getItem("edit_items"));
+            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
             delete items[id];
-            localStorage.setItem("edit_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items));
             reloadSales();
         });
 
@@ -545,10 +599,10 @@
         });
 
         $("#sale_reset").on('click', function() {
-            localStorage.removeItem("edit_items");
+            localStorage.removeItem("edit_sales_items");
             localStorage.removeItem("edit_sales");
-            var origitems = JSON.parse(localStorage.getItem("original_edit_items"));
-            localStorage.setItem("edit_items", JSON.stringify(origitems));
+            var origitems = JSON.parse(localStorage.getItem("original_edit_sales_items"));
+            localStorage.setItem("edit_sales_items", JSON.stringify(origitems));
             reloadSales();
         });
 
@@ -559,6 +613,23 @@
             if(selected == 'add_new') {
               $.ajax({
                 url :  "{{ route('customer.addCustomerModal') }}",
+                type: "POST",
+                success: function (response) {
+                  if(response) {
+                    $(".view_modal").html(response).modal('show');
+                  }
+                }
+              });
+              $(this).val('').trigger('change');
+            } 
+        });
+
+        
+        $('select[name=warehouse_id]').on('change', function() {
+            var selected = $(this).find('option:selected').val();
+            if(selected == 'add_new') {
+              $.ajax({
+                url :  "{{ route('warehouse.addWarehouseModal') }}",
                 type: "POST",
                 success: function (response) {
                   if(response) {
@@ -608,7 +679,7 @@
                     $.each(result.error, function(index, val){
                       var elem = $('[name="'+ index +'"]');
                       if(index == 'sales_item_array') {
-                        $('#sales_item_tables').after('<label class="text-danger error">Order Items are required to make a sale, Please add an item.</label>');
+                        $('#sales_item_tables').after('<label class="text-danger error">' + val + '</label>');
                       }
                       else if(elem.hasClass('select2-hidden-accessible')) {
                         new_elem = elem.parent().find('span.select2.select2-container')

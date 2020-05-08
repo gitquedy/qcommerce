@@ -103,8 +103,35 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/removeskuproduct/', 'SkuController@removeskuproduct')->name('sku.removeskuproduct');
 		Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
-		Route::get('/sku/search/{search?}/{customer?}', 'SkuController@search')->name('sku.search');
+		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
 	});
+
+	// Route::group(['middleware' => 'permission:warehouse.manage'], function()
+	// {
+		Route::resource('/warehouse', 'WarehouseController');
+		Route::get('/warehouse/delete/{warehouse}', 'WarehouseController@delete');
+		Route::post('/warehouse/addWarehouseModal', 'WarehouseController@addWarehouseModal')->name('warehouse.addWarehouseModal');
+		Route::post('/warehouse/addWarehouseAjax', 'WarehouseController@addWarehouseAjax')->name('warehouse.addWarehouseAjax');
+	// });
+
+	// Route::group(['middleware' => 'permission:adjustment.manage'], function()
+	// {
+		Route::get('/adjustment/import/', 'AdjustmentController@import')->name('adjustment.import');
+		Route::post('/adjustment/import/', 'AdjustmentController@submitImport')->name('adjustment.submitImport');
+		Route::get('/adjustment/first', 'AdjustmentController@first'); //temporary remove this after update
+		Route::resource('/adjustment', 'AdjustmentController');
+		Route::post('/adjustment/viewAdjustmentModal/{adjustment}', 'AdjustmentController@viewAdjustmentModal')->name('adjustment.viewAdjustmentModal');
+		Route::get('/adjustment/delete/{adjustment}', 'AdjustmentController@delete');
+
+	// });
+
+	// Route::group(['middleware' => 'permission:transfer.manage'], function()
+	// {
+		Route::resource('/transfer', 'TransferController');
+		Route::post('/transfer/viewTransferModal/{transfer}', 'TransferController@viewTransferModal')->name('transfer.viewTransferModal');
+		Route::get('/transfer/delete/{transfer}', 'TransferController@delete');
+
+	// });
 
 	Route::group(['middleware' => 'permission:supplier.manage'], function()
 	{

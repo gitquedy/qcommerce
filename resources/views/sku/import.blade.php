@@ -25,7 +25,7 @@
           <div class="row">
             <div class="col-md-12 form-group">
               <p>The first line in downloaded file should remain as it is. Please do not change the order of columns.</p>
-              <p>The correct column order is <b>(code, name, brand, category, supplier, cost, price, quantity, alert_quantity)</b> & you must follow this. </p>
+              <p>The correct column order is <b>(code, name, brand, category, supplier, cost, price, alert_quantity)</b> & you must follow this. </p>
               <a href="{{asset('file/sample_sku.csv')}}" class="btn btn-primary">Download CSV Template</a>
               <a href="{{asset('file/sample_sku.xlsx')}}" class="btn btn-primary">Download XLSX Template</a>
             </div>

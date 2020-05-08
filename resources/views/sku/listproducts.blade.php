@@ -42,17 +42,34 @@
                   <tr class="text-center">
                     <th>Cost</th>
                     <th>Price</th>
-                    <th>Quanity</th>
+                    <th>Total Quanity</th>
                     <th>Alert Qty</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td> <p class="card-text text-danger mb-0"><b>{{ number_format($sku->cost, 2) }}</b></p></td>
-                    <td><p class="card-text text-success mb-0"><b>{{ number_format($sku->price, 2) }}</b></p></td>
-                    <td><p class="card-text text-primary mb-0"><b>{{ number_format($sku->quantity, 2) }}</b></p></td>
-                    <td><p class="card-text text-warning mb-0"><b>{{ number_format($sku->alert_quantity, 2) }}</b></p></td>
+                    <td><p class="card-text text-center text-danger mb-0"><b>{{ number_format($sku->cost, 2) }}</b></p></td>
+                    <td><p class="card-text text-center text-success mb-0"><b>{{ number_format($sku->price, 2) }}</b></p></td>
+                    <td><p class="card-text text-center text-primary mb-0"><b>{{ number_format($sku->quantity, 2) }}</b></p></td>
+                    <td><p class="card-text text-center text-warning mb-0"><b>{{ number_format($sku->alert_quantity, 2) }}</b></p></td>
                   </tr>
+                </tbody>
+              </table> 
+
+              <table class="table">
+                <thead>
+                  <tr class="text-center">
+                    <th>Warehouse</th>
+                    <th>Quanity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($sku->warehouse_items as $items)
+                  <tr>
+                    <td><p class="card-text text-center text-default mb-0"><b>{{$items->warehouse->name}}</b></p></td>
+                    <td><p class="card-text text-center text-primary mb-0"><b>{{ number_format($items->quantity, 2) }}</b></p></td>
+                  </tr>
+                  @endforeach
                 </tbody>
               </table> 
             </div>
@@ -89,6 +106,7 @@
             <th>Image</th>
             <th>Name</th>
             <th>Price</th>
+            <th>Quantity</th>
             <th>Actions</th>
             
           </tr>
@@ -135,6 +153,7 @@
             },
             { data: 'name', name: 'name' },
             { data: 'price', name: 'price'},
+            { data: 'quantity', name: 'quantity'},
             { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {

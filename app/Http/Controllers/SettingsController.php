@@ -49,12 +49,13 @@ class SettingsController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'sales_prefix' => 'required|string|max:255',
-            // 'quote_prefix' => 'required|string|max:255',
-            // 'purchase_prefix' => 'required|string|max:255',
-            // 'transfer_prefix' => 'required|string|max:255',
-            // 'delivery_prefix' => 'required|string|max:255',
-            // 'payment_prefix' => 'required|string|max:255',
-            // 'return_prefix' => 'required|string|max:255',
+            'quote_prefix' => 'required|string|max:255',
+            'purchase_prefix' => 'required|string|max:255',
+            'transfer_prefix' => 'required|string|max:255',
+            'delivery_prefix' => 'required|string|max:255',
+            'payment_prefix' => 'required|string|max:255',
+            'return_prefix' => 'required|string|max:255',
+            'adjustment_prefix' => 'required|string|max:255',
         ]);
         
 

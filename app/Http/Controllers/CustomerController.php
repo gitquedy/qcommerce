@@ -280,7 +280,9 @@ class CustomerController extends Controller
             
             if ($data->save()) {
                 $output = ['success' => 1,
-                    'customer' => $data,
+                    'select_id' => 'select_customer',
+                    'option_id' => $data->id,
+                    'option_name' => $data->formatName(),
                     'msg' => 'Customer added successfully!',
                     'redirect' => action('CustomerController@index')
                 ];

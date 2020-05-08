@@ -24,6 +24,7 @@ class CreateOrderRefsTable extends Migration
             $table->integer('do')->default(1);
             $table->integer('pay')->default(1);
             $table->integer('re')->default(1);
+            $table->integer('adj')->default(1);
             $table->timestamps();
         });
     }

@@ -26,7 +26,6 @@ class SkuImport implements ToModel, WithHeadingRow
             'supplier'      => $row['supplier'], 
             'cost'          => $row['cost'],
             'price'         => $row['price'],
-            'quantity'      => $row['quantity'],
             'alert_quantity'=> $row['alert_quantity']
         ]);
     }
@@ -41,7 +40,6 @@ class SkuImport implements ToModel, WithHeadingRow
             'supplier' => 'nullable',
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
-            'quantity' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
         ];
     }

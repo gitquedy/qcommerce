@@ -16,7 +16,7 @@ class Settings extends Model
      * @var array
      */
     protected $fillable = [
-        'business_id', 'sales_prefix', 'quote_prefix', 'purchase_prefix', 'transfer_prefix', 'delivery_prefix', 'payment_prefix', 'return_prefix'
+        'business_id', 'sales_prefix', 'quote_prefix', 'purchase_prefix', 'transfer_prefix', 'delivery_prefix', 'payment_prefix', 'return_prefix', 'adjustment_prefix'
     ];
 
     
@@ -50,5 +50,9 @@ class Settings extends Model
 
     public function getReference_re() {
         return $this->return_prefix.sprintf('%04d', $this->order_ref->re);
+    }
+
+    public function getReference_adj() {
+        return $this->adjustment_prefix.sprintf('%04d', $this->order_ref->adj);
     }
 }

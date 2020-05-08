@@ -58,6 +58,10 @@
                       <td>Customer Name:</td>
                       <td>{{$sales->customer_last_name.", ".$sales->customer_first_name}}</td>
                     </tr>
+                    <tr>
+                      <td>Warehouse:</td>
+                      <td>{{isset($sales->warehouse->name)?$sales->warehouse->name:'[Deleted Warehouse]'}}</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -88,7 +92,7 @@
                         <img src="{{$item->image}}" alt="No Image Available" class="d-flex mr-1 product_image">
                         <div class="media-body">
                           <h5 class="mt-0">{{$item->sku_name}}</h5>
-                          {{($item->brand)?$item->sku_name:''}}
+                          {{($item->brand)?$item->brand:''}}
                           {{$item->sku_code}}
                           <input type="hidden" name="sales_item_array[{{$item->id}}][image]" class="original_sku_image" value="{{$item->image}}" />
                           <input type="hidden" name="sales_item_array[{{$item->id}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />

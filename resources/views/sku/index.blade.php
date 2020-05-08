@@ -114,12 +114,9 @@
               },
             },
             { data: 'name', name: 'name'},
-            // { data: 'brand_name', name: 'brand_name'},
-            // { data: 'category_name', name: 'category_name'},
-            // { data: 'supplier_company', name: 'supplier_company'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
-            { data: 'quantity', name: 'quantity', className: 'quick_update_box'},
+            { data: 'quantity', name: 'quantity'},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'action', name: 'action', orderable : false},
             { data: 'products_count', name: 'products_count', searchable: false, visible: false }

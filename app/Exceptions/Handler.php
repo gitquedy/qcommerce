@@ -117,7 +117,7 @@ class Handler extends ExceptionHandler
         $response['status'] = $statusCode;
 
         return ResponseBuilder::asError($statusCode)
-          ->withHttpCode($statuscode)
+          ->withHttpCode($statusCode)
           ->withDebugData(null)
           ->withMessage($response['message'])
           ->build();

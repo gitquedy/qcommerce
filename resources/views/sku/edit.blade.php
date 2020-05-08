@@ -92,7 +92,6 @@
                       </div>
                     </div>
               </div>
-              <div class="col-md-6"></div>
               <div class="col-md-6 form-group">
                   <lable>Cost</lable>
                   <input type="number" step="any" class="form-control" value="{!!$Sku->cost!!}" name="cost">
@@ -100,10 +99,6 @@
               <div class="col-md-6 form-group">
                   <lable>Price</lable>
                   <input type="number" step="any" class="form-control" value="{!!$Sku->price!!}" name="price">
-              </div>
-              <div class="col-md-6 form-group">
-                  <lable>Quantity</lable>
-                  <input type="number" class="form-control"  name="quantity" value="{!!$Sku->quantity!!}">
               </div>
               <div class="col-md-6 form-group">
                   <lable>Alert Quantity</lable>

@@ -11,7 +11,7 @@ class Sales extends Model
     protected $table = 'sales';
 
 	protected $fillable = [
-        'business_id', 'customer_id', 'customer_first_name', 'customer_last_name', 'date', 'reference_no', 'note', 'status', 'total', 'discount', 'grand_total', 'paid', 'payment_status', 'created_by', 'updated_by'
+        'business_id', 'customer_id', 'warehouse_id', 'customer_first_name', 'customer_last_name', 'date', 'reference_no', 'note', 'status', 'total', 'discount', 'grand_total', 'paid', 'payment_status', 'created_by', 'updated_by'
     ];
 
     public function customer(){
@@ -20,6 +20,10 @@ class Sales extends Model
 
     public function payments(){
         return $this->hasMany(Payment::class, 'sales_id', 'id');
+    }
+
+    public function warehouse() {
+        return $this->hasOne(Warehouse::class, 'id', 'warehouse_id');
     }
 
 	public function items(){
