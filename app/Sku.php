@@ -62,7 +62,6 @@ class Sku extends Model
                 foreach ($Sku_prod as $prod) {
                     $shop_id = $prod->shop_id;
                     $access_token = Shop::find($shop_id)->access_token;
-
                     $prod = Products::where('id', $prod->id)->first();
                     $prod->quantity = $warehouse_item->quantity;
                     $prod->save();

@@ -7,6 +7,7 @@ use App\Order;
 use App\Shop;
 use App\Products;
 use App\Sku;
+use App\WarehouseItems;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -138,18 +139,29 @@ class BarcodeController extends Controller
             $order->save();
             foreach ($request->items as $sku => $qty) {
                 $shop_id = $request->shop_id;
-                $access_token = Shop::find($shop_id)->access_token;
+                $shop = Shop::find($shop_id);
+                $access_token = $shop->access_token;
+                $warehouse_id = $shop->warehouse_id;
                 $prod = Products::where('SellerSku', $sku)->where('shop_id', $shop_id)->first();
                 if($prod->seller_sku_id) {
                     $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
                     $sku->quantity -= $qty;
+                    $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
+                    $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
+                    $new_quantity = $warehouse_qty - $qty;
+                    $warehouse_item = WarehouseItems::updateOrCreate(
+                        ['warehouse_id' => $warehouse_id,
+                         'sku_id' => $sku->id],
+                        ['quantity' => $new_quantity]
+                    );
+                    $prod->quantity = $warehouse_item->quantity;
                     $result = $sku->save();
                     $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
                     foreach ($Sku_prod as $prod) {
                         $shop_id = $prod->shop_id;
                         $access_token = Shop::find($shop_id)->access_token;
                         $prod = Products::where('id', $prod->id)->first();
-                        $prod->quantity = $sku->quantity;
+                        $prod->quantity = $warehouse_item->quantity;
                         $prod->save();
                             $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                             <Request>
