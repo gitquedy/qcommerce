@@ -143,7 +143,7 @@ class BarcodeController extends Controller
                 $access_token = $shop->access_token;
                 $warehouse_id = $shop->warehouse_id;
                 $prod = Products::where('SellerSku', $sku)->where('shop_id', $shop_id)->first();
-                if($prod->seller_sku_id) {
+                if(isset($prod->seller_sku_id)) {
                     $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
                     $sku->quantity -= $qty;
                     $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
