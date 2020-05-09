@@ -23,7 +23,7 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['business_id', 'warehouse_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
+    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
@@ -43,16 +43,12 @@ class Shop extends Model
     public function products(){
 		return $this->hasMany(Products::class, 'shop_id','id');
 	}
-
-    public function warehouse(){
-        return $this->hasOne(Warehouse::class, 'id','warehouse_id');
-    }
     
-    public function syncOrders($date = '2018-01-01', $step = '+3 day'){
+    public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
             $this->update(['active' => 2]);
             if($this->site == 'lazada'){
-                $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
+                $dates = Utilities::getDaterange($date, Carbon::now()->addDays(2)->format('Y-m-d'), 'c', $step);
                 $created_before_increment = 1;
                 $orders = [];
                 $length = count($dates);
