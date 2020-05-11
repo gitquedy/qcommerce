@@ -98,7 +98,7 @@
             { data: 'id', name: 'id'},
             { data: 'site', name: 'site', orderable : false, className: 'shop_logo'},
             { data: 'name', name: 'name' },
-            { data: 'warehouse.name', name: 'warehouse.name' },
+            { data: 'warehouse_name', name: 'warehouse_name' },
             { data: 'statusChip', name: 'statusChip' },
             { data: 'products', name: 'products' },
             { data: 'pending_count', name: 'pending_count' },
