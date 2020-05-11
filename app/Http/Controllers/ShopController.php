@@ -167,7 +167,7 @@ class ShopController extends Controller
                 $data['email'] = $responseData['account'];
                 $data['expires_in'] = Carbon::now()->addDays(6);
                 $data['business_id'] = $request->user()->business_id;
-                $data['business_id'] = $request->warehouse_id;
+                $data['warehouse_id'] = $request->warehouse_id;
                 $data['site'] = 'lazada';
                 $shop = Shop::create($data);
                 $output = ['success' => 1,

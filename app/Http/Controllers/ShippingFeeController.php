@@ -40,7 +40,7 @@ class ShippingFeeController extends Controller
                  }else if($request->get('tab') == 'resolved'){
                   $orders->where('shipping_fee_reconciled', 3);
                  }
-
+                 
                 $daterange = explode('/', $request->get('daterange'));
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
@@ -89,7 +89,7 @@ class ShippingFeeController extends Controller
                               if($order->shipping_fee_reconciled == 1){
                                 $disabled['filed'] = '';
                                 $disabled['resolved'] = '';
-                                $button = '<button type="button" class="btn btn-primary"><a class="text-white" target="_blank" href="https://xform.lazada.com.ph/form/show.do?spm=a2a15.helpcenter-psc-contact.new-navigation.8.2ef25331K09vKG&lang=en">File Dispute</a></button>';
+                                $button = '<button type="button" class="btn btn-primary"><a class="text-white" target="_blank" href="'. env('shipping_fee_reconciliation_link') .'">File Dispute</a></button>';
                               }else if($order->shipping_fee_reconciled == 2){
                                 $disabled['resolved'] = '';
                               }

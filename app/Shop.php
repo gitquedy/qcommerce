@@ -23,7 +23,7 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['business_id', 'warehouse_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
+    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site'];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
@@ -45,37 +45,47 @@ class Shop extends Model
 	}
 
     public function warehouse(){
-        return $this->hasOne(Warehouse::class, 'id','warehouse_id');
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
     
-    public function syncOrders($date = '2018-01-01', $step = '+3 day'){
+    public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
             $this->update(['active' => 2]);
             if($this->site == 'lazada'){
-                $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'c', $step);
-                $created_before_increment = 1;
+                // $dates = Utilities::getDaterange($date, Carbon::now()->addDays(2)->format('Y-m-d'), 'c', $step);
+                // $created_before_increment = 1;
                 $orders = [];
-                $length = count($dates);
-                foreach($dates as $index => $date){
-                    $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
-                    $created_before_increment += 1;
+                $after = Carbon::parse($date)->format('c');
+                $before = Carbon::now()->addDays(2)->format('c');
+                $offset = 0;
+                $limit = 100;
+                $count = 1;
+                while($count != 0){
                     $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
                     $r = new LazopRequest('/orders/get','GET');
-                    $r->addApiParam('update_after', $date);
-                    $r->addApiParam('update_before', $created_before);
+                    $r->addApiParam('created_after', $after);
+                    $r->addApiParam('created_before', $before);
+                    $r->addApiParam('limit', $limit);
+                    $r->addApiParam('offset', $offset);
                     $r->addApiParam('sort_by','updated_at');
                     $result = $c->execute($r, $this->access_token);
                     $data = json_decode($result, true);
-                    if(isset($data['data']['orders'])){
-                        $orders = array_merge_recursive($data['data']['orders'], $orders);
+                    if(isset($data['data']['count'])){
+                        $count = $data['data']['count'];
+                        $offset += $count;
+                        if(isset($data['data']['orders'])){
+                            $orders = array_merge_recursive($data['data']['orders'], $orders);
+                        }
+                    }else{
+                        $count = 0;
                     }
                 }
                 if($orders){
                     $orders = array_map(function($order){
                         $status = $order['statuses'][0];
-                        if(array_key_exists(1,$order['statuses'])){
-                             $status = $order['statuses'][1];
-                        }
+                        // if(array_key_exists(1,$order['statuses'])){
+                        //      $status = $order['statuses'][1];
+                        // }
                         $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
                         $order['ordersn'] = $order['order_id'];
                         $order['printed'] = $printed;
