@@ -43,6 +43,10 @@ class Shop extends Model
     public function products(){
 		return $this->hasMany(Products::class, 'shop_id','id');
 	}
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
     
     public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
