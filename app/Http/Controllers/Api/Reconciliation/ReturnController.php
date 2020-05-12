@@ -62,6 +62,11 @@ class ReturnController extends Controller
             $orders->where('returned', $request->get('tab'));
         }
 
+        if($request->get('sort_by')){
+            $sort_direction = $request->get('sort_direction') ? $request->get('sort_direction') : 'desc' ;
+            $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
+        }
+
         $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();
         $data = ['orders' => $orders];
 
