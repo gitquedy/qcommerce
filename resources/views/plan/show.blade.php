@@ -42,6 +42,7 @@
     <form action="{{ action('PayPalController@payment', $plan->id) }}" method="POST" class="form" enctype="multipart/form-data">
       @csrf
       <input type="hidden" name="billing" value="{{$billing}}">
+      <input type="hidden" id="promocode" name="promocode" value="">
       <div class="card-body">
         <div class="row text-center">
           <div class="col-md-3">
@@ -68,16 +69,19 @@
                   <p><b>Billed <span class="billing_text">Annually</span></b></p>
                 @endif
             </div>
+            @if($plan->id != 1)
             <div class="form-group">
               <label for="">Promocode</label>
               {{-- <input type="text" class="form-control" name="promocode" disabled=""> --}}
               <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Promocode" aria-label="Promocode" aria-describedby="apply-button">
+                <input type="text" id="promocode_input" class="form-control" placeholder="Promocode" aria-label="Promocode" aria-describedby="apply-button">
                 <div class="input-group-append">
                   <button class="btn btn-primary apply_promocode" type="button">Apply</button>
                 </div>
               </div>
+              <p class="promocode_warning"></p>
             </div>
+            @endif
           </div>
           <div class="col-md-3">
             <ul class="list-group">
@@ -135,7 +139,7 @@
                     @endif
                 @elseif($business->subscription() !== NULL &&  $business->subscription()->plan->monthly_cost > $plan->monthly_cost);
                     <h3>You are currently subscribed to a higher plan.</h3>
-                @else
+                @elseif($plan->id != 1)
                     <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribed">
                 @endif
                 </form>
@@ -170,6 +174,27 @@
         console.log('I was closed by the timer')
       }
     })
+  });
+
+  $('.apply_promocode').on('click', function() {
+      $('.promocode_warning').html('').removeClass().addClass('promocode_warning');
+      $('#promocode').val('');
+      var promocode = $("#promocode_input").val();
+      $.ajax({
+        url :  "{{ route('promocode.checkPromocode') }}",
+        type: "POST",
+        data: {'code':promocode},
+        success: function (result) {
+          if(result.success == true){
+            $('#promocode').val(result.promocode);
+            $('.promocode_warning').html(result.msg).addClass('text-success');
+          }
+          else {
+            $('.promocode_warning').html(result.msg).addClass('text-danger');
+          }
+        }
+      });
+
   });
 </script>
 @endsection

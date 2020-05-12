@@ -57,9 +57,16 @@
                   <input type="number" class="form-control text-right" name="max_uses" value="1">
               </div>
               <div class="col-md-2 form-group">
+                  <lable>Discount Range</lable>
+                  <select name="discount_range" class="form-control">
+                    <option value="first">First Payment</option>
+                    <option value="all">All Payments</option>
+                  </select>
+              </div>
+              {{-- <div class="col-md-2 form-group">
                   <lable>Maximum Use Per Business</lable>
                   <input type="number" class="form-control text-right" name="max_uses_business" value="1">
-              </div>
+              </div> --}}
               <div class="col-md-2 form-group">
                   <lable>Discount Amount</lable>
                   <input type="number" class="form-control text-right" aria-label="Discount Amount" name="discount_amount">

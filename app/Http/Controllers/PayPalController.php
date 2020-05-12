@@ -8,6 +8,7 @@ use Srmklive\PayPal\Services\ExpressCheckout;
 use App\Billing;
 use App\Package;
 use App\Plan;
+use App\Promocode;
 use Carbon\Carbon;
 use DB;
    
@@ -24,7 +25,8 @@ class PayPalController extends Controller
             $invoice_no = Billing::getNextInvoiceNumber();
 	        $data = [];
             $billing_period = $request->billing;
-            $promocode = $request->promocode;
+            $promocode_id = isset($request->promocode)?$request->promocode:null;
+            $total_discount = 0;
             if($billing_period == 'Month') {
                 if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
                     $price = $plan->promo_monthly_cost;
@@ -42,25 +44,42 @@ class PayPalController extends Controller
                 }
             }
             $desc = '1 '.$billing_period.' '.$plan->name.' Plan subscription on Qcommerce.';
+            
+            $billing_price = $price;
+            if($promocode_id) {
+                $promocode = Promocode::whereId($promocode_id)->where('starts_at', '<=', Carbon::now())->where('expires_at', '>=', Carbon::now())->whereRaw('uses < max_uses')->first();
+                if($promocode->discount_type == "percentage") {
+                    $total_discount = ($promocode->discount_amount / 100) * $price;
+                }
+                else if($promocode->discount_type == "fixed") {
+                    if($promocode->discount_amount > $price) {
+                        $total_discount = $price;
+                    }
+                    else {
+                        $total_discount = $promocode->discount_amount;
+                    }
+                }
+
+                if($promocode->discount_range == "all") {
+                    $billing_price = $price - $total_discount;
+                }
+            } 
+            $paypal_price = $price - $total_discount;
 	        $data['items'] = [
 	            [
 	                'name' => $plan->name,
-	                'price' => $price,
+	                'price' => $paypal_price,
 	                'desc'  => $desc,
 	                'qty' => 1
 	            ]
 	        ];
 
-            if($promocode) {
-                //check promocode if valid
-                //apply promocode to price
-                //update promocode as used
-            } 
 	        $billing = Billing::create([
 	        	'business_id' => $request->user()->business_id,
 	        	'plan_id' => $plan->id,
                 'billing_period' => $billing_period,
-                'amount' => $price,
+                'promocode' => $promocode_id,
+                'amount' => $billing_price,
 	        	'invoice_no' => $invoice_no
 	        ]);
 
@@ -68,11 +87,9 @@ class PayPalController extends Controller
 	        $data['invoice_description'] = $desc;
 	        $data['return_url'] = action('PlanController@confirm', $billing->id);
 	        $data['cancel_url'] = action('PayPalController@cancel', $billing->id);
-	        $data['total'] = $price;
+	        $data['total'] = $paypal_price;
 	  
 	        $provider = new ExpressCheckout;
-	  
-	        // $response = $provider->setExpressCheckout($data);
 	  
 	        $response = $provider->setExpressCheckout($data, true);
 	        if($response['paypal_link'] != null){

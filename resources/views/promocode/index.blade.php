@@ -30,7 +30,7 @@
             <th>Description</th>
             <th>Used</th>
             <th>Max use</th>
-            <th>Max use per user</th>
+            <th>Discount Range</th>
             <th>Discount Amount</th>
             <th>Discount Type</th>
             <th>Validity Start</th>
@@ -84,8 +84,8 @@
             { data: 'name', name: 'name' },
             { data: 'description', name: 'description' },
             { data: 'uses', name: 'uses', class: 'text-right'},
-            { data: 'max_uses', name: 'max_uses', class: 'text-right'},
-            { data: 'max_uses_business', name: 'max_uses_business', class: 'text-right'},
+            { data: 'max_uses', name: 'max_uses', class: 'text-right' },
+            { data: 'discount_range', name: 'discount_range'},
             { data: 'discount_amount', name: 'discount_amount', class: 'text-right'},
             { data: 'discount_type', name: 'discount_type', class: 'text-capitalize'},
             { data: 'starts_at', name: 'starts_at'},

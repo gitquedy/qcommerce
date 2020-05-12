@@ -51,8 +51,34 @@ function boolean_to_text($value) {
             </div>
             <div class="form-group">
               <label>Billing Amount:</label>
-              <h3>PHP {{ number_format($billing->amount, 2) }}</h3>
+              @php
+              $total_discount = 0;
+              if($billing->promocode) {
+                $pcode = $billing->promocode_details;
+                if($pcode->discount_range == "first") {
+                  if($pcode->discount_type == "percentage") {
+                      $total_discount = ($pcode->discount_amount / 100) * $billing->amount;
+                  }
+                  else if($pcode->discount_type == "fixed") {
+                      if($pcode->discount_amount > $billing->amount) {
+                          $total_discount = $billing->amount;
+                      }
+                      else {
+                          $total_discount = $pcode->discount_amount;
+                      }
+                  }
+                }
+              }
+              @endphp
+              <h3>PHP {{ number_format($billing->amount, 2) }} </h3>
+              @if($total_discount > 0) <p class="text-success"> {{ number_format($total_discount, 2) }} discount on your first Payment.</p> @endif
             </div>
+            @if($billing->promocode)
+            <div class="form-group">
+              <label>Promocode:</label>
+              <h3>{{ $billing->promocode_details->name }}</h3>
+            </div>
+            @endif
             <div class="form-group">
               <label>Billing Account:</label>
               <h3>{{ucfirst($response['LASTNAME'])}}, {{ucfirst($response['FIRSTNAME'])}}</h3>
