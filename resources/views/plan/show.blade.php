@@ -137,7 +137,7 @@
                     @else
                     --
                     @endif
-                @elseif($business->subscription() !== NULL &&  $business->subscription()->plan->monthly_cost > $plan->monthly_cost);
+                @elseif($business->subscription() !== NULL &&  $business->subscription()->plan->monthly_cost > $plan->monthly_cost)
                     <h3>You are currently subscribed to a higher plan.</h3>
                 @elseif($plan->id != 1)
                     <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribed">
