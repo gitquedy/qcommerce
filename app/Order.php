@@ -31,7 +31,7 @@ class Order extends Model
         'UNPAID','READY_TO_SHIP', 'RETRY_SHIP', 'SHIPPED' ,'COMPLETED', 'TO_CONFIRM_RECEIVE' ,'IN_CANCEL','CANCELLED','TO_RETURN',
      ];
 
-     protected $appends = ['shipping_fee_overcharge'];
+     // protected $appends = ['shipping_fee_overcharge'];
 
 	public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id', 'id');
@@ -50,9 +50,18 @@ class Order extends Model
     }
 
     public function getShippingFeeOverchargeAttribute(){
+        
+    }
+
+    public function toArray() {
+        $data = parent::toArray();
+
         if($this->seller_payout_fees && $this->customer_payout_fees){
-            return number_format(abs($this->seller_payout_fees->amount) - $this->customer_payout_fees->amount);
+            $data['shipping_fee_overcharge'] =  number_format(abs($this->seller_payout_fees->amount) - $this->customer_payout_fees->amount);
+        }else{
+            $data['shipping_fee_overcharge'] = 0;
         }
+        return $data;
     }
 
 	public function getActionsDropdown(){
