@@ -62,6 +62,11 @@ class ReturnController extends Controller
             $orders->where('returned', $request->get('tab'));
         }
 
+        if($request->get('sort_by')){
+            $sort_direction = $request->get('sort_direction') ? $request->get('sort_direction') : 'desc' ;
+            $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
+        }
+
         $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();
         $data = ['orders' => $orders];
 
@@ -103,6 +108,33 @@ class ReturnController extends Controller
 
         return ResponseBuilder::asSuccess(200)
                   ->withData(['updated_orders' => $updated_orders])
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+
+    public function headers(Request $request){
+      $shops = $request->user()->business->shops();
+      if($request->get('shop') != ''){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
+      $shops_id = $shops->pluck('id')->toArray();
+
+      $unconfirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', false);
+      $confirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', true);
+
+      if($request->get('created_from') && $request->get('created_to')){
+          $unconfirmed = $unconfirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+          $confirmed = $confirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+      }
+      $data = [
+        'unconfirmed' => $unconfirmed->count(),
+        'confirmed' => $confirmed->count(),
+      ];
+      $data['total'] = $data['unconfirmed'] + $data['confirmed'];
+
+      return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
                   ->withMessage('OK')
                   ->build();
     }

@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use App\Order;
 use App\Shop;
 use Validator;
+use App\LazadaPayout;
+use App\ShopeePayout;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
 
-class ShippingFeeController extends Controller
+class PayoutController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,17 +20,15 @@ class ShippingFeeController extends Controller
      */
     public function index(Request $request)
     {
-        $validation = [
+         $validation = [
             'site' => ['required', 'in:lazada,shopee'],
             'per_page' => ['required', 'integer', 'min:1', 'max:100'],
             'created_from' => ['sometimes', 'required' , 'date', 'date_format:Y-m-d'],
             'created_to' => ['required_with:created_from', 'after:created_from' , 'date' , 'date_format:Y-m-d'],
             'sort_by' => ['in:created_at,updated_at'],
             'sort_direction' => ['in:ASC,DESC'],
-            'tab' => ['in:1,2,3'],
+            'tab' => ['in:1,0'],
         ];
-
-        
 
         $validator = Validator::make($request->all(), $validation);
         if ($validator->fails()) {
@@ -38,7 +38,6 @@ class ShippingFeeController extends Controller
                   ->withMessage('Invalid Inputs')
                   ->build();
         }
-
 
         $user = $request->user();
         $shops = Shop::where('business_id', $user->business_id);
@@ -46,43 +45,43 @@ class ShippingFeeController extends Controller
             $shops->whereIn('id', explode(',', $request->get('shop_ids')));
         }
         $shop_ids = $shops->pluck('id')->toArray();
-        $orders = Order::whereIn('shop_id',$shop_ids)->where('shipping_fee_reconciled','!=',0)->with('seller_payout_fees')->with('customer_payout_fees');
 
-        if($request->get('site')){
-            $orders = $orders->where('site', $request->get('site'));
+        if($request->get('site') == 'lazada'){
+            $payouts = LazadaPayout::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
+        }else{
+            $payouts = ShopeePayout::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
         }
         
         if($request->get('status')){
-            $orders = $orders->where('status', $request->get('status'));
+            $payouts = $payouts->where('status', $request->get('status'));
         }
-
         if($request->get('created_from') && $request->get('created_to')){
-            $orders = $orders->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+            $payouts = $payouts->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
         }
 
         if($request->get('tab') !== null){
-            $orders->where('shipping_fee_reconciled', $request->get('tab'));
+            $payouts->where('reconciled', $request->get('tab'));
         }
 
         if($request->get('sort_by')){
             $sort_direction = $request->get('sort_direction') ? $request->get('sort_direction') : 'desc' ;
-            $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
+            $payouts = $payouts->orderBy($request->get('sort_by'), $sort_direction);
         }
 
-        $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();
-        $data = ['orders' => $orders];
+        $payouts = $payouts->paginate($request->get('per_page'))->jsonSerialize();
+        $data = ['payouts' => $payouts];
 
         return ResponseBuilder::asSuccess(200)
                   ->withData($data)
                   ->withMessage('OK')
                   ->build();
-        
     }
 
     public function reconcile(Request $request){
         $validation = [
-            'order_ids' => ['required'],
-            'action' => ['required', 'in:1,2,3'],
+            'ids' => ['required'],
+            'action' => ['required', 'in:1,0'],
+            'site' => ['required', 'in:lazada,shopee'],
         ];
 
         $validator = Validator::make($request->all(), $validation);
@@ -93,69 +92,66 @@ class ShippingFeeController extends Controller
                   ->withMessage('Invalid Inputs')
                   ->build();
         }
-        $order_ids = explode(',',$request->get('order_ids'));
+
+        $ids = explode(',',$request->get('ids'));
         $user = $request->user();
         $shops = Shop::where('business_id', $user->business_id);
         $shop_ids = $shops->pluck('id')->toArray();
+
+        if($request->get('site') == 'lazada'){
+            $payouts = LazadaPayout::whereIn('shop_id', $shop_ids)->whereIn('id', $ids)->update(['reconciled' => $request->get('action')]);
+            $update_payouts = LazadaPayout::whereIn('shop_id', $shop_ids)->whereIn('id', $ids)->get();
+        }else{
+            $payouts = ShopeePayout::whereIn('shop_id', $shop_ids)->whereIn('id', $ids)->update(['reconciled' => $request->get('action')]);
+            $update_payouts = ShopeePayout::whereIn('shop_id', $shop_ids)->whereIn('id', $ids)->get();
+        }
         
-
-        Order::whereIn('id', $order_ids)->orWhereIn('ordersn', $order_ids)
-        ->whereIn('shop_id',$shop_ids)
-        ->where('shipping_fee_reconciled','!=',0)
-        ->update(['shipping_fee_reconciled' => $request->get('action')]);
-
-        $updated_orders = Order::whereIn('id', $order_ids)->orWhereIn('ordersn', $order_ids)
-        ->whereIn('shop_id',$shop_ids)
-        ->where('shipping_fee_reconciled','!=',0)->get();
-
-
         return ResponseBuilder::asSuccess(200)
-                  ->withData(['updated_orders' => $updated_orders])
-                  ->withMessage('OK')
-                  ->build();
-    }
-
-    public function reconciliation_link(){
-        $data['reconciliation_link'] = env('shipping_fee_reconciliation_link');
-        return ResponseBuilder::asSuccess(200)
-                  ->withData($data)
+                  ->withData(['update_payouts' => $update_payouts])
                   ->withMessage('OK')
                   ->build();
     }
 
 
     public function headers(Request $request){
+        $validation = [
+            'site' => ['required', 'in:lazada,shopee'],
+        ];
+
+        $validator = Validator::make($request->all(), $validation);
+
+        if ($validator->fails()) {
+            return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
+                  ->withDebugData(['error' => $validator->errors()->toArray()])
+                  ->withMessage('Invalid Inputs')
+                  ->build();
+      }
       $shops = $request->user()->business->shops();
-      if($request->get('shop')){
+      if($request->get('shop') != ''){
          $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
       }
       $shops_id = $shops->pluck('id')->toArray();
-      
-      $daterange = explode('/', $request->get('daterange'));
 
-      $pending = Order::whereIn('shop_id', $shops_id);
-      $filed = Order::whereIn('shop_id', $shops_id);
-      $resolved = Order::whereIn('shop_id', $shops_id);
-      $total = Order::whereIn('shop_id', $shops_id);
-
-      if($request->get('created_from') && $request->get('created_to')){
-            $pending = $pending->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
-            $filed = $filed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
-            $resolved = $resolved->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
-            $total = $total->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+      if($request->get('site') == 'lazada'){
+        $unconfirmed = LazadaPayout::whereIn('shop_id', $shops_id)->where('reconciled', false);
+        $confirmed = LazadaPayout::whereIn('shop_id', $shops_id)->where('reconciled', true);
+      }else{
+        $unconfirmed = ShopeePayout::whereIn('shop_id', $shops_id)->where('reconciled', false);
+        $confirmed = ShopeePayout::whereIn('shop_id', $shops_id)->where('reconciled', true);
       }
 
-      $pending = $pending->where('shipping_fee_reconciled', 1)->count();
-      $filed = $filed->where('shipping_fee_reconciled', 2)->count();
-      $resolved = $resolved->where('shipping_fee_reconciled', 3)->count();
-      $total = $total->where('shipping_fee_reconciled', '!=', 0)->count();
+      if($request->get('created_from') && $request->get('created_to')){
+          $unconfirmed = $unconfirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+          $confirmed = $confirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+      }
 
       $data = [
-        'pending' => $pending,
-        'filed' => $filed,
-        'resolved' => $resolved,
-        'total' => $total,
+        'unconfirmed' => $unconfirmed->count(),
+        'confirmed' => $confirmed->count(),
       ];
+      $data['total'] = $data['unconfirmed'] + $data['confirmed'];
+
       return ResponseBuilder::asSuccess(200)
                   ->withData($data)
                   ->withMessage('OK')
