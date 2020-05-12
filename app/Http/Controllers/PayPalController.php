@@ -44,7 +44,7 @@ class PayPalController extends Controller
                 }
             }
             $desc = '1 '.$billing_period.' '.$plan->name.' Plan subscription on Qcommerce.';
-            
+
             $billing_price = $price;
             if($promocode_id) {
                 $promocode = Promocode::whereId($promocode_id)->where('starts_at', '<=', Carbon::now())->where('expires_at', '>=', Carbon::now())->whereRaw('uses < max_uses')->first();
@@ -170,6 +170,8 @@ class PayPalController extends Controller
             $billing->payment_date = date("Y-m-d H:i:s");
             $billing->next_payment_date = date("Y-m-d H:i:s", strtotime('+ 1'.$billing->billing_period,strtotime('+1day')));
             $billing->payment_transaction_id = $response['PAYMENTINFO_0_TRANSACTIONID'];
+            $billing->promocode_details->uses += 1;
+            $billing->promocode_details->save();
             $startdate = Carbon::now()->toAtomString();
             $data = [
                 'PROFILESTARTDATE' => $startdate,

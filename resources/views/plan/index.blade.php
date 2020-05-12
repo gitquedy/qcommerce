@@ -89,7 +89,7 @@
                 <div class="label mx-2">
                   <label>Promocode:</label>
                   <p><span class="badge badge-secondary" id="promocode">
-                    {{(isset($billing->promocode) && $billing->promocode != '')?$billing->promocode:'None'}}</span></p>
+                    {{isset($billing->promocode)?$billing->promocode_details->code:'None'}}</span></p>
                 </div>
               </li>
               <li class="list-inline-item">
