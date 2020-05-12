@@ -106,4 +106,31 @@ class ReturnController extends Controller
                   ->withMessage('OK')
                   ->build();
     }
+
+
+    public function headers(Request $request){
+      $shops = $request->user()->business->shops();
+      if($request->get('shop') != ''){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
+      $shops_id = $shops->pluck('id')->toArray();
+
+      $unconfirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', false);
+      $confirmed =  Order::whereIn('shop_id', $shops_id)->whereIn('status', Order::statusesForReturned())->where('returned', true);
+
+      if($request->get('created_from') && $request->get('created_to')){
+          $unconfirmed = $unconfirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+          $confirmed = $confirmed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+      }
+      $data = [
+        'unconfirmed' => $unconfirmed->count(),
+        'confirmed' => $confirmed->count(),
+      ];
+      $data['total'] = $data['unconfirmed'] + $data['confirmed'];
+
+      return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
 }

@@ -55,6 +55,7 @@ class ShippingFeeController extends Controller
         if($request->get('status')){
             $orders = $orders->where('status', $request->get('status'));
         }
+
         if($request->get('created_from') && $request->get('created_to')){
             $orders = $orders->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
         }
@@ -112,6 +113,45 @@ class ShippingFeeController extends Controller
     public function reconciliation_link(){
         $data['reconciliation_link'] = env('shipping_fee_reconciliation_link');
         return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+
+    public function headers(Request $request){
+      $shops = $request->user()->business->shops();
+      if($request->get('shop')){
+         $shops = $shops->whereIn('id', explode(',', $request->get('shop')));
+      }
+      $shops_id = $shops->pluck('id')->toArray();
+      
+      $daterange = explode('/', $request->get('daterange'));
+
+      $pending = Order::whereIn('shop_id', $shops_id);
+      $filed = Order::whereIn('shop_id', $shops_id);
+      $resolved = Order::whereIn('shop_id', $shops_id);
+      $total = Order::whereIn('shop_id', $shops_id);
+
+      if($request->get('created_from') && $request->get('created_to')){
+            $pending = $pending->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+            $filed = $filed->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+            $resolved = $resolved->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+            $total = $total->whereBetween('created_at', [$request->get('created_from'), $request->get('created_to')]);
+      }
+
+      $pending = $pending->where('shipping_fee_reconciled', 1)->count();
+      $filed = $filed->where('shipping_fee_reconciled', 2)->count();
+      $resolved = $resolved->where('shipping_fee_reconciled', 3)->count();
+      $total = $total->where('shipping_fee_reconciled', '!=', 0)->count();
+
+      $data = [
+        'pending' => $pending,
+        'filed' => $filed,
+        'resolved' => $resolved,
+        'total' => $total,
+      ];
+      return ResponseBuilder::asSuccess(200)
                   ->withData($data)
                   ->withMessage('OK')
                   ->build();

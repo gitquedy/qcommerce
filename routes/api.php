@@ -65,12 +65,14 @@ Route::group([
       {
         Route::get('', 'Api\Reconciliation\ReturnController@index');
         Route::get('reconcile', 'Api\Reconciliation\ReturnController@reconcile');
+        Route::get('headers', 'Api\Reconciliation\ReturnController@headers');
       });
 
       Route::group(['middleware' => 'permission:shippingFeeRecon.manage', 'prefix' => 'reconciliation/shippingfee'], function()
       {
         Route::get('', 'Api\Reconciliation\ShippingFeeController@index');
-         Route::get('reconcile', 'Api\Reconciliation\ShippingFeeController@reconcile');
+        Route::get('reconcile', 'Api\Reconciliation\ShippingFeeController@reconcile');
+        Route::get('headers', 'Api\Reconciliation\ShippingFeeController@headers');
         Route::get('reconciliation_link', 'Api\Reconciliation\ShippingFeeController@reconciliation_link');
 
          
