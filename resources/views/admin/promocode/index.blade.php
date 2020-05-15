@@ -58,24 +58,6 @@
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
 @endsection
 @section('myscript')
-  {{-- Page js files --}}
-  <script type="text/javascript">
-    function getParams(){
-            var $params = "?site={{ $request->get('site') }}" + "&daterange=" + $("#daterange").val();
-            return $params;
-          }
-    function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('OrderController@headers')  }}" + getParams(),
-        success: function success(result) {     
-            $.each(result.data, function (i, item) {
-              $('#badge_' + i).html(item);
-            });
-          },
-        });     
-      }
-  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [

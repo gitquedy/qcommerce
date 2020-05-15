@@ -19,15 +19,15 @@
             </a>
         </li>
 
-        <li class="nav-item {{ $request->segment(1) == 'admin' ? 'active' : '' }}">
+        <li class="nav-item {{ $request->segment(1) == '' ? 'active' : '' }}">
             <a href="{{route('admin.dashboard')}}">
                 <i class="feather icon-home"></i>
                 <span class="menu-title" data-i18n="nav.order">Dashboard</span>
             </a>
         </li>  
 
-        <li class="{{ $request->segment(1) == 'promocode' ? 'active' : '' }}">
-            <a href="{{url('/promocode')}}">
+        <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'promocode' ? 'active' : '' }}">
+            <a href="{{url('/admin/promocode')}}">
                 <i class="feather icon-plus"></i>
                 <span class="menu-title" data-i18n="">Promocode</span>
             </a>

@@ -34,7 +34,7 @@
                   </ul>
               </div>
           @endif
-          <form action="{{ action('PromocodeController@store') }}"  class="form" method="post">
+          <form action="{{ action('Admin\PromocodeController@store') }}"  class="form" method="post">
           @csrf
           <div class="row">
               <div class="col-md-4 form-group">

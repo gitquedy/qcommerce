@@ -24,7 +24,7 @@
           <div class="card">
               <div class="card-content">
                   <div class="card-body">
-                      <form action="{{ action('PromocodeController@update', $promocode->id) }}" method="POST" class="form" enctype="multipart/form-data">
+                      <form action="{{ action('Admin\PromocodeController@update', $promocode->id) }}" method="POST" class="form" enctype="multipart/form-data">
                         @method('put')
                         @csrf
                         <div class="row">

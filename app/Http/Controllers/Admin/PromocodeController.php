@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Validator;
 use App\Promocode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class PromocodeController extends Controller
 {
@@ -18,9 +19,9 @@ class PromocodeController extends Controller
     public function index()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Admin"],['link'=> action('PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Promocode List"]
+            ['link'=>"/",'name'=>"Admin"],['link'=> action('Admin\PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Promocode List"]
         ];
-        if ( request()->ajax()) {
+        if (request()->ajax()) {
             $promocode = Promocode::orderBy('updated_at', 'desc');
             return Datatables($promocode)
             ->editColumn('code', function(Promocode $promocode) {
@@ -47,9 +48,9 @@ class PromocodeController extends Controller
 
             })
             ->addColumn('action', function(Promocode $promocode) {
-                    $edit = '<a class="dropdown-item" href="'. action('PromocodeController@edit', $promocode->id) .'"><i class="fa fa-edit" aria-hidden="true"></i> Edit</a>';
+                    $edit = '<a class="dropdown-item" href="'. action('Admin\PromocodeController@edit', $promocode->id) .'"><i class="fa fa-edit" aria-hidden="true"></i> Edit</a>';
 
-                    $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('PromocodeController@delete', $promocode->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
+                    $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('Admin\PromocodeController@delete', $promocode->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
 
                     $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$edit.$delete.'</div></div>';
                     return $actions;
@@ -57,7 +58,7 @@ class PromocodeController extends Controller
             ->rawColumns(['action','code'])
             ->make(true); 
         }
-        return view('promocode.index', [
+        return view('admin.promocode.index', [
             'breadcrumbs' => $breadcrumbs,
         ]);
     }
@@ -70,7 +71,7 @@ class PromocodeController extends Controller
     public function create()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Admin"],['link'=> action('PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Promocode  Create"]
+            ['link'=>"/",'name'=>"Admin"],['link'=> action('Admin\PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Promocode  Create"]
         ];
         
         return view('promocode.create', ['breadcrumbs' => $breadcrumbs]);
@@ -107,7 +108,7 @@ class PromocodeController extends Controller
 
             $output = ['success' => 1,
                 'msg' => 'Promocode added successfully!',
-                'redirect' => action('PromocodeController@index')
+                'redirect' => action('Admin\PromocodeController@index')
             ];
             DB::commit();
           
@@ -141,9 +142,9 @@ class PromocodeController extends Controller
     public function edit(Promocode $promocode)
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Admin"],['link'=> action('PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Edit Promocode"]
+            ['link'=>"/",'name'=>"Admin"],['link'=> action('Admin\PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Edit Promocode"]
         ];
-        return view('promocode.edit', compact('promocode', 'breadcrumbs'));
+        return view('admin.promocode.edit', compact('promocode', 'breadcrumbs'));
     }
 
     /**
@@ -178,7 +179,7 @@ class PromocodeController extends Controller
 
             $output = ['success' => 1,
                 'msg' => 'Promocode updated successfully!',
-                'redirect' => action('PromocodeController@index')
+                'redirect' => action('Admin\PromocodeController@index')
             ];
             DB::commit();
           
@@ -219,7 +220,7 @@ class PromocodeController extends Controller
 
 
     public function delete(Promocode $promocode, Request $request){
-        $action = action('PromocodeController@destroy', $promocode->id);
+        $action = action('Admin\PromocodeController@destroy', $promocode->id);
         $title = 'promocode ' . $promocode->code;
         return view('layouts.delete', compact('action' , 'title'));
     }

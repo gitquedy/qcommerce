@@ -83,7 +83,7 @@ class ProductController extends Controller
                         $image_url = $imagres[0];
                     }
                     return $image_url;
-                                    })
+                })
                 ->addColumn('getImgAndIdDisplay', function(Products $product) {
                                 return $product->getImgAndIdDisplay();
                  })

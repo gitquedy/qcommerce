@@ -100,7 +100,8 @@ class OrderController extends Controller
                               $item_list = '';
                               foreach ($order->products as $item) {
                                 if(isset($item->product)) {
-                                  $image = $item->product->Images;
+                                  $images = explode("|", $item->product->Images);
+                                  $image = $images[0];
                                   $name = $item->product->name;
                                   $sku = $item->product->SkuId;
                                 }
