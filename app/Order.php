@@ -61,6 +61,11 @@ class Order extends Model
         }else{
             $data['shipping_fee_overcharge'] = 0;
         }
+
+        if($this->products){
+            $data['products'] = $this->products;
+        }
+        
         return $data;
     }
 
