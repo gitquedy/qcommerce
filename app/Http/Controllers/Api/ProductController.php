@@ -59,6 +59,12 @@ class ProductController extends Controller
             $products = $products->orderBy($request->get('sort_by'), $sort_direction);
         }
 
+        if($request->get('ids')){
+            $products = $products->whereIn('id', explode(',', $request->get('ids')));
+        }
+
+
+
         $products = $products->paginate(100)->jsonSerialize();
         $data = ['products' => $products];
 

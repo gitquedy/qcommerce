@@ -65,7 +65,6 @@ class Order extends Model
         if($this->products){
             $data['products'] = $this->products;
         }
-        
         return $data;
     }
 
