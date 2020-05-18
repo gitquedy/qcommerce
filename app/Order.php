@@ -276,18 +276,20 @@ class Order extends Model
     }
 
 
-    public static function get_dashboard_orders($status="",$type=""){
-        $shops = Shop::get_auth_shops();
-        $shops_array = array();  
-        foreach($shops as $shopsVAL){
-            $shops_array[] = $shopsVAL->id;
-        }
-        
+    public static function get_dashboard_orders($status="",$type="", $current_user=true){
         $query = DB::table('order'); 
-        if(count($shops_array)>0){
-            $query->whereIn('shop_id',$shops_array);
-        }else{
-            return array();
+        if ($current_user) {
+            $shops = Shop::get_auth_shops();
+            $shops_array = array();  
+            foreach($shops as $shopsVAL){
+                $shops_array[] = $shopsVAL->id;
+            }
+            
+            if(count($shops_array)>0){
+                $query->whereIn('shop_id',$shops_array);
+            }else{
+                return array();
+            }
         }
         
         if($status!=""){

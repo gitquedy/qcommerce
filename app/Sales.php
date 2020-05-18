@@ -30,9 +30,11 @@ class Sales extends Model
 		return $this->hasMany('App\SaleItems', 'sales_id');
 	}
 
-    public static function get_dashboard_sales($status="",$type=""){
+    public static function get_dashboard_sales($status="",$type="",$current_user=true){
         $query = DB::table('sales'); 
-        $query->where('business_id', Auth::user()->business_id);
+        if($current_user){
+            $query->where('business_id', Auth::user()->business_id);
+        }
         if($status!=""){
            $query->where('status','=',$status); 
         }

@@ -252,7 +252,17 @@ class DashboardController extends Controller
     	            $total_orders++;
     	        }
     	    }
-    	    
+            foreach($pos_today as $KeyTo => $TodayVAL){
+                $record_dateT = date('Y-m-d H',strtotime($TodayVAL->created_at));
+                $matche_hourT = date_format($date,"Y-m-d H");
+                
+                
+                if($record_dateT==$matche_hourT){
+                    $total_price += (float) str_replace(",","",$TodayVAL->grand_total);
+                    $total_orders++;
+                }
+            }
+            
     	    $hour_data[date_format($date,"h:i A")] = $total_price;
     	    $hour_orders[date_format($date,"h:i A")] = $total_orders;
     	    
