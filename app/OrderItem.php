@@ -19,4 +19,12 @@ class OrderItem extends Model
     public function product(){
     	return $this->belongsTo(Products::class, 'product_id', 'id');
     }
+
+    public function toArray(){
+    	$data = parent::toArray();
+    	if($this->product){
+    		$data['product_details'] = $this->product;
+    	}
+    	return $data;
+    }
 }

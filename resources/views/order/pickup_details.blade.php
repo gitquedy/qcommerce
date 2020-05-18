@@ -43,16 +43,24 @@
                             </td>
                             <td class="text-left">
                                 <select class="form-control form-control" name="address_id" id="address">
+                                    @if(count($info) > 0)
                                     @foreach($info['pickup']['address_list'] as $address)
                                       <option value="{{ $address['address_id'] }}" data-detail="{{ $address['address'] }} {{ $address['district'] }} {{ $address['city'] }}"> Pickup Address - {{ $loop->iteration }}</option>
                                     @endforeach
+                                    @else
+                                    <option>No data available</option>
+                                    @endif
                                 </select>
                             </td>
                             <td class="text-left wd-20p">
                                 <select class="form-control form-controltime-slot select-timeslot" name="pickup_time_id">
+                                    @if(count($info) > 0)
                                     @foreach($info['pickup']['address_list'][0]['time_slot_list'] as $time)
                                       <option value="{{ $time['pickup_time_id'] }}">{{ $time['date'] }}</option>
                                     @endforeach
+                                     @else
+                                    <option>No data available</option>
+                                    @endif
                                 </select>
                             </td>
                             <td class="tx-medium text-left wd-30p text-address">
@@ -67,8 +75,10 @@
     </div>
 
     <div class="modal-footer">
+      @if(count($info) > 0)
       <button type="submit" class="btn btn-primary no-print btn_save"><i class="fa fa-save"></i> Confirm
       </button>
+      @endif
       <button type="button" class="btn btn-default no-print" data-dismiss="modal">Close</button>
     </div>
   </div>

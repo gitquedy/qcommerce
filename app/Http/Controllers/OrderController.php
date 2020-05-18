@@ -211,16 +211,19 @@ class OrderController extends Controller
    public function readyToShipShopee(Order $order,Request $request){
        return view ('order.ready_to_ship', compact('order'));
    }
+
    public function pickupDetailsShopee(Order $order,Request $request){
     $client = $order->shop->shopeeGetClient();
-    $info = $client->logistics->getLogisticInfo(['ordersn' => $order->ordersn])->getData();
+    $info_logistics = $client->logistics->getLogisticInfo(['ordersn' => $order->ordersn])->getData();
     $counter = 0;
-    
-    foreach($info['pickup']['address_list'] as $i){
+    $info = [];
+    foreach($info_logistics['pickup']['address_list'] as $i){
       $timeslot = 0;
       foreach($i['time_slot_list'] as $d){
-        $info['pickup']['address_list'][$counter]['time_slot_list'][$timeslot]['date'] = Carbon::createFromTimestamp($d['date'])->toDateString();
-        $timeslot += 1;
+        if(isset($d['date'])){
+          $info['pickup']['address_list'][$counter]['time_slot_list'][$timeslot]['date'] = Carbon::createFromTimestamp($d['date'])->toDateString();
+          $timeslot += 1;
+        }
       }
       $counter += 1;
     }

@@ -51,6 +51,9 @@ Route::group([
         Route::resource('order', 'Api\OrderController');
         Route::get('order/constant/statuses', 'Api\OrderController@statuses');
         Route::get('order/index/headers', 'Api\OrderController@headers');
+        Route::get('order/index/lazada/rts', 'Api\OrderController@lazadaRts');
+        Route::get('order/index/shopee/rts', 'Api\OrderController@shopeeRts');
+        Route::get('order/index/shopee/pickupDetails', 'Api\OrderController@pickupDetails');
     });
 
 

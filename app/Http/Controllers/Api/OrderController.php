@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Shop;
 use Validator;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -61,6 +62,10 @@ class OrderController extends Controller
             $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
         }
 
+        if($request->get('order_ids')){
+            $orders = $orders->whereIn('ordersn', explode(',', $request->get('order_ids')));
+        }
+
         $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();
         $data = ['orders' => $orders];
 
@@ -79,51 +84,6 @@ class OrderController extends Controller
                   ->build();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Order $order)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Order $order)
-    {
-        //
-    }
-
     public function headers(Request $request){
         $data = [];
         $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
@@ -140,6 +100,152 @@ class OrderController extends Controller
         $data['lazada_pending'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending'])->count();
         $data['shopee_pending'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP'])->count();
 
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+    public function lazadaRts(Request $request){
+        $validation = [
+            'ids' => ['required'],
+        ];
+
+        $validator = Validator::make($request->all(), $validation);
+        if ($validator->fails()) {
+            return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
+                  ->withDebugData(['error' => $validator->errors()->toArray()])
+                  ->withMessage('Invalid Inputs')
+                  ->build();
+        }
+
+        $ids = $request->get('ids');
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+        $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('ordersn', $ids);
+
+        $success = [];
+        $fail = [];
+
+        foreach($orders as $order){
+            $items = $order->getOrderItems();
+            $item_ids = $order->getItemIds($items);
+            $result = $order->readyToShip($item_ids);
+            if(isset($result['message'])){
+                $order->updateTracking();
+                $fail[$order->ordersn] = $order;
+                $fail[$order->ordersn]['message'] = $result['message'];
+                $fail[$order->ordersn]['rts_status'] = false;
+            }else{
+                $success[$order->ordersn] = $order;
+                $success[$order->ordersn]['message'] = 'Order ' . $order->ordersn . ' is now ready to ship';
+                $success[$order->ordersn]['rts_status'] = true;
+            }
+        }
+
+        $data['success'] = $success;
+        $data['fail'] = $fail;
+
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+    public function shopeeRts(Request $request){
+
+        $validation = [
+            'ordersn' => ['required'],
+            'type' => ['required', 'in:dropoff,pickup'],
+            'pickup_time_id' => ['required_if:type,pickup'],
+            'address_id' => ['required_if:type,pickup'],
+        ];
+
+        $validator = Validator::make($request->all(), $validation);
+        if ($validator->fails()) {
+            return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
+                  ->withDebugData(['error' => $validator->errors()->toArray()])
+                  ->withMessage('Invalid Inputs')
+                  ->build();
+        }
+
+        $ordersn = $request->get('ordersn');
+
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+
+        $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->where('ordersn', $ordersn);
+
+        $success = [];
+        $fail = [];
+
+        $type = $request->get('type');
+
+        foreach($orders as $order){
+            if($type == 'dropoff'){
+              $client = $order->shop->shopeeGetClient();
+              $branch = $client->logistics->getBranch(['ordersn' => $order->ordersn])->getData();
+              if(isset($branch['msg'])){
+                $request->session()->flash('flash_error', $order->ordersn. ' ' .$branch['msg']);
+                $fail[$order->ordersn] = $order;
+                $fail[$order->ordersn]['message'] = $order->ordersn. ' ' .$branch['msg'];
+                $fail[$order->ordersn]['rts_status'] = false;
+              }else{
+                  $params = ['ordersn' => $order->ordersn, 'dropoff' => ['branch_id' => $branch['branch']['branch_id']]];
+                  $result = $client->logistics->init($params)->getData();
+                  $success[$order->ordersn] = $order;
+                  $success[$order->ordersn]['message'] = $order->ordersn . 'is now ready to ship, Tracking No: ' . $result['tracking_number'];
+                  $success[$order->ordersn]['rts_status'] = true;
+              }
+            }else if($type =='pickup'){
+              $client = $order->shop->shopeeGetClient();
+              $params = ['ordersn' => $order->ordersn ,
+               'pickup' => ['pickup_time_id' => $request->pickup_time_id, 'address_id' => (int)$request->address_id]
+              ];
+              $result = $client->logistics->init($params)->getData();
+              $order->update(['tracking_no' => '123']);
+              $output = ['success' => 1,
+                            'msg' => 'Ready to ship Order Serial No: ' . $order->ordersn,
+                        ];
+            }
+        }
+
+        $data['success'] = $success;
+        $data['fail'] = $fail;
+
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+    public function pickupDetails(Request $request){
+        $validation = [
+            'ordersn' => ['required', 'exists:order,ordersn'],
+        ];
+
+        $validator = Validator::make($request->all(), $validation);
+        if ($validator->fails()) {
+            return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
+                  ->withDebugData(['error' => $validator->errors()->toArray()])
+                  ->withMessage('Invalid Inputs')
+                  ->build();
+        }
+
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+
+        $order = Order::whereIn('shop_id', $shop_ids)->where('ordersn', $request->get('ordersn'))->first();
+        if($order == null){
+            return ResponseBuilder::asError(422)
+                  ->withHttpCode(422)
+                  ->withDebugData(['error' => ['order' => $request->get('ordersn') . ' not found on current user shops']])
+                  ->withMessage('Invalid Inputs')
+                  ->build();
+        }
+        $client = $order->shop->shopeeGetClient();
+        $info = $client->logistics->getLogisticInfo(['ordersn' => $order->ordersn])->getData();
+        $counter = 0;
+        $data = ['order' => $order, 'logistics_info' => $info];
         return ResponseBuilder::asSuccess(200)
                   ->withData($data)
                   ->withMessage('OK')

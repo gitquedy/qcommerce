@@ -67,6 +67,10 @@ class ReturnController extends Controller
             $orders = $orders->orderBy($request->get('sort_by'), $sort_direction);
         }
 
+        if($request->get('order_ids')){
+            $orders = $orders->whereIn('ordersn', explode(',', $request->get('order_ids')));
+        }
+
         $orders = $orders->paginate($request->get('per_page'))->jsonSerialize();
         $data = ['orders' => $orders];
 
