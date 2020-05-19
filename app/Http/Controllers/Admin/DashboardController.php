@@ -57,6 +57,7 @@ class DashboardController extends Controller
             $today_sales += (float) str_replace(",","",$todayVAL->grand_total);
         }
         $total_orders_today = count($today) + count($pos_today);
+        $total_sales_today = number_format($today_sales);
 
         /* Hourly sales data and orders*/
         $hour_data = array();
@@ -109,8 +110,9 @@ class DashboardController extends Controller
             'total_shops' => number_format($total_shops),
             'total_shops_count' => array_reverse($shops_count),
             'total_orders_today' => number_format($total_orders_today),
-            'hour_data'=>$hour_data,
-            'hour_orders'=>$hour_orders,
+            'total_sales_today' => number_format($total_sales_today),
+            'hour_data'=> $hour_data,
+            'hour_orders'=> $hour_orders,
             'colour'=>$colour,
         ]);
     }

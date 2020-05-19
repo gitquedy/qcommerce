@@ -74,7 +74,7 @@ class PromocodeController extends Controller
             ['link'=>"/",'name'=>"Admin"],['link'=> action('Admin\PromocodeController@index'), 'name'=>"Promocode"], ['name'=>"Promocode  Create"]
         ];
         
-        return view('promocode.create', ['breadcrumbs' => $breadcrumbs]);
+        return view('admin.promocode.create', ['breadcrumbs' => $breadcrumbs]);
     }
 
     /**
