@@ -57,53 +57,34 @@ class DashboardController extends Controller
             $today_sales += (float) str_replace(",","",$todayVAL->grand_total);
         }
         $total_orders_today = count($today) + count($pos_today);
-        $total_sales_today = number_format($today_sales);
+        $total_sales_today = $today_sales;
 
         /* Hourly sales data and orders*/
-        $hour_data = array();
-        $hour_orders = array();
+        $OrderSales_data = array();
+        $OrderSales_orders = array();
         
-        $day_hour_start = date('Y-m-d 00:00:00');
+        $day_OrderSalesstart = date('Y-m-d');
         
-        $date=date_create($day_hour_start);
+        $date=date_create($day_OrderSalesstart);
 
         
-        for ($i=0; $i <24 ; $i++) { 
-            
-            if(strtotime(date_format($date,"Y-m-d H:i:s"))<time()){
-            
+        for ($i=0; $i < 30 ; $i++) {
+            $ordersToday = Order::where(DB::raw('DATE(created_at)'), $date)->get();
+            $posSalesToday = Sales::where(DB::raw('DATE(created_at)'), $date)->get();
             $total_price = 0;
             $total_orders = 0;
-            foreach($today as $KeyTo => $TodayVAL){
-                $record_dateT = date('Y-m-d H',strtotime($TodayVAL->created_at));
-                $matche_hourT = date_format($date,"Y-m-d H");
-                
-                
-                if($record_dateT==$matche_hourT){
-                    $total_price += (float) str_replace(",","",$TodayVAL->price);
-                    $total_orders++;
-                }
+            foreach ($ordersToday as $key => $value) {
+                $total_price += (float) str_replace(",","",$value->price);
+                $total_orders++;
             }
-            foreach($pos_today as $KeyTo => $TodayVAL){
-                $record_dateT = date('Y-m-d H',strtotime($TodayVAL->created_at));
-                $matche_hourT = date_format($date,"Y-m-d H");
-                
-                
-                if($record_dateT==$matche_hourT){
-                    $total_price += (float) str_replace(",","",$TodayVAL->grand_total);
-                    $total_orders++;
-                }
+            foreach($posSalesToday as $key => $value){
+                $total_price += (float) str_replace(",","",$value->grand_total);
+                $total_orders++;
             }
-            $hour_data[date_format($date,"h:i A")] = $total_price;
-            $hour_orders[date_format($date,"h:i A")] = $total_orders;
-            
-            
-            
-            date_modify($date,"+1 hours");
-            
-            }
+            $OrderSales_data[date_format($date,"Y-m-d")] = $total_price;
+            $OrderSales_orders[date_format($date,"Y-m-d")] = $total_orders;
+            date_modify($date,"-1 day");
         }
-        
     	return view('admin.dashboard.index', [
             'total_users' => number_format($total_users),
             'total_user_count' => array_reverse($user_count),
@@ -111,8 +92,8 @@ class DashboardController extends Controller
             'total_shops_count' => array_reverse($shops_count),
             'total_orders_today' => number_format($total_orders_today),
             'total_sales_today' => number_format($total_sales_today),
-            'hour_data'=> $hour_data,
-            'hour_orders'=> $hour_orders,
+            'orderSales_datas'=> array_reverse($OrderSales_data),
+            'orderSales_orders'=> array_reverse($OrderSales_orders),
             'colour'=>$colour,
         ]);
     }

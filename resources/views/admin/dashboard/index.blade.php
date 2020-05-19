@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">{!!$total_orders_today!!}</h2>
-                    <p class="mb-0">Total Orders Today **Change to last 30 days</p>
+                    <p class="mb-0">Total Orders Today</p>
                 </div>
                 <div class="card-content">
                     <div id="total-orders-chart"></div>
@@ -95,7 +95,7 @@
                         </div>
                     </div>
                     <h2 class="text-bold-700 mt-1">{!!$total_sales_today!!}</h2>
-                    <p class="mb-0">Total Sales Today **Change to last 30 days</p>
+                    <p class="mb-0">Total Sales Today</p>
                 </div>
                 <div class="card-content">
                     <div id="total-sales-chart"></div>
@@ -125,21 +125,21 @@
         
         <?php } }  ?>
 
-        var hour_order_val = [];
-        var hour_order_label = [];
-        <?php if(isset($hour_orders)){ 
-        foreach($hour_orders as $KeyHourORD => $VALHourORD){ ?>
-        hour_order_val.push(parseFloat("<?php echo $VALHourORD;?>"));
-        hour_order_label.push('<?php echo $KeyHourORD; ?>');
+        var orderSales_order_val = [];
+        var orderSales_order_label = [];
+        <?php if(isset($orderSales_orders)){ 
+        foreach($orderSales_orders as $KeyHourORD => $VALHourORD){ ?>
+        orderSales_order_val.push(parseFloat("<?php echo $VALHourORD;?>"));
+        orderSales_order_label.push('<?php echo $KeyHourORD; ?>');
         
         <?php } }  ?>
 
-        var hour_data_val = [];
-        var hour_data_label = [];
-        <?php if(isset($hour_datas)){ 
-        foreach($hour_datas as $KeyHourORD => $VALHourORD){ ?>
-        hour_data_val.push(parseFloat("<?php echo $VALHourORD;?>"));
-        hour_data_label.push('<?php echo $KeyHourORD; ?>');
+        var orderSales_data_val = [];
+        var orderSales_data_label = [];
+        <?php if(isset($orderSales_datas)){ 
+        foreach($orderSales_datas as $KeyHourORD => $VALHourORD){ ?>
+        orderSales_data_val.push(parseFloat("<?php echo $VALHourORD;?>"));
+        orderSales_data_label.push('<?php echo $KeyHourORD; ?>');
         
         <?php } }  ?>
       

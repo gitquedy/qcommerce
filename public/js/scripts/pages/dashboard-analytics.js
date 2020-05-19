@@ -199,12 +199,12 @@ var totalShopsChartoptions = {
       }
     },
     series: [{
-      name: 'Hourly Orders',
-      data: hour_order_val
+      name: 'Daily Orders',
+      data: orderSales_order_val
     }],
 
     xaxis: {
-            categories: hour_order_label,
+            categories: orderSales_order_label,
             },
     yaxis: [{
       y: 0,
@@ -264,12 +264,12 @@ var totalShopsChartoptions = {
       }
     },
     series: [{
-      name: 'Hourly Sales',
-      data: hour_data_val
+      name: 'Daily Sales',
+      data: orderSales_data_val
     }],
 
     xaxis: {
-            categories: hour_data_label,
+            categories: orderSales_data_label,
             },
     yaxis: [{
       y: 0,
