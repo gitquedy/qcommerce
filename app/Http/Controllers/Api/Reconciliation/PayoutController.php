@@ -47,9 +47,9 @@ class PayoutController extends Controller
         $shop_ids = $shops->pluck('id')->toArray();
 
         if($request->get('site') == 'lazada'){
-            $payouts = LazadaPayout::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
+            $payouts = LazadaPayout::with('shop')->whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
         }else{
-            $payouts = ShopeePayout::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
+            $payouts = ShopeePayout::with('shop')->whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
         }
         
         if($request->get('status')){
