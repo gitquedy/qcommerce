@@ -364,8 +364,7 @@ class SkuController extends Controller
     }
 
     public function skuproducts(Sku $sku,Request $request){
-
-
+        
         $all_shops = Shop::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc')->get();
         
         $breadcrumbs = [

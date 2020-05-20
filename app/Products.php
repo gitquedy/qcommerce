@@ -18,7 +18,7 @@ class Products extends Model
 {
     protected $table = 'products';
     
-    protected $fillable = ['item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at'];
+    protected $fillable = ['seller_sku_id', 'item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at'];
     
     public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
 
@@ -66,6 +66,29 @@ class Products extends Model
                 $this->touch();
             }
         }
+    }
+
+    public function lazada_get_sku_xml(){
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+        <Request>
+            <Product>
+                <Skus>
+                    <Sku>
+                        <SellerSku>'.$this->SellerSku.'</SellerSku>
+                        <price>'.$this->price.'</price>
+                        <quantity>'.$this->quantity.'</quantity>
+                    </Sku>
+                </Skus>
+            </Product>
+        </Request>';
+        return $xml;
+    }
+
+    public function lazada_sync_sku(){
+        $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+        $r = new LazopRequest('/product/update','POST');
+        $r->addApiParam('payload', $this->lazada_get_sku_xml());
+        return  $c->execute($r,$this->shop->access_token);
     }
 
     public function product_update($xml){

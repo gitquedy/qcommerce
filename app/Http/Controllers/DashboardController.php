@@ -85,6 +85,7 @@ class DashboardController extends Controller
         }
 
         $pos_today = Sales::get_dashboard_sales('', 'today');
+        
         foreach($pos_today as $todayVAL){
             $today_sales += (float) str_replace(",","",$todayVAL->grand_total);
         }

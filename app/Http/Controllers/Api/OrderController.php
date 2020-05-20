@@ -120,10 +120,10 @@ class OrderController extends Controller
                   ->build();
         }
 
-        $ids = $request->get('ids');
         $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
-        $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('ordersn', $ids);
-
+        
+        $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('ordersn', explode(',', $request->get('ids')))->get();
+        
         $success = [];
         $fail = [];
 
@@ -131,8 +131,9 @@ class OrderController extends Controller
             $items = $order->getOrderItems();
             $item_ids = $order->getItemIds($items);
             $result = $order->readyToShip($item_ids);
+          
             if(isset($result['message'])){
-                $order->updateTracking();
+                // $order->updateTracking();
                 $fail[$order->ordersn] = $order;
                 $fail[$order->ordersn]['message'] = $result['message'];
                 $fail[$order->ordersn]['rts_status'] = false;
@@ -142,7 +143,7 @@ class OrderController extends Controller
                 $success[$order->ordersn]['rts_status'] = true;
             }
         }
-
+        
         $data['success'] = $success;
         $data['fail'] = $fail;
 

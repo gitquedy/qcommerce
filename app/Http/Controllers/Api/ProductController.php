@@ -63,6 +63,10 @@ class ProductController extends Controller
             $products = $products->whereIn('id', explode(',', $request->get('ids')));
         }
 
+        if($request->get('seller_sku_ids')){
+            $products = $products->whereIn('seller_sku_ids', explode(',', $request->get('seller_sku_ids')));
+        }
+
         $products = $products->paginate(100)->jsonSerialize();
         $data = ['products' => $products];
 
