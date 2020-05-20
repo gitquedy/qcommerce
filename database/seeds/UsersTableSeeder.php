@@ -32,8 +32,14 @@ class UsersTableSeeder extends Seeder
             ['name' => 'category.manage'],
             ['name' => 'brand.manage'],
             ['name' => 'barcode.manage'],
-            ['name' => 'customer.manage'],
             ['name' => 'sales.manage'],
+            ['name' => 'warehouse.manage'],
+            ['name' => 'adjustment.manage'],
+            ['name' => 'transfer.manage'],
+            ['name' => 'customer.manage'],
+            ['name' => 'deposit.manage'],
+            ['name' => 'payment.manage'],
+            ['name' => 'settings.manage'],
         ];
         foreach($permissions as $permission){
             Permission::create($permission);

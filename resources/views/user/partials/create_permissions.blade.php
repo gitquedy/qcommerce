@@ -144,6 +144,36 @@
               <span class="">Barcode</span>
             </div></fieldset>
           </td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="warehouse.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-server"></i></span>
+              </span>
+              <span class="">Warehouse</span>
+            </div></fieldset>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="adjustment.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-repeat"></i></span>
+              </span>
+              <span class="">Adjustment</span>
+            </div></fieldset>
+          </td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="transfer.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-log-in"></i></span>
+              </span>
+              <span class="">Transfer</span>
+            </div></fieldset>
+          </td>
           <td></td>
         </tr>
       </tbody>
@@ -173,6 +203,60 @@
       </tbody>
       <thead>
         <tr>
+          <th>Offline Sales</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="sales.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
+              </span>
+              <span class="">Sales</span>
+            </div></fieldset>
+          </td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="customer.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-user-check"></i></span>
+              </span>
+              <span class="">Customer</span>
+            </div></fieldset>
+          </td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="deposit.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-dollar-sign"></i></span>
+              </span>
+              <span class="">Deposit</span>
+            </div></fieldset>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="payment.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-dollar-sign"></i></span>
+              </span>
+              <span class="">Payment</span>
+            </div></fieldset>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th>Reports</th>
           <th></th>
           <th></th>
@@ -189,6 +273,30 @@
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-file"></i></span>
               </span>
               <span class="">Reports</span>
+            </div></fieldset>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th>Settings</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="settings.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-settings"></i></span>
+              </span>
+              <span class="">Settings</span>
             </div></fieldset>
           </td>
           <td></td>

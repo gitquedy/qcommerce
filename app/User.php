@@ -48,6 +48,14 @@ use Notifiable, HasRoles;
     //     return $this->hasMany(Permission::class, 'model_id', 'id');
     // }
 
+    public static function giveOwnerPermissionToOwners(){
+        $users = User::where('role', 'Owner')->get();
+
+        foreach($users as $user){
+            $user->giveOwnerPermissions();
+        }
+    }
+
     public static function ownerPermissions(){
         $permissions = Permission::all();
         return $permissions;

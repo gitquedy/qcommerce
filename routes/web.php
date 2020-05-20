@@ -110,16 +110,16 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
 	});
 
-	// Route::group(['middleware' => 'permission:warehouse.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:warehouse.manage'], function()
+	{
 		Route::resource('/warehouse', 'WarehouseController');
 		Route::get('/warehouse/delete/{warehouse}', 'WarehouseController@delete');
 		Route::post('/warehouse/addWarehouseModal', 'WarehouseController@addWarehouseModal')->name('warehouse.addWarehouseModal');
 		Route::post('/warehouse/addWarehouseAjax', 'WarehouseController@addWarehouseAjax')->name('warehouse.addWarehouseAjax');
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:adjustment.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:adjustment.manage'], function()
+	{
 		Route::get('/adjustment/import/', 'AdjustmentController@import')->name('adjustment.import');
 		Route::post('/adjustment/import/', 'AdjustmentController@submitImport')->name('adjustment.submitImport');
 		Route::get('/adjustment/first', 'AdjustmentController@first'); //temporary remove this after update
@@ -127,15 +127,15 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/adjustment/viewAdjustmentModal/{adjustment}', 'AdjustmentController@viewAdjustmentModal')->name('adjustment.viewAdjustmentModal');
 		Route::get('/adjustment/delete/{adjustment}', 'AdjustmentController@delete');
 
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:transfer.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:transfer.manage'], function()
+	{
 		Route::resource('/transfer', 'TransferController');
 		Route::post('/transfer/viewTransferModal/{transfer}', 'TransferController@viewTransferModal')->name('transfer.viewTransferModal');
 		Route::get('/transfer/delete/{transfer}', 'TransferController@delete');
 
-	// });
+	});
 
 	Route::group(['middleware' => 'permission:supplier.manage'], function()
 	{
@@ -177,47 +177,48 @@ Route::group(['middleware' => 'auth'], function()
 	});
 
 
-	// Route::group(['middleware' => 'permission:customer.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:customer.manage'], function()
+	{
 		Route::resource('/customer', 'CustomerController');
 		Route::get('/customer/delete/{customer}', 'CustomerController@delete');
 		Route::post('/customer/addCustomerModal', 'CustomerController@addCustomerModal')->name('customer.addCustomerModal');
 		Route::post('/customer/addCustomerAjax', 'CustomerController@addCustomerAjax')->name('customer.addCustomerAjax');
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:deposit.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:deposit.manage'], function()
+	{
 		Route::resource('/deposit', 'DepositController');
 		Route::get('/deposit/delete/{deposit}', 'DepositController@delete');
 		Route::post('/deposit/viewDepositModal/{customer}', 'DepositController@viewDepositModal')->name('deposit.viewDepositModal');
 		Route::post('/deposit/addDepositModal/{customer}', 'DepositController@addDepositModal')->name('deposit.addDepositModal');
 		Route::post('/deposit/addDepositAjax', 'DepositController@addDepositAjax')->name('deposit.addDepositAjax');
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:sales.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:sales.manage'], function()
+	{
 		Route::resource('/sales', 'SalesController');
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 		Route::post('/sales/viewSalesModal/{sales}', 'SalesController@viewSalesModal')->name('sales.viewSalesModal');
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:payment.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:payment.manage'], function()
+	{
 		Route::resource('/payment', 'PaymentController');
 		Route::get('/payment/delete/{paymment}', 'PaymentController@delete');
 		Route::post('/payment/viewPaymentModal/{sales}', 'PaymentController@viewPaymentModal')->name('payment.viewPaymentModal');
 		Route::post('/payment/addPaymentModal/{sales}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
 		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');
-	// });
+	});
 
-	// Route::group(['middleware' => 'permission:settings.manage'], function()
-	// {
+	Route::group(['middleware' => 'permission:settings.manage'], function()
+	{
 		Route::resource('/settings', 'SettingsController');
 
 		Route::resource('/price_group', 'PriceGroupController');
 		Route::get('/price_group/delete/{price_group}', 'PriceGroupController@delete');
 		Route::get('/price_group/get_sku', 'PriceGroupController@getSku')->name('price_group.getSku');
-	// });
+	});
+	
 	Route::resource('/plan', 'PlanController')->only(['index', 'show']);
 	Route::get('/plan/subscribe/{plan}/{billing?}', 'PlanController@subscribe');
 	Route::get('/plan/confirm/{billing}', 'PlanController@confirm')->name('plan.confirm');
