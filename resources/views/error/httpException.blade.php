@@ -16,8 +16,7 @@
           <img src="{{ asset('images/pages/404.png') }}" class="img-fluid align-self-center" alt="branding logo">
           <h1 class="font-large-2 my-1">{{ $exception->getStatusCode()  }}- {{ $exception->getMessage() }}</h1>
           <p class="p-2">
-            paraphonic unassessable foramination Caulopteris worral Spirophyton encrimson esparcet aggerate chondrule
-            restate whistler shallopy biosystematy area bertram plotting unstarting quarterstaff.
+            Sorry for the inconvenience caused. Please try again later
           </p>
           <a class="btn btn-primary btn-lg mt-2" href="{{ url('/') }}">Back to Home</a>
         </div>

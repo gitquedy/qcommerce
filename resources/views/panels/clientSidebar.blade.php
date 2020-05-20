@@ -104,23 +104,6 @@
                     </ul>
                 </li>
             @endif
-
-
-              {{--   <li class="nav-item ">
-                    <a href="">
-                        <i class="feather icon-command "></i>
-                        <span class="menu-title" data-i18n="">Applications</span>
-                    </a>
-                    <ul class="menu-content">
-                            <li class="{{ $request->segment(1) == 'plan' && $request->segment(2) == '' ? 'active' : '' }}">
-                                <a href="{{ action('PlanController@index') }}">
-                                    <i class="feather icon-circle"></i>
-                                    <span class="menu-title" data-i18n="">Plan Store</span>
-                                </a>
-                            </li>
-                    </ul>
-                </li> --}}
-
             <hr>
             
             <li class="nav-item  ">
@@ -158,7 +141,7 @@
                 </li>
             @endcan
 
-            {{-- @can('warehouse.manage') --}}
+             @can('warehouse.manage')
                 <li class="nav-item">
                     <a href="#">
                         <i class="feather icon-box"></i>
@@ -179,9 +162,9 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('adjustment.manage') --}}
+            @can('adjustment.manage')
                 <li class="nav-item">
                     <a href="#">
                         <i class="fa fa-bar-chart"></i>
@@ -208,9 +191,9 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('transfer.manage') --}}
+            @can('transfer.manage')
                 <li class="nav-item">
                     <a href="#">
                         <i class="fa fa-exchange"></i>
@@ -231,7 +214,7 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
             @can('barcode.manage')
             <li class="nav-item {{ $request->segment(1) == 'barcode' && $request->segment(2) == '' ? 'active' : '' }}">
@@ -338,7 +321,7 @@
                 </a>
             </li>
 
-            {{-- @can('sales.manage') --}}
+            @can('sales.manage')
                 <li class="nav-item ">
                     <a href="">
                         <i class="feather icon-dollar-sign"></i>
@@ -359,9 +342,9 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('customer.manage') --}}
+            @can('customer.manage')
                 <li class="nav-item">
                     <a href="">
                         <i class="feather icon-user"></i>
@@ -382,9 +365,9 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('deposit.manage') --}}
+            can('deposit.manage')
                {{--  <li class="nav-item">
                     <a href="">
                         <i class="feather icon-menu"></i>
@@ -405,9 +388,9 @@
                         </li>
                     </ul>
                 </li> --}}
-            {{-- @endcan --}}
+            @endcan
 
-            {{-- @can('pos.settings') --}}
+            @can('pos.settings')
                 <li class="nav-item">
                     <a href="">
                         <i class="feather icon-settings"></i>
@@ -429,7 +412,7 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endcan --}}
+            @endcan 
             
         </ul>
     </div>
