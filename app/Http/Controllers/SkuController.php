@@ -141,7 +141,7 @@ class SkuController extends Controller
     
     public function add(Request $request){
         $request->validate([
-            'code' => 'required',
+            'code' => 'required|unique:sku,code,NULL,id,business_id,'.Auth::user()->business_id,
             'name' => 'required',
             'brand' => 'nullable',
             'category' => 'nullable',
@@ -217,7 +217,7 @@ class SkuController extends Controller
             return redirect('/sku');
         }
         $request->validate([
-            'code' => 'required',
+            'code' => 'required|unique:sku,code,'.$request->id.',id,business_id,'.Auth::user()->business_id,
             'name' => 'required',
             // 'brand' => 'nullable',
             // 'category' => 'nullable',

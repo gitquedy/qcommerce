@@ -33,7 +33,7 @@ class SkuImport implements ToModel, WithHeadingRow
     public function rules(): array
     {
         return [
-            'code' => 'required',
+            'code' => 'required|unique:sku,code,NULL,id,business_id,'.Auth::user()->business_id,
             'name' => 'required',
             'brand' => 'nullable',
             'category' => 'nullable',

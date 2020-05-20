@@ -199,12 +199,12 @@ var totalShopsChartoptions = {
       }
     },
     series: [{
-      name: 'Hourly Orders',
-      data: hour_order_val
+      name: 'Daily Orders',
+      data: orderSales_order_val
     }],
 
     xaxis: {
-            categories: hour_order_label,
+            categories: orderSales_order_label,
             },
     yaxis: [{
       y: 0,
@@ -224,4 +224,70 @@ var totalShopsChartoptions = {
 
   totalorderslineChart.render();
 
+  // Total Sales Chart
+  // ----------------------------------
+
+
+ var saleslineChartoptions = {
+    chart: {
+      height: 100,
+      type: 'area',
+      toolbar: {
+        show: false,
+      },
+      sparkline: {
+        enabled: true
+      },
+      grid: {
+        show: false,
+        padding: {
+          left: 0,
+          right: 0
+        }
+      },
+    },
+    colors: [$warning],
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2.5
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 0.9,
+        opacityFrom: 0.7,
+        opacityTo: 0.5,
+        stops: [0, 80, 100]
+      }
+    },
+    series: [{
+      name: 'Daily Sales',
+      data: orderSales_data_val
+    }],
+
+    xaxis: {
+            categories: orderSales_data_label,
+            },
+    yaxis: [{
+      y: 0,
+      offsetX: 0,
+      offsetY: 0,
+      padding: { left: 0, right: 0 },
+    }],
+    tooltip: {
+      x: { show: false }
+    },
+  }
+
+  var saleslineChart = new ApexCharts(
+    document.querySelector("#total-sales-chart"),
+    saleslineChartoptions
+  );
+
+  saleslineChart.render();
+
 });
+  

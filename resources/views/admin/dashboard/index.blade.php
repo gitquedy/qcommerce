@@ -38,7 +38,7 @@
     {{-- Dashboard Analytics Start --}}
     <section id="dashboard-analytics">
       <div class="row">
-        <div class="col-lg-4 col-sm-6 col-12">
+        <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
                 <div class="card-header d-flex flex-column align-items-start pb-0">
                     <div class="avatar bg-rgba-primary p-50 m-0">
@@ -54,7 +54,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-sm-6 col-12">
+        <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
                 <div class="card-header d-flex flex-column align-items-start pb-0">
                     <div class="avatar bg-rgba-success p-50 m-0">
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-sm-6 col-12">
+        <div class="col-lg-3 col-sm-6 col-12">
             <div class="card">
                 <div class="card-header d-flex flex-column align-items-start pb-0">
                     <div class="avatar bg-rgba-danger p-50 m-0">
@@ -83,6 +83,22 @@
                 </div>
                 <div class="card-content">
                     <div id="total-orders-chart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="card-header d-flex flex-column align-items-start pb-0">
+                    <div class="avatar bg-rgba-danger p-50 m-0">
+                        <div class="avatar-content">
+                            <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-bold-700 mt-1">{!!$total_sales_today!!}</h2>
+                    <p class="mb-0">Total Sales Today</p>
+                </div>
+                <div class="card-content">
+                    <div id="total-sales-chart"></div>
                 </div>
             </div>
         </div>
@@ -109,12 +125,21 @@
         
         <?php } }  ?>
 
-        var hour_order_val = [];
-        var hour_order_label = [];
-        <?php if(isset($hour_orders)){ 
-        foreach($hour_orders as $KeyHourORD => $VALHourORD){ ?>
-        hour_order_val.push(parseFloat("<?php echo $VALHourORD;?>"));
-        hour_order_label.push('<?php echo $KeyHourORD; ?>');
+        var orderSales_order_val = [];
+        var orderSales_order_label = [];
+        <?php if(isset($orderSales_orders)){ 
+        foreach($orderSales_orders as $KeyHourORD => $VALHourORD){ ?>
+        orderSales_order_val.push(parseFloat("<?php echo $VALHourORD;?>"));
+        orderSales_order_label.push('<?php echo $KeyHourORD; ?>');
+        
+        <?php } }  ?>
+
+        var orderSales_data_val = [];
+        var orderSales_data_label = [];
+        <?php if(isset($orderSales_datas)){ 
+        foreach($orderSales_datas as $KeyHourORD => $VALHourORD){ ?>
+        orderSales_data_val.push(parseFloat("<?php echo $VALHourORD;?>"));
+        orderSales_data_label.push('<?php echo $KeyHourORD; ?>');
         
         <?php } }  ?>
       

@@ -18,6 +18,9 @@ Route::group(['middleware' => 'auth'], function()
 {
 	Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function(){
 		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
+		Route::resource('/manageuser', 'Admin\UserManagementController');
+		Route::get('/manageuser/delete/{user}', 'Admin\UserManagementController@delete');
+		Route::resource('/manageshop', 'Admin\ShopManagementController')->only(['index','edit','update','destroy']);
 		Route::resource('/promocode', 'Admin\PromocodeController');
 		Route::get('/promocode/delete/{promocode}', 'Admin\PromocodeController@delete');
 		Route::post('/promocode/checkPromocode', 'Admin\PromocodeController@checkPromocode')->name('promocode.checkPromocode');
