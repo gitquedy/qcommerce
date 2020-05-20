@@ -367,7 +367,7 @@
                 </li>
             @endcan
 
-            can('deposit.manage')
+            @can('deposit.manage')
                {{--  <li class="nav-item">
                     <a href="">
                         <i class="feather icon-menu"></i>
