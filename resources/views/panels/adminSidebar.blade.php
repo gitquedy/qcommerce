@@ -33,6 +33,13 @@
             </a>
         </li>
 
+        <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'manageshop' ? 'active' : '' }}">
+            <a href="{{url('/admin/manageshop')}}">
+                <i class="feather icon-shopping-bag"></i>
+                <span class="menu-title" data-i18n="">Shop Management</span>
+            </a>
+        </li>
+
         <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'promocode' ? 'active' : '' }}">
             <a href="{{url('/admin/promocode')}}">
                 <i class="feather icon-plus"></i>
