@@ -73,7 +73,7 @@ class SkuController extends Controller
     public function store(Request $request)
     {
         $validation = [
-            'code' => 'required',
+            'code' => 'required|unique:sku,code,NULL,id,business_id,' . $request->user()->business_id,
             'name' => 'required',
             'brand' => 'nullable',
             'category' => 'nullable',
@@ -125,9 +125,8 @@ class SkuController extends Controller
      */
     public function update(Request $request, Sku $sku)
     {
-
         $validation = [
-            'code' => 'required',
+            'code' => 'required|unique:sku,code,NULL,id,business_id,' . $request->user()->business_id,
             'name' => 'required',
             'brand' => 'nullable',
             'category' => 'nullable',
@@ -261,7 +260,6 @@ class SkuController extends Controller
             }
         }
      
-
         $data = [
             'linked' => $linked,
             'unlinked' => $unlinked,
