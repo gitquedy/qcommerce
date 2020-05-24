@@ -155,7 +155,7 @@ class AdjustmentController extends Controller
             Adjustment::applyItemsOnWarehouse($adjustment->id);
             Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
 
-            if (!$request->reference_no) {
+            if (! $request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['adj' => DB::raw('adj + 1')]);
             }
             $output = ['success' => 1,
