@@ -47,6 +47,47 @@ class Shop extends Model
     public function warehouse(){
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
+
+    public function orders($status = null){
+        $orders = $this->hasMany(Order::class, 'shop_id', 'id');
+        if($status){
+            if($this->site == 'lazada'){
+                $orders->where('status', $status);
+            }else if($this->site == 'shopee'){
+                if($status == 'pending'){
+                    $orders->where('status','READY_TO_SHIP');
+                }
+                else if($status == 'ready_to_ship'){
+                    $orders->where('status','READY_TO_SHIP');
+                }
+                else if($status == 'shipped'){
+                    $orders->where('status','SHIPPED');
+                }
+                else if($status == 'delivered'){
+                   $orders->where('status','COMPLETED');
+                }
+            }
+            
+        }
+        return $orders;
+    }
+
+    public function toArray() {
+        $data = parent::toArray();
+
+        if($this->products){
+            $data['products_count'] = $this->products->count();
+        }
+
+        if($this->orders){
+            $data['pending'] = $this->orders('pending')->count();
+            $data['ready_to_ship'] = $this->orders('ready_to_ship')->count();
+            $data['shipped'] = $this->orders('shipped')->count();
+            $data['delivered'] = $this->orders('delivered')->count();
+        }
+
+        return $data;
+    }
     
     public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
@@ -341,30 +382,6 @@ class Shop extends Model
         }
     }
 
-    public function orders($status = null){
-        $orders = $this->hasMany(Order::class, 'shop_id', 'id');
-        if($status){
-            if($this->site == 'lazada'){
-                $orders->where('status', $status);
-            }else if($this->site == 'shopee'){
-                if($status == 'pending'){
-                    $orders->where('status','READY_TO_SHIP');
-                }
-                else if($status == 'ready_to_ship'){
-                    $orders->where('status','READY_TO_SHIP');
-                }
-                else if($status == 'shipped'){
-                    $orders->where('status','SHIPPED');
-                }
-                else if($status == 'delivered'){
-                   $orders->where('status','COMPLETED');
-                }
-            }
-            
-        }
-        return $orders;
-    }
-    
     public static function get_auth_shops(){
         
         $business_id = Auth::user()->business_id;
