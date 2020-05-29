@@ -93,6 +93,8 @@ Route::group([
         Route::apiResource('sku', 'Api\Inventory\SkuController')->middleware('permission:sku.manage');
         Route::apiResource('warehouse', 'Api\Inventory\WarehouseController')->middleware('permission:warehouse.manage');
         Route::apiResource('adjustment', 'Api\Inventory\AdjustmentController')->middleware('permission:adjustment.manage');
+        Route::apiResource('supplier', 'Api\Inventory\SupplierController')->middleware('permission:supplier.manage');
+        Route::apiResource('transfer', 'Api\Inventory\TransferController')->middleware('permission:transfer.manage');
         Route::group(['prefix' => 'sku','middleware' => 'permission:sku.manage'], function()
         {
           Route::post('link/{sku}', 'Api\Inventory\SkuController@link');

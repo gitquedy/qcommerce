@@ -197,9 +197,9 @@ class Products extends Model
         if(isset($product_details->skus[0]->package_height)){
         $xml .= '<package_height>'.$product_details->skus[0]->package_height.'</package_height>';
         }
-        if(isset($product_details->skus[0]->special_price)){
-        $xml .= '<special_price>'.$product_details->skus[0]->special_price.'</special_price>';
-        }
+        // if(isset($product_details->skus[0]->special_price)){
+        // $xml .= '<special_price>'.$product_details->skus[0]->special_price.'</special_price>';
+        // }
         if(isset($product_details->skus[0]->price)){
             $xml .= '<price>'.$product_details->skus[0]->price.'</price>';
         }

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\Inventory;
 use App\Http\Controllers\Controller;
 use App\Sku;
 use Illuminate\Http\Request;
-use Validator;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
 use Carbon\Carbon;
+use Validator;
 use App\Shop;
 use App\Products;
 
@@ -40,7 +40,7 @@ class SkuController extends Controller
 
         $user = $request->user();
 
-        $skus = Sku::with('products')->where('business_id',$user->business_id);
+        $skus = Sku::with('products', 'warehouse_items')->where('business_id',$user->business_id);
 
         if($request->get('id')){
             $skus = $skus->where('id', $request->get('id'));
@@ -91,6 +91,7 @@ class SkuController extends Controller
                   ->withMessage('Invalid Inputs')
                   ->build();
         }
+        
         $sku = $request->all();
         $sku['business_id'] = $request->user()->business_id;
         $sku['quantity'] = 0;
