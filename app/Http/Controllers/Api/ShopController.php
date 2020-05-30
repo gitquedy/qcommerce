@@ -56,12 +56,12 @@ class ShopController extends Controller
 
         if($request->get('total_sales_today')){
             $user->hourlySalesToday = $user->totalSalesToday($shop_ids);
-            $user->totalSalesToday = array_sum($user->hourlySalesToday);
+            $user->totalSalesToday = number_format(array_sum($user->hourlySalesToday), 2);
         }
 
         if($request->get('total_orders_today')){
             $user->hourlyOrdersToday = $user->totalOrdersToday($shop_ids);
-            $user->totalOrdersToday = array_sum($user->hourlyOrdersToday);
+            $user->totalOrdersToday = number_format(array_sum($user->hourlyOrdersToday), 2);
         }
 
         if($request->get('current_pending_orders')){
@@ -70,8 +70,9 @@ class ShopController extends Controller
 
         if($request->get('total_monthly_sales')){
             $user->monthlySales = $user->totalMonthlySales($shop_ids);
-            $user->totalMonthlySales = array_sum($user->monthlySales);
+            $user->totalMonthlySales = number_format(array_sum($user->monthlySales), 2);
         }
+        
 
         $data = ['user' => $request->user(), 'shops' => $shops];
         return ResponseBuilder::success($data);

@@ -521,13 +521,13 @@ class Shop extends Model
        $datas = ['week' => 0, 'yesterday' => 0, 'today' => 0, 'month' => 0];
        foreach($datas as $key => $val){
             if($key == 'week'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->sum('price');
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->sum('price'), 2);
             }else if($key == 'today'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->sum('price');
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->sum('price'), 2);
             }else if($key == 'yesterday'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->sum('price');
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->sum('price'), 2);
             }else if($key == 'month'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->sum('price');
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->sum('price'), 2);
             }
        }
        return (object) $datas;
@@ -537,13 +537,13 @@ class Shop extends Model
         $datas = ['week' => 0, 'yesterday' => 0, 'today' => 0, 'month' => 0];
        foreach($datas as $key => $val){
             if($key == 'week'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count(), 2);
             }else if($key == 'today'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->count();
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today())->count(), 2);
             }else if($key == 'yesterday'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->count();
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->whereDate('created_at', Carbon::today()->subDays(1))->count(), 2);
             }else if($key == 'month'){
-                $datas[$key] = $this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->count();
+                $datas[$key] = number_format($this->orders()->whereNotIn('status', Order::statusNotIncludedInSales())->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString())->count(), 2);
             }
        }
        return (object) $datas;

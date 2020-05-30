@@ -109,10 +109,9 @@ use Notifiable, HasRoles;
             if($iteration == 25){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $data[$date] = number_format(Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price'), 2);
             $iteration++;
         }
-
         return $data;
     }
 
@@ -124,7 +123,7 @@ use Notifiable, HasRoles;
             if($iteration == 25){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereBetween('created_at', [$date, $dates[$iteration]])->count();
+            $data[$date] =  number_format(Order::whereIn('shop_id', $shop_ids)->whereBetween('created_at', [$date, $dates[$iteration]])->count());
             $iteration++;
         }
         return $data;
@@ -132,9 +131,7 @@ use Notifiable, HasRoles;
 
     public function currentPendingOrders($shop_ids){
         $data = 0;
-        // $data = Order::whereIn('shop_id', $shop_ids)->whereDate('created_at', Carbon::today())->whereIn('status', ['ready_to_ship', 'pending', 'UNPAID', 'READY_TO_SHIP'])->count();
-
-        $data = Order::whereIn('shop_id', $shop_ids)->whereIn('status', ['pending'])->count();
+        $data = number_format(Order::whereIn('shop_id', $shop_ids)->whereIn('status', ['pending'])->count());
         return $data;
     }
 
@@ -146,7 +143,7 @@ use Notifiable, HasRoles;
             if($iteration == 8){ //skip last
                 continue;
             }
-            $data[$date] =  Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price');
+            $data[$date] =  number_format(Order::whereIn('shop_id', $shop_ids)->whereNotIn('status', Order::statusNotIncludedInSales())->whereBetween('created_at', [$date, $dates[$iteration]])->sum('price'), 2);
             $iteration++;
         }
         return $data;
@@ -157,7 +154,7 @@ use Notifiable, HasRoles;
     }
 
     public function imageUrl(){
-        return asset('images/profile/profile-picture/'.$this->picture);
+        return asset('images/profile/profile-picture/'. $this->picture);
     }
 
     public function getNameAndImgDisplay(){
