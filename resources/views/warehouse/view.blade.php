@@ -42,7 +42,7 @@
                               </tr>
                             </thead>
                             <tbody>
-                              @foreach($warehouse->skus as $wsku) 
+                              @forelse($warehouse->items as $wsku) 
                                 <tr>
                                   <td>{{$wsku->sku->code}}</td>
                                   <td>
@@ -56,7 +56,11 @@
                                   <td>{{$wsku->sku->name}}</td>
                                   <td>{{$wsku->quantity}}</td>
                                 </tr>
-                              @endforeach
+                              @empty
+                              <tr>
+                                <td colspan="4">Empty.</td>
+                              </tr>
+                              @endforelse
                             </tbody>
                           </table>
                         </div>
