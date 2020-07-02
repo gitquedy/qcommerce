@@ -390,7 +390,7 @@
                 </li> --}}
             @endcan
 
-            @can('pos.settings')
+            @can('settings.manage') {{-- pos.settings --}}
                 <li class="nav-item">
                     <a href="">
                         <i class="feather icon-settings"></i>
