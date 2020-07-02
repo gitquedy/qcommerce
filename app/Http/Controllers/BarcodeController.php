@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Api;
-use App\Order;
-use App\Shop;
-use App\Products;
-use App\Sku;
-use App\WarehouseItems;
-use Illuminate\Http\Request;
-use App\Lazop;
-use Carbon\Carbon;
-use App\Library\lazada\LazopRequest;
-use App\Library\lazada\LazopClient;
-use App\Library\lazada\UrlConstants;
 use App\Http\Controllers\Controller;
+use App\Lazop;
+use App\Library\lazada\LazopClient;
+use App\Library\lazada\LazopRequest;
+use App\Library\lazada\UrlConstants;
+use App\Order;
+use App\Products;
+use App\Shop;
+use App\Sku;
 use App\Utilities;
-use Validator;
-use Yajra\DataTables\Facades\DataTables;
+use App\WarehouseItems;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Validator;
+use Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class BarcodeController extends Controller
 {
@@ -140,7 +141,6 @@ class BarcodeController extends Controller
             foreach ($request->items as $sku => $qty) {
                 $shop_id = $request->shop_id;
                 $shop = Shop::find($shop_id);
-                $access_token = $shop->access_token;
                 $warehouse_id = $shop->warehouse_id;
                 $prod = Products::where('SellerSku', $sku)->where('shop_id', $shop_id)->first();
                 if(isset($prod->seller_sku_id)) {
@@ -159,7 +159,6 @@ class BarcodeController extends Controller
                     $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
                     foreach ($Sku_prod as $prod) {
                         $shop_id = $prod->shop_id;
-                        $access_token = Shop::find($shop_id)->access_token;
                         $prod = Products::where('id', $prod->id)->first();
                         $prod->quantity = $warehouse_item->quantity;
                         $prod->save();
@@ -176,7 +175,7 @@ class BarcodeController extends Controller
                             </Request>';
                         if(env('lazada_sku_sync', true)){
                             if($prod->site == 'lazada'){
-                                $response = Products::product_update($access_token,$xml);
+                                $response = $prod->product_update($xml);
                             }
                         }
                     }

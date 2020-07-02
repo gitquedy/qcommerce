@@ -289,7 +289,6 @@ class SkuController extends Controller
                 
                 foreach ($Sku_prod as $prod) {
                     $shop_id = $prod->shop_id;
-                    $access_token = Shop::find($shop_id)->access_token;
 
                     $prod = Products::where('id', $prod->id)->first();
                     $prod->$column = $request->val;
@@ -307,7 +306,7 @@ class SkuController extends Controller
                         </Request>';
                     if(env('lazada_sku_sync', true)){
                         if($prod->site == 'lazada'){
-                            $response = Products::product_update($access_token,$xml);
+                            $response = $prod->product_update($xml);
                         }
                     }
                 }
@@ -333,7 +332,6 @@ class SkuController extends Controller
             foreach ($Sku_prod as $prod) {
                 $shop_id = $prod->shop_id;
                 $Shop = Shop::find($shop_id)->first();
-                $access_token = $Shop->access_token;
                 $warehouse_id = $Shop->warehouse_id;
                 $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $s->id)->first();
                 $prod = Products::where('id', $prod->id)->first();
@@ -354,7 +352,7 @@ class SkuController extends Controller
                     </Request>';
                 if(env('lazada_sku_sync', true)){
                     if($prod->site == 'lazada'){
-                        $response = Products::product_update($access_token,$xml);
+                        $response = $prod->product_update($xml);
                     }
                 }
             }

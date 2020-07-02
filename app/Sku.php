@@ -61,7 +61,6 @@ class Sku extends Model
                 $sku->save();
                 foreach ($Sku_prod as $prod) {
                     $shop_id = $prod->shop_id;
-                    $access_token = Shop::find($shop_id)->access_token;
                     $prod = Products::where('id', $prod->id)->first();
                     $prod->quantity = $warehouse_item->quantity;
                     $prod->save();
@@ -78,7 +77,7 @@ class Sku extends Model
                         </Request>';
                     if(env('lazada_sku_sync', true)){
                         if($prod->site == 'lazada'){
-                            $response = Products::product_update($access_token,$xml);
+                            $response = $prod->product_update($xml);
                         }
                     }
                 }
@@ -104,7 +103,6 @@ class Sku extends Model
                 $sku->save();
                 foreach ($Sku_prod as $prod) {
                     $shop_id = $prod->shop_id;
-                    $access_token = Shop::find($shop_id)->access_token;
 
                     $prod = Products::where('id', $prod->id)->first();
                     $prod->quantity = $warehouse_item->quantity;
@@ -122,7 +120,7 @@ class Sku extends Model
                         </Request>';
                     if(env('lazada_sku_sync', true)){
                         if($prod->site == 'lazada'){
-                            $response = Products::product_update($access_token,$xml);
+                            $response = $prod->product_update($xml);
                         }
                     }
                 }
@@ -154,7 +152,7 @@ class Sku extends Model
                             </Product>
                         </Request>';
                     if(env('lazada_sku_sync', true)){
-                        $response = Products::product_update($access_token,$xml);
+                        $response = $prod->product_update($access_token,$xml);
                     }
                 }
                 else if($prod->site == 'shopee') {
