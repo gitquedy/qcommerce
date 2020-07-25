@@ -152,7 +152,7 @@ class Sku extends Model
                             </Product>
                         </Request>';
                     if(env('lazada_sku_sync', true)){
-                        $response = $prod->product_update($access_token,$xml);
+                        $response = $prod->product_update($xml);
                     }
                 }
                 else if($prod->site == 'shopee') {
