@@ -22,10 +22,10 @@ class CreateSkuTable extends Migration
             $table->string('brand')->nullable();
             $table->string('category')->nullable();
             $table->string('supplier')->nullable();
-            $table->float('cost', 15, 2);
+            $table->float('cost', 15, 2)->default(0);
             $table->float('price', 15, 2);
-            $table->integer('quantity');
-            $table->integer('alert_quantity');
+            $table->integer('quantity')->default(0);
+            $table->integer('alert_quantity')->default(0);
             $table->timestamps();
         });
     }

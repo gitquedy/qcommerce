@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use Validator;
-use App\Business;
-use App\Sku;
-use App\Shop;
-use App\Sales;//temp
-use App\Products;
 use App\Adjustment;
 use App\AdjustmentItems;
+use App\Business;
+use App\Imports\AdjustmentImport;
+use App\OrderRef;
+use App\Products;
+use App\Sales;
+use App\Settings;
+use App\Shop;
+use App\Sku;
 use App\Warehouse;
 use App\WarehouseItems;
-use App\OrderRef;
-use App\Settings;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Imports\AdjustmentImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Validator;
 
 class AdjustmentController extends Controller
 {
@@ -474,13 +475,31 @@ class AdjustmentController extends Controller
             ];
             DB::commit();
           
-        } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        } 
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $msg = [];
+            foreach ($failures as $failure) {
+                 $failure->row(); // row that went wrong
+                 $failure->attribute(); // either heading key (if using heading row concern) or column index
+                 $failure->errors(); // Actual error messages from Laravel validator
+                 $failure->values(); // The values of the row that has failed.
+                 foreach ($failure->errors as $error) {
+                    $msg[] = $error." Row ".$failure->row(); 
+                 }
+             }
+            // \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
-                        'msg' => 'Sorry something went wrong, please check adjustment data and try again.'
+                        'msg' =>  $msg
                     ];
-             DB::rollBack();
         }
+        // catch (\Exception $e) {
+        //     \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        //     $output = ['success' => 0,
+        //                 'msg' => 'Sorry something went wrong, please check adjustment data and try again.'
+        //             ];
+        //      DB::rollBack();
+        // }
         return response()->json($output);
     }
 }

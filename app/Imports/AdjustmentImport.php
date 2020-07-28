@@ -3,12 +3,13 @@
 namespace App\Imports;
 
 use Auth;
-use Validator;
 use App\Adjustment;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class AdjustmentImport implements ToModel, WithHeadingRow
+class AdjustmentImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
     * @param array $row

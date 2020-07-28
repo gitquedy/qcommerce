@@ -42,7 +42,7 @@
                   <tr class="text-center">
                     <th>Cost</th>
                     <th>Price</th>
-                    <th>Total Quanity</th>
+                    <th>Total Quantity</th>
                     <th>Alert Qty</th>
                   </tr>
                 </thead>
@@ -60,7 +60,7 @@
                 <thead>
                   <tr class="text-center">
                     <th>Warehouse</th>
-                    <th>Quanity</th>
+                    <th>Quantity</th>
                   </tr>
                 </thead>
                 <tbody>

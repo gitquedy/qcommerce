@@ -2,30 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Sku;
-use App\Products;
+use App\Brand;
 use App\Category;
 use App\Customer;
-use App\Brand;
-use App\Shop;
-use App\Supplier;
-use App\WarehouseItems;
-use App\PriceGroupItemPrice;
-use Illuminate\Http\Request;
-use App\Lazop;
-use Carbon\Carbon;
-use App\Library\lazada\LazopRequest;
-use App\Library\lazada\LazopClient;
-use App\Library\lazada\UrlConstants;
 use App\Http\Controllers\Controller;
+use App\Imports\SkuImport;
+use App\Lazop;
+use App\Library\lazada\LazopClient;
+use App\Library\lazada\LazopRequest;
+use App\Library\lazada\UrlConstants;
+use App\PriceGroupItemPrice;
+use App\Products;
+use App\Shop;
+use App\Sku;
+use App\Supplier;
 use App\Utilities;
+use App\WarehouseItems;
+use Auth;
+use Carbon\Carbon;
+use Helper;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\DB;
-use Helper;
-use Auth;
-use App\Imports\SkuImport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SkuController extends Controller
 {
@@ -568,21 +569,29 @@ class SkuController extends Controller
 
     public function submitImport(Request $request) {
         try {
-            DB::beginTransaction();
             if(Excel::import(new SkuImport,request()->file('file'))) {
                 $output = ['success' => 1,
                     'msg' => 'SKU Imported successfully!',
                     'redirect' => action('SkuController@index')
                 ];
             }
-            DB::commit();
           
-        } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $msg = [];
+            foreach ($failures as $failure) {
+                 $failure->row(); // row that went wrong
+                 $failure->attribute(); // either heading key (if using heading row concern) or column index
+                 $failure->errors(); // Actual error messages from Laravel validator
+                 $failure->values(); // The values of the row that has failed.
+                 foreach ($failure->errors as $error) {
+                    $msg[] = $error." Row ".$failure->row(); 
+                 }
+             }
+            // \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
-                        'msg' => 'Sorry something went wrong, please check sku data and try again.'
+                        'msg' =>  $msg
                     ];
-             DB::rollBack();
         }
         return response()->json($output);
     }

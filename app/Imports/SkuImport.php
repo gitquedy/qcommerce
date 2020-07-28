@@ -3,12 +3,13 @@
 namespace App\Imports;
 
 use Auth;
-use Validator;
 use App\Sku;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class SkuImport implements ToModel, WithHeadingRow
+class SkuImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
     * @param array $row

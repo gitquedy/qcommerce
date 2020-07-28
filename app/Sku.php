@@ -94,7 +94,7 @@ class Sku extends Model
         }
         foreach ($items as $item) {
             $sku = Sku::where('business_id','=', $user->business_id)->where('id','=', $item->sku_id)->first();
-            $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $id)->first();
+            $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $item->sku_id)->first();
             $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$item->sku_id)->orderBy('updated_at', 'desc')->get();
             if($sku){
                 $sku->quantity += $item['quantity'];
