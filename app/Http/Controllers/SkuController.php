@@ -241,10 +241,8 @@ class SkuController extends Controller
             $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
             foreach ($Sku_prod as $prod) {
                 $shop_id = $prod->shop_id;
-                $access_token = Shop::find($shop_id)->access_token;
-                $prod = Products::where('id', $prod->id)->first();
+                $access_token = $prod->shop->access_token;
                 $prod->price = $sku->price;
-                $prod->quantity = $sku->quantity;
                 $prod->save();
                     $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                     <Request>
@@ -253,7 +251,6 @@ class SkuController extends Controller
                                 <Sku>
                                     <SellerSku>'.$prod->SellerSku.'</SellerSku>
                                     <price>'.$prod->price.'</price>
-                                    <quantity>'.$prod->quantity.'</quantity>
                                 </Sku>
                             </Skus>
                         </Product>
@@ -330,12 +327,9 @@ class SkuController extends Controller
 
         foreach($sku as $s) {
             $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$s->id)->orderBy('updated_at', 'desc')->get();
+
             foreach ($Sku_prod as $prod) {
-                $shop_id = $prod->shop_id;
-                $Shop = Shop::find($shop_id)->first();
-                $warehouse_id = $Shop->warehouse_id;
-                $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $s->id)->first();
-                $prod = Products::where('id', $prod->id)->first();
+                $witem = $prod->shop->warehouse->items()->where('sku_id', $s->id)->first();
                 $prod->price = $s->price;
                 $prod->quantity = isset($witem->quantity)?$witem->quantity:0;
                 $prod->save();

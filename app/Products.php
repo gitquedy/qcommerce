@@ -60,7 +60,7 @@ class Products extends Model
                     'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],
                     'Url' => $product_details['skus'][0]['Url'],
-                    'quantity' => $product_details['skus'][0]['quantity'],
+                    // 'quantity' => $product_details['skus'][0]['quantity'],
                 ];               
                 $this->update($product_details);
                 $this->touch();

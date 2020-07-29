@@ -475,7 +475,6 @@ class AdjustmentController extends Controller
             ];
             DB::commit();
           
-        } 
         } catch (ValidationException $e) {
             $failures = $e->failures();
             $msg = [];

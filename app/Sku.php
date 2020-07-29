@@ -133,11 +133,7 @@ class Sku extends Model
         foreach ($Skus as $sku) {
             foreach ($sku->products as $prod) {
                 if($prod->site == 'lazada'){
-                    $shop_id = $prod->shop_id;
-                    $Shop = Shop::find($shop_id);
-                    $access_token = $Shop->access_token;
-                    $warehouse_id = $Shop->warehouse_id;
-                    $warehouse_item = WarehouseItems::where('sku_id', $sku->id)->where('warehouse_id', $warehouse_id)->first();
+                    $warehouse_item = $prod->shop->warehouse->items()->where('sku_id', $sku->id)->first();
                     $prod->quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
                     $prod->save();
                         $xml = '<?xml version="1.0" encoding="UTF-8" ?>
