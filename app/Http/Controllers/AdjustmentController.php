@@ -232,7 +232,7 @@ class AdjustmentController extends Controller
                 }
             }
             Adjustment::restoreItemsOnWarehouse($adjustment->id);
-            Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
+            // Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
             $adjustment->items()->delete();
             $user = Auth::user();
             $warehouse = Warehouse::where('business_id', $user->business_id)->where('id', $request->warehouse_id)->first();

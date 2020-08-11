@@ -339,8 +339,8 @@ class SkuController extends Controller
                             <Skus>
                                 <Sku>
                                     <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                    <price>'.$prod->price.'</price>
-                                    <quantity>'.$prod->quantity.'</quantity>
+                                    <Price>'.$prod->price.'</Price>
+                                    <Quantity>'.$prod->quantity.'</Quantity>
                                 </Sku>
                             </Skus>
                         </Product>

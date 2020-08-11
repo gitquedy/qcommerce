@@ -39,6 +39,13 @@
       </div>
     </div>
   </section>
+  <section id="packed_div" class="card" style="display: none;">
+    <div class="card-content">
+      <div class="card-body">
+        <button type="submit" id="packed_button" class="btn btn-lg btn-primary btn-block">Packed</button>
+      </div>
+    </div>
+  </section>
   <form id="packed_form" method="POST" class="form" enctype='multipart/form-data'>
     @method('POST')
     @csrf
@@ -97,13 +104,6 @@
             </table>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-  <section id="packed_div" class="card" style="display: none;">
-    <div class="card-content">
-      <div class="card-body">
-        <button type="submit" id="packed_button" class="btn btn-lg btn-primary btn-block">Packed</button>
       </div>
     </div>
   </section>

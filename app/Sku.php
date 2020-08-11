@@ -113,7 +113,7 @@ class Sku extends Model
                                 <Skus>
                                     <Sku>
                                         <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                        <quantity>'.$prod->quantity.'</quantity>
+                                        <Quantity>'.$prod->quantity.'</Quantity>
                                     </Sku>
                                 </Skus>
                             </Product>
@@ -129,7 +129,7 @@ class Sku extends Model
     }
 
     public static function reSyncStocks($sku_ids) {
-        $Skus = Sku::where('business_id', Auth::user()->business_id)->where('id', $sku_ids)->get();
+        $Skus = Sku::where('business_id', Auth::user()->business_id)->whereIn('id', $sku_ids)->get();
         foreach ($Skus as $sku) {
             foreach ($sku->products as $prod) {
                 if($prod->site == 'lazada'){
@@ -142,12 +142,13 @@ class Sku extends Model
                                 <Skus>
                                     <Sku>
                                         <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                        <quantity>'.$prod->quantity.'</quantity>
+                                        <Quantity>'.$prod->quantity.'</Quantity>
                                     </Sku>
                                 </Skus>
                             </Product>
                         </Request>';
-                    if(env('lazada_sku_sync', true)){
+
+         if(env('lazada_sku_sync', true)){
                         $response = $prod->product_update($xml);
                     }
                 }

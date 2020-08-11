@@ -54,9 +54,9 @@
           <tr>
             <th>Image</th>
             <th>Name</th>
-            <th>Brand</th>
+            {{-- <th>Brand</th> --}}
             <th>Supplier</th>
-            <th>Category</th>
+            {{-- <th>Category</th> --}}
             <th>Cost</th>
             <th>Price</th>
             <th>SupplierID</th>
@@ -103,9 +103,9 @@
               }
             },
             { data: 'name', name: 'name'},
-            { data: 'brand_name', name: 'brand_name'},
+            // { data: 'brand_name', name: 'brand_name'},
             { data: 'supplier_name', name: 'supplier_name'},
-            { data: 'category_name', name: 'category_name'},
+            // { data: 'category_name', name: 'category_name'},
             { data: 'cost', name: 'cost'},
             { data: 'price', name: 'price'},
             { data: 'supplier', name: 'supplier', visible: false}
