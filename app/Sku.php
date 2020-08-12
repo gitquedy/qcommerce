@@ -128,8 +128,13 @@ class Sku extends Model
         }
     }
 
-    public static function reSyncStocks($sku_ids) {
-        $Skus = Sku::where('business_id', Auth::user()->business_id)->whereIn('id', $sku_ids)->get();
+    public static function reSyncStocks($sku_ids, $skip_user = false) {
+        if ($skip_user) {
+            $Skus = Sku::whereIn('id', $sku_ids)->get();
+        }
+        else {
+            $Skus = Sku::where('business_id', Auth::user()->business_id)->whereIn('id', $sku_ids)->get();
+        }
         foreach ($Skus as $sku) {
             foreach ($sku->products as $prod) {
                 if($prod->site == 'lazada'){

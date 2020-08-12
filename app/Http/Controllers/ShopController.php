@@ -141,7 +141,7 @@ class ShopController extends Controller
         try {
             $data = $request->all();
             DB::beginTransaction();
-            if($data['code'] != null){
+            if($data['code'] != null && $data['shop_id'] == null){
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
                 $r = new LazopRequest("/auth/token/create");
                 $r->addApiParam("code", $data['code']);
@@ -175,6 +175,7 @@ class ShopController extends Controller
                     'redirect' => action('ShopController@index')
                 ];
             }else if($data['shop_id'] != null){
+
                 $client = new \Shopee\Client([
                     'secret' => Shopee::shopee_app_key(),
                     'partner_id' => Shopee::shopee_partner_id(),

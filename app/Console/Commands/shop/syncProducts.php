@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands\shop;
 
-use Illuminate\Console\Command;
+use App\Products;
 use App\Shop;
+use App\Sku;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class syncProducts extends Command
 {
@@ -45,6 +47,8 @@ class syncProducts extends Command
                 $shop->syncLazadaProducts();
                 $shop->touch();
             }
+        $sku_id = Products::where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
+        Sku::reSyncStocks($sku_id, true);
         echo 'Synced products successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
     }
 }
