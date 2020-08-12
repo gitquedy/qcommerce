@@ -148,7 +148,7 @@ class Shop extends Model
                         $items = [];
                         foreach ($data['data'] as $item) {
                             $item_id = $item['sku'];
-                            $product = Products::where('SellerSku', $item_id)->first();
+                            $product = Products::where('shop_id', $this->id)->where('SellerSku', $item_id)->first();
                             if($product != null){
                                 if(!in_array($item_id, $item_ids)) {
                                     array_push($item_ids, $item_id);
@@ -341,7 +341,7 @@ class Shop extends Model
                     $record = Order::updateOrCreate(
                     ['ordersn' => $orders_details['ordersn']], $orders_details);
                     foreach($order['items'] as $item){
-                        $product = Products::where('item_id', $item['item_id'])->first();
+                        $product = Products::where('shop_id', $this->id)->where('item_id', $item['item_id'])->first();
                         if($product != null){
                             $item_detail = [
                                 'order_id' => $record->id,
@@ -449,7 +449,7 @@ class Shop extends Model
                     $record = Products::updateOrCreate(
                     ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                 }
-                Products::whereIn('item_id', $delete_item_ids)->delete();
+                Products::where('shop_id', $this->id)->whereIn('item_id', $delete_item_ids)->delete();
             }
         }
     }
