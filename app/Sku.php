@@ -128,8 +128,8 @@ class Sku extends Model
         }
     }
 
-    public static function reSyncStocks($sku_ids, $skip_user = false) {
-        if ($skip_user) {
+    public static function reSyncStocks($sku_ids, $cron = false) {
+        if ($cron) {
             $Skus = Sku::whereIn('id', $sku_ids)->get();
         }
         else {
@@ -137,10 +137,10 @@ class Sku extends Model
         }
         foreach ($Skus as $sku) {
             foreach ($sku->products as $prod) {
+                $warehouse_item = $prod->shop->warehouse->items()->where('sku_id', $sku->id)->first();
+                $prod->quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
+                $prod->save();
                 if($prod->site == 'lazada'){
-                    $warehouse_item = $prod->shop->warehouse->items()->where('sku_id', $sku->id)->first();
-                    $prod->quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
-                    $prod->save();
                         $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                         <Request>
                             <Product>
@@ -153,7 +153,7 @@ class Sku extends Model
                             </Product>
                         </Request>';
 
-         if(env('lazada_sku_sync', true)){
+                    if(env('lazada_sku_sync', true)){
                         $response = $prod->product_price_quantity_update($xml);
                     }
                 }

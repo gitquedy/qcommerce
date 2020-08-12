@@ -51,7 +51,7 @@ class ProductController extends Controller
         ];
 
         if ( request()->ajax()) {
-               $Products = Products::with('shop')->orderBy('updated_at', 'desc');
+               $Products = Products::orderBy('updated_at', 'desc'); ///with('shop')->
                
                if($request->get('shop') != ''){
                     $Products->where('shop_id', $request->get('shop'));
