@@ -97,6 +97,13 @@ class Products extends Model
         $r->addApiParam('payload', $xml);
         return  $c->execute($r,$this->shop->access_token);
     }
+
+    public function product_price_quantity_update($xml){
+        $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+        $r = new LazopRequest('/product/price_quantity/update','POST');
+        $r->addApiParam('payload', $xml);
+        return  $c->execute($r,$this->shop->access_token);
+    }
     
     
     public function getDetails(){

@@ -175,7 +175,7 @@ class BarcodeController extends Controller
                             </Request>';
                         if(env('lazada_sku_sync', true)){
                             if($prod->site == 'lazada'){
-                                $response = $prod->product_update($xml);
+                                $response = $prod->product_price_quantity_update($xml);
                             }
                         }
                     }
