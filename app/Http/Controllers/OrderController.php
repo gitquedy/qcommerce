@@ -52,17 +52,17 @@ class OrderController extends Controller
 
      if ( request()->ajax()) {
            $shops = $request->user()->business->shops;
+
            if($request->get('shop') != ''){
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
-
            }
            $shops_id = $shops->pluck('id')->toArray();
            $status = $request->get('status');
            if($status == 'all') {
-              $orders = Order::with('shop')->whereIn('shop_id', $shops_id);
+              $orders = Order::whereIn('shop_id', $shops_id); //with('shop')->
            }
            else {
-              $orders = Order::with('shop')->whereIn('shop_id', $shops_id)->where('status', $status);
+              $orders = Order::whereIn('shop_id', $shops_id)->where('status', $status); //with('shop')->
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
