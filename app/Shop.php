@@ -430,35 +430,20 @@ class Shop extends Model
                 }
 
                 foreach($products as $product_details){
-                    // $product_details = [
-                    // 'shop_id' => $this->id,
-                    // 'site' => 'lazada',
-                    // 'SkuId' => $product_details['skus'][0]['SkuId'],
-                    // 'SellerSku' => $product_details['skus'][0]['SellerSku'],
-                    // 'item_id' => $product_details['item_id'],
-                    // 'price' =>  $product_details['skus'][0]['price'],
-                    // 'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
-                    // 'name' => $product_details['attributes']['name'],
-                    // 'Status' => $product_details['skus'][0]['Status'],
-                    // 'Url' => $product_details['skus'][0]['Url'],
-                    // 'quantity' => $product_details['skus'][0]['quantity'],
-                    // 'created_at' => date('Y-m-d H:i:s'),
-                    // 'updated_at' => date('Y-m-d H:i:s'),
-                    // ];
                     $product_details = [
                     'shop_id' => $this->id,
-                    // 'site' => 'lazada',
-                    // 'SkuId' => $product_details['skus'][0]['SkuId'],
-                    // 'SellerSku' => $product_details['skus'][0]['SellerSku'],
+                    'site' => 'lazada',
+                    'SkuId' => $product_details['skus'][0]['SkuId'],
+                    'SellerSku' => $product_details['skus'][0]['SellerSku'],
                     'item_id' => $product_details['item_id'],
                     'price' =>  $product_details['skus'][0]['price'],
                     'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
-                    // 'name' => $product_details['attributes']['name'],
+                    'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],
-                    // 'Url' => $product_details['skus'][0]['Url'],
+                    'Url' => $product_details['skus'][0]['Url'],
                     'quantity' => $product_details['skus'][0]['quantity'],
-                    // 'created_at' => date('Y-m-d H:i:s'),
-                    // 'updated_at' => date('Y-m-d H:i:s'),
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
                     ];
                     $delete_item_ids = array_diff( $delete_item_ids, [$product_details['item_id']]);
                     $record = Products::updateOrCreate(
