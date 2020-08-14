@@ -105,7 +105,6 @@ class Products extends Model
         return  $c->execute($r,$this->shop->access_token);
     }
     
-    
     public function getDetails(){
         $access_token = Shop::find($this->shop_id)->access_token;
         $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
@@ -326,6 +325,11 @@ class Products extends Model
     public function shopeeGetItemDetail(){
         $client = $this->shop->shopeeGetClient();
         return $client->item->getItemDetail(['item_id' => (int) $this->item_id])->getData();
+    }
+
+    public function shopeeUpdateStock($data) { //TESTING ... NOT WORKING
+        $client = $this->shop->shopeeGetClient();
+        return $client->item->updateStock($data);
     }
     
     public static function remove_product($products=array()){

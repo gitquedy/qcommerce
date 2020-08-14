@@ -158,7 +158,16 @@ class Sku extends Model
                     }
                 }
                 else if($prod->site == 'shopee') {
-                    //
+                    $data = [
+                        "item_id" => $prod->item_id,
+                        "stock" => $prod->quantity,
+                        "partner_id" => env('shopee_partner_id'),
+                        "shopid" => $prod->shop->shop_id,
+                        "timestamp" => strtotime("now"),
+                    ];
+                    if(env('lazada_sku_sync', true)){
+                        $prod->shopeeUpdateStock($data); // Not Working .. WIP
+                    }
                 }
             }
         }
