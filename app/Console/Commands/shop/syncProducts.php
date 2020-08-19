@@ -44,11 +44,14 @@ class syncProducts extends Command
         $shops = Shop::all();
             foreach($shops as $shop){
                 $shop->syncShopeeProducts(Carbon::now()->subDays(15)->format('Y-m-d'), '+2 day');
-                $shop->syncLazadaProducts();
+                $test = $shop->syncLazadaProducts();
+                echo "TEST LOGS :: ".$test;
                 $shop->touch();
+                $sku_id = $shop->products()->where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
+                Sku::reSyncStocks($sku_id, true);
             }
-        $sku_id = Products::where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
-        Sku::reSyncStocks($sku_id, true);
+        // $sku_id = Products::where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
+        
         echo 'Synced products successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
     }
 }

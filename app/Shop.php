@@ -428,7 +428,7 @@ class Shop extends Model
                     }
                     $offset += 20;
                 }
-
+                $product_update_or_create_result = [];
                 foreach($products as $product_details){
                     $product_details = [
                     'shop_id' => $this->id,
@@ -445,11 +445,14 @@ class Shop extends Model
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                     ];
+
                     $delete_item_ids = array_diff( $delete_item_ids, [$product_details['item_id']]);
                     $record = Products::updateOrCreate(
                     ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                    $product_update_or_create_result[] = $record;
                 }
                 Products::where('shop_id', $this->id)->whereIn('item_id', $delete_item_ids)->delete();
+                return $product_update_or_create_result
             }
         }
     }
@@ -495,23 +498,25 @@ class Shop extends Model
         foreach($products as $product){
             if(isset($product['item_id'])){
                 $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData(); 
-                if(count($product_details['item']) > 0){
-                    $product_details = [
-                    'shop_id' => $this->id,
-                    'site' => 'shopee',
-                    'SkuId' => $product_details['item']['item_sku'],
-                    'SellerSku' => $product_details['item']['item_sku'],
-                    'item_id' => $product_details['item']['item_id'],
-                    'price' => $product_details['item']['price'],
-                    'Images' => implode('|', $product_details['item']['images']),
-                    'name' => $product_details['item']['name'],
-                    'Status' => $product_details['item']['status'],
-                    'quantity' => $product_details['item']['stock'],
-                    'created_at' => Carbon::createFromTimestamp($product_details['item']['create_time'])->toDateTimeString(),
-                    'updated_at' => Carbon::createFromTimestamp($product_details['item']['update_time'])->toDateTimeString(),
-                    ];
-                    $record = Products::updateOrCreate(
-                    ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                if (isset($product_details['item'])) {
+                    if(count($product_details['item']) > 0){
+                        $product_details = [
+                        'shop_id' => $this->id,
+                        'site' => 'shopee',
+                        'SkuId' => $product_details['item']['item_sku'],
+                        'SellerSku' => $product_details['item']['item_sku'],
+                        'item_id' => $product_details['item']['item_id'],
+                        'price' => $product_details['item']['price'],
+                        'Images' => implode('|', $product_details['item']['images']),
+                        'name' => $product_details['item']['name'],
+                        'Status' => $product_details['item']['status'],
+                        'quantity' => $product_details['item']['stock'],
+                        'created_at' => Carbon::createFromTimestamp($product_details['item']['create_time'])->toDateTimeString(),
+                        'updated_at' => Carbon::createFromTimestamp($product_details['item']['update_time'])->toDateTimeString(),
+                        ];
+                        $record = Products::updateOrCreate(
+                        ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                    }
                 }
             }
         }
