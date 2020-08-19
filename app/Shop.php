@@ -452,7 +452,7 @@ class Shop extends Model
                     $product_update_or_create_result[] = $record;
                 }
                 Products::where('shop_id', $this->id)->whereIn('item_id', $delete_item_ids)->delete();
-                return $product_update_or_create_result
+                return $product_update_or_create_result;
             }
         }
     }
