@@ -45,7 +45,6 @@ class ReportsController extends Controller
 
 
     public function outOfStock(){
-        $Suppliers = Supplier::auth_supplier();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@outOfStock'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
         ];
@@ -75,7 +74,7 @@ class ReportsController extends Controller
                     //                    return  $Brand->name;
                     //                 }
                     //                 else {
-                    //                     return "";
+                    //                     return "--";
                     //                 }
                     //             })
                     ->addColumn('supplier_name', function(Sku $SKSU) {
@@ -84,19 +83,17 @@ class ReportsController extends Controller
                                        return  $Supplier->company;
                                     }
                                     else {
-                                        return "";
+                                        return "--";
                                     }
                                 })
                     ->make(true);
             }
         return view('reports.out_of_stock', [
             'breadcrumbs' => $breadcrumbs,
-            'suppliers' => $Suppliers,
         ]);
     }
 
     public function productAlert(){
-        $Suppliers = Supplier::auth_supplier();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@productAlert'), 'name'=>"Reports"], ['name'=>"Product Alert"]
         ];
@@ -126,7 +123,7 @@ class ReportsController extends Controller
                                    return  $Brand->name;
                                 }
                                 else {
-                                    return "";
+                                    return "--";
                                 }
                             })
                 ->addColumn('supplier_name', function(Sku $SKSU) {
@@ -135,14 +132,13 @@ class ReportsController extends Controller
                                    return  $Supplier->company;
                                 }
                                 else {
-                                    return "";
+                                    return "--";
                                 }
                             })
                 ->make(true);
             }
         return view('reports.product_alert', [
             'breadcrumbs' => $breadcrumbs,
-            'suppliers' => $Suppliers,
         ]);
     }
     public function topSellingProducts(Request $request){

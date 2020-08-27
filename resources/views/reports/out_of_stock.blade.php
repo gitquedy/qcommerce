@@ -33,18 +33,6 @@
 
 
 <section id="data-list-view" class="data-list-view-header">
-    <div class="action-btns d-none">
-      <div class="btn-dropdown mr-1 mb-1">
-        <div class="btn-group dropdown column-filter">
-          <select class="column-select s2" data-column="7">
-            <option value="">All Supplier</option>
-            @foreach($suppliers as $supplier):
-              <option value="{{$supplier->id}}">{{$supplier->company}} <span class="text-secondary">({{$supplier->contact_person}})</span></option>
-            @endforeach;
-          </select>
-        </div>
-      </div>
-    </div>
 
     {{-- DataTable starts --}}
     <div class="table-responsive">
@@ -154,6 +142,88 @@
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
+
+
+
+  var table = '';
+$(document).ready(function () {
+  "use strict";
+    table = $(".data-list-view").DataTable({
+        processing: true,
+        serverSide: false,
+        ajax: table_route,
+        columns: columnns,
+        createdRow: created_row_function,
+        drawCallback: (typeof draw_callback_function === "function")  ? draw_callback_function : function(){},
+        responsive: !1,
+        columnDefs: [{
+            orderable: false,
+            targets: 0,
+            checkboxes: {
+                selectRow: !0
+            },
+        }],
+        dom: '<"top"<"actions action-btns"B><"action-filters"lf>><"clear">rt<"bottom"<"actions">p>',
+        oLanguage: {
+            sLengthMenu: "_MENU_",
+            sSearch: ""
+        },
+        aLengthMenu: aLengthMenu,
+        select: {
+            selector: "first-child",
+            style: "multi",
+        },
+        bInfo: typeof BInfo !== 'undefined' ? BInfo : true,
+        bFilter: typeof bFilter !== 'undefined' ? bFilter : true,
+        pageLength: pageLength,
+        "aaSorting": [],
+        // order: [[1, 'asc']],
+        buttons: buttons,
+        initComplete: function(t, e) {
+            $(".dt-buttons .btn").removeClass("btn-secondary")
+            this.api().columns(2).every( function () {
+              var column = this;
+              $('.data-list-view .head .head_hide').html('');
+
+              $('<div class="btn-group dropdown column-filter" style="box-shadow: none" ></div>')
+                  .appendTo( $(".actions.action-btns"));
+
+              var select = $('<select id="SupplierFilter" class="form-control"><option value="">All</option></select>')
+                  .appendTo( $(".column-filter"))
+                  .on( 'change', function () {
+                      var val = $.fn.dataTable.util.escapeRegex(
+                          $(this).val()
+                      );
+                      column
+                          .search( val ? '^'+val+'$' : '', true, false )
+                          .draw();
+                  });
+
+              column.data().unique().sort().each( function ( d, j ) {
+                  select.append( '<option value="'+d+'">'+d+'</option>' )
+              });
+            }); 
+        }
+    });
+
+  // To append actions dropdown before add new button
+  var actionDropdown = $(".actions-dropodown")
+  actionDropdown.insertBefore($(".top .actions .dt-buttons"))
+  var columnFilter = $(".column-filter")
+  columnFilter.insertAfter($(".top .actions .dt-buttons"))
+
+  // Scrollbar
+  if ($(".data-items").length > 0) {
+    new PerfectScrollbar(".data-items", { wheelPropagation: false });
+  }
+
+  // Close sidebar
+  $(".hide-data-sidebar, .cancel-data-btn").on("click", function () {
+    $(".add-new-data").removeClass("show");
+    $(".overlay-bg").removeClass("show");
+    $("#data-name, #data-price").val("");
+    $("#data-category, #data-status").prop('selectedIndex', 0);
+  });
+});
 </script>
-<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 @endsection
