@@ -21,7 +21,8 @@
     <div class="col-sm-12">
       <div class="card">
         <div class="card-body">
-          <form action="{{ action('SettingsController@store') }}" method="POST" class="form" enctype="multipart/form-data">
+          <form action="{{ route('settings.update', $settings->id) }}" method="POST" class="form" enctype="multipart/form-data">
+            @method('PUT')
             @csrf
             <h3>Order Prefix</h3>
             <hr>
@@ -121,11 +122,23 @@
                   </div>
               </div>
             </div>
+            <hr>
+            <h3>Customer Settings</h3>
+            <hr>
             <div class="row">
               <div class="col-6">
                 <div class="form-group">
-                    <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
+                    <select class="form-control select2" name="customer_name_format">
+                      <option value="Fnam Lname"  @if("Fnam Lname" == $settings->customer_name_format) selected @endif>FirstName LastName</option>
+                      <option value="Lname, Fname"  @if("Lname, Fname" == $settings->customer_name_format) selected @endif>LastName, FirstName</option>
+                    </select>
                 </div>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-6">
+                <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">
               </div>
             </div>
           </form>
@@ -144,5 +157,11 @@
 @endsection
 @section('myscript')
 <script type="text/javascript">
+  $(document).ready(function(){
+        $(".select2").select2({
+          dropdownAutoWidth: true,
+          width: '100%'
+        });
+    }); 
 </script>
 @endsection

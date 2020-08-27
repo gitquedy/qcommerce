@@ -27,15 +27,24 @@ class Customer extends Model
      */
 
     public function formatName() {
-        return $this->last_name.", ".$this->first_name;
-    }
-
-    public function business(){
-        return $this->belongsTo(Business::class, 'business_id', 'id');
+      $format = $this->business->settings->customer_name_format;
+      switch ($format) {
+        case "Lname, Fname":
+            return $this->last_name.", ".$this->first_name;
+          break;
+        case "Fname Lname":
+        default:
+            return $this->first_name." ".$this->last_name;
+          break;
+      }
     }
     
     public function fullName(){
         return $this->first_name . ' ' . $this->last_name;
+    }
+
+    public function business(){
+        return $this->belongsTo(Business::class, 'business_id', 'id');
     }
     
     public function price_group_data(){

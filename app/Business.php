@@ -25,6 +25,10 @@ class Business extends Model
 		return $this->hasMany(Shop::class, 'business_id', 'id');
 	}
 
+	public function settings() {
+		return $this->hasOne(Settings::class, 'business_id', 'id');
+	}
+
     public function subscription() {
     	return Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->first();
     }

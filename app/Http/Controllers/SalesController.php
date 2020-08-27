@@ -38,7 +38,7 @@ class SalesController extends Controller
                     return $sales->customer->formatName();
                 }
                 else {
-                    return $sales->customer_last_name.', '.$sales->customer_first_name;
+                    return $sales->savedCustomer();
                 }
             })   
             ->addColumn('balance', function(Sales $sales) {

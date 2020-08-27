@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Adjustment extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'business_id', 'date', 'reference_no', 'warehouse_id', 'note', 'created_by', 'updated_by'
     ];
 

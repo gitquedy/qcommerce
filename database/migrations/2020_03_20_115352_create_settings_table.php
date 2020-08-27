@@ -25,6 +25,7 @@ class CreateSettingsTable extends Migration
             $table->string('payment_prefix')->default('PAY');
             $table->string('return_prefix')->default('SR');
             $table->string('adjustment_prefix')->default('ADJ');
+            $table->string('customer_name_format')->default('Fnam Lname');
             $table->timestamps();
         });
     }

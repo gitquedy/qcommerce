@@ -122,7 +122,7 @@ Route::group(['middleware' => 'auth'], function()
 	{
 		Route::get('/adjustment/import/', 'AdjustmentController@import')->name('adjustment.import');
 		Route::post('/adjustment/import/', 'AdjustmentController@submitImport')->name('adjustment.submitImport');
-		Route::get('/adjustment/first', 'AdjustmentController@first'); //temporary remove this after update
+		// Route::get('/adjustment/first', 'AdjustmentController@first'); //temporary, remove this after update
 		Route::resource('/adjustment', 'AdjustmentController');
 		Route::post('/adjustment/viewAdjustmentModal/{adjustment}', 'AdjustmentController@viewAdjustmentModal')->name('adjustment.viewAdjustmentModal');
 		Route::get('/adjustment/delete/{adjustment}', 'AdjustmentController@delete');

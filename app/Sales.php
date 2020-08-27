@@ -18,6 +18,23 @@ class Sales extends Model
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
 	}
 
+    public function savedCustomer(){
+        $format = $this->business->settings->customer_name_format;
+        switch ($format) {
+            case "Lname, Fname":
+                return $this->customer_last_name.", ".$this->customer_first_name;
+              break;
+            case "Fname Lname":
+            default:
+                return $this->customer_first_name." ".$this->customer_last_name;
+              break;
+        }
+    }
+
+    public function business(){
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
+
     public function payments(){
         return $this->hasMany(Payment::class, 'sales_id', 'id');
     }

@@ -342,48 +342,48 @@ class AdjustmentController extends Controller
 
 
     //Temporary
-    public function first() {
-        echo date("F d, Y H:i:s")."<br>";
-        echo "Start ".date("F d, Y H:i:s")."<br>";
-        $business = Business::all();
-        foreach ($business as $bus) {
-            echo "Business : ".$bus->id." :: ".$bus->name."<br>";
-            $warehouse = Warehouse::updateOrCreate(
-                ['business_id' => $bus->id, 'code' => 'DFLT'],
-                ['name' => 'Default Warehouse', 'address' => $bus->location]
-            );
-            echo "Warehouse : ".$warehouse->id." :: ".$warehouse->name."<br>";
-            $Shops = Shop::where('business_id', $bus->id)->get();
-            foreach ($Shops as $shop) {
-                $shop->warehouse_id = $warehouse->id;
-                $shop->save();
-            }
-            echo "Shops warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
-            $Sales = Sales::where('business_id', $bus->id)->get();
-            foreach ($Sales as $sale) {
-                $sale->warehouse_id = $warehouse->id;
-                $sale->save();
-            }
-            echo "Sales warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
+    // public function first() {
+    //     echo date("F d, Y H:i:s")."<br>";
+    //     echo "Start ".date("F d, Y H:i:s")."<br>";
+    //     $business = Business::all();
+    //     foreach ($business as $bus) {
+    //         echo "Business : ".$bus->id." :: ".$bus->name."<br>";
+    //         $warehouse = Warehouse::updateOrCreate(
+    //             ['business_id' => $bus->id, 'code' => 'DFLT'],
+    //             ['name' => 'Default Warehouse', 'address' => $bus->location]
+    //         );
+    //         echo "Warehouse : ".$warehouse->id." :: ".$warehouse->name."<br>";
+    //         $Shops = Shop::where('business_id', $bus->id)->get();
+    //         foreach ($Shops as $shop) {
+    //             $shop->warehouse_id = $warehouse->id;
+    //             $shop->save();
+    //         }
+    //         echo "Shops warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
+    //         $Sales = Sales::where('business_id', $bus->id)->get();
+    //         foreach ($Sales as $sale) {
+    //             $sale->warehouse_id = $warehouse->id;
+    //             $sale->save();
+    //         }
+    //         echo "Sales warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
 
-            $Skus = Sku::where('business_id', $bus->id)->get();
-            foreach ($Skus as $sku) {
-                if($sku->quantity > 0) {
-                    echo "SKU : ".$sku->id." :: ".$sku->name."<br>";
-                    $warehouse_items = WarehouseItems::updateOrCreate(
-                    ['warehouse_id' => $warehouse->id, 'sku_id' => $sku->id],
-                    ['quantity' => $sku->quantity, 'avg_cost' => $sku->cost]
-                    );
-                    echo "Warehouse Item: ".$warehouse_items->warehouse_id." :: ".$warehouse_items->sku_id."<br>";
-                }
-                else {
-                    echo "Skipping SKU : ".$sku->id." :: ".$sku->name." for quantity is equal to 0<br>";
-                }
-            }
-        }
+    //         $Skus = Sku::where('business_id', $bus->id)->get();
+    //         foreach ($Skus as $sku) {
+    //             if($sku->quantity > 0) {
+    //                 echo "SKU : ".$sku->id." :: ".$sku->name."<br>";
+    //                 $warehouse_items = WarehouseItems::updateOrCreate(
+    //                 ['warehouse_id' => $warehouse->id, 'sku_id' => $sku->id],
+    //                 ['quantity' => $sku->quantity, 'avg_cost' => $sku->cost]
+    //                 );
+    //                 echo "Warehouse Item: ".$warehouse_items->warehouse_id." :: ".$warehouse_items->sku_id."<br>";
+    //             }
+    //             else {
+    //                 echo "Skipping SKU : ".$sku->id." :: ".$sku->name." for quantity is equal to 0<br>";
+    //             }
+    //         }
+    //     }
 
-        echo "Finished ".date("F d, Y H:i:s")."<br>";
-    }
+    //     echo "Finished ".date("F d, Y H:i:s")."<br>";
+    // }
 
     public function import() {
         $breadcrumbs = [

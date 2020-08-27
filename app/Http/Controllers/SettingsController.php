@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Auth;
 use Validator;
 use App\Settings;
-use App\OrderRef;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,10 +21,10 @@ class SettingsController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Settings"], ['name'=>"General Settings"]
         ];
        
-        $Settings = Settings::where('business_id', Auth::user()->business_id)->first();
+        $s = Settings::where('business_id', Auth::user()->business_id)->first();
         return view('settings.index', [
             'breadcrumbs' => $breadcrumbs,
-            'settings' => $Settings,
+            'settings' => $s,
         ]);
     }
 
@@ -47,17 +46,52 @@ class SettingsController extends Controller
      */
     public function store(Request $request)
     {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Settings  $settings
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Settings $settings)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Settings  $settings
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Settings $settings)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Settings  $settings
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $settings)
+    {
+        $settings = Settings::where('id', $settings)->first();
         $validator = Validator::make($request->all(),[
-            'sales_prefix' => 'required|string|max:255',
-            'quote_prefix' => 'required|string|max:255',
-            'purchase_prefix' => 'required|string|max:255',
-            'transfer_prefix' => 'required|string|max:255',
-            'delivery_prefix' => 'required|string|max:255',
-            'payment_prefix' => 'required|string|max:255',
-            'return_prefix' => 'required|string|max:255',
-            'adjustment_prefix' => 'required|string|max:255',
+            'sales_prefix' => 'required|string|max:191',
+            'quote_prefix' => 'required|string|max:191',
+            'purchase_prefix' => 'required|string|max:191',
+            'transfer_prefix' => 'required|string|max:191',
+            'delivery_prefix' => 'required|string|max:191',
+            'payment_prefix' => 'required|string|max:191',
+            'return_prefix' => 'required|string|max:191',
+            'adjustment_prefix' => 'required|string|max:191',
+            'customer_name_format' => 'required|string|max:191',
         ]);
-        
 
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
@@ -65,14 +99,13 @@ class SettingsController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $data = $request->except(['_token', 'store_type']);
+            $data = $request->except(['_token', '_method']);
 
-            $q = Settings::where('business_id', $user->business_id)->first();
             foreach ($data as $col => $val) {
-                $q->$col = $val;
+                $settings->$col = $val;
             }
-            $q->save();
-
+            $settings->save();
+ 
             $output = ['success' => 1,
                 'msg' => 'Settings updated successfully!',
                 'redirect' => action('SettingsController@index')
@@ -87,52 +120,16 @@ class SettingsController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Settings  $Settings
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Settings $Settings)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Settings  $Settings
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Settings $Settings)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Settings  $Settings
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Settings $Settings)
-    {
-        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Settings  $Settings
+     * @param  \App\Settings  $settings
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Settings $Settings)
+    public function destroy(Settings $settings)
     {
         //
     }
-
 }
