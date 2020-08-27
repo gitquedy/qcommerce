@@ -100,7 +100,7 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  @forelse($customer->sales as $sale)
+                                  @foreach($customer->sales as $sale)
                                     <tr>
                                       <td class="text-center">{{$sale->date}}</td>
                                       <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $sale->id) }}">{{$sale->reference_no}}</a></td>
@@ -149,11 +149,7 @@
                                         @endphp
                                       </td>
                                     </tr>
-                                  @empty
-                                    <tr>
-                                      <td class="text-center" colspan="3">No Sales Data</td>
-                                    </tr>
-                                  @endforelse
+                                  @endforeach
                                 </tbody>
                               </table>
                             </div>
@@ -175,7 +171,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                                @forelse($customer->payments as $pay)
+                                @foreach($customer->payments as $pay)
                                   <tr>
                                     <td class="text-center">{{$pay->date}}</td>
                                     <td class="text-center">{{$pay->reference_no}}</td>
@@ -196,11 +192,7 @@
                                         }
                                         @endphp</td>
                                   </tr>
-                                @empty
-                                  {{-- <tr>
-                                    <td class="text-center" colspan="5">No Payment Data</td>
-                                  </tr> --}}
-                                @endforelse
+                                @endforeach
                               </tbody>
                             </table>
                           </div>
@@ -221,7 +213,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                                  @forelse($customer->deposits as $deposit)
+                                  @foreach($customer->deposits as $deposit)
                                     <tr>
                                       <td>{{$deposit->date}}</td>
                                       <td>{{$deposit->reference_no}}</td>
@@ -230,11 +222,7 @@
                                       <td>{{$deposit->created_by_name->formatName()}}</td>
                                       <td>{{($deposit->updated_by_name)?$deposit->updated_by_name->formatName():'--'}}</td>
                                     </tr>
-                                  @empty
-                                    {{-- <tr>
-                                      <td class="text-center" colspan="6">No Deposit</td>
-                                    </tr> --}}
-                                  @endforelse
+                                  @endforeach
                               </tbody>
                             </table>
                           </div>
