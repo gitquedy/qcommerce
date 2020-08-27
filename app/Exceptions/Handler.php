@@ -50,9 +50,9 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         // dd($exception instanceof NotFoundHttpException);
-       // if ($request->wantsJson() || $request->expectsJson() || $request->isJson()) {
-       //      return $this->handleApiException($request, $exception);
-       // }
+       if ($request->wantsJson() || $request->expectsJson() || $request->isJson()) {
+            return $this->handleApiException($request, $exception);
+       }
 
         if ($this->isHttpException($exception) && !($request->wantsJson())) {
             return response()->view('error.httpException', compact('exception'), $exception->getStatusCode());
