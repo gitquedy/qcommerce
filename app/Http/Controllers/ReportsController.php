@@ -102,12 +102,12 @@ class ReportsController extends Controller
                 $business_id = Auth::user()->business_id;
                 $Sku = Sku::where('business_id','=',$business_id)->whereRaw('quantity <= alert_quantity')->where('quantity','>', 0)->orderBy('updated_at', 'desc');
                 return Datatables::eloquent($Sku)
-                ->addColumn('category_name', function(Sku $SKSU) {
-                                $category = Category::find($SKSU->category);
-                                if($category){
-                                   return  $category->name;
-                                }
-                            })
+                // ->addColumn('category_name', function(Sku $SKSU) {
+                //                 $category = Category::find($SKSU->category);
+                //                 if($category){
+                //                    return  $category->name;
+                //                 }
+                //             })
                 ->addColumn('image', function(Sku $SKSU) {
                                 $products = Products::where('seller_sku_id', $SKSU->id)->first();
                                 if($products){
@@ -117,15 +117,15 @@ class ReportsController extends Controller
                                     return asset('images/pages/no-img.jpg');
                                 }
                             })
-                ->addColumn('brand_name', function(Sku $SKSU) {
-                                $Brand = Brand::find($SKSU->brand);
-                                if($Brand){
-                                   return  $Brand->name;
-                                }
-                                else {
-                                    return "--";
-                                }
-                            })
+                // ->addColumn('brand_name', function(Sku $SKSU) {
+                //                 $Brand = Brand::find($SKSU->brand);
+                //                 if($Brand){
+                //                    return  $Brand->name;
+                //                 }
+                //                 else {
+                //                     return "--";
+                //                 }
+                //             })
                 ->addColumn('supplier_name', function(Sku $SKSU) {
                                 $Supplier = Supplier::find($SKSU->supplier);
                                 if($Supplier){
