@@ -446,13 +446,13 @@ class Shop extends Model
                     'updated_at' => date('Y-m-d H:i:s'),
                     ];
 
-                    $delete_item_ids = array_diff( $delete_item_ids, [$product_details['item_id']]);
+                    // $delete_item_ids = array_diff( $delete_item_ids, [$product_details['item_id']]);
                     
                     //bago pa ma update ... kukunin ko na seller_sku_id
-                    $seller_sku_id = $this->products->where('item_id', $product_details['item_id'])->first();
-                    if($seller_sku_id) {
-                        $seller_sku_id = $seller_sku_id->seller_sku_id;
-                    }
+                    // $seller_sku_id = $this->products->where('item_id', $product_details['item_id'])->first();
+                    // if($seller_sku_id) {
+                    //     $seller_sku_id = $seller_sku_id->seller_sku_id;
+                    // }
 
 
                     //eto yung update/create
@@ -460,16 +460,16 @@ class Shop extends Model
 
 
                     //pang identify kung na update or na bagong create yung record
-                    $record_result = "";
-                    if($record->wasRecentlyCreated) {
-                        $record_result = "Created";
-                    }
-                    else if($record->wasChanged()) {
-                        $record_result = "Updated";
-                    }
-                    else {
-                        $record_result = "--";
-                    }
+                    // $record_result = "";
+                    // if($record->wasRecentlyCreated) {
+                    //     $record_result = "Created";
+                    // }
+                    // else if($record->wasChanged()) {
+                    //     $record_result = "Updated";
+                    // }
+                    // else {
+                    //     $record_result = "--";
+                    // }
 
                     //pang log
                     $product_update_or_create_result[] =  [
@@ -480,7 +480,8 @@ class Shop extends Model
                         'method' => $record_result //update or create
                     ];
                 }
-                Products::where('shop_id', $this->id)->whereIn('item_id', $delete_item_ids)->delete();
+                // remove ntn to bry
+                // Products::where('shop_id', $this->id)->whereIn('item_id', $delete_item_ids)->delete();
                 return $product_update_or_create_result;
             }
         }
