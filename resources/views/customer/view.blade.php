@@ -2,7 +2,13 @@
 @extends('layouts/contentLayoutMaster')
 
 @section('title', 'View Customer')
-
+@section('mystyle')
+<style>
+  table.dataTable td.dataTables_empty {
+      text-align: center;    
+  }
+</style>
+@endsection
 @section('content')
 <section id="floating-label-layouts">
   <div class="row match-height">
@@ -97,7 +103,7 @@
                                   @forelse($customer->sales as $sale)
                                     <tr>
                                       <td class="text-center">{{$sale->date}}</td>
-                                      <td class="text-center">{{$sale->reference_no}}</td>
+                                      <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $sale->id) }}">{{$sale->reference_no}}</a></td>
                                       <td class="text-center">
                                           @php
                                           switch ($sale->status) {
@@ -145,7 +151,7 @@
                                     </tr>
                                   @empty
                                     <tr>
-                                      <td class="text-center" colspan="5">No Sales Data</td>
+                                      <td class="text-center" colspan="3">No Sales Data</td>
                                     </tr>
                                   @endforelse
                                 </tbody>
@@ -191,9 +197,9 @@
                                         @endphp</td>
                                   </tr>
                                 @empty
-                                  <tr>
+                                  {{-- <tr>
                                     <td class="text-center" colspan="5">No Payment Data</td>
-                                  </tr>
+                                  </tr> --}}
                                 @endforelse
                               </tbody>
                             </table>
@@ -225,9 +231,9 @@
                                       <td>{{($deposit->updated_by_name)?$deposit->updated_by_name->formatName():'--'}}</td>
                                     </tr>
                                   @empty
-                                    <tr>
+                                    {{-- <tr>
                                       <td class="text-center" colspan="6">No Deposit</td>
-                                    </tr>
+                                    </tr> --}}
                                   @endforelse
                               </tbody>
                             </table>
@@ -248,7 +254,7 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
-  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
@@ -261,8 +267,24 @@
     $('.select2').select2();
     $('.datatables').DataTable({
       dom: '<"top"><"clear">rt<"bottom"<"actions">p>',
+      order: [[ 0, "desc" ]]
     });
-  </script>
+    function created_row_function(row, data, dataIndex){
+
+    }
+    $(document).on('click', '.toggle_view_modal', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).data('action'),
+            method: "POST",
+            data: {},
+            success:function(result)
+            {
+                $('.view_modal').html(result).modal();
+            }
+        });
+    });
+  </script> 
 <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
 
