@@ -25,7 +25,14 @@ class Sku extends Model
     // protected $fillable = ['business_id','item_id', 'shop_id', 'SellerSku', 'primary_category', 'name', 'brand', 'supplier' , 'cost', 'price', 'quantity', 'Available', 'updated_at', 'created_at'];
     protected $fillable = ['business_id','code', 'name', 'brand', 'category', 'supplier', 'cost', 'price' , 'quantity', 'alert_quantity'];
     
-    
+    public function SkuImage() {
+        if($this->products->first()) {
+            return explode('|',$this->products->first()->Images)[0];
+        }
+        else {
+            return asset('images/pages/no-img.jpg');
+        }
+    }
     
     public function category(){
 		return $this->belongsTo(Category::class, 'category','id');

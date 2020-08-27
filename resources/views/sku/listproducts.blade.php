@@ -33,7 +33,7 @@
       <div class="col-xl-3 col-md-6 col-sm-12">
         <div class="card">
           <div class="card-content">
-            <img class="card-img-top img-fluid" src="{{ $sku->products->first() ? explode(',',$sku->products->first()->Images)[0] : asset('images/pages/no-img.jpg') }}"
+            <img class="card-img-top img-fluid" src="{{ $sku->SkuImage() }}"
               alt="Card image cap">
             <div class="card-body">
               <h5>{{ $sku->code }} - {{ $sku->name }}</h5>
