@@ -42,15 +42,21 @@
       </div>
       <div class="row">
         <div class="col-md-12">
+          @php
+          $balance = $sales->grand_total - $sales->paid;
+          @endphp
           <div class="card border-light">
+            <div class="card-header">
+              <p class="text-secondary" >Balance : <span class="text-warning">{{$balance}}</span></p>
+              <p class="text-secondary" >Total Amount : <span class="text-primary">{{$sales->grand_total}}</span></p>
+              <p class="text-secondary" >Total Paid : <span class="text-primary">{{$sales->paid}}</span></p>
+            </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
                   <label>Amount</label>
                   <div class="position-relative has-icon-left">
-                    @php
-                    $balance = $sales->grand_total - $sales->paid;
-                    @endphp
+                    
                     <input type="number" name="amount" class="form-control" max="{{$balance}}">
                     <div class="form-control-position"> 
                       <i class="feather icon-dollar-sign"></i>
@@ -156,6 +162,17 @@
                       <div class="form-control-position"> 
                         <i class="feather icon-gift"></i>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="deposit payment_type_ext" style="display: none">
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="gift_card_no">Current Deposit Balance:</label>
+                    <div class="position-relative has-icon-left">
+                      <h3 class="text-primary">{{ number_format($sales->customer->available_deposit(), 2) }}</h3>
                     </div>
                   </div>
                 </div>
