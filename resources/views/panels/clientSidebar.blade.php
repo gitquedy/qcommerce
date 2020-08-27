@@ -53,7 +53,7 @@
             
             @can('product.manage')
                 <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
-                    <a href="{{url('/product')}}?site=lazada">
+                    <a href="{{url('/product')}}?site=lazada&status=active">
                         <i class="feather icon-package "></i>
                         <span class="menu-title" data-i18n="">Products</span>
                     </a>

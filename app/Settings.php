@@ -16,7 +16,7 @@ class Settings extends Model
      * @var array
      */
     protected $fillable = [
-        'sales_prefix', 'quote_prefix', 'purchase_prefix', 'transfer_prefix', 'delivery_prefix', 'payment_prefix', 'return_prefix', 'adjustment_prefix', 'customer_name_format'
+        'sales_prefix', 'quote_prefix', 'purchase_prefix', 'transfer_prefix', 'delivery_prefix', 'payment_prefix', 'return_prefix', 'adjustment_prefix', 'customer_name_format', 'business_id'
     ];
 
     

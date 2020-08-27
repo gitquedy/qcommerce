@@ -29,6 +29,10 @@ class Products extends Model
 		return $this->belongsTo(Shop::class, 'shop_id','id');
 	}
 
+    public function sku(){
+        return $this->belongsTo(Sku::class, 'seller_sku_id', 'id');
+    }
+
     public function getImgAndIdDisplay(){
         return '<div class="text-primary font-medium-2 text-bold-600">'. $this->item_id .' </div>' . $this->shop->getImgSiteDisplay();
     }

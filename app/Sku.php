@@ -144,7 +144,7 @@ class Sku extends Model
         }
         foreach ($Skus as $sku) {
             foreach ($sku->products as $prod) {
-                $warehouse_item = $prod->shop->warehouse->items()->where('sku_id', $sku->id)->first();
+                $warehouse_item = $prod->sku->warehouse_items->first();
                 $prod->quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
                 $prod->save();
                 if($prod->site == 'lazada'){
