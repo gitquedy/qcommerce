@@ -310,73 +310,77 @@ class DashboardController extends Controller
             $last_30_range = Helper::dateRange($start_last_30,$end_last_30);
             
     	    
-    	    foreach($today as $todayVAL){
-    	        if($todayVAL->shop_id==$ShopVAL->id){
-    	            $today_order++;
-    	        }
-    	    }
 
-            foreach($pos_today as $pos_todayVAL){
-                    $today_order++;
-            }
-    	    
-    	    
-    	    foreach($monthly as $monthlyVAL){
-    	        if($monthlyVAL->shop_id==$ShopVAL->id){
-    	            $rec_dt = date('Y-m-d',strtotime($monthlyVAL->created_at));
-    	            
-    	            $monthly_order++;
-    	            foreach($week_range as $weekDAte){
-    	                
-    	                $wmtch = $weekDAte;
-    	                if($wmtch==$rec_dt){
-    	                    $last_7_days_order++;
-    	                }
-    	                
-    	            }
-    	            
-    	            if($rec_dt==$yesterday_date){
-    	                    $yesterday_orders++;
-    	                } 
-    	        }
-    	    }
-            foreach($pos_monthly as $pos_monthlyVAL){
-                    $rec_dt = date('Y-m-d',strtotime($pos_monthlyVAL->date));
-                    
-                    $monthly_order++;
-                    foreach($week_range as $weekDAte){
-                        
-                        $wmtch = $weekDAte;
-                        if($wmtch==$rec_dt){
-                            $last_7_days_order++;
+            if($ShopVAL->id != "POS") {
+        	    foreach($today as $todayVAL){
+        	        if($todayVAL->shop_id==$ShopVAL->id){
+        	            $today_order++;
+        	        }
+        	    }
+
+        	    foreach($monthly as $monthlyVAL){
+        	        if($monthlyVAL->shop_id==$ShopVAL->id){
+        	            $rec_dt = date('Y-m-d',strtotime($monthlyVAL->created_at));
+        	            
+        	            $monthly_order++;
+        	            foreach($week_range as $weekDAte){
+        	                
+        	                $wmtch = $weekDAte;
+        	                if($wmtch==$rec_dt){
+        	                    $last_7_days_order++;
+        	                }
+        	                
+        	            }
+        	            
+        	            if($rec_dt==$yesterday_date){
+        	                    $yesterday_orders++;
+        	                } 
+        	        }
+        	    }
+
+                foreach($last_6_month as $last_6_monthVAL){
+                    if($last_6_monthVAL->shop_id==$ShopVAL->id){
+                        foreach($last_30_range as $last_30_rangeVAL){
+                            $rec_dtcc = date('Y-m-d',strtotime($last_6_monthVAL->created_at));
+                            $wmtchcc = $last_30_rangeVAL;
+                            if($rec_dtcc==$wmtchcc){
+                                $last_30_days_order++;
+                            }
                         }
                         
                     }
-                    
-                    if($rec_dt==$yesterday_date){
-                        $yesterday_orders++;
-                    } 
+                }
             }
-    	    
-    	    
-    	    foreach($last_6_month as $last_6_monthVAL){
-    	        if($last_6_monthVAL->shop_id==$ShopVAL->id){
-    	            foreach($last_30_range as $last_30_rangeVAL){
-    	                $rec_dtcc = date('Y-m-d',strtotime($last_6_monthVAL->created_at));
-    	                $wmtchcc = $last_30_rangeVAL;
-    	                if($rec_dtcc==$wmtchcc){
-    	                    $last_30_days_order++;
-    	                }
-    	            }
-    	            
-    	        }
-    	    }
-            foreach($pos_last_6_month as $pos_last_6_monthVAL){
-                foreach($last_30_range as $last_30_rangeVAL){
-                    $rec_dtcc = date('Y-m-d',strtotime($pos_last_6_monthVAL->date));
-                    $wmtchcc = $last_30_rangeVAL;
-                    if($rec_dtcc==$wmtchcc){
-                        $last_30_days_order++;
+            else {
+                foreach($pos_today as $pos_todayVAL){
+                        $today_order++;
+                }
+
+                foreach($pos_monthly as $pos_monthlyVAL){
+                        $rec_dt = date('Y-m-d',strtotime($pos_monthlyVAL->date));
+                        
+                        $monthly_order++;
+                        foreach($week_range as $weekDAte){
+                            
+                            $wmtch = $weekDAte;
+                            if($wmtch==$rec_dt){
+                                $last_7_days_order++;
+                            }
+                            
+                        }
+                        
+                        if($rec_dt==$yesterday_date){
+                            $yesterday_orders++;
+                        } 
+                }
+
+                foreach($pos_last_6_month as $pos_last_6_monthVAL){
+                    foreach($last_30_range as $last_30_rangeVAL){
+                        $rec_dtcc = date('Y-m-d',strtotime($pos_last_6_monthVAL->date));
+                        $wmtchcc = $last_30_rangeVAL;
+                        if($rec_dtcc==$wmtchcc){
+                            $last_30_days_order++;
+                        }
                     }
                 }
             }
