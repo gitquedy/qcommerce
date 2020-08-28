@@ -162,6 +162,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        Oseintow\Shopify\ShopifyServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -232,6 +233,7 @@ return [
         'Helper' => App\Helpers\Helper::class,
         'PayPal' => Srmklive\PayPal\Facades\PayPal::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Shopify' => Oseintow\Shopify\Facades\Shopify::class,
     ],
 
 ];

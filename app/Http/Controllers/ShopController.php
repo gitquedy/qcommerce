@@ -102,9 +102,11 @@ class ShopController extends Controller
         $breadcrumbs = [
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
+        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         // die(var_dump(request()->session()));
         return view('shop.create', [
-          'breadcrumbs' => $breadcrumbs
+          'breadcrumbs' => $breadcrumbs,
+          'warehouses' => $warehouses
         ]);
     }
 

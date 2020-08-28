@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a016d28a2b78d573c802a229acb5139",
+    "content-hash": "f6deb598147988ea0de3c6817ebb9e37",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1584,6 +1584,54 @@
                 "serialize"
             ],
             "time": "2019-11-29T22:36:02+00:00"
+        },
+        {
+            "name": "oseintow/laravel-shopify",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oseintow/laravel-shopify.git",
+                "reference": "e7d3c13d8894f985b2a4328bb137fd847fc8abca"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oseintow/laravel-shopify/zipball/e7d3c13d8894f985b2a4328bb137fd847fc8abca",
+                "reference": "e7d3c13d8894f985b2a4328bb137fd847fc8abca",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "illuminate/support": "^6.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Oseintow\\Shopify\\ShopifyServiceProvider"
+                    ],
+                    "aliases": {
+                        "Shopify": "Oseintow\\Shopify\\Facades\\Shopify"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Oseintow\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "michael osei ntow",
+                    "email": "oseintow@gmail.com"
+                }
+            ],
+            "description": "Laravel shopify package",
+            "time": "2019-12-17T04:14:32+00:00"
         },
         {
             "name": "paragonie/random_compat",

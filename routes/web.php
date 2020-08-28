@@ -66,6 +66,10 @@ Route::group(['middleware' => 'auth'], function()
 	{
 		Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 		Route::resource('/shop', 'ShopController');
+		Route::group(['prefix' => 'shopify'], function(){
+			Route::get('/install', 'ShopifyController@install');
+			Route::get('/getAccessToken', 'ShopifyController@getAccessToken');
+		});
 	});
 	
 	Route::group(['middleware' => 'permission:barcode.manage'], function()
