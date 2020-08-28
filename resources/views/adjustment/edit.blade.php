@@ -128,8 +128,9 @@
                                       <thead>
                                         <tr>
                                           <th class="text-center" width="65%">Product (Code - Name)</th>
-                                          <th class="text-center" width="15%">Type</th>
-                                          <th class="text-center" width="15%">Quantity</th>
+                                          <th class="text-center" width="10%">Current Stock</th>
+                                          <th class="text-center" width="10%">Type</th>
+                                          <th class="text-center" width="10%">Quantity</th>
                                           <th class="text-center" width="5%"><i class="feather icon-trash"></i></th>
                                         </tr>
                                       </thead>
@@ -151,6 +152,18 @@
                                             </div>
                                           </td>
                                           <td>
+                                            @php
+                                              $warehouse_qty = App\WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item->sku->id)->first()->quantity;
+                                              if($item->type == "addition") {
+                                                $datamax = $warehouse_qty - $item->quantity;
+                                              }
+                                              else if($item->type == "subtraction") {
+                                                $datamax = $warehouse_qty + $item->quantity;
+                                              }
+                                            @endphp
+                                            <h4 class="text-center"> {{$datamax}} </h4>
+                                          </td>
+                                          <td>
                                             <div class="media">
                                               <select name="adjustment_item_array[{{$item->id}}][type]" data-array_name="type" class="form-control change_sku sku_select_tye original_sku_type" placeholder="Select Type">
                                                 <option value="addition" @if($item->type == "addition") selected @endif>Addition</option>
@@ -163,15 +176,7 @@
                                               <div class="input-group-prepend d-none d-md-inline-block">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>
                                               </div>
-                                              @php
-                                              $warehouse_qty = App\WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item->sku->id)->first()->quantity;
-                                              if($item->type == "addition") {
-                                                $datamax = $warehouse_qty - $item->quantity;
-                                              }
-                                              else if($item->type == "subtraction") {
-                                                $datamax = $warehouse_qty + $item->quantity;
-                                              }
-                                              @endphp
+                                              
                                               <input type="number" name="adjustment_item_array[{{$item->id}}][quantity]" min="1" data-max="{{$datamax}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
                                               <div class="input-group-append d-none d-md-inline-block h-100">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>
@@ -184,8 +189,9 @@
                                       <tfoot>
                                         <tr>
                                           <th class="text-center text-muted text-sm">[Product (Code - Name)]</th>
-                                          <th class="text-center text-muted text-sm">[Quantity]</th>
+                                          <th class="text-center text-muted text-sm">[Current Stock]</th>
                                           <th class="text-center text-muted text-sm">[Type]</th>
+                                          <th class="text-center text-muted text-sm">[Quantity]</th>
                                           <th class="text-center text-muted"><i class="feather icon-trash"></i></th>
                                         </tr>
                                       </tfoot>
@@ -359,6 +365,9 @@
                             '<input type="hidden" name="adjustment_item_array['+i+'][code]" value="'+data.code+'" />'+
                           '</div>'+
                         '</div>'+
+                      '</td>'+
+                      '<td>'+
+                        '<h4 class="text-center">'+((datamax > 0)?datamax:0)+'</h4>'+
                       '</td>'+
                       '<td>'+
                         '<div class="media">'+

@@ -475,13 +475,12 @@ class SkuController extends Controller
             }
             $result = $sku->get();
             foreach ($result as &$r) {
-                $products = Products::where('seller_sku_id', $r->id)->first();
-                if($products){
-                   $r->image = $products->Images;
+                if($warehouse != 'none' && !$withQTY) {
+                    $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first()->quantity;
+                    $r->quantity = ($qty)?$qty:0;
                 }
-                else {
-                    $r->image = asset('images/pages/no-img.jpg');
-                }
+
+                $r->image = $r->SkuImage();
                 if ($customer_id != 'none') {
                     $customer = Customer::where('business_id', Auth::user()->business_id)->where('id', $customer_id)->first();
                     $price_group_item = PriceGroupItemPrice::where('price_group_id', $customer->price_group)->where('sku_id', $r->id)->first();
