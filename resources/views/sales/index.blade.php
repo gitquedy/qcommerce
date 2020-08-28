@@ -109,6 +109,7 @@
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
+
 </script>
 <script type="text/javascript">
     $(document).on('click', '.toggle_view_modal', function(e) {
@@ -125,4 +126,28 @@
     });
 </script> 
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    table.order( [ 1, 'desc' ] ).draw();
+    $(document).on('click', '.payment_delete', function(e) {
+        e.preventDefault();
+        var href = $(this).attr('href');
+        $.ajax({
+          method: "DELETE",
+          dataType: "JSON",
+          url: href,
+          success: function success(result) {     
+              if(result.success == true){
+                toastr.success(result.msg);
+                table.ajax.reload();
+              }else{
+                if(result.msg){
+                  toastr.error(result.msg);
+                }
+              }
+          },
+        }); 
+    });
+  }) 
+</script>
 @endsection

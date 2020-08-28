@@ -28,7 +28,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label>Bank Referencce No.</label>
+                <label>Bank Reference No.</label>
                 <div class="position-relative has-icon-left">
                   <input type="text" class="form-control update_input" name="reference_no" placeholder="Reference No.">
                   <div class="form-control-position">

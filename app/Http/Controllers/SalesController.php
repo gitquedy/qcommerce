@@ -450,7 +450,7 @@ class SalesController extends Controller
 
     public function delete(Sales $sales, Request $request){
       if($sales->business_id != Auth::user()->business_id){
-          abort(401, 'You don\'t have access to edit this sales');
+          abort(401, 'You don\'t have access to delete this sales');
       }
         $action = action('SalesController@destroy', $sales->id);
         $title = 'Sale ' . $sales->reference_no;

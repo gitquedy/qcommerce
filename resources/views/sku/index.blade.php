@@ -46,6 +46,20 @@
       </div>
     </div>
 
+
+    <div class="additional_custom_filter">
+      <div class="dataTables_length" id="DataTables_Table_0_warehouse">
+        <label>
+          <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm" id="warehouse">
+            <option value="">All Warehouse</option>
+            @foreach($all_warehouse as $warehouse)
+              <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+            @endforeach
+          </select>
+        </label>
+      </div>
+    </div>
+
     {{-- DataTable starts --}}
     <div class="table-responsive">
         
@@ -61,6 +75,7 @@
             <!-- <th>Brand</th> -->
             <!-- <th>Category</th> -->
             <!-- <th>Supplier</th> -->
+            <th>Linked Shop</th>
             <th>Cost</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -114,6 +129,7 @@
               },
             },
             { data: 'name', name: 'name'},
+            { data: 'link_shop', name: 'link_shop'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity'},
@@ -124,9 +140,7 @@
   var table_route = {
           url: '{{ route('sku.index') }}',
           data: function (data) {
-                data.shop = $("#shop").val();
-                data.status = $("#status").val();
-                data.timings = $("#timings").val();
+                data.warehouse = $("#warehouse").val();
             }
         };
   var buttons = [
@@ -143,14 +157,19 @@
     if(data['products_count'] < 1){
         $(row).addClass('text-danger bold font-weight-bold');
     }
-
   }
+
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
+      var additional_custom_filter = $(".additional_custom_filter").html();
+      $(".action-filters").prepend(additional_custom_filter);
+      $(".additional_custom_filter").html('');
+
+
       $(".select2").select2({
         dropdownAutoWidth: true,
         width: '100%'
