@@ -90,6 +90,7 @@
                               <table class="table datatables">
                                 <thead>
                                   <tr>
+                                    <th>For Checkbox</th>
                                     <th class="text-center">Date</th>
                                     <th class="text-center">Reference No</th>
                                     <th class="text-center">Sales Status</th>
@@ -102,6 +103,7 @@
                                 <tbody>
                                   @foreach($customer->sales as $sale)
                                     <tr>
+                                      <td></td>
                                       <td class="text-center">{{$sale->date}}</td>
                                       <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $sale->id) }}">{{$sale->reference_no}}</a></td>
                                       <td class="text-center">
@@ -163,6 +165,7 @@
                             <table class="table datatables">
                               <thead>
                                 <tr>
+                                  <th>For Checkbox</th>
                                   <th class="text-center">Date</th>
                                   <th class="text-center">Reference No</th>
                                   <th class="text-center">Payment Type</th>
@@ -173,6 +176,7 @@
                               <tbody>
                                 @foreach($customer->payments as $pay)
                                   <tr>
+                                    <td></td>
                                     <td class="text-center">{{$pay->date}}</td>
                                     <td class="text-center">{{$pay->reference_no}}</td>
                                     <td class="text-center">{{ucwords($pay->payment_type)}}</td>
@@ -204,6 +208,7 @@
                             <table class="table datatables">
                               <thead>
                                 <tr>
+                                  <th>For Checkbox</th>
                                   <th>Date</th>
                                   <th>Bank Reference No</th>
                                   <th>Amount</th>
@@ -215,6 +220,7 @@
                               <tbody>
                                   @foreach($customer->deposits as $deposit)
                                     <tr>
+                                      <td></td>
                                       <td>{{$deposit->date}}</td>
                                       <td>{{$deposit->reference_no}}</td>
                                       <td>{{number_format($deposit->amount, 2)}}</td>
@@ -255,7 +261,16 @@
     $('.select2').select2();
     $('.datatables').DataTable({
       dom: '<"top"><"clear">rt<"bottom"<"actions">p>',
-      order: [[ 0, "desc" ]]
+      order: [[ 0, "desc" ]],
+      columnDefs: [ {
+          orderable: false,
+          className: 'select-checkbox',
+          targets:   0
+      } ],
+      select: {
+          style:    'os',
+          selector: 'td:first-child'
+      },
     });
     function created_row_function(row, data, dataIndex){
 
