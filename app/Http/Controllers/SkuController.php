@@ -476,8 +476,8 @@ class SkuController extends Controller
             $result = $sku->get();
             foreach ($result as &$r) {
                 if($warehouse != 'none' && !$withQTY) {
-                    $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first()->quantity;
-                    $r->quantity = ($qty)?$qty:0;
+                    $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first();
+                    $r->quantity = ($qty)?$qty->quantity:0;
                 }
 
                 $r->image = $r->SkuImage();
