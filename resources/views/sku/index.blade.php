@@ -75,6 +75,7 @@
             <!-- <th>Brand</th> -->
             <!-- <th>Category</th> -->
             <!-- <th>Supplier</th> -->
+            <th>Linked Shop</th>
             <th>Cost</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -128,6 +129,7 @@
               },
             },
             { data: 'name', name: 'name'},
+            { data: 'link_shop', name: 'link_shop'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity'},

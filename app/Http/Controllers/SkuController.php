@@ -53,6 +53,11 @@ class SkuController extends Controller
            
            
             return Datatables::eloquent($Sku)
+            ->editColumn('link_shop', function(Sku $SKSU) {
+                            $shop_list = array();
+                            $SKSU->products->map( function($prod) use (&$shop_list) { $shop_list[] = '<span class="badge btn-outline-primary text-black font-weight-bold">'.$prod->shop->short_name.'</span>'; } );
+                            return implode(' ', $shop_list);
+                        })
             ->editColumn('cost', function(Sku $SKSU) {
                             return "<p>".$SKSU->cost.'</p><input type="number" min="0" class="form-control" data-defval="'.$SKSU->cost.'" data-name="cost" value="'.$SKSU->cost.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
@@ -117,7 +122,7 @@ class SkuController extends Controller
                             </div>
                             </div>';
                         })
-            ->rawColumns(['cost','price','quantity','alert_quantity','action'])
+            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','action'])
             ->make(true);
         }
         $business_id = Auth::user()->business_id;
