@@ -204,7 +204,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::group(['middleware' => 'permission:payment.manage'], function()
 	{
 		Route::resource('/payment', 'PaymentController');
-		Route::get('/payment/delete/{paymment}', 'PaymentController@delete');
+		Route::get('/payment/delete/{payment}', 'PaymentController@delete')->name('payment.delete');
 		Route::post('/payment/viewPaymentModal/{sales}', 'PaymentController@viewPaymentModal')->name('payment.viewPaymentModal');
 		Route::post('/payment/addPaymentModal/{sales}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
 		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');

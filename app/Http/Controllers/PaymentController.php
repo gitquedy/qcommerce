@@ -88,7 +88,42 @@ class PaymentController extends Controller
      */
     public function destroy(Payment $payment)
     {
-        //
+        $sales = $payment->sale;
+        if($sales->business_id != Auth::user()->business_id){
+            abort(401, 'You don\'t have access to edit this sale');
+        }
+        try {
+            DB::beginTransaction();
+            $sales->paid -= $payment->amount;
+            if($sales->grand_total != $sales->paid && $sales->paid == 0) {
+                $sales->payment_status = "pending";
+            }
+            else if($sales->grand_total != $sales->paid && $sales->paid != 0) {
+                $sales->payment_status = "partial";
+            }
+            $sales->save();
+            $payment->delete();
+            DB::commit();
+            $output = ['success' => 1,
+                        'msg' => 'Payment successfully deleted!'
+                    ];
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+    public function delete(Request $request, Payment $payment){
+      if($payment->sale->business_id != Auth::user()->business_id){
+          abort(401, 'You don\'t have access to delete this payment');
+      }
+        $action = action('PaymentController@destroy', $payment);
+        $title = 'Payment ' . $payment->reference_no;
+        return view('layouts.delete', compact('action' , 'title'));
     }
 
     public function viewPaymentModal(Sales $sales, Request $request) {

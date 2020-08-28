@@ -56,8 +56,7 @@
                 <div class="col-md-6">
                   <label>Amount</label>
                   <div class="position-relative has-icon-left">
-                    
-                    <input type="number" name="amount" class="form-control" max="{{$balance}}">
+                    <input type="number" name="amount" class="form-control" value="{{$balance}}" max="{{$balance}}">
                     <div class="form-control-position"> 
                       <i class="feather icon-dollar-sign"></i>
                     </div>
@@ -188,7 +187,7 @@
         </div>
       </div>
     <div class="modal-footer">
-      <button type="submit" class="btn btn-primary no-print"> Submit </button>
+      <button type="submit" class="btn btn-primary no-print btn_save"> Submit </button>
       </form>
       <button type="button" class="btn btn-default no-print" data-dismiss="modal">Close</button>
     </div>
@@ -217,6 +216,5 @@
         $('.input-number').keyup(function () { 
             this.value = this.value.replace(/[^0-9\.]/g,'');
         });
-
     }); 
 </script>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Brand;
+use App\Business;
 use App\Category;
 use App\Customer;
 use App\Http\Controllers\Controller;
@@ -59,7 +60,21 @@ class SkuController extends Controller
                             return "<p>".$SKSU->price.'</p><input type="number" min="1" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('quantity', function(Sku $SKSU) {
-                            return "<p>".$SKSU->quantity.'</p><input type="number" min="0" class="form-control" data-defval="'.$SKSU->quantity.'" data-name="quantity" value="'.$SKSU->quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                            $warehouse = request()->warehouse;
+                            if($warehouse != "") {
+                                $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
+                                if($warehouse) {
+                                    return '<p>'.$warehouse->quantity.'</p>';
+                                }
+                                else {
+                                    return '<p>0</p>';
+                                }
+                            }
+                            else {
+                                return '<p>'.$SKSU->quantity.'</p>';
+                            }
+
+
                         })
             ->editColumn('alert_quantity', function(Sku $SKSU) {
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
@@ -105,9 +120,11 @@ class SkuController extends Controller
             ->rawColumns(['cost','price','quantity','alert_quantity','action'])
             ->make(true);
         }
-        
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse;
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
+            'all_warehouse' => $all_warehouse,
             'all_shops' => array(),
             'statuses' => array(),
         ]);

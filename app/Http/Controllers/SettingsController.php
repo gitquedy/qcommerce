@@ -52,10 +52,10 @@ class SettingsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Settings  $settings
+     * @param  \App\Settings  $setting
      * @return \Illuminate\Http\Response
      */
-    public function show(Settings $settings)
+    public function show(Settings $setting)
     {
         //
     }
@@ -63,10 +63,10 @@ class SettingsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Settings  $settings
+     * @param  \App\Settings  $setting
      * @return \Illuminate\Http\Response
      */
-    public function edit(Settings $settings)
+    public function edit(Settings $setting)
     {
         //
     }
@@ -75,12 +75,11 @@ class SettingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Settings  $settings
+     * @param  \App\Settings  $setting
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $settings)
+    public function update(Request $request, Settings $setting)
     {
-        $settings = Settings::where('id', $settings)->first();
         $validator = Validator::make($request->all(),[
             'sales_prefix' => 'required|string|max:191',
             'quote_prefix' => 'required|string|max:191',
@@ -102,9 +101,9 @@ class SettingsController extends Controller
             $data = $request->except(['_token', '_method']);
 
             foreach ($data as $col => $val) {
-                $settings->$col = $val;
+                $setting->$col = $val;
             }
-            $settings->save();
+            $setting->save();
  
             $output = ['success' => 1,
                 'msg' => 'Settings updated successfully!',
@@ -125,10 +124,10 @@ class SettingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Settings  $settings
+     * @param  \App\Settings  $setting
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Settings $settings)
+    public function destroy(Settings $setting)
     {
         //
     }

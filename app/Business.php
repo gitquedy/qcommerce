@@ -2,10 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use App\User;
 use App\Shop;
+use App\User;
+use App\Warehouse;
 use Auth;
+use Illuminate\Database\Eloquent\Model;
 
 
 class Business extends Model
@@ -23,6 +24,10 @@ class Business extends Model
 
 	public function shops(){
 		return $this->hasMany(Shop::class, 'business_id', 'id');
+	}
+
+	public function warehouse(){
+		return $this->hasMany(Warehouse::class, 'business_id', 'id');
 	}
 
 	public function settings() {

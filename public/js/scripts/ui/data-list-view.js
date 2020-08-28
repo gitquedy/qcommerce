@@ -8,6 +8,9 @@
     Author URL: http://www.themeforest.net/user/pixinvent
 ==========================================================================================*/
 var table = '';
+if (typeof(order) === 'undefined') {
+  var order = [];
+}
 $(document).ready(function () {
   "use strict";
     table = $(".data-list-view").DataTable({
@@ -39,10 +42,10 @@ $(document).ready(function () {
         bFilter: typeof bFilter !== 'undefined' ? bFilter : true,
         pageLength: pageLength,
         "aaSorting": [],
-        // order: [[1, 'asc']],
+        order: order,
         buttons: buttons,
         initComplete: function(t, e) {
-            $(".dt-buttons .btn").removeClass("btn-secondary")
+            $(".dt-buttons .btn").removeClass("btn-secondary");
         }
     });
   
