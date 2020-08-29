@@ -80,7 +80,7 @@
             }
             $(document).ready(function(){
               notification();
-              setInterval(function(){ notification() }, 10000); 
+              setInterval(function(){ notification() }, 100000); 
             });
 
         </script>
