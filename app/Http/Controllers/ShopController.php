@@ -41,6 +41,16 @@ class ShopController extends Controller
             ->addColumn('warehouse_name', function(Shop $shop) {
                 return isset($shop->warehouse->name)?$shop->warehouse->name:'[Deleted Warehouse]';
             })
+            ->addColumn('reSync', function(Shop $shop) {
+                           $actions = '<div class="btn-group dropright mr-1 mb-1">
+                                        <button type="button" class="btn btn-primary round dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-refresh"> Resync</i><span class="sr-only">Toggle Dropdown</span></button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncProducts', $shop->id) .'"><i class="feather icon-package  aria-hidden="true""></i> Products</a>
+                                            <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncOrders', $shop->id) .'"><i class="fa fa-shopping-cart aria-hidden="true""></i> Orders</a>
+                                        </div></div>';
+                    return $actions;
+                        })
             ->addColumn('statusChip', function(Shop $shop) {
                             $html = '';
                             if($shop->active == 1){
@@ -84,7 +94,7 @@ class ShopController extends Controller
                     </div></div>';
                     return $actions;
              })
-            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action'])
+            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action', 'reSync'])
             ->make(true);
         }
         return view('shop.index', [
@@ -274,5 +284,46 @@ class ShopController extends Controller
             }
         }
         return response()->json(['logistics' => $data]);
+    }
+
+    public function reSyncProducts(Request $request, Shop $shop){
+        try {
+              
+              if($shop->site == 'shopee'){
+                $shop->syncShopeeProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'lazada'){
+                $shop->syncLazadaProducts();
+              }
+
+              $output = ['success' => 1,
+                  'msg' => 'Products '. $shop->name .'['. $shop->short_name . '] successfully synced',
+              ];
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+    public function reSyncOrders(){
+         try {
+         
+
+              $output = ['success' => 1,
+                  'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',
+              ];
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
     }
 }

@@ -53,6 +53,7 @@
             <th>NAME</th>
             <th>Warehouse</th>
             <th>Status</th>
+            <th>Resync</th>
             <th>Products</th>
             <th>Pending</th>
             <th>Ready to Ship</th>
@@ -100,6 +101,7 @@
             { data: 'name', name: 'name' },
             { data: 'warehouse_name', name: 'warehouse_name' },
             { data: 'statusChip', name: 'statusChip' },
+            { data: 'reSync', name: 'reSync' },
             { data: 'products', name: 'products' },
             { data: 'pending_count', name: 'pending_count' },
             { data: 'ready_to_ship_count', name: 'ready_to_ship_count' },

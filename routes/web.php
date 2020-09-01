@@ -64,8 +64,15 @@ Route::group(['middleware' => 'auth'], function()
 
 	Route::group(['middleware' => 'permission:shop.manage'], function()
 	{
+
+		
+
+		Route::get('/shop/reSyncProducts/{shop}', 'ShopController@reSyncProducts')->name('shop.reSyncProducts');
+		Route::get('/shop/reSyncOrders/{shop}', 'ShopController@reSyncOrders')->name('shop.reSyncOrders');
 		Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 		Route::resource('/shop', 'ShopController');
+
+
 		Route::group(['prefix' => 'shopify'], function(){
 			Route::get('/install', 'ShopifyController@install');
 			Route::get('/getAccessToken', 'ShopifyController@getAccessToken');

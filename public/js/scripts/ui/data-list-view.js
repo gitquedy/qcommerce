@@ -108,6 +108,37 @@ $(document).ready(function () {
       });
     });
 
+    $(document).on("click",".ajax",function() {
+      if($(this).data('method')){
+        var method = $(this).data('method');
+      }
+      else {
+        var method = "GET";
+      }
+          $.ajax({
+            method: method,
+            url: $(this).data('href'),
+            // data: {'input': result.value},
+            dataType: "json",
+            success: function(result){
+              if(result.success == true){
+                toastr.success(result.msg);
+                table.ajax.reload();
+              }else{
+                if(result.msg){
+                  toastr.error(result.msg);
+                }
+              }
+            },
+            error: function(jqXhr, json, errorThrown){
+            console.log(jqXhr);
+            console.log(json);
+            console.log(errorThrown);
+            toastr.error('Sorry, Something went wrong. Please try again later.');
+          }
+          });
+    });
+
     $('.view_modal').on('hidden.bs.modal', function () {
         $(this).html('');
         table.ajax.reload();
