@@ -9,7 +9,8 @@ class ShopifyController extends Controller
 {
     public function install(Request $request){
     	$shopUrl = $request->channel;
-	    $scope = ["write_products","read_orders"];
+	    $scope = ["read_orders", "write_products"];
+
 	    $redirectUrl = "https://app.qcommerce.asia/shopify/getAccessToken";
 
 	    $shopify = Shopify::setShopUrl($shopUrl);
@@ -17,9 +18,13 @@ class ShopifyController extends Controller
     }
 
     public function getAccessToken(){
-    	$shopUrl = "testdevqcommerce1.myshopify.com";
+    	$shopUrl = "pepper-juan.myshopify.com";
 	    $accessToken = Shopify::setShopUrl($shopUrl)->getAccessToken($request->code);
 
 	    dd($accessToken);
+    }
+
+    public function test(){
+    	Shopify::get("resource uri", ["query string params"]);
     }
 }

@@ -75,6 +75,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::group(['prefix' => 'shopify'], function(){
 			Route::get('/install', 'ShopifyController@install');
 			Route::get('/getAccessToken', 'ShopifyController@getAccessToken');
+			Route::get('/test', 'ShopifyController@test');
 		});
 	});
 	
