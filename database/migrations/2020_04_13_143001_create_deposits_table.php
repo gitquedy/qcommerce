@@ -20,7 +20,7 @@ class CreateDepositsTable extends Migration
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
             $table->date('date');
-            $table->string('reference_no');
+            $table->string('reference_no')->nullable();
             $table->text('note')->nullable();
             $table->float('amount', 10, 2);
             $table->integer('created_by');

@@ -14,6 +14,9 @@ $(".modal .form").submit(function(e) {
           if (result.select_id) {
             $('#'+result.select_id).append('<option value="'+result.option_id+'">'+result.option_name+'</option>').val(result.option_id).trigger('change');
           }
+          else if(result.reload) {
+            location.reload();
+          }
         }else{
           if(result.msg){
             toastr.error(result.msg);

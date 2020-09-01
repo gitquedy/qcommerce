@@ -24,7 +24,6 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/promocode', 'Admin\PromocodeController');
 		Route::get('/promocode/delete/{promocode}', 'Admin\PromocodeController@delete');
 		Route::post('/promocode/checkPromocode', 'Admin\PromocodeController@checkPromocode')->name('promocode.checkPromocode');
-
 	});
 
 
@@ -219,6 +218,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/payment/viewPaymentModal/{sales}', 'PaymentController@viewPaymentModal')->name('payment.viewPaymentModal');
 		Route::post('/payment/addPaymentModal/{sales}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
 		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');
+		Route::post('/payment/addMMultiPaymentModal/{customer}', 'PaymentController@addMultiPaymentModal')->name('payment.addMultiPaymentModal');
+		Route::post('/payment/addMMultiPaymentAjax', 'PaymentController@addMultiPaymentAjax')->name('payment.addMultiPaymentAjax');
 	});
 
 	Route::group(['middleware' => 'permission:settings.manage'], function()
