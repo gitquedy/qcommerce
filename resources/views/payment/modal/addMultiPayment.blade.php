@@ -1,6 +1,6 @@
 
 <div class="modal-dialog modal-lg" role="document">
-	<form action="{{ route('payment.addPaymentAjax') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
+	<form action="{{ route('payment.addMultiPaymentAjax') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
   @method('POST')
 	@csrf
   <style>
@@ -10,9 +10,8 @@
   </style>
   <div class="modal-content">
   	<div class="modal-header">
-		<h4 class="modal-title" id="modal-title">Add Payment for {{$sales->reference_no}}</h4>
-    <input type="hidden" name="sales_id" value="{{$sales->id}}">
-    <input type="hidden" name="customer_id" value="{{$sales->customer_id}}">
+		<h4 class="modal-title" id="modal-title">Add MultiPayment</h4>
+    <input type="hidden" name="customer_id" value="{{$customer->id}}">
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
 	<div class="modal-body">
@@ -42,29 +41,43 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          @php
-          $balance = $sales->grand_total - $sales->paid;
-          @endphp
           <div class="card border-light">
             <div class="card-header">
+              @php
+                $total_balance = 0;
+              @endphp
+              @foreach ($sales as $sale)
+              <input type="hidden" name="sales_id[]" value="{{$sale->id}}">
+              @php
+              $balance = 0;
+              $balance = $sale->grand_total - $sale->paid;
+              $total_balance += $balance;
+              @endphp
+              <div class="row">
+                <div class="col-12">
+                  <p>Sales Reference No.: <b>{{$sale->reference_no}}</b></p>
+                </div>
+              </div>
               <div class="row  w-100">
                 <div class="col-md-4">
                   <p class="text-secondary" >Balance : <span class="text-warning">{{$balance}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$sales->grand_total}}</span></p>
+                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$sale->grand_total}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$sales->paid}}</span></p>
+                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$sale->paid}}</span></p>
                 </div>
               </div>
+              @endforeach
+              <h4>Total Balance :  {{number_format($total_balance, 2)}}</h4>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
                   <label>Amount</label>
                   <div class="position-relative has-icon-left">
-                    <input type="number" name="amount" class="form-control" value="{{$balance}}" max="{{$balance}}">
+                    <input type="number" name="amount" class="form-control" value="{{$total_balance}}" max="{{$total_balance}}">
                     <div class="form-control-position"> 
                       <i class="feather icon-dollar-sign"></i>
                     </div>
@@ -179,7 +192,7 @@
                   <div class="col-md-6">
                     <label for="gift_card_no">Current Deposit Balance:</label>
                     <div class="position-relative has-icon-left">
-                      <h3 class="text-primary">{{ number_format($sales->customer->available_deposit(), 2) }}</h3>
+                      <h3 class="text-primary">{{ number_format($customer->available_deposit(), 2) }}</h3>
                     </div>
                   </div>
                 </div>

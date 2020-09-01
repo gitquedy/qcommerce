@@ -2,12 +2,20 @@
 @extends('layouts/contentLayoutMaster')
 
 @section('title', 'View Customer')
+@section('vendor-style')
+        {{-- vednor files --}}
+        <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/extensions/dataTables.checkboxes.css')) }}">
+        <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
+        <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
+        <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+@endsection
 @section('mystyle')
 <style>
   table.dataTable td.dataTables_empty {
       text-align: center;    
   }
 </style>
+<link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
 @endsection
 @section('content')
 <section id="floating-label-layouts">
@@ -84,13 +92,26 @@
                       </ul>
                       <div class="tab-content" id="view_profile_tab_content">
                         <div class="tab-pane fade show active" id="tab_sales" role="tabpanel" aria-labelledby="tab_sales">
+                          <div class="action-btns">
+                            <div class="btn-dropdown mr-1 mb-1">
+                              <div class="btn-group dropdown actions-dropodown">
+                                <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item massAction" href="#" data-action_type="view_modal" data-action="{{ route('payment.addMultiPaymentModal', $customer->id) }}"><i class="fa fa-dollar" aria-hidden="true"></i> Add MultiPayment</a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           <section id="data-list-view" class="data-list-view-header">
                             {{-- DataTable starts --}}
                             <div class="table-responsive">
-                              <table class="table datatables">
+                              <table class="table data-list-view">
                                 <thead>
                                   <tr>
-                                    <th>For Checkbox</th>
+                                    <th></th>
                                     <th class="text-center">Date</th>
                                     <th class="text-center">Reference No</th>
                                     <th class="text-center">Sales Status</th>
@@ -102,7 +123,7 @@
                                 </thead>
                                 <tbody>
                                   @foreach($customer->sales as $sale)
-                                    <tr>
+                                    <tr data-id="{{$sale->id}}">
                                       <td></td>
                                       <td class="text-center">{{$sale->date}}</td>
                                       <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $sale->id) }}">{{$sale->reference_no}}</a></td>
@@ -159,13 +180,26 @@
                           </section>
                         </div>
                         <div class="tab-pane fade" id="tab_payments" role="tabpanel" aria-labelledby="tab_payments">
+                          <div class="action-btns">
+                            <div class="btn-dropdown mr-1 mb-1">
+                              <div class="btn-group dropdown actions-dropodown">
+                                <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                  {{-- <a class="dropdown-item massAction" href="#" data-action=""> Add Payment</a> --}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           <section id="data-list-view" class="data-list-view-header">
                           {{-- DataTable starts --}}
                           <div class="table-responsive">
-                            <table class="table datatables">
+                            <table class="table datatables data-list-view">
                               <thead>
                                 <tr>
-                                  <th>For Checkbox</th>
+                                  <th></th>
                                   <th class="text-center">Date</th>
                                   <th class="text-center">Reference No</th>
                                   <th class="text-center">Payment Type</th>
@@ -175,7 +209,7 @@
                               </thead>
                               <tbody>
                                 @foreach($customer->payments as $pay)
-                                  <tr>
+                                   <tr data-id="{{$sale->id}}">
                                     <td></td>
                                     <td class="text-center">{{$pay->date}}</td>
                                     <td class="text-center">{{$pay->reference_no}}</td>
@@ -203,12 +237,25 @@
                           {{-- DataTable ends --}}
                         </div>
                         <div class="tab-pane fade" id="tab_deposits" role="tabpanel" aria-labelledby="tab_deposits">
+                          <div class="action-btns">
+                            <div class="btn-dropdown mr-1 mb-1">
+                              <div class="btn-group dropdown actions-dropodown">
+                                <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                  {{-- <a class="dropdown-item massAction" href="#" data-action=""> Add Payment</a> --}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           {{-- DataTable starts --}}
                           <div class="table-responsive">
-                            <table class="table datatables">
+                            <table class="table datatables data-list-view">
                               <thead>
                                 <tr>
-                                  <th>For Checkbox</th>
+                                  <th></th>
                                   <th>Date</th>
                                   <th>Bank Reference No</th>
                                   <th>Amount</th>
@@ -219,7 +266,7 @@
                               </thead>
                               <tbody>
                                   @foreach($customer->deposits as $deposit)
-                                    <tr>
+                                    <tr data-id="{{$sale->id}}">
                                       <td></td>
                                       <td>{{$deposit->date}}</td>
                                       <td>{{$deposit->reference_no}}</td>
@@ -259,22 +306,33 @@
   {{-- Page js files --}}
   <script type="text/javascript">
     $('.select2').select2();
-    $('.datatables').DataTable({
+    $('.data-list-view').DataTable({
       dom: '<"top"><"clear">rt<"bottom"<"actions">p>',
-      order: [[ 0, "desc" ]],
-      columnDefs: [ {
-          orderable: false,
-          className: 'select-checkbox',
-          targets:   0
-      } ],
+      order: [[ 1, "desc" ]],
+      colimns: [{ data: 'id',
+            name: 'id' ,
+            "render": function (){
+                    return '<input type="checkbox" class="dt-checkboxes">';
+                },
+                className:'dt-checkboxes-cell'
+            }],
+      responsive: !1,
+        columnDefs: [{
+            orderable: false,
+            targets: 0,
+            checkboxes: {
+                selectRow: !0
+            },
+        }],
       select: {
-          style:    'os',
-          selector: 'td:first-child'
+          selector: "first-child",
+          style: "multi",
       },
+      initComplete: function(t, e) {
+          $(".dt-buttons .btn").removeClass("btn-secondary");
+      }
     });
-    function created_row_function(row, data, dataIndex){
 
-    }
     $(document).on('click', '.toggle_view_modal', function(e) {
         e.preventDefault();
         $.ajax({
@@ -286,6 +344,67 @@
                 $('.view_modal').html(result).modal();
             }
         });
+    });
+
+    $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {
+      var dtCheckbox = $(this).parent("tr").find(".dt-checkboxes-cell .dt-checkboxes")
+      $(this).closest("tr").toggleClass("selected");
+      if($(this).closest("tr").hasClass("selected")==true){
+          dtCheckbox.prop("checked",true);
+      }else{
+          dtCheckbox.prop("checked",false);
+      }
+    });
+
+    $(document).on('click', '.massAction', function(){
+        var ids = [];
+        var table_name = $(this).data('tablename');
+        $('tr.selected').each(function(){
+            ids.push($(this).data('id'));
+        });
+        if(ids.length > 0)
+        {
+          if($(this).data('action_type') == "view_modal") {
+            $.ajax({
+                url: $(this).data('action'),
+                method: "POST",
+                data: {ids:ids,table:table_name},
+                success:function(result)
+                {
+                    $('.view_modal').html(result).modal();
+                }
+            });  
+          }
+          else {
+
+          }
+            // $.ajax({
+            //     url: $(this).data('action'),
+            //     method: "POST",
+            //     data: {ids:ids,table:table_name},
+            //     success:function(result)
+            //     {
+            //         if(result.success == true){
+            //             toastr.success(result.msg);
+            //         }
+            //         else{
+            //           if(result.msg){
+            //             toastr.error(result.msg);
+            //           }
+            //         }
+            //         table.ajax.reload();
+            //     },
+            //     error: function(jqXhr, json, errorThrown){
+            //       console.log(jqXhr);
+            //       console.log(json);
+            //       console.log(errorThrown);
+            //     }
+            // });
+        }
+        else
+        {
+            alert("Please select atleast one checkbox");
+        }
     });
   </script> 
 <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
