@@ -309,10 +309,13 @@ class ShopController extends Controller
         return response()->json($output);
     }
 
-    public function reSyncOrders(){
+    public function reSyncOrders(Request $request, Shop $shop){
          try {
-         
-
+              if($shop->site == 'shopee'){
+                $shop->syncShopeeOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'lazada'){
+                $shop->syncLazadaOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }
               $output = ['success' => 1,
                   'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',
               ];

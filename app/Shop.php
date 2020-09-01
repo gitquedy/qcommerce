@@ -93,91 +93,9 @@ class Shop extends Model
         try {
             $this->update(['active' => 2]);
             if($this->site == 'lazada'){
-                // $dates = Utilities::getDaterange($date, Carbon::now()->addDays(2)->format('Y-m-d'), 'c', $step);
-                // $created_before_increment = 1;
-                $orders = [];
-                $after = Carbon::parse($date)->format('c');
-                $before = Carbon::now()->addDays(2)->format('c');
-                $offset = 0;
-                $limit = 100;
-                $count = 1;
-                while($count != 0){
-                    $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
-                    $r = new LazopRequest('/orders/get','GET');
-                    $r->addApiParam('created_after', $after);
-                    $r->addApiParam('created_before', $before);
-                    $r->addApiParam('limit', $limit);
-                    $r->addApiParam('offset', $offset);
-                    $r->addApiParam('sort_by','updated_at');
-                    $result = $c->execute($r, $this->access_token);
-                    $data = json_decode($result, true);
-                    if(isset($data['data']['count'])){
-                        $count = $data['data']['count'];
-                        $offset += $count;
-                        if(isset($data['data']['orders'])){
-                            $orders = array_merge_recursive($data['data']['orders'], $orders);
-                        }
-                    }else{
-                        $count = 0;
-                    }
-                }
-                if($orders){
-                    $orders = array_map(function($order){
-                        $status = $order['statuses'][0];
-                        // if(array_key_exists(1,$order['statuses'])){
-                        //      $status = $order['statuses'][1];
-                        // }
-                        $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
-                        $order['ordersn'] = $order['order_id'];
-                        $order['printed'] = $printed;
-                        $order['price'] = Order::tofloat($order['price']);
-                        unset($order['statuses']);
-                        unset($order['address_billing']);
-                        unset($order['address_shipping']);
-                        unset($order['order_number']);
-                        $order = array_merge($order, ['status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
-                        unset($order['order_id']);     
-                        $record = Order::updateOrCreate(
-                        ['ordersn' => $order['ordersn']], $order);
-                        $c = $this->lazadaGetClient();
-                        $r = new LazopRequest("/order/items/get",'GET');
-                        $r->addApiParam("order_id", $order['ordersn']);
-                        $response = $c->execute($r, $this->access_token);
-                        $data = json_decode($response, true);
-                        $item_ids = [];
-                        $items = [];
-                        foreach ($data['data'] as $item) {
-                            $item_id = $item['sku'];
-                            $product = Products::where('shop_id', $this->id)->where('SellerSku', $item_id)->first();
-                            if($product != null){
-                                if(!in_array($item_id, $item_ids)) {
-                                    array_push($item_ids, $item_id);
-                                    $items[$item_id] = array(
-                                        'order_id' => $record->id,
-                                        'product_id' => $product->id,
-                                        'quantity' => 1,
-                                        'price' => $item['paid_price'],
-                                        'created_at' => Carbon::parse($record->created_at)->format('Y-m-d H:i:s'),
-                                        'updated_at' => Carbon::parse($record->updated_at)->format('Y-m-d H:i:s'),
-                                    );
-                                }
-                                else {
-                                    $items[$item_id]['quantity'] += 1;
-                                    $items[$item_id]['price'] += $item['paid_price'];
-                                }
-                            }
-                        } // item
-                        foreach($items as $item_detail){
-                            OrderItem::updateOrCreate(
-                                    ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
-                                );
-                        }
-                        return $order;
-                    }, $orders);
-                }
+                $data = $this->syncLazadaOrders($date);
             }else if($this->site == 'shopee'){
-                $orders = $this->shopeeGetOrdersPerDate($date);
-                $this->shopeeSaveOrdersPerSN($orders);
+                $this->syncShopeeOrders($date);
             }
              $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -187,6 +105,94 @@ class Shop extends Model
                     ];
         }
         // return $data;
+    }
+
+    public function syncShopeeOrders($date){
+        $orders = $this->shopeeGetOrdersPerDate($date);
+        $this->shopeeSaveOrdersPerSN($orders);
+    }
+
+    public function syncLazadaOrders($date = "2018-01-01"){
+        $orders = [];
+            $after = Carbon::parse($date)->format('c');
+            $before = Carbon::now()->addDays(2)->format('c');
+            $offset = 0;
+            $limit = 100;
+            $count = 1;
+            while($count != 0){
+                $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+                $r = new LazopRequest('/orders/get','GET');
+                $r->addApiParam('created_after', $after);
+                $r->addApiParam('created_before', $before);
+                $r->addApiParam('limit', $limit);
+                $r->addApiParam('offset', $offset);
+                $r->addApiParam('sort_by','updated_at');
+                $result = $c->execute($r, $this->access_token);
+                $data = json_decode($result, true);
+                if(isset($data['data']['count'])){
+                    $count = $data['data']['count'];
+                    $offset += $count;
+                    if(isset($data['data']['orders'])){
+                        $orders = array_merge_recursive($data['data']['orders'], $orders);
+                    }
+                }else{
+                    $count = 0;
+                }
+            }
+            if($orders){
+                $orders = array_map(function($order){
+                    $status = $order['statuses'][0];
+                    // if(array_key_exists(1,$order['statuses'])){
+                    //      $status = $order['statuses'][1];
+                    // }
+                    $printed = $status == 'ready_to_ship' || $status == 'pending' ? false : true;
+                    $order['ordersn'] = $order['order_id'];
+                    $order['printed'] = $printed;
+                    $order['price'] = Order::tofloat($order['price']);
+                    unset($order['statuses']);
+                    unset($order['address_billing']);
+                    unset($order['address_shipping']);
+                    unset($order['order_number']);
+                    $order = array_merge($order, ['status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
+                    unset($order['order_id']);     
+                    $record = Order::updateOrCreate(
+                    ['ordersn' => $order['ordersn']], $order);
+                    $c = $this->lazadaGetClient();
+                    $r = new LazopRequest("/order/items/get",'GET');
+                    $r->addApiParam("order_id", $order['ordersn']);
+                    $response = $c->execute($r, $this->access_token);
+                    $data = json_decode($response, true);
+                    $item_ids = [];
+                    $items = [];
+                    foreach ($data['data'] as $item) {
+                        $item_id = $item['sku'];
+                        $product = Products::where('shop_id', $this->id)->where('SellerSku', $item_id)->first();
+                        if($product != null){
+                            if(!in_array($item_id, $item_ids)) {
+                                array_push($item_ids, $item_id);
+                                $items[$item_id] = array(
+                                    'order_id' => $record->id,
+                                    'product_id' => $product->id,
+                                    'quantity' => 1,
+                                    'price' => $item['paid_price'],
+                                    'created_at' => Carbon::parse($record->created_at)->format('Y-m-d H:i:s'),
+                                    'updated_at' => Carbon::parse($record->updated_at)->format('Y-m-d H:i:s'),
+                                );
+                            }
+                            else {
+                                $items[$item_id]['quantity'] += 1;
+                                $items[$item_id]['price'] += $item['paid_price'];
+                            }
+                        }
+                    } // item
+                    foreach($items as $item_detail){
+                        OrderItem::updateOrCreate(
+                                ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                            );
+                    }
+                    return $order;
+                }, $orders);
+            }
     }
 
     public function syncShippingDetails($start_date, $end_date) {
