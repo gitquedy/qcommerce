@@ -21,6 +21,7 @@
                           @csrf
                           <input type="hidden" name="code" value="{{ $request->get('code') }}">
                           <input type="hidden" name="shop_id" value="{{ $request->get('shop_id') }}">
+                          <input type="hidden" name="domain" value="{{ $request->get('shop') }}">
                           <div class="form-body">
                               <div class="row">
                                   <div class="col-6">
@@ -71,7 +72,7 @@
 <!-- // Basic Floating Label Form section end -->
 @endsection
 @section('vendor-script')
-  <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
+  <!-- <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script> -->
 @endsection
 @section('myscript')
 <script>

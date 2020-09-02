@@ -18,6 +18,7 @@ use Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Shopee;
+use Oseintow\Shopify\Facades\Shopify;
 
 
 class ShopController extends Controller
@@ -153,7 +154,7 @@ class ShopController extends Controller
         try {
             $data = $request->all();
             DB::beginTransaction();
-            if($data['code'] != null && $data['shop_id'] == null){
+            if($data['code'] != null && $data['shop_id'] == null && $data['domain'] == null){ // lazada
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
                 $r = new LazopRequest("/auth/token/create");
                 $r->addApiParam("code", $data['code']);
@@ -186,7 +187,7 @@ class ShopController extends Controller
                     'msg' => 'Shop added successfully!',
                     'redirect' => action('ShopController@index')
                 ];
-            }else if($data['shop_id'] != null){
+            }else if($data['shop_id'] != null){ //shopee
 
                 $client = new \Shopee\Client([
                     'secret' => Shopee::shopee_app_key(),
@@ -223,6 +224,18 @@ class ShopController extends Controller
                         'msg' => 'Shop added successfully!',
                         'redirect' => action('ShopController@index')
                     ];
+            }else if($data['code'] != null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
+                $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
+
+                $data = [
+                    'domain' => $data['domain'],
+                    'access_token' => $accessToken,
+                    'site' => 'shopee',
+                    'name' => $data['name'],
+                    'short_name' => $data['short_name'],
+                    'business_id' => $request->user()->business_id,
+                    'warehouse_id' => $request->warehouse_id,
+                ];
             }
             DB::commit();
           

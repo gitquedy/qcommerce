@@ -24,6 +24,7 @@ class CreateShopTable extends Migration
             $table->string('email')->nullable();
             $table->string('refresh_token')->nullable();
             $table->string('access_token')->nullable();
+            $table->string('domain')->nullable();
             $table->string('expires_in');
             $table->string('is_first_time')->default(true);
             $table->string('active')->default('2');

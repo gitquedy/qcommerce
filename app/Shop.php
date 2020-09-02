@@ -23,7 +23,7 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site', 'warehouse_id'];
+    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site', 'warehouse_id', 'domain'];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
@@ -385,6 +385,8 @@ class Shop extends Model
             }else{
                 return false;
             }
+        }else if($this->site == 'shopify'){
+            
         }
     }
 

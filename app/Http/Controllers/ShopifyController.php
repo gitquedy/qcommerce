@@ -11,14 +11,15 @@ class ShopifyController extends Controller
     	$shopUrl = $request->channel;
 	    $scope = ["read_orders", "write_products"];
 
-	    $redirectUrl = "https://app.qcommerce.asia/shopify/getAccessToken";
+	    $redirectUrl = "https://app.qcommerce.asia/shop/form";
 
 	    $shopify = Shopify::setShopUrl($shopUrl);
 	    return redirect()->to($shopify->getAuthorizeUrl($scope,$redirectUrl));
     }
 
-    public function getAccessToken(){
-    	$shopUrl = "pepper-juan.myshopify.com";
+    public function getAccessToken(Request $request){
+    	// $shopUrl = "pepper-juan.myshopify.com";
+    	$shopUrl = $request->shop;
 	    $accessToken = Shopify::setShopUrl($shopUrl)->getAccessToken($request->code);
 
 	    dd($accessToken);
