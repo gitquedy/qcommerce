@@ -43,6 +43,7 @@ class syncFirstTime extends Command
         foreach($shops as $shop){
             $shop->syncShopeeProducts();
             $shop->syncLazadaProducts();
+            $shop->syncShopifyProducts();
             $shop->syncOrders(Carbon::now()->subDays(250)->format('Y-m-d'), '+1 day');
             $shop->syncLazadaPayout();
             $shop->syncShopeePayout();

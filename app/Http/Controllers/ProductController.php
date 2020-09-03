@@ -33,9 +33,12 @@ class ProductController extends Controller
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
            $statuses = Products::$shopeeStatuses;
-        }else{
+        }else if ($request->get('site') == 'lazada'){
            $statuses = Products::$lazadaStatuses;
            $all_shops = $all_shops->where('site', 'lazada');
+        }else if ($request->get('site') == 'shopify'){
+           $statuses = Products::$shopifyStatuses;
+           $all_shops = $all_shops->where('site', 'shopify');
         }
 
         if($request->get('status')){
@@ -325,7 +328,7 @@ class ProductController extends Controller
                     $data[$status] = $products->where('status', $status)->count();
                 }
             }
-        }else{
+        }else if($request->site == 'shopee'){
             $shopee_statuses = Products::$shopeeStatuses;
             foreach($shopee_statuses as $status){
                 $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
@@ -338,7 +341,7 @@ class ProductController extends Controller
         }
         $data['lazada_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->count();
         $data['shopee_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->count();
-
+        $data['shopify_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopify')->count();
         return response()->json(['data' => $data]); 
     }
 }

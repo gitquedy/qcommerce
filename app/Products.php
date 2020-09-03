@@ -24,6 +24,8 @@ class Products extends Model
 
     public static $shopeeStatuses = ['NORMAL', 'DELETED', 'BANNED', 'UNLIST', 'sold-out'];
 
+    public static $shopifyStatuses = ['active', 'archived', 'draft'];
+
 
     public function shop(){
 		return $this->belongsTo(Shop::class, 'shop_id','id');
@@ -330,12 +332,7 @@ class Products extends Model
         $client = $this->shop->shopeeGetClient();
         return $client->item->getItemDetail(['item_id' => (int) $this->item_id])->getData();
     }
-
-    public function shopeeUpdateStock($data) { //TESTING ... NOT WORKING
-        $client = $this->shop->shopeeGetClient();
-        return $client->item->updateStock($data);
-    }
-    
+ 
     public static function remove_product($products=array()){
         $feed_back = array();   
         foreach($products as $productsVAL){
@@ -349,7 +346,6 @@ class Products extends Model
                 $shop = Shop::find($shop_id);
                 $token = $shop->access_token;
             }
-            
             $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
                     $r = new LazopRequest('/product/remove');
                     $r->addApiParam('seller_sku_list',$json_sku);
@@ -360,5 +356,45 @@ class Products extends Model
             $Products_tmp->delete();
         }
         return $feed_back;
+    }
+
+    public function updateWarehouseQuantity(){
+        $warehouse_item = $this->sku->warehouse_items->first();
+        $this->update(['quantity' => isset($warehouse_item->quantity) ? $warehouse_item->quantity : 0]);
+    }
+
+    public function updatePlatform(){
+        if($this->site == 'lazada'){
+            $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+            <Request>
+                <Product>
+                    <Skus>
+                        <Sku>
+                            <SellerSku>'.$this->SellerSku.'</SellerSku>
+                            <Quantity>'.$this->quantity.'</Quantity>
+                        </Sku>
+                    </Skus>
+                </Product>
+            </Request>';
+            if(env('lazada_sku_sync', true)){
+                $response = $this->product_price_quantity_update($xml);
+            }
+        }
+        else if($this->site == 'shopee') {
+            $data = [
+                "item_id" =>(int) $this->item_id,
+                "stock" => $this->quantity,
+                "shopid" => $this->shop->shop_id,
+                "timestamp" => Carbon::now()->timestamp,
+            ];
+            if(env('lazada_sku_sync', true)){
+                $client = $this->shop->shopeeGetClient();
+                $data = $client->item->updateStock($data)->getData();
+            }
+        }
+    }
+
+    public function shopeeUpdateStock($data) { 
+        
     }
 }

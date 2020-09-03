@@ -18,6 +18,7 @@ use App\Library\lazada\UrlConstants;
 use Auth;
 use DB;
 use App\Policies\ShopPolicy;
+use Oseintow\Shopify\Facades\Shopify;
 
 class Shop extends Model
 {
@@ -88,6 +89,7 @@ class Shop extends Model
 
         return $data;
     }
+
     
     public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
@@ -458,6 +460,35 @@ class Shop extends Model
                 }
                 return $product_update_or_create_result;
             }
+        }
+    }
+
+    public function syncShopifyProducts($updated_at_min = '2018-01-01'){
+        if ($this->site == 'shopify'){
+            $params = [                
+                'updated_at_min' => Carbon::parse($updated_at_min)->format('c'),
+                'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
+            ];
+            $products = Shopify::setShopUrl($this->domain)
+                ->setAccessToken($this->access_token)
+                ->get('admin/products.json', $params);
+            $products->each(function($product){
+                $product_details = [
+                    'shop_id' => $this->id,
+                    'site' => 'shopify',
+                    'SkuId' => $product->variants[0]->product_id,
+                    'SellerSku' => $product->variants[0]->sku, 
+                    'item_id' => $product->id,
+                    'price' =>  $product->variants[0]->price,
+                    'Images' => $product->image->src,
+                    'name' => $product->title,
+                    'Status' => 'active',
+                    'quantity' => $product->variants[0]->inventory_quantity,
+                    'created_at' => Carbon::createFromTimestamp($product->created_at)->toDateTimeString(),
+                    'updated_at' => Carbon::createFromTimestamp($product->updated_at)->toDateTimeString(),
+                    ];
+                    $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+            });
         }
     }
 

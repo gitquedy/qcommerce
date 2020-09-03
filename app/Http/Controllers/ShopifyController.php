@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Oseintow\Shopify\Facades\Shopify;
+use App\Shop;
 
 class ShopifyController extends Controller
 {
@@ -18,7 +19,6 @@ class ShopifyController extends Controller
     }
 
     public function getAccessToken(Request $request){
-    	// $shopUrl = "pepper-juan.myshopify.com";
     	$shopUrl = $request->shop;
 	    $accessToken = Shopify::setShopUrl($shopUrl)->getAccessToken($request->code);
 
@@ -26,6 +26,7 @@ class ShopifyController extends Controller
     }
 
     public function test(){
-    	Shopify::get("resource uri", ["query string params"]);
+    	$shop = Shop::where('site', 'shopify')->first();
+        $shop->syncShopifyProducts();
     }
 }

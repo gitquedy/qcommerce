@@ -228,14 +228,20 @@ class ShopController extends Controller
                 $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
 
                 $data = [
+                    'expires_in' => Carbon::now()->addDays(364),
                     'domain' => $data['domain'],
                     'access_token' => $accessToken,
-                    'site' => 'shopee',
+                    'site' => 'shopify',
                     'name' => $data['name'],
                     'short_name' => $data['short_name'],
                     'business_id' => $request->user()->business_id,
                     'warehouse_id' => $request->warehouse_id,
                 ];
+                $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
+                $output = ['success' => 1,
+                        'msg' => 'Shop added successfully!',
+                        'redirect' => action('ShopController@index')
+                    ];
             }
             DB::commit();
           
@@ -306,6 +312,8 @@ class ShopController extends Controller
                 $shop->syncShopeeProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
               }else if($shop->site == 'lazada'){
                 $shop->syncLazadaProducts();
+              }else if($shop->site == 'shopify'){
+                $shop->syncShopifyProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
               }
 
               $output = ['success' => 1,

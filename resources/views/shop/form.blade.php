@@ -72,7 +72,7 @@
 <!-- // Basic Floating Label Form section end -->
 @endsection
 @section('vendor-script')
-  <!-- <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script> -->
+  <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
 @section('myscript')
 <script>
