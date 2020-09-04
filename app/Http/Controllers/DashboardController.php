@@ -27,6 +27,7 @@ class DashboardController extends Controller
             return redirect(route('admin.dashboard'));
         }
         $Shop = Shop::get_auth_shops();
+        $Warehouses = $request->user()->business->warehouse;
         foreach ($Shop as $shop) {
             $shop->shop_info_data_today = Order::get_dashboard_shop_performance($shop->id,'today');
             $shop->shop_info_data_yesterday = Order::get_dashboard_shop_performance($shop->id,'yesterday');
@@ -275,28 +276,28 @@ class DashboardController extends Controller
     	}
     	
     	/* Shop Pie Chart */
-    	
-    	$Shop_pie = array();
-    	
-    	foreach($Shop as $ShopVAL){
-    	    $today_order = 0;
-    	    $monthly_order = 0;
-    	    $last_7_days_order = 0;
-    	    $last_30_days_order = 0;
-    	    $yesterday_orders = 0;
-    	    
-    	    
-    	    $date=date_create();
+        
+        $Shop_pie = array();
+        
+        foreach($Shop as $ShopVAL){
+            $today_order = 0;
+            $monthly_order = 0;
+            $last_7_days_order = 0;
+            $last_30_days_order = 0;
+            $yesterday_orders = 0;
+            
+            
+            $date=date_create();
             date_modify($date,"-1 days");
             $yesterday_date = date_format($date,"Y-m-d");
             
 
             
-    	    
-    	    $Shop_pie[$ShopVAL->id] = array('name'=>$ShopVAL->name);
-    	    
-    	    $end_week = date('Y-m-d');
-    	    $date=date_create();
+            
+            $Shop_pie[$ShopVAL->id] = array('name'=>$ShopVAL->name);
+            
+            $end_week = date('Y-m-d');
+            $date=date_create();
             date_modify($date,"-6 days");
             $start_week = date_format($date,"Y-m-d");
             
@@ -309,34 +310,34 @@ class DashboardController extends Controller
             
             $last_30_range = Helper::dateRange($start_last_30,$end_last_30);
             
-    	    
+            
 
             if($ShopVAL->id != "POS") {
-        	    foreach($today as $todayVAL){
-        	        if($todayVAL->shop_id==$ShopVAL->id){
-        	            $today_order++;
-        	        }
-        	    }
+                foreach($today as $todayVAL){
+                    if($todayVAL->shop_id==$ShopVAL->id){
+                        $today_order++;
+                    }
+                }
 
-        	    foreach($monthly as $monthlyVAL){
-        	        if($monthlyVAL->shop_id==$ShopVAL->id){
-        	            $rec_dt = date('Y-m-d',strtotime($monthlyVAL->created_at));
-        	            
-        	            $monthly_order++;
-        	            foreach($week_range as $weekDAte){
-        	                
-        	                $wmtch = $weekDAte;
-        	                if($wmtch==$rec_dt){
-        	                    $last_7_days_order++;
-        	                }
-        	                
-        	            }
-        	            
-        	            if($rec_dt==$yesterday_date){
-        	                    $yesterday_orders++;
-        	                } 
-        	        }
-        	    }
+                foreach($monthly as $monthlyVAL){
+                    if($monthlyVAL->shop_id==$ShopVAL->id){
+                        $rec_dt = date('Y-m-d',strtotime($monthlyVAL->created_at));
+                        
+                        $monthly_order++;
+                        foreach($week_range as $weekDAte){
+                            
+                            $wmtch = $weekDAte;
+                            if($wmtch==$rec_dt){
+                                $last_7_days_order++;
+                            }
+                            
+                        }
+                        
+                        if($rec_dt==$yesterday_date){
+                                $yesterday_orders++;
+                            } 
+                    }
+                }
 
                 foreach($last_6_month as $last_6_monthVAL){
                     if($last_6_monthVAL->shop_id==$ShopVAL->id){
@@ -384,16 +385,27 @@ class DashboardController extends Controller
                     }
                 }
             }
-    	    $Shop_pie[$ShopVAL->id]['today'] = $today_order;
-    	    $Shop_pie[$ShopVAL->id]['monthly'] = $monthly_order;
-    	    $Shop_pie[$ShopVAL->id]['last7'] = $last_7_days_order;
-    	    $Shop_pie[$ShopVAL->id]['last30'] = $last_30_days_order;
-    	    $Shop_pie[$ShopVAL->id]['yesterday'] = $yesterday_orders;
+            $Shop_pie[$ShopVAL->id]['today'] = $today_order;
+            $Shop_pie[$ShopVAL->id]['monthly'] = $monthly_order;
+            $Shop_pie[$ShopVAL->id]['last7'] = $last_7_days_order;
+            $Shop_pie[$ShopVAL->id]['last30'] = $last_30_days_order;
+            $Shop_pie[$ShopVAL->id]['yesterday'] = $yesterday_orders;
             $Shop_pie[$ShopVAL->id]['name'] = $ShopVAL->name . ' (' . ucfirst($ShopVAL->site) . ')';
-    	}
-    	
+        }
 
+        $Warehouse_stocks_pie = array();
         
+        foreach($Warehouses as $warehouse){
+            $total = 0;
+            foreach($warehouse->items as $item) {
+              $total += $item->sku->price * $item->sku->quantity;
+            }
+            
+            $Warehouse_stocks_pie[$warehouse->id]['total'] = $total;
+            $Warehouse_stocks_pie[$warehouse->id]['total_formatted'] = number_format($total, 2);
+            $Warehouse_stocks_pie[$warehouse->id]['name'] = $warehouse->name;
+        }
+
     	
        // die(var_dump(['monthly_sales' => number_format($monthly_sales),
        //      'today_sales' =>number_format($today_sales),
@@ -423,7 +435,9 @@ class DashboardController extends Controller
             'six_month_data'=>array_reverse($six_month_data),
             'hour_data'=>$hour_data,
             'hour_orders'=>$hour_orders,
-            'Shop_pie'=>$Shop_pie
+            'Shop_pie'=>$Shop_pie,
+            'Warehouse_stocks_pie'=>$Warehouse_stocks_pie,
+            'warehouses' => $Warehouses
         ]);
     }
 

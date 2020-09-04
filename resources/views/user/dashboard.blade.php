@@ -236,6 +236,50 @@
                     </ul>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between pb-0">
+                    <h4 class="card-title">Warehouse Stocks </h4>
+                    <div class="dropdown chart-dropdown">
+                        <button class="btn btn-sm border-0 dropdown-toggle px-0" type="button" id="dropdownItem4"
+                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          All
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
+                            <a class="dropdown-item"  onclick="refresh_stock_pie(this,'all')" >All</a>
+                          @foreach ($warehouses as $w) 
+                            <a class="dropdown-item"  onclick="refresh_stock_pie(this,{{$w->id}})" >{{$w->name}}</a>
+                          @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-body py-0">
+                        <div id="stocks-chart"></div>
+                    </div>
+                    <ul class="list-group list-group-flush stock-info"  id="warehouses_area">
+                      @foreach ($warehouses as $w) 
+                        <li class="list-group-item d-flex justify-content-between ">
+                          <div class="series-info">
+                              <i class="fa fa-circle font-small-3 "></i>
+                              <span class="text-bold-600">{{$w->name}}</span>
+                          </div>
+                          <div class="product-result">
+                              <span>
+                                  <?php
+                                    $total = 0;
+                                   foreach($w->items as $item) {
+                                      $total += $item->sku->price * $item->sku->quantity;
+                                   }
+
+                                   echo number_format($total, 2);
+                                  ?>
+                              </span>
+                          </div>
+                        </li>
+                      @endforeach
+                    </ul>
+                </div>
+            </div>
         </div>
       </div>
         
@@ -377,6 +421,18 @@
         console.log(shop_pie_data);
         
         <?php } ?>
+        
+        var warehouse_pie_data = [];
+        
+        <?php if(isset($Warehouse_stocks_pie)){ ?>
+        
+        var warehouse_pie_json = '<?php echo json_encode($Warehouse_stocks_pie);?>';
+        
+        warehouse_pie_data = JSON.parse(warehouse_pie_json);
+        
+        console.log(warehouse_pie_data);
+        
+        <?php } ?>
       
 </script>
 
@@ -491,16 +547,95 @@
       customerChart.render();
                 
     
-            }
+    }
     
             
-         
+    function refresh_stock_pie(ele,type){
+        
+        if(ele==undefined){
+            $('#dropdownItem4').html("All");
+        }else{
+           $('#dropdownItem4').html($(ele).html()); 
+        }
+        
+        if(type==undefined){
+            type = 'all';
+        }
+        
+        
+        
+        var li_string = '';
+        
+        var warehouse_names = [];
+        var warehouse_values = [];
+        $.each(warehouse_pie_data, function( index, valuePIE ) {
+          if(type == index || type == "all") {
+            warehouse_names.push(valuePIE.name);
+            warehouse_values.push(parseFloat(valuePIE.total));
+
+            li_string += '<li class="list-group-item d-flex justify-content-between ">'+
+                              '<div class="series-info">'+
+                                  '<i class="fa fa-circle font-small-3 "></i>'+
+                                  '<span class="text-bold-600"> '+valuePIE.name +'</span>'+
+                              '</div>'+
+                              '<div class="product-result">'+
+                                  '<span>'+valuePIE.total_formatted+
+                                  '</span>'+
+                              '</div>'+
+                          '</li>';  
+          }
+        });
+        
+         stocks_pie_chart_labels = warehouse_names;
+         stocks_pie_chart_serize = warehouse_values;
+        
+        $('#warehouses_area').html(li_string);
+        
+        var StocksChartoptions = {
+          chart: {
+            type: 'pie',
+            height: 330,
+            dropShadow: {
+              enabled: false,
+              blur: 5,
+              left: 1,
+              top: 1,
+              opacity: 0.2
+            },
+            toolbar: {
+              show: false
+            }
+          },
+          labels: stocks_pie_chart_labels,
+          series: stocks_pie_chart_serize,
+          dataLabels: {
+            enabled: false
+          },
+          legend: { show: false },
+          stroke: {
+            width: 5
+          },
+          fill: {
+            type: 'gradient'
+          }
+        }
+    
+      var warehouseStocksChart = new ApexCharts(
+        document.querySelector("#stocks-chart"),
+        StocksChartoptions
+      );
+    
+      warehouseStocksChart.render();
+                
+    
+    }    
         
         
         
         
         $(document).ready(function(){
           refresh_pie();
+          refresh_stock_pie();
           notification();
         });
     

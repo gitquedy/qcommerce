@@ -489,62 +489,62 @@
     });
 
 
-    // $(function() {
-    //   var button = 'save';
-    //   $('input[type="submit"]').on('click', function(){
-    //        button = this.name;
-    //   });
-    //   $(".form").submit(function(e) {
-    //     e.preventDefault(); 
+    $(function() {
+      var button = 'save';
+      $('input[type="submit"]').on('click', function(){
+           button = this.name;
+      });
+      $(".form").submit(function(e) {
+        e.preventDefault(); 
         
-    //     if($('.btn_save').prop('disabled') == true){
-    //       return false;
-    //     }
-    //       $('.btn_save').prop('disabled', true);
-    //       $.ajax({
-    //         url : $(this).attr('action'),
-    //         type : 'POST',
-    //         data: new FormData(this),
-    //         processData: false,
-    //         contentType: false,
-    //         success: function(result){  
-    //           console.log(result);
-    //           if(result.success == true){
-    //             toastr.success(result.msg);
-    //             $('.error').remove();
-    //             $("#reset_btn").trigger('click');
-    //             setTimeout(function(){
-    //                 window.location.replace(result.redirect);
-    //             }, 1500);
-    //           }else{
-    //             if(result.msg){
-    //               toastr.error(result.msg);
-    //             }
-    //              $('.error').remove();
-    //                 $.each(result.error, function(index, val){
-    //                   var elem = $('[name="'+ index +'"]');
-    //                   if(index == 'adjustment_item_array') {
-    //                     $('#adjustment_item_tables').after('<label class="text-danger error">' + val + '</label>');
-    //                   }
-    //                   else if(elem.hasClass('select2-hidden-accessible')) {
-    //                     new_elem = elem.parent().find('span.select2.select2-container')
-    //                     new_elem.after('<label class="text-danger error">' + val + '</label>');
-    //                   }
-    //                   else {
-    //                     elem.after('<label class="text-danger error">' + val + '</label>');
-    //                   }
-    //                 });
-    //           }
-    //           $('.btn_save').prop('disabled', false);
-    //            },
-    //           error: function(jqXhr, json, errorThrown){
-    //             console.log(jqXhr);
-    //             console.log(json);
-    //             console.log(errorThrown);
-    //             $('.btn_save').prop('disabled', false);
-    //           }
-    //       });
-    //   });
-    // });
+        if($('.btn_save').prop('disabled') == true){
+          return false;
+        }
+          $('.btn_save').prop('disabled', true);
+          $.ajax({
+            url : $(this).attr('action'),
+            type : 'POST',
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            success: function(result){  
+              console.log(result);
+              if(result.success == true){
+                toastr.success(result.msg);
+                $('.error').remove();
+                $("#reset_btn").trigger('click');
+                setTimeout(function(){
+                    window.location.replace(result.redirect);
+                }, 1500);
+              }else{
+                if(result.msg){
+                  toastr.error(result.msg);
+                }
+                 $('.error').remove();
+                    $.each(result.error, function(index, val){
+                      var elem = $('[name="'+ index +'"]');
+                      if(index == 'adjustment_item_array') {
+                        $('#adjustment_item_tables').after('<label class="text-danger error">' + val + '</label>');
+                      }
+                      else if(elem.hasClass('select2-hidden-accessible')) {
+                        new_elem = elem.parent().find('span.select2.select2-container')
+                        new_elem.after('<label class="text-danger error">' + val + '</label>');
+                      }
+                      else {
+                        elem.after('<label class="text-danger error">' + val + '</label>');
+                      }
+                    });
+              }
+              $('.btn_save').prop('disabled', false);
+               },
+              error: function(jqXhr, json, errorThrown){
+                console.log(jqXhr);
+                console.log(json);
+                console.log(errorThrown);
+                $('.btn_save').prop('disabled', false);
+              }
+          });
+      });
+    });
 </script>
 @endsection
