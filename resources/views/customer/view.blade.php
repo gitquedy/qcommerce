@@ -346,6 +346,14 @@
         });
     });
 
+    $(".dt-checkboxes").on("click", function () {
+        if($(this).prop('checked')==true){
+            $(this).closest("tr").addClass("selected");
+        }else{
+            $(this).closest("tr").removeClass("selected");
+        }
+    });
+
     $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {
       var dtCheckbox = $(this).parent("tr").find(".dt-checkboxes-cell .dt-checkboxes")
       $(this).closest("tr").toggleClass("selected");
@@ -354,6 +362,18 @@
       }else{
           dtCheckbox.prop("checked",false);
       }
+    });
+
+    $(".dt-checkboxes-select-all input").on("click", function () {
+        if($(this).prop('checked')==true){
+            $(".data-list-view").find("tbody tr").addClass("selected");
+            $(".data-thumb-view").find("tbody tr").addClass("selected");
+            $('.dt-checkboxes').prop('checked',true);
+        }else{
+            $(".data-list-view").find("tbody tr").removeClass("selected");
+            $(".data-thumb-view").find("tbody tr").removeClass("selected");
+            $('.dt-checkboxes').prop('checked',false);
+        }
     });
 
     $(document).on('click', '.massAction', function(){
