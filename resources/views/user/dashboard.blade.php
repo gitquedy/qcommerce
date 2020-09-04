@@ -609,7 +609,7 @@
           labels: stocks_pie_chart_labels,
           series: stocks_pie_chart_serize,
           dataLabels: {
-            enabled: false
+            enabled: false,
           },
           legend: { show: false },
           stroke: {
@@ -617,6 +617,23 @@
           },
           fill: {
             type: 'gradient'
+          },
+          tooltip: {
+            enabled: true,
+            y: {
+              formatter: function(val) {
+                 val = Number(val).toFixed(2);
+                 val += '';
+                 var x = val.split('.');
+                 var x1 = x[0];
+                 var x2 = x.length > 1 ? '.' + x[1] : '';
+                 var rgx = /(\d+)(\d{3})/;
+                 while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                 }
+                 return x1 + x2;
+              }
+            }
           }
         }
     
