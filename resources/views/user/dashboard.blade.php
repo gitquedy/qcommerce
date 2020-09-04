@@ -268,7 +268,7 @@
                                   <?php
                                     $total = 0;
                                    foreach($w->items as $item) {
-                                      $total += $item->sku->price * $item->sku->quantity;
+                                      $total += $item->sku->price * $item->quantity;
                                    }
 
                                    echo number_format($total, 2);
@@ -372,7 +372,7 @@
           
           $total = 0;
             foreach($warehouseVAL->items as $item) {
-              $total += $item->sku->price * $item->sku->quantity;
+              $total += $item->sku->price * $item->quantity;
             }
           ?>
           warehouse_pie_chart_labels.push('<?php echo $warehouseVAL->name;?>');

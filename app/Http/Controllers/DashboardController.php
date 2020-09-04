@@ -398,7 +398,7 @@ class DashboardController extends Controller
         foreach($Warehouses as $warehouse){
             $total = 0;
             foreach($warehouse->items as $item) {
-              $total += $item->sku->price * $item->sku->quantity;
+              $total += $item->sku->price * $item->quantity;
             }
             
             $Warehouse_stocks_pie[$warehouse->id]['total'] = $total;
