@@ -254,7 +254,7 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body py-0">
-                        <div id="stocks-chart"></div>
+                        <div id="warhouse_stocks_chart"></div>
                     </div>
                     <ul class="list-group list-group-flush stock-info"  id="warehouses_area">
                       @foreach ($warehouses as $w) 
@@ -360,6 +360,23 @@
           ?>
           pie_chart_labels.push('<?php echo $ShopsVAL->short_name;?>');
           pie_chart_serize.push(parseFloat('<?php echo $total;?>'));
+                                      
+    <?php } ?>
+      
+      var warehouse_pie_chart_labels = [];
+      var warehouse_pie_chart_serize = [];
+      
+      <?php 
+      
+      foreach($warehouses as $shop_key => $warehouseVAL){ 
+          
+          $total = 0;
+            foreach($warehouseVAL->items as $item) {
+              $total += $item->sku->price * $item->sku->quantity;
+            }
+          ?>
+          warehouse_pie_chart_labels.push('<?php echo $warehouseVAL->name;?>');
+          warehouse_pie_chart_serize.push(parseFloat('<?php echo $total;?>'));
                                       
     <?php } ?>
     
@@ -562,6 +579,7 @@
             type = 'all';
         }
         
+        $('#warhouse_stocks_chart').html('');
         
         
         var li_string = '';
@@ -569,26 +587,31 @@
         var warehouse_names = [];
         var warehouse_values = [];
         $.each(warehouse_pie_data, function( index, valuePIE ) {
-          if(type == index || type == "all") {
-            warehouse_names.push(valuePIE.name);
-            warehouse_values.push(parseFloat(valuePIE.total));
+            console.log(type+" == "+index);
+            if(type == index || type == "all") {
+              console.log("true");
+                warehouse_names.push(valuePIE.name);
+                warehouse_values.push(parseFloat(valuePIE.total));
 
-            li_string += '<li class="list-group-item d-flex justify-content-between ">'+
-                              '<div class="series-info">'+
-                                  '<i class="fa fa-circle font-small-3 "></i>'+
-                                  '<span class="text-bold-600"> '+valuePIE.name +'</span>'+
-                              '</div>'+
-                              '<div class="product-result">'+
-                                  '<span>'+valuePIE.total_formatted+
-                                  '</span>'+
-                              '</div>'+
-                          '</li>';  
-          }
+                li_string += '<li class="list-group-item d-flex justify-content-between ">'+
+                                  '<div class="series-info">'+
+                                      '<i class="fa fa-circle font-small-3 "></i>'+
+                                      '<span class="text-bold-600"> '+valuePIE.name +'</span>'+
+                                  '</div>'+
+                                  '<div class="product-result">'+
+                                      '<span>'+valuePIE.total_formatted+
+                                      '</span>'+
+                                  '</div>'+
+                              '</li>';  
+            }
+            else {
+              console.log("false");
+            }
         });
-        
-         stocks_pie_chart_labels = warehouse_names;
-         stocks_pie_chart_serize = warehouse_values;
-        
+        console.log(warehouse_names);
+        console.log(warehouse_values);
+        warehouse_pie_chart_labels = warehouse_names;
+        warehouse_pie_chart_serize = warehouse_values;
         $('#warehouses_area').html(li_string);
         
         var StocksChartoptions = {
@@ -606,8 +629,8 @@
               show: false
             }
           },
-          labels: stocks_pie_chart_labels,
-          series: stocks_pie_chart_serize,
+          labels: warehouse_pie_chart_labels,
+          series: warehouse_pie_chart_serize,
           dataLabels: {
             enabled: false,
           },
@@ -638,7 +661,7 @@
         }
     
       var warehouseStocksChart = new ApexCharts(
-        document.querySelector("#stocks-chart"),
+        document.querySelector("#warhouse_stocks_chart"),
         StocksChartoptions
       );
     
