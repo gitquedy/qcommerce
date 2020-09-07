@@ -117,7 +117,7 @@
           }
           window.location.href = $('#channel').find(":selected").data('url') + '?channel=' + domain;
         }
-        window.location.href = $('#channel').find(":selected").data('url') + '?channel=' + $("#domain").val();
+        window.location.href = $('#channel').find(":selected").data('url');
       });
       $('select[name=channel]').on('change', function() {
         if(this.value == 'shopify'){
