@@ -68,6 +68,13 @@ Route::group(['middleware' => 'auth'], function()
 
 		Route::get('/shop/reSyncProducts/{shop}', 'ShopController@reSyncProducts')->name('shop.reSyncProducts');
 		Route::get('/shop/reSyncOrders/{shop}', 'ShopController@reSyncOrders')->name('shop.reSyncOrders');
+
+		Route::post('/shop/massResyncProducts/', 'ShopController@massResyncProducts')->name('shop.massResyncProducts');
+		Route::post('/shop/massResyncOrders/', 'ShopController@massResyncOrders')->name('shop.massResyncOrders');
+
+
+		 
+		
 		Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 		Route::resource('/shop', 'ShopController');
 

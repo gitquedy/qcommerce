@@ -217,7 +217,7 @@ class CrudController extends Controller
         
         if(count($ids)==$result_count){
             $output = ['success' => 1,
-                        'msg' => 'Cruds successfully deleted!',
+                        'msg' => 'Successfully deleted!',
                     ];
         }
         

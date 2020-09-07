@@ -42,16 +42,16 @@ class ShopController extends Controller
             ->addColumn('warehouse_name', function(Shop $shop) {
                 return isset($shop->warehouse->name)?$shop->warehouse->name:'[Deleted Warehouse]';
             })
-            ->addColumn('reSync', function(Shop $shop) {
-                           $actions = '<div class="btn-group dropright mr-1 mb-1">
-                                        <button type="button" class="btn btn-primary round dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-refresh"> Resync</i><span class="sr-only">Toggle Dropdown</span></button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncProducts', $shop->id) .'"><i class="feather icon-package  aria-hidden="true""></i> Products</a>
-                                            <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncOrders', $shop->id) .'"><i class="fa fa-shopping-cart aria-hidden="true""></i> Orders</a>
-                                        </div></div>';
-                    return $actions;
-                        })
+            // ->addColumn('reSync', function(Shop $shop) {
+            //                $actions = '<div class="btn-group dropright mr-1 mb-1">
+            //                             <button type="button" class="btn btn-primary round dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            //                             <i class="fa fa-refresh"> Resync</i><span class="sr-only">Toggle Dropdown</span></button>
+            //                             <div class="dropdown-menu">
+            //                                 <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncProducts', $shop->id) .'"><i class="feather icon-package  aria-hidden="true""></i> Products</a>
+            //                                 <a class="dropdown-item ajax" href="#" data-href="'. action('ShopController@reSyncOrders', $shop->id) .'"><i class="fa fa-shopping-cart aria-hidden="true""></i> Orders</a>
+            //                             </div></div>';
+            //         return $actions;
+            //             })
             ->addColumn('statusChip', function(Shop $shop) {
                             $html = '';
                             if($shop->active == 1){
@@ -329,6 +329,35 @@ class ShopController extends Controller
         }
         return response()->json($output);
     }
+
+    public function massResyncProducts(Request $request, Shop $shop){
+        try {
+            // $ids 
+              if($shop->site == 'shopee'){
+                $shop->syncShopeeProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'lazada'){
+                $shop->syncLazadaProducts();
+              }else if($shop->site == 'shopify'){
+                $shop->syncShopifyProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }
+
+              $output = ['success' => 1,
+                  'msg' => 'Products '. $shop->name .'['. $shop->short_name . '] successfully synced',
+              ];
+            
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
+
+    
+// massResyncOrders
 
     public function reSyncOrders(Request $request, Shop $shop){
          try {

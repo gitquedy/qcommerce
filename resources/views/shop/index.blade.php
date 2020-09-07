@@ -32,10 +32,9 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop">Delete</a>
-            <!--<a class="dropdown-item" href="#">Print</a>-->
-            <!--<a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massArchived') }}">Archive</a>-->
-            <!--<a class="dropdown-item" href="#">Another Action</a>-->
+            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop"> Delete</a>
+            <a class="dropdown-item massAction" href="#" data-action="{{ action('ShopController@massResyncProducts')}}">Resync Products</a>
+            <a class="dropdown-item massAction" href="#" data-action="{{ action('ShopController@massResyncOrders')}}">Resync Orders</a>
           </div>
         </div>
       </div>
@@ -53,7 +52,7 @@
             <th>NAME</th>
             <th>Warehouse</th>
             <th>Status</th>
-            <th>Resync</th>
+            <!-- <th>Resync</th> -->
             <th>Products</th>
             <th>Pending</th>
             <th>Ready to Ship</th>
@@ -101,7 +100,7 @@
             { data: 'name', name: 'name' },
             { data: 'warehouse_name', name: 'warehouse_name' },
             { data: 'statusChip', name: 'statusChip' },
-            { data: 'reSync', name: 'reSync' },
+            // { data: 'reSync', name: 'reSync' },
             { data: 'products', name: 'products' },
             { data: 'pending_count', name: 'pending_count' },
             { data: 'ready_to_ship_count', name: 'ready_to_ship_count' },
@@ -126,6 +125,8 @@
       $('.view_modal').on('hidden.bs.modal', function () {
         table.ajax.reload();
       });
+
+
   });  
   </script>
   <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
