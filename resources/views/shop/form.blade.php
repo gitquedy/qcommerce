@@ -21,8 +21,9 @@
                           @csrf
                           <input type="hidden" name="code" value="{{ $request->get('code') }}">
                           <input type="hidden" name="shop_id" value="{{ $request->get('shop_id') }}">
-                          <input type="hidden" name="domain" value="{{ $request->get('shop') }}">
+                          <input type="hidden" name="shop" value="{{ $request->get('shop') }}">
                           <input type="hidden" name="hmac" value="{{ $request->get('hmac') }}">
+                          <input type="hidden" name="timestamp" value="{{ $request->get('timestamp') }}">
                           <div class="form-body">
                               <div class="row">
                                   <div class="col-6">

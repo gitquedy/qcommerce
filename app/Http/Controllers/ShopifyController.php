@@ -29,6 +29,6 @@ class ShopifyController extends Controller
 	    dd($accessToken);
     }
 
-    public function test(){
+    public function test(Request $request){ 
     }
 }

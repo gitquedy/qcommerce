@@ -154,7 +154,7 @@ class ShopController extends Controller
         try {
             $data = $request->all();
             DB::beginTransaction();
-            if($data['code'] != null && $data['shop_id'] == null && $data['domain'] == null){ // lazada
+            if($data['code'] != null && $data['shop_id'] == null && $data['shop'] == null){ // lazada
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
                 $r = new LazopRequest("/auth/token/create");
                 $r->addApiParam("code", $data['code']);
@@ -224,14 +224,13 @@ class ShopController extends Controller
                         'msg' => 'Shop added successfully!',
                         'redirect' => action('ShopController@index')
                     ];
-            }else if($data['code'] == null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
-
-
-                if(Shopify::verifyRequest($data['hmac'])){
-                     $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
+            }else if($data['code'] == null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
+                $request->only()
+                if(Shopify::verifyRequest($request->only(['shop', 'hmac', 'timestamp']))){
+                    $accessToken = Shopify::setShopUrl($data['shop'])->getAccessToken($data['code']);
                     $data = [
                         'expires_in' => Carbon::now()->addDays(364),
-                        'domain' => $data['domain'],
+                        'domain' => $data['shop'],
                         'access_token' => $accessToken,
                         'site' => 'shopify',
                         'name' => $data['name'],
