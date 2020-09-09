@@ -100,8 +100,8 @@ class Shop extends Model
                 $this->syncShopeeOrders($date);
             }else if($this->site == 'shopify'){
                 $this->syncShopifyOrders($date);
-             $this->update(['active' => 1, 'is_first_time' => false]);
             }
+            $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
@@ -109,6 +109,25 @@ class Shop extends Model
                     ];
         }
         // return $data;
+    }
+
+    public function syncProducts($date = '2018-01-01'){
+        try {
+            $this->update(['active' => 2]);
+            if($this->site == 'lazada'){
+                $data = $this->syncLazadaProducts($date);
+            }else if($this->site == 'shopee'){
+                $this->syncShopeeProducts($date);
+            }else if($this->site == 'shopify'){
+                $this->syncShopifyProducts($date);
+            }
+            $this->update(['active' => 1, 'is_first_time' => false]);
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+        }
     }
 
     public function syncShopeeOrders($date){
