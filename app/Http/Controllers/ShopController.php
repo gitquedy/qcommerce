@@ -225,23 +225,32 @@ class ShopController extends Controller
                         'redirect' => action('ShopController@index')
                     ];
             }else if($data['code'] == null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
-                $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
 
-                $data = [
-                    'expires_in' => Carbon::now()->addDays(364),
-                    'domain' => $data['domain'],
-                    'access_token' => $accessToken,
-                    'site' => 'shopify',
-                    'name' => $data['name'],
-                    'short_name' => $data['short_name'],
-                    'business_id' => $request->user()->business_id,
-                    'warehouse_id' => $request->warehouse_id,
-                ];
-                $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
-                $output = ['success' => 1,
-                        'msg' => 'Shop added successfully!',
-                        'redirect' => action('ShopController@index')
+
+                if(Shopify::verifyRequest($data['hmac'])){
+                     $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
+                    $data = [
+                        'expires_in' => Carbon::now()->addDays(364),
+                        'domain' => $data['domain'],
+                        'access_token' => $accessToken,
+                        'site' => 'shopify',
+                        'name' => $data['name'],
+                        'short_name' => $data['short_name'],
+                        'business_id' => $request->user()->business_id,
+                        'warehouse_id' => $request->warehouse_id,
                     ];
+                    $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
+                    $output = ['success' => 1,
+                            'msg' => 'Shop added successfully!',
+                            'redirect' => action('ShopController@index')
+                        ];
+                }else{
+                    $output = ['success' => 0,
+                            'msg' => 'Verification Failed. Please try again',
+                            'redirect' => action('ShopController@create')
+                        ];
+                }
+               
             }
             DB::commit();
           
