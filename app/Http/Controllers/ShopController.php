@@ -225,7 +225,6 @@ class ShopController extends Controller
                         'redirect' => action('ShopController@index')
                     ];
             }else if($data['code'] == null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
-                $request->only()
                 if(Shopify::verifyRequest($request->only(['shop', 'hmac', 'timestamp']))){
                     $accessToken = Shopify::setShopUrl($data['shop'])->getAccessToken($data['code']);
                     $data = [
