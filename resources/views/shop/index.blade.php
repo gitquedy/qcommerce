@@ -32,9 +32,9 @@
             Actions
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop"> Delete</a>
             <a class="dropdown-item massAction" href="#" data-action="{{ action('ShopController@massResyncProducts')}}">Resync Products</a>
             <a class="dropdown-item massAction" href="#" data-action="{{ action('ShopController@massResyncOrders')}}">Resync Orders</a>
+            <a class="dropdown-item massAction" href="#" data-action="{{ route('crud.massDelete')}}" data-tablename="shop"> Delete</a>
           </div>
         </div>
       </div>

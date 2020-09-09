@@ -126,7 +126,7 @@ class ShopController extends Controller
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
 
-        if($request->input('code') == null && $request->input('shop_id') == null){
+        if($request->input('code') == null && $request->input('shop_id') == null && $request->input('shop') == null){
             $request->session()->flash('alert-class', 'error');
             $request->session()->flash('status', 'Invalid parameters.');
             return redirect(action('ShopController@create'));
@@ -153,6 +153,7 @@ class ShopController extends Controller
             }
         try {
             $data = $request->all();
+            // dd($data);
             DB::beginTransaction();
             if($data['code'] != null && $data['shop_id'] == null && $data['domain'] == null){ // lazada
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
@@ -224,7 +225,8 @@ class ShopController extends Controller
                         'msg' => 'Shop added successfully!',
                         'redirect' => action('ShopController@index')
                     ];
-            }else if($data['code'] != null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
+            }else if($data['code'] == null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
+                dd('test');
                 $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
 
                 $data = [

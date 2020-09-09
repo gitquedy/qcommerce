@@ -31,6 +31,12 @@ class Order extends Model
         'UNPAID','READY_TO_SHIP', 'RETRY_SHIP', 'SHIPPED' ,'COMPLETED', 'TO_CONFIRM_RECEIVE' ,'IN_CANCEL','CANCELLED','TO_RETURN',
      ];
 
+     public static $shopify_statuses = [
+        'Open','Closed',
+     ];
+
+     
+
      // protected $appends = ['shipping_fee_overcharge'];
 
 	public function shop(){

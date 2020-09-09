@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Oseintow\Shopify\Facades\Shopify;
 use App\Shop;
+use Carbon\Carbon;
+use App\Order;
+use App\Products;
+use App\OrderItem;
 
 class ShopifyController extends Controller
 {
@@ -26,7 +30,5 @@ class ShopifyController extends Controller
     }
 
     public function test(){
-    	$shop = Shop::where('site', 'shopify')->first();
-        $shop->syncShopifyProducts();
     }
 }

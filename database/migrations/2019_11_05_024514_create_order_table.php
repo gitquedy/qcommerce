@@ -26,7 +26,7 @@ class CreateOrderTable extends Migration
             $table->string('customer_last_name')->nullable();
             $table->float('price', 10, 2);
             $table->string('payment_method');
-            $table->string('customer_first_name');
+            $table->string('customer_first_name')->nullable();
             $table->string('shipping_fee');
             $table->string('items_count');
             $table->string('status');

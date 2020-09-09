@@ -35,9 +35,13 @@ class OrderController extends Controller
            $statuses = Order::$shopee_statuses;
            $all_shops = $all_shops->where('site', 'shopee');
            // $selectedStatuses = ['UNPAID','READY_TO_SHIP'];
-        }else{
+        }else if ($request->get('site') == 'lazada'){
            $statuses = Order::$statuses;
            $all_shops = $all_shops->where('site', 'lazada');
+           // $selectedStatuses = ['pending','ready_to_ship','shipped'];
+        }else if ($request->get('site') == 'shopify'){
+           $statuses = Order::$shopify_statuses;
+           $all_shops = $all_shops->where('site', 'shopify');
            // $selectedStatuses = ['pending','ready_to_ship','shipped'];
         }
         if($request->get('status')){
@@ -80,6 +84,8 @@ class OrderController extends Controller
                   $orders->where('tracking_no', '!=', '');
                 }
               }
+           }else if ($request->get('site') == 'shopify'){
+            $orders->orderByRaw('CASE WHEN status = "open" THEN 1 WHEN status = "closed" THEN 2 else 4 END');
            }
 
            if($request->printed){
