@@ -153,7 +153,6 @@ class ShopController extends Controller
             }
         try {
             $data = $request->all();
-            // dd($data);
             DB::beginTransaction();
             if($data['code'] != null && $data['shop_id'] == null && $data['domain'] == null){ // lazada
                 $client = new LazopClient("https://auth.lazada.com/rest", Lazop::get_api_key(), Lazop::get_api_secret());
@@ -226,7 +225,6 @@ class ShopController extends Controller
                         'redirect' => action('ShopController@index')
                     ];
             }else if($data['code'] == null && $data['domain'] != null && $data['shop_id'] == null){ // shopify
-                dd('test');
                 $accessToken = Shopify::setShopUrl($data['domain'])->getAccessToken($data['code']);
 
                 $data = [
@@ -333,7 +331,9 @@ class ShopController extends Controller
     }
 
     public function massResyncProducts(Request $request, Shop $shop){
-        try {
+        $shops = Shop::where('business_id', $request->user()->business_id)->whereIn('id', $request->get('ids'))->get();
+        foreach($shops as $shop){
+            try {
             // $ids 
               if($shop->site == 'shopee'){
                 $shop->syncShopeeProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
@@ -344,15 +344,37 @@ class ShopController extends Controller
               }
 
               $output = ['success' => 1,
-                  'msg' => 'Products '. $shop->name .'['. $shop->short_name . '] successfully synced',
+                  'msg' => 'Products successfully synced',
               ];
             
-        } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
-            $output = ['success' => 0,
-                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
-                    ];
-             DB::rollBack();
+            } catch (\Exception $e) {
+                \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+                $output = ['success' => 0,
+                            'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                        ];
+                 DB::rollBack();
+            }
+        }
+        
+        return response()->json($output);
+    }
+
+    public function massResyncOrders(Request $request){
+        $shops = Shop::where('business_id', $request->user()->business_id)->whereIn('id', $request->get('ids'))->get();
+        foreach($shops as $shop){
+            try {
+                  $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                  $output = ['success' => 1,
+                      'msg' => 'Orders successfully synced',
+                  ];
+                
+            } catch (\Exception $e) {
+                \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+                $output = ['success' => 0,
+                            'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                        ];
+                 DB::rollBack();
+            }
         }
         return response()->json($output);
     }
@@ -376,7 +398,7 @@ class ShopController extends Controller
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,
                         'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
-                    ];
+                     ];
              DB::rollBack();
         }
         return response()->json($output);
