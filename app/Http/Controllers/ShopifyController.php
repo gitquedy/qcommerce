@@ -14,7 +14,7 @@ class ShopifyController extends Controller
 {
     public function install(Request $request){
     	$shopUrl = $request->channel;
-	    $scope = ["read_orders", "write_products"];
+	    $scope = ["read_orders", "write_products", "write_inventory", "read_inventory", "read_products", "write_products", "read_locations"];
 
 	    $redirectUrl = "https://app.qcommerce.asia/shop/form";
 
@@ -30,5 +30,19 @@ class ShopifyController extends Controller
     }
 
     public function test(Request $request){ 
+        $shop = Shop::first();
+        $inventory_levels = Shopify::setShopUrl($shop->domain)
+            ->setAccessToken($shop->access_token)
+            ->get('/admin/api/2020-07/locations/53632041115/inventory_levels.json');
+
+        dd($inventory_levels);
+
+        $products->each(function($product){
+             \Log::info($product->title);
+        });
+
+        // get products see if theres a field inventory_item_id location_id
+
+        
     }
 }

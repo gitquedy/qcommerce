@@ -224,8 +224,8 @@ class ShopController extends Controller
                         'msg' => 'Shop added successfully!',
                         'redirect' => action('ShopController@index')
                     ];
-            }else if($data['code'] == null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
-                if(Shopify::verifyRequest($request->only(['shop', 'hmac', 'timestamp']))){
+            }else if($data['code'] != null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
+                if(Shopify::verifyRequest($request->only(['code','shop', 'hmac', 'timestamp']))){
                     $accessToken = Shopify::setShopUrl($data['shop'])->getAccessToken($data['code']);
                     $data = [
                         'expires_in' => Carbon::now()->addDays(364),
