@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Order;
 use App\Products;
 use App\OrderItem;
+use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
 
 class ShopifyController extends Controller
 {
@@ -29,20 +30,68 @@ class ShopifyController extends Controller
 	    dd($accessToken);
     }
 
-    public function test(Request $request){ 
-        $shop = Shop::first();
-        $inventory_levels = Shopify::setShopUrl($shop->domain)
-            ->setAccessToken($shop->access_token)
-            ->get('/admin/api/2020-07/locations/53632041115/inventory_levels.json');
+    public function customersRedact(Request $request){
+        $payload = $request->all();
 
-        dd($inventory_levels);
+        $shop = Shop::where('domain', $payload['shop_domain'])->first();
+        if($shop){
+            $shop->orders->whereIn('ordersn', $payload['orders_to_redact'])->delete();
+        }
 
-        $products->each(function($product){
-             \Log::info($product->title);
-        });
+        $data = ['orders_redacted' => $payload['orders_to_redact'], 'shop_domain' => $payload['shop_domain'], 'shop_id' => $payload['shop_id']];
 
-        // get products see if theres a field inventory_item_id location_id
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
 
-        
+    public function shopRedact(Request $request){
+        $payload = $Request->all();
+        $shop = Shop::where('domain', $payload['shop_domain'])->first();
+
+        if($shop){
+            $shop->delete();
+        }
+
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+    public function dataRequest(Request $request){
+        $payload = $request->all();
+        $shop = Shop::where('domain', $payload['shop_domain'])->first();
+
+        $data = ['customer' => $payload['customer']];
+        return ResponseBuilder::asSuccess(200)
+                  ->withData($data)
+                  ->withMessage('OK')
+                  ->build();
+    }
+
+    public function test(Request $request){
+
+
+        $product = Products::first();
+        $product->updatePlatform();
+
+
+
+                $shop = Shop::first();
+
+        $params = [                
+                    'updated_at_min' => Carbon::parse('2018-01-01')->format('c'),
+                    'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
+                    'limit' => 250,
+                ];
+
+        $products = Shopify::setShopUrl($shop->domain)
+                    ->setAccessToken($shop->access_token)
+                    ->get('admin/products.json', $params);
+                    dd($products);        
     }
 }
+
+

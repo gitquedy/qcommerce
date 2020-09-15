@@ -25,6 +25,7 @@ class CreateProductsTable extends Migration
             $table->string('SkuId');
             $table->text('name');
             $table->string('item_id');
+            $table->bigInteger('inventory_item_id')->nullable();
             $table->integer('quantity')->default(0);
             $table->text('Images')->nullable();
             $table->string('Url')->nullable();

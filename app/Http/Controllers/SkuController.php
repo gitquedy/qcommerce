@@ -254,28 +254,17 @@ class SkuController extends Controller
         $sku->alert_quantity = $request->alert_quantity;
         
         if($sku->save()){
-            $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
-            foreach ($Sku_prod as $prod) {
-                $shop_id = $prod->shop_id;
-                $access_token = $prod->shop->access_token;
-                $prod->price = $sku->price;
-                $prod->save();
-                    $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                    <Request>
-                        <Product>
-                            <Skus>
-                                <Sku>
-                                    <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                    <price>'.$prod->price.'</price>
-                                </Sku>
-                            </Skus>
-                        </Product>
-                    </Request>';
-                if(env('lazada_sku_sync', true)){
-                    if($prod->site == 'lazada'){
-                        $response = $prod->product_price_quantity_update($xml);
-                    }
-                }
+            foreach ($sku->products as $product) {
+                $data = [
+                    'seller_sku_id' => $sku->id,
+                    'price' => $sku->price,
+                    // 'SellerSku' => $sku->code,
+                    'quantity' => $sku->quantity
+                ];
+
+                $result = $product->update($data);
+
+                $response = $product->updatePlatform();
             }
             $request->session()->flash('flash_success', 'Success !');
         }else{
@@ -292,7 +281,6 @@ class SkuController extends Controller
         foreach($all_shops as $all_shopsVAL){
             $Shop_array[] = $all_shopsVAL->id;
         }
-        $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$request->sku)->orderBy('updated_at', 'desc')->get();
         $column = $request->name;
         $sku = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku)->first();
         if($sku && $column != 'quantity'){  //quantity is dependent on warehouse
@@ -301,28 +289,17 @@ class SkuController extends Controller
 
             if(in_array($column, array('price'))) {
                 
-                foreach ($Sku_prod as $prod) {
-                    $shop_id = $prod->shop_id;
+                foreach ($sku->products as $product) {
+                    $data = [
+                        'seller_sku_id' => $sku->id,
+                        'price' => $sku->price,
+                        // 'SellerSku' => $sku->code,
+                        'quantity' => $sku->quantity
+                    ];  
 
-                    $prod = Products::where('id', $prod->id)->first();
-                    $prod->$column = $request->val;
-                    $prod->save();
-                        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                        <Request>
-                            <Product>
-                                <Skus>
-                                    <Sku>
-                                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                        <'.$column.'>'.$prod->$column.'</'.$column.'>
-                                    </Sku>
-                                </Skus>
-                            </Product>
-                        </Request>';
-                    if(env('lazada_sku_sync', true)){
-                        if($prod->site == 'lazada'){
-                            $response = $prod->product_price_quantity_update($xml);
-                        }
-                    }
+                    $result = $product->update($data);
+
+                    $response = $product->updatePlatform();
                 }
             }
         }
@@ -341,31 +318,18 @@ class SkuController extends Controller
             $Shop_array[] = $all_shopsVAL->id;
         }
 
-        foreach($sku as $s) {
-            $Sku_prod = Products::with('shop')->whereIn('shop_id', $Shop_array)->where('seller_sku_id','=',$s->id)->orderBy('updated_at', 'desc')->get();
+        foreach($sku as $sku) {
+            foreach ($sku->products as $product) {
+                $data = [
+                    'seller_sku_id' => $sku->id,
+                    'price' => $sku->price,
+                    // 'SellerSku' => $sku->code,
+                    'quantity' => $sku->quantity
+                ];  
 
-            foreach ($Sku_prod as $prod) {
-                $witem = $prod->shop->warehouse->items()->where('sku_id', $s->id)->first();
-                $prod->price = $s->price;
-                $prod->quantity = isset($witem->quantity)?$witem->quantity:0;
-                $prod->save();
-                    $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                    <Request>
-                        <Product>
-                            <Skus>
-                                <Sku>
-                                    <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                    <Price>'.$prod->price.'</Price>
-                                    <Quantity>'.$prod->quantity.'</Quantity>
-                                </Sku>
-                            </Skus>
-                        </Product>
-                    </Request>';
-                if(env('lazada_sku_sync', true)){
-                    if($prod->site == 'lazada'){
-                        $response = $prod->product_price_quantity_update($xml);
-                    }
-                }
+                $result = $product->update($data);
+
+                $response = $product->updatePlatform();
             }
         }
         $result = array('success' => true, 'msg' => 'Product Syncs Successfully.');
@@ -433,30 +397,20 @@ class SkuController extends Controller
 
     public function addproduct(Request $request){
         $business_id = Auth::user()->business_id;
-        $prod = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
-        $access_token = Shop::find($prod->shop_id)->access_token;
+        $product = Products::whereId($request->product)->where('shop_id', $request->shop)->first();
         $sku = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku_id)->first();
-        $prod->seller_sku_id = $request->sku_id;
-        $prod->price = $sku->price;
-        $prod->quantity = $sku->quantity;
-        $result = $prod->save();
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-        <Request>
-            <Product>
-                <Skus>
-                    <Sku>
-                        <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                        <price>'.$prod->price.'</price>
-                        <quantity>'.$prod->quantity.'</quantity>
-                    </Sku>
-                </Skus>
-            </Product>
-        </Request>';
-        if(env('lazada_sku_sync', true)){
-            if($prod->site == 'lazada'){
-                $response = $prod->product_price_quantity_update($xml);
-            }
-        }
+
+        $data = [
+            'seller_sku_id' => $sku->id,
+            'price' => $sku->price,
+            // 'SellerSku' => $sku->code,
+            'quantity' => $sku->quantity
+        ];  
+
+        $result = $product->update($data);
+
+        $response = $product->updatePlatform();
+  
         print json_encode($result);
     }
 

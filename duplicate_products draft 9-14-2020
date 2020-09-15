@@ -1,0 +1,97 @@
+public function duplicate_product(Shop $duplicate_to, $logistics_ids = null){
+        
+        if($duplicate_to->site == 'lazada'){
+            $xml = $this->getXML();
+            dd($xml);
+            $access_token_shop_next = $duplicate_to->access_token;         
+            $c = new LazopClient(UrlConstants::getPH(), Lazop::get_api_key(), Lazop::get_api_secret());
+            $r = new LazopRequest('/product/create','POST');
+            $r->addApiParam('payload', $xml);
+            $duplicate_product = $c->execute($r,$duplicate_to->access_token);
+            dd($duplicate_product);
+            $duplicate_product = json_decode($duplicate_product, true);
+
+            $c = $this->shop->lazadaGetClient();
+            $r = new LazopRequest('/product/item/get','GET');
+            $r->addApiParam('seller_sku', $this->SellerSku);
+            $result = $c->execute($r,$duplicate_to->access_token);
+            $data = json_decode($result, true);
+            if($data['code'] == "0" && $duplicate_product['code'] == "0"){
+                $product_details = $data['data'];
+                $product_details = [
+                    'shop_id' => $duplicate_to->id,
+                    'site' => 'lazada',
+                    'SkuId' => $product_details['skus'][0]['SkuId'],
+                    'SellerSku' => $product_details['skus'][0]['SellerSku'],
+                    'item_id' => $product_details['item_id'],
+                    'price' =>  $product_details['skus'][0]['price'],
+                    'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
+                    'name' => $product_details['attributes']['name'],
+                    'Status' => $product_details['skus'][0]['Status'],
+                    'quantity' => $product_details['skus'][0]['quantity'],
+                    'Url' => $product_details['skus'][0]['Url'],
+                    ];
+
+                $record = Products::updateOrCreate(
+                    ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                return $this->name . ' Add item successfully';
+            }else{
+                return $this->name . ' ' . $duplicate_product['message'] . ' (' . $duplicate_product['detail'][0]['message']  .')';
+            }
+        }else if($duplicate_to->site == 'shopee'){
+            $product_details = $this->shopeeGetItemDetail();
+            if(isset($product_details['item'])){
+                $duplicate_to_client = $duplicate_to->shopeeGetClient();
+                unset($product_details['item']['shopid']);
+
+                //logistics
+                $c_logistics = $duplicate_to->shopeeGetLogistics();
+                unset($product_details['item']['logistics']);
+                foreach($logistics_ids as $key => $value){
+                    foreach($c_logistics['logistics'] as $c_logistic){
+                        if($value == $c_logistic['logistic_id']){
+                            if($c_logistic['fee_type'] == "SIZE_SELECTION"){
+                                $product_details['item']['logistics'][0]['size_id'] = 1;
+                            }
+                            $product_details['item']['logistics'][0]['logistic_id'] = (int)$value;
+                            $product_details['item']['logistics'][0]['enabled'] = true;
+                            break;
+                        }
+                    }
+                }
+    
+                //images
+                foreach($product_details['item']['images'] as $key => $imgUrl){
+                    unset($product_details['item']['images'][$key]);
+                    $product_details['item']['images'][$key]['url'] = $imgUrl;
+                }
+
+                //attributes
+                foreach($product_details['item']['attributes'] as $key => $value){
+                    $product_details['item']['attributes'][$key]['attributes_id'] = $value['attribute_id'];
+                    $product_details['item']['attributes'][$key]['value'] = $value['attribute_value'];
+                }
+
+                $duplicate_product = $duplicate_to_client->item->add($product_details['item'])->getData();
+                if(isset($duplicate_product['item'])){
+                    $product_details = [
+                    'shop_id' => $duplicate_to->id,
+                    'site' => 'shopee',
+                    'SkuId' => $duplicate_product['item']['item_sku'],
+                    'SellerSku' => $duplicate_product['item']['item_sku'],
+                    'item_id' => $duplicate_product['item']['item_id'],
+                    'price' => $duplicate_product['item']['price'],
+                    'Images' => implode('|', $duplicate_product['item']['images']),
+                    'name' => $duplicate_product['item']['name'],
+                    'Status' => $duplicate_product['item']['status'],
+                    'quantity' => $product_details['item']['stock'],
+                    'created_at' => Carbon::createFromTimestamp($duplicate_product['item']['create_time'])->toDateTimeString(),
+                    'updated_at' => Carbon::createFromTimestamp($duplicate_product['item']['update_time'])->toDateTimeString(),
+                    ];
+                    $record = Products::updateOrCreate(
+                        ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                }
+                return $this->name . ' ' . $duplicate_product['msg'];
+            }
+        }
+    }

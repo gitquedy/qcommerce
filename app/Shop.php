@@ -570,6 +570,7 @@ class Shop extends Model
                         'SellerSku' => $product->variants[0]->sku, 
                         'item_id' => $product->variants[0]->id,
                         'price' =>  $product->variants[0]->price,
+                        'inventory_item_id' => $product->variants[0]->inventory_item_id,
                         'Images' => $product->image->src,
                         'name' => $product->title,
                         'Status' => 'active',

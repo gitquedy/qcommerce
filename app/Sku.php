@@ -95,8 +95,5 @@ class Sku extends Model
             $product->updateWarehouseQuantity();
             $product->updatePlatform();
         } // foreach
-    }
-
-    
-    
+    }    
 }

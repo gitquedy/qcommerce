@@ -18,6 +18,14 @@ use Illuminate\Http\Request;
 // });
 
 Route::group([
+  'prefix' => 'shopify'
+], function () {
+  Route::get('shopRedact', 'ShopifyController@shopRedact');
+  Route::get('customersRedact', 'ShopifyController@customersRedact');
+  Route::get('dataRequest', 'ShopifyController@dataRequest');
+});
+
+Route::group([
   'prefix' => 'auth'
 ], function () {
   Route::post('login', 'Api\AuthController@login');

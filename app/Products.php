@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Library\lazada\LazopRequest;
 use App\Library\lazada\LazopClient;
 use App\Library\lazada\UrlConstants;
+use Oseintow\Shopify\Facades\Shopify;
 use Auth;
 use DB;
 
@@ -18,7 +19,7 @@ class Products extends Model
 {
     protected $table = 'products';
     
-    protected $fillable = ['seller_sku_id', 'item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at'];
+    protected $fillable = ['seller_sku_id', 'item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at', 'inventory_item_id'];
     
     public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
 
@@ -363,33 +364,87 @@ class Products extends Model
         $this->update(['quantity' => isset($warehouse_item->quantity) ? $warehouse_item->quantity : 0]);
     }
 
-    public function updatePlatform(){
-        if($this->site == 'lazada'){
+    public function updatePlatform(){ // price qty SellerSku
+        if(env('lazada_sku_sync', true) == false){
+            return false;
+        }
+        if($this->site == 'lazada'){ // price qty ok
             $xml = '<?xml version="1.0" encoding="UTF-8" ?>
             <Request>
                 <Product>
                     <Skus>
                         <Sku>
+                            <SkuId>'. $this->SkuId .'</SkuId>
                             <SellerSku>'.$this->SellerSku.'</SellerSku>
                             <Quantity>'.$this->quantity.'</Quantity>
+                            <Price>'.$this->price.'</Price>
                         </Sku>
                     </Skus>
                 </Product>
             </Request>';
-            if(env('lazada_sku_sync', true)){
-                $response = $this->product_price_quantity_update($xml);
-            }
+            $response = $this->product_price_quantity_update($xml);
         }
-        else if($this->site == 'shopee') {
-            $data = [
+        else if($this->site == 'shopee') { // price stock sku ok tested
+            $stock = [
                 "item_id" =>(int) $this->item_id,
                 "stock" => $this->quantity,
                 "shopid" => $this->shop->shop_id,
                 "timestamp" => Carbon::now()->timestamp,
             ];
-            if(env('lazada_sku_sync', true)){
-                $client = $this->shop->shopeeGetClient();
-                $data = $client->item->updateStock($data)->getData();
+            $price = [
+                "item_id" =>(int) $this->item_id,
+                "price" => $this->price,
+                "shopid" => $this->shop->shop_id,
+                "timestamp" => Carbon::now()->timestamp,
+            ];
+            $sku = [
+                "item_id" =>(int) $this->item_id,
+                "item_sku" => $this->SellerSku,
+                "shopid" => $this->shop->shop_id,
+                "timestamp" => Carbon::now()->timestamp,
+            ];
+            $client = $this->shop->shopeeGetClient();
+            $stock = $client->item->updateStock($stock)->getData();
+            $price = $client->item->updatePrice($price)->getData();
+            $sku = $client->item->updateItem($sku)->getData();
+        }else if($this->site == 'shopify'){ // qty price sku ok tested
+            $params = [
+                'inventory_item_ids' => $this->inventory_item_id
+            ];
+            $inventory_level = Shopify::setShopUrl($this->shop->domain)
+                ->setAccessToken($this->shop->access_token)
+                ->get('/admin/api/2020-07/inventory_levels.json', $params)->first();
+
+            if($inventory_level){ //qty price sku ok tested
+                $system_stock  = $this->quantity;
+                $shopify_stock = $inventory_level->available;
+                $adjusting_stock = $system_stock - $shopify_stock;
+
+                $stockParams = [
+                    'available_adjustment' => $adjusting_stock,
+                    'location_id' => $inventory_level->location_id,
+                    'inventory_item_id' => $this->inventory_item_id,
+                ];
+
+                $stock = Shopify::setShopUrl($this->shop->domain) //qty
+                ->setAccessToken($this->shop->access_token)
+                ->post('/admin/api/2020-07/inventory_levels/adjust.json', $stockParams);
+
+                $productParams = [
+                    'product' => [
+                        'id' => $this->SkuId,
+                        'variants' => [
+                            0 => [
+                                'id' =>  $this->item_id,
+                                'price' => $this->price,
+                                'sku' => $this->SellerSku,
+                            ]
+                        ]
+                    ]
+                ];
+                $priceSku = Shopify::setShopUrl($this->shop->domain) //price sku
+                ->setAccessToken($this->shop->access_token)
+                ->put('/admin/api/2020-07/products/'. $this->SkuId .'.json', $productParams);
             }
         }
     }
