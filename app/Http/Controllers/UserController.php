@@ -283,20 +283,20 @@ class UserController extends Controller
         $permissions = collect($request->permissions);
         if($permissions->contains('adjustment.manage')){
           if(collect($request->warehouses)->count() == 0){
-            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use adjustment module.' ,'error' => []]);
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order to use adjustment module.' ,'error' => []]);
           }
         }
         if($permissions->contains('sales.manage')){
           if(collect($request->warehouses)->count() == 0){
-            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use sales module.' ,'error' => []]);
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order to use sales module.' ,'error' => []]);
           }
         }
         if($permissions->contains('transfer.manage')){
           if(collect($request->warehouses)->count() <= 1){
-            return response()->json(['msg' => 'Kindly check atleast two warehouse in order use transfer module.' ,'error' => []]);
+            return response()->json(['msg' => 'Kindly check atleast two warehouse in order to use transfer module.' ,'error' => []]);
           }
         }
-        
+
         try {
             $data = $request->only(['first_name', 'last_name', 'email']);
             DB::beginTransaction();
