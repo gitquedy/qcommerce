@@ -15,15 +15,14 @@ class WarehouseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouse"], ['name'=>"Warehouse List"]
         ];
         if ( request()->ajax()) {
            $user = Auth::user();
-           $warehouse = Warehouse::where('business_id', $user->business_id)->orderBy('updated_at', 'desc');
-           // return $warehouse->get();
+           $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
             return Datatables($warehouse)
             ->addColumn('action', function(Warehouse $warehouse) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">

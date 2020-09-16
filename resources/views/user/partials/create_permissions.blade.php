@@ -4,6 +4,7 @@
     <h6 class="border-bottom py-1 mx-1 mb-0 font-medium-2"><i
         class="feather icon-lock mr-50 "></i>Permission</h6>
     <table class="table table-borderless">
+      
       <thead>
         <tr>
           <th>Main</th>
@@ -15,15 +16,6 @@
       <tbody>
         <tr>
           <td></td>
-          <td>
-            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
-              <input type="checkbox" value="shop.manage" name="permissions[]">
-              <span class="vs-checkbox">
-                <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
-              </span>
-              <span class="">Shops</span>
-            </div></fieldset>
-          </td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="order.manage" name="permissions[]" checked>
@@ -43,6 +35,32 @@
             </div></fieldset>
           </td>
         </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th>Shop Access</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($shops as $items)
+        <tr>
+          <td></td>
+          @foreach($items as $shop)
+            <td>
+              <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+                <input type="checkbox" value="{{ $shop->id }}" name="shops[]">
+                <span class="vs-checkbox">
+                  <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
+                </span>
+                <span class="">{!! $shop->getImgSiteDisplay()!!}</span>
+              </div></fieldset>
+            </td>
+            @endforeach
+        </tr>
+        @endforeach
       </tbody>
        <thead>
         <tr>
@@ -146,18 +164,6 @@
           </td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
-              <input type="checkbox" value="warehouse.manage" name="permissions[]">
-              <span class="vs-checkbox">
-                <span class="vs-checkbox--check"><i class="vs-icon feather icon-server"></i></span>
-              </span>
-              <span class="">Warehouse</span>
-            </div></fieldset>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="adjustment.manage" name="permissions[]">
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-repeat"></i></span>
@@ -165,6 +171,9 @@
               <span class="">Adjustment</span>
             </div></fieldset>
           </td>
+        </tr>
+        <tr>
+          <td></td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="transfer.manage" name="permissions[]">
@@ -175,7 +184,34 @@
             </div></fieldset>
           </td>
           <td></td>
+          <td></td>
         </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th>Warehouse Access</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($warehouses as $items)
+        <tr>
+          <td></td>
+          @foreach($items as $warehouse)
+            <td>
+              <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+                <input type="checkbox" value="{{ $warehouse->id }}" name="warehouses[]">
+                <span class="vs-checkbox">
+                  <span class="vs-checkbox--check"><i class="vs-icon feather icon-server"></i></span>
+                </span>
+                <span class="">{!! $warehouse->name!!}</span>
+              </div></fieldset>
+            </td>
+            @endforeach
+        </tr>
+        @endforeach
       </tbody>
       <thead>
         <tr>

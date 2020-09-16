@@ -122,12 +122,12 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales List"], ['name'=>"Add Sales"]
         ];
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
         return view('sales.create', compact('breadcrumbs','customers','warehouses'));
     }
@@ -292,7 +292,7 @@ class SalesController extends Controller
     {
 
         $sales = Sales::findOrFail($id);
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this sales');

@@ -34,7 +34,7 @@ class ShopController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
         ];
         if ( request()->ajax()) {
-           $shop = Shop::where('shop.business_id', $request->user()->business_id)->orderBy('shop.updated_at', 'desc');
+           $shop = $request->user()->business->shops()->orderBy('shop.updated_at', 'desc');
             return Datatables::eloquent($shop)
             ->editColumn('site', function(Shop $shop) {
                             return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';

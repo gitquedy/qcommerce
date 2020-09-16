@@ -73,12 +73,12 @@ class AdjustmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('AdjustmentController@index'), 'name'=>"Adjustment List"], ['name'=>"Add Adjustment"]
         ];
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         return view('adjustment.create', compact('breadcrumbs','warehouses'));
     }
 
@@ -197,7 +197,7 @@ class AdjustmentController extends Controller
         if($adjustment->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this adjustment');
         }
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         return view('adjustment.edit', compact('adjustment', 'warehouses'));
     }
 
