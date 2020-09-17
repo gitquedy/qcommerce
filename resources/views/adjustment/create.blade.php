@@ -209,7 +209,21 @@
           }
         });
 
+        function reOrderItems(stored_items) {
+          var items = JSON.parse(localStorage.getItem(stored_items));
+          var item_list = []
+          var index = 0;
+          $.each(items, function(i, data) {
+              if(data) {
+                item_list[index] = data;
+                index++;
+              }
+          });
+          localStorage.setItem(stored_items, JSON.stringify(item_list));
+        }
+
         function reloadAdjustment() {
+          reOrderItems("adjustment_items");
           warehouse_reset = false;
           var adjustment = JSON.parse(localStorage.getItem("adjustment"));
           if(adjustment) {
@@ -232,7 +246,7 @@
           var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items"));
           var html = '';
           $("#adjustment_item_tables tbody").html(html);
-          $.each(adjustment_items, function(i, data) {
+          $.each(adjustment_items.reverse(), function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
             var select_addition = ' ';
             var select_subtraction = ' ';
@@ -257,6 +271,7 @@
                             '<input type="hidden" name="adjustment_item_array['+i+'][name]" value="'+data.name+'" />'+
                             '<input type="hidden" name="adjustment_item_array['+i+'][brand]" value="'+data.brand+'" />'+
                             '<input type="hidden" name="adjustment_item_array['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="adjustment_item_array['+i+'][sku_id]" value="'+data.id+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
@@ -285,7 +300,7 @@
                       '<td><i class="feather icon-x remove_sku" style="cursor: pointer;"></i></td>'+
                     '</tr>';
           });
-          $("#adjustment_item_tables tbody").append(html);
+          $("#adjustment_item_tables tbody").prepend(html);
           warehouse_reset = true;
         }
 
@@ -340,26 +355,27 @@
             if(localStorage.getItem("adjustment_items")) {
               adjustment_items = JSON.parse(localStorage.getItem("adjustment_items"));            
             }
-            var i = datum.id;
-            if(!adjustment_items[i]) {
-              adjustment_items[i] = {};
-              adjustment_items[i]['id']  = datum.id;
-              adjustment_items[i]['code']  = datum.code;
-              adjustment_items[i]['name']  = datum.name;
-              adjustment_items[i]['brand']  = datum.brand;
-              adjustment_items[i]['quantity']  = 1;
-              adjustment_items[i]['max_quantity']  = datum.quantity;
-              adjustment_items[i]['image']  = datum.image;
-              adjustment_items[i]['type']  = 'addition';
+            var item_index = adjustment_items.length;
+            var list_item_index = Object.values(adjustment_items).findIndex((ai => ai.id == datum.id));
+            if(list_item_index == -1) {
+              adjustment_items[item_index] = {};
+              adjustment_items[item_index]['id']  = datum.id;
+              adjustment_items[item_index]['code']  = datum.code;
+              adjustment_items[item_index]['name']  = datum.name;
+              adjustment_items[item_index]['brand']  = datum.brand;
+              adjustment_items[item_index]['quantity']  = 1;
+              adjustment_items[item_index]['max_quantity']  = datum.quantity;
+              adjustment_items[item_index]['image']  = datum.image;
+              adjustment_items[item_index]['type']  = 'addition';
+              item_index++;
             }
-            else if(adjustment_items[i]['quantity'] < datum.quantity) {
-              adjustment_items[i]['quantity']++;
-            }
-            else {
+            else if(adjustment_items[list_item_index]['quantity'] < datum.quantity) {
+              adjustment_items[list_item_index]['quantity']++;
             }
             localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items));
             reloadAdjustment();
         });
+
 
         $(document).on('change', '.update_select', function() {
             var adjustment = {};
@@ -386,9 +402,9 @@
             var input = $(this)
             var name = $(this).data('array_name');
             var val = $(this).val();
-            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items"));
+            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items")).reverse();
             adjustment_items[id][name] = val;
-            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items));
+            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items.reverse()));
         });
 
 
@@ -439,16 +455,16 @@
                 break;
             }
             input.val(val).trigger('change');
-            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items"));
+            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items")).reverse();
             adjustment_items[id][change] = val;
-            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items));
+            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items.reverse()));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items"));
+            var adjustment_items = JSON.parse(localStorage.getItem("adjustment_items")).reverse();
             delete adjustment_items[id];
-            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items));
+            localStorage.setItem("adjustment_items", JSON.stringify(adjustment_items.reverse()));
             reloadAdjustment();
         });
 

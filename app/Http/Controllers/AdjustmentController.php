@@ -120,11 +120,10 @@ class AdjustmentController extends Controller
             $adjustment->created_by = $user->id;
             $adjustment->save();
             $adjustment_items = [];
-            foreach ($request->adjustment_item_array as $id => $item) {
-                // $Sku = Sku::whereId($id)->first();
+            foreach ($request->adjustment_item_array as $item) {
                 $adjustment_item = [];
                 $adjustment_item['adjustment_id'] = $adjustment->id;
-                $adjustment_item['sku_id'] = $id;
+                $adjustment_item['sku_id'] = $item['sku_id'];
                 $adjustment_item['sku_code'] = $item['code'];
                 $adjustment_item['sku_name'] = $item['name'];
                 $adjustment_item['image'] = $item['image'];
@@ -132,25 +131,11 @@ class AdjustmentController extends Controller
                 $adjustment_item['warehouse_id'] = $adjustment->warehouse_id;
                 $adjustment_item['type'] = $item['type'];
                 $adjustment_items[] = $adjustment_item;
-                $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $id)->first();
+                $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item['sku_id'])->first();
                 $warehouse_qty = (isset($warehouse_item->quantity))?$warehouse_item->quantity:0;
                 if ($item['type'] == "subtraction" && $item['quantity'] > $warehouse_qty) {
                     return response()->json(['msg' => 'Please check for errors' ,'error' => ['adjustment_item_array' => ['Insufficient warehouse quantity for '.$item['name'].' ['.$item['code'].']']]]);
                 }
-                // else if($item['type'] == "subtraction" && $item['quantity'] <= $warehouse_qty) {
-                //     $Sku->quantity -= $item['quantity'];
-                //     $warehouse_item->quantity -= $item['quantity'];
-                //     $warehouse_item->save();
-                // }
-                // else if($item['type'] == "addition") {
-                //     $Sku->quantity += $item['quantity'];
-                //     $warehouse_qty += $item['quantity'];
-                //     $warehouse_items = WarehouseItems::updateOrCreate(
-                //     ['warehouse_id' => $adjustment->warehouse_id, 'sku_id' => $id],
-                //     ['quantity' => $warehouse_qty]
-                //     );
-                // }
-                // $Sku->save();
             }
             $adjustment_items_query = AdjustmentItems::insert($adjustment_items);
             Adjustment::applyItemsOnWarehouse($adjustment->id);
@@ -245,10 +230,10 @@ class AdjustmentController extends Controller
             $adjustment->updated_by = $user->id;
             $adjustment->save();
             $adjustment_items = [];
-            foreach ($request->adjustment_item_array as $id => $item) {
+            foreach ($request->adjustment_item_array as $item) {
                 $adjustment_item = [];
                 $adjustment_item['adjustment_id'] = $adjustment->id;
-                $adjustment_item['sku_id'] = $id;
+                $adjustment_item['sku_id'] = $item['sku_id'];
                 $adjustment_item['sku_code'] = $item['code'];
                 $adjustment_item['sku_name'] = $item['name'];
                 $adjustment_item['image'] = $item['image'];
@@ -256,7 +241,7 @@ class AdjustmentController extends Controller
                 $adjustment_item['warehouse_id'] = $adjustment->warehouse_id;
                 $adjustment_item['type'] = $item['type'];
                 $adjustment_items[] = $adjustment_item;
-                $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $id)->first();
+                $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item['sku_id'])->first();
                 $warehouse_qty = (isset($warehouse_item->quantity))?$warehouse_item->quantity:0;
                 if ($item['type'] == "subtraction" && $item['quantity'] > $warehouse_qty) {
                     return response()->json(['msg' => 'Please check for errors' ,'error' => ['adjustment_item_array' => ['Insufficient warehouse quantity for '.$item['name'].' ['.$item['code'].']']]]);
@@ -339,51 +324,6 @@ class AdjustmentController extends Controller
         $business_id = Auth::user()->business_id;
         return view('adjustment.modal.viewAdjustment', compact('adjustment'));
     }
-
-
-    //Temporary
-    // public function first() {
-    //     echo date("F d, Y H:i:s")."<br>";
-    //     echo "Start ".date("F d, Y H:i:s")."<br>";
-    //     $business = Business::all();
-    //     foreach ($business as $bus) {
-    //         echo "Business : ".$bus->id." :: ".$bus->name."<br>";
-    //         $warehouse = Warehouse::updateOrCreate(
-    //             ['business_id' => $bus->id, 'code' => 'DFLT'],
-    //             ['name' => 'Default Warehouse', 'address' => $bus->location]
-    //         );
-    //         echo "Warehouse : ".$warehouse->id." :: ".$warehouse->name."<br>";
-    //         $Shops = Shop::where('business_id', $bus->id)->get();
-    //         foreach ($Shops as $shop) {
-    //             $shop->warehouse_id = $warehouse->id;
-    //             $shop->save();
-    //         }
-    //         echo "Shops warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
-    //         $Sales = Sales::where('business_id', $bus->id)->get();
-    //         foreach ($Sales as $sale) {
-    //             $sale->warehouse_id = $warehouse->id;
-    //             $sale->save();
-    //         }
-    //         echo "Sales warehouse update : ".$warehouse->id." :: ".$warehouse->name."<br>";
-
-    //         $Skus = Sku::where('business_id', $bus->id)->get();
-    //         foreach ($Skus as $sku) {
-    //             if($sku->quantity > 0) {
-    //                 echo "SKU : ".$sku->id." :: ".$sku->name."<br>";
-    //                 $warehouse_items = WarehouseItems::updateOrCreate(
-    //                 ['warehouse_id' => $warehouse->id, 'sku_id' => $sku->id],
-    //                 ['quantity' => $sku->quantity, 'avg_cost' => $sku->cost]
-    //                 );
-    //                 echo "Warehouse Item: ".$warehouse_items->warehouse_id." :: ".$warehouse_items->sku_id."<br>";
-    //             }
-    //             else {
-    //                 echo "Skipping SKU : ".$sku->id." :: ".$sku->name." for quantity is equal to 0<br>";
-    //             }
-    //         }
-    //     }
-
-    //     echo "Finished ".date("F d, Y H:i:s")."<br>";
-    // }
 
     public function import() {
         $breadcrumbs = [
@@ -479,10 +419,10 @@ class AdjustmentController extends Controller
             $failures = $e->failures();
             $msg = [];
             foreach ($failures as $failure) {
-                 $failure->row(); // row that went wrong
-                 $failure->attribute(); // either heading key (if using heading row concern) or column index
-                 $failure->errors(); // Actual error messages from Laravel validator
-                 $failure->values(); // The values of the row that has failed.
+                 // $failure->row(); // row that went wrong
+                 // $failure->attribute(); // either heading key (if using heading row concern) or column index
+                 // $failure->errors(); // Actual error messages from Laravel validator
+                 // $failure->values(); // The values of the row that has failed.
                  foreach ($failure->errors as $error) {
                     $msg[] = $error." Row ".$failure->row(); 
                  }
@@ -492,13 +432,6 @@ class AdjustmentController extends Controller
                         'msg' =>  $msg
                     ];
         }
-        // catch (\Exception $e) {
-        //     \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
-        //     $output = ['success' => 0,
-        //                 'msg' => 'Sorry something went wrong, please check adjustment data and try again.'
-        //             ];
-        //      DB::rollBack();
-        // }
         return response()->json($output);
     }
 }

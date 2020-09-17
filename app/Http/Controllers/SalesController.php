@@ -210,10 +210,10 @@ class SalesController extends Controller
             $sales->grand_total = $total - $request->discount;
             $sales->save();
             $sales_items = [];
-            foreach ($request->sales_item_array as $id => $item) {
+            foreach ($request->sales_item_array as $item) {
                 $sales_item = [];
                 $sales_item['sales_id'] = $sales->id;
-                $sales_item['sku_id'] = $id;
+                $sales_item['sku_id'] = $item['sku_id'];
                 $sales_item['sku_code'] = $item['code'];
                 $sales_item['sku_name'] = $item['name'];
                 $sales_item['image'] = $item['image'];
@@ -223,7 +223,6 @@ class SalesController extends Controller
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
                 $sales_items[] = $sales_item;
-
             }
             if($request->status == 'completed') {
                 Sku::syncStocks($request->warehouse_id ,$request->sales_item_array);   
@@ -374,10 +373,10 @@ class SalesController extends Controller
             $sales->grand_total = $total - $request->discount;
             $sales->save();
             $sales_items = [];
-            foreach ($request->sales_item_array as $id => $item) {
+            foreach ($request->sales_item_array as $item) {
                 $sales_item = [];
                 $sales_item['sales_id'] = $sales->id;
-                $sales_item['sku_id'] = $id;
+                $sales_item['sku_id'] = $item['sku_id'];
                 $sales_item['sku_code'] = $item['code'];
                 $sales_item['sku_name'] = $item['name'];
                 $sales_item['image'] = $item['image'];
