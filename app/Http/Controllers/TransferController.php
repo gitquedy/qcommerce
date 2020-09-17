@@ -90,12 +90,12 @@ class TransferController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Add Transfer"]
         ];
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         return view('transfer.create', compact('breadcrumbs','warehouses'));
     }
 
@@ -197,12 +197,12 @@ class TransferController extends Controller
      * @param  \App\Transfer  $transfer
      * @return \Illuminate\Http\Response
      */
-    public function edit(Transfer $transfer)
+    public function edit(Transfer $transfer, Request $request)
     {
         if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
         }
-        $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $warehouses = $request->user()->business->warehouse;
         return view('transfer.edit', compact('transfer', 'warehouses'));
     }
 

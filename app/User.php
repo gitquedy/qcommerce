@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Utilities;
 use Spatie\Permission\Models\Permission;
+use App\ShopPermission;
 
 class User extends Authenticatable
 {
@@ -47,6 +48,34 @@ use Notifiable, HasRoles;
     // public function permissions(){
     //     return $this->hasMany(Permission::class, 'model_id', 'id');
     // }
+
+    public function shopPermissions(){
+        return $this->hasMany(ShopPermission::class, 'user_id', 'id');
+    }
+
+    public function warehousePermissions(){
+        return $this->hasMany(WarehousePermission::class, 'user_id', 'id');
+    }
+
+    public function checkAllowedSite($site){
+        if($this->business->shops->contains('site', $site)){
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+
+    public function checkFirstAllowedSite(){
+        $sites = ['lazada', 'shopee', 'shopify'];
+        foreach($sites as $site){
+            if($this->checkAllowedSite($site)){
+                return $site;
+            }
+        }
+        return 'lazada';
+    }
+
 
     public static function giveOwnerPermissionToOwners(){
         $users = User::where('role', 'Owner')->get();

@@ -53,7 +53,7 @@
             
             @can('product.manage')
                 <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
-                    <a href="{{url('/product')}}?site=lazada&status=active">
+                    <a href="{{url('/product')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=active">
                         <i class="feather icon-package "></i>
                         <span class="menu-title" data-i18n="">Products</span>
                     </a>
@@ -62,7 +62,7 @@
             
             @can('order.manage')
                 <li class="nav-item {{ $request->segment(1) == 'order' && $request->segment(2) == '' ? 'active' : '' }}">
-                    <a href="{{url('/order')}}?site=lazada&status=pending">
+                    <a href="{{url('/order')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=pending">
                         <i class="feather icon-shopping-cart"></i>
                         <span class="menu-title" data-i18n="">Orders</span>
                         
@@ -106,11 +106,20 @@
             @endif
             <hr>
             
+
+
+
+
+
+
+
+            @if( $request->user()->can('sku.manage') || $request->user()->can('warehouse.manage') || $request->user()->can('adjustment.manage') || $request->user()->can('transfer.manage') || $request->user()->can('barcode.manage') || $request->user()->can('supplier.manage') || $request->user()->can('report.manage'))
             <li class="nav-item  ">
                 <a href="#">
                     <span class="menu-title" data-i18n="nav.order">Inventory</span>
                 </a>
             </li>
+            @endif
             
             @can('sku.manage')
                 <li class="nav-item">
@@ -314,12 +323,19 @@
                 </li>
             @endif -->
 
+
+
+
+
+
             <hr>
+            @if( $request->user()->can('sales.manage') || $request->user()->can('customer.manage') || $request->user()->can('deposit.manage') || $request->user()->can('settings.manage'))
             <li class="nav-item  ">
                 <a >
                     <span class="menu-title" data-i18n="nav.order">POS</span>
                 </a>
             </li>
+            @endif
 
             @can('sales.manage')
                 <li class="nav-item ">

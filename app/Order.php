@@ -285,7 +285,7 @@ class Order extends Model
     public static function get_dashboard_orders($status="",$type="", $current_user=true){
         $query = DB::table('order'); 
         if ($current_user) {
-            $shops = Shop::get_auth_shops();
+            $shops = Auth::user()->business->shops;
             $shops_array = array();  
             foreach($shops as $shopsVAL){
                 $shops_array[] = $shopsVAL->id;

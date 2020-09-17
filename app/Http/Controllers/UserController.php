@@ -14,6 +14,10 @@ use DB;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use App\Package;
+use App\Shop;
+use App\ShopPermission;
+use App\WarehousePermission;
+use App\Warehouse;
 
 class UserController extends Controller
 {
@@ -83,9 +87,6 @@ class UserController extends Controller
         
         }
         $user->save();
-       
-
-
         $output = ['success' => 1,
                         'msg' => 'User updated successfully',
                         'redirect' => action('UserController@settings')
@@ -116,12 +117,16 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('UserController@index'), 'name'=>"Users List"], ['name'=>"Add User"]
         ];
-        return view('user.create', compact('breadcrumbs'));
+
+        $shops = $request->user()->business->shops->chunk(3);
+
+        $warehouses = $request->user()->business->warehouse->chunk(3);
+        return view('user.create', compact('breadcrumbs', 'shops', 'warehouses'));
     }
 
     /**
@@ -143,28 +148,68 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+
+        $permissions = collect($request->permissions);
+        if($permissions->contains('adjustment.manage')){
+          if(collect($request->warehouses)->count() == 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use adjustment module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('sales.manage')){
+          if(collect($request->warehouses)->count() == 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use sales module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('transfer.manage')){
+          if(collect($request->warehouses)->count() <= 1){
+            return response()->json(['msg' => 'Kindly check atleast two warehouse in order use transfer module.' ,'error' => []]);
+          }
+        }
         try {
             $data = $request->all();
+            // return response()->json($data);
             DB::beginTransaction();
             $data['business_id'] = $request->user()->business_id;
-
             if ($request->hasFile('picture')) {
                 $image = $request->file('picture');
                 $image_name = sha1(time()) . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images/profile/profile-picture/') , $image_name);
-
                 $data['picture'] = $image_name;
             }
-
-
             $data['password'] = Hash::make($data['password']);
             $data['role'] = 'Staff';
             $user = User::create($data);
+
+            $permissions = $request->permissions;
+
+             if($request->has('shops')){
+              $permissions[] = 'shop.manage';
+              $shops = Shop::whereIn('id', $request->shops)->get();
+              foreach($shops as $shop){
+                ShopPermission::create([
+                  'shop_id' => $shop->id,
+                  'user_id' => $user->id
+                ]);
+              }
+            }
+
+            if($request->has('warehouses')){
+              $permissions[] = 'warehouse.manage';
+              $warehouses = Shop::whereIn('id', $request->warehouses)->get();
+              foreach($warehouses as $warehouse){
+                WarehousePermission::create([
+                  'warehouse_id' => $warehouse->id,
+                  'user_id' => $user->id
+                ]);
+              }
+            }
            
              if($request->has('permissions')){
-                $permissions = Permission::whereIn('name', $request->permissions)->get();
+                $permissions = Permission::whereIn('name', $permissions)->get();
                 $user->givePermissionTo($permissions);
             }
+
+           
             $output = ['success' => 1,
                 'msg' => 'User added successfully!',
                 'redirect' => action('UserController@index')
@@ -204,7 +249,11 @@ class UserController extends Controller
           abort(401, 'You don\'t have access to edit this user');
         }
 
-        return view('user.edit', compact('user'));
+        $shops = $request->user()->business->shops->chunk(3);
+
+        $warehouses = $request->user()->business->warehouse->chunk(3);
+
+        return view('user.edit', compact('user', 'shops', 'warehouses'));
     }
 
     /**
@@ -230,6 +279,24 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors','error' => $validator->errors()]);
         }
+
+        $permissions = collect($request->permissions);
+        if($permissions->contains('adjustment.manage')){
+          if(collect($request->warehouses)->count() == 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order to use adjustment module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('sales.manage')){
+          if(collect($request->warehouses)->count() == 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order to use sales module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('transfer.manage')){
+          if(collect($request->warehouses)->count() <= 1){
+            return response()->json(['msg' => 'Kindly check atleast two warehouse in order to use transfer module.' ,'error' => []]);
+          }
+        }
+
         try {
             $data = $request->only(['first_name', 'last_name', 'email']);
             DB::beginTransaction();
@@ -244,12 +311,43 @@ class UserController extends Controller
             if($request->password != null){
               $data['password'] = Hash::make($request->password);
             }
-            $permissions = User::ownerPermissions();
-            $user->revokePermissionTo($permissions);
+
+            ShopPermission::where('user_id', $user->id)->delete();
+            WarehousePermission::where('user_id', $user->id)->delete();
+
+            $permissions = $request->permissions;
+
+            if($request->has('shops')){
+              $permissions[] = 'shop.manage';
+              $shops = Shop::whereIn('id', $request->shops)->get();
+              foreach($shops as $shop){
+                ShopPermission::create([
+                  'shop_id' => $shop->id,
+                  'user_id' => $user->id
+                ]);
+              }
+            }
+
+            if($request->has('warehouses')){
+              $permissions[] = 'warehouse.manage';
+              $warehouses = Shop::whereIn('id', $request->warehouses)->get();
+              foreach($warehouses as $warehouse){
+                WarehousePermission::create([
+                  'warehouse_id' => $warehouse->id,
+                  'user_id' => $user->id
+                ]);
+              }
+            }
+
+            $remove_permissions = User::ownerPermissions();
+            $user->revokePermissionTo($remove_permissions);
              if($request->has('permissions')){
-                $permissions = Permission::whereIn('name', $request->permissions)->get();
+                $permissions = Permission::whereIn('name', $permissions)->get();
                 $user->givePermissionTo($permissions);
             }
+
+            
+
             $user = $user->update($data);
 
             $output = ['success' => 1,

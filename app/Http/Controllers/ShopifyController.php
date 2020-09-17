@@ -73,7 +73,7 @@ class ShopifyController extends Controller
 
     public function test(Request $request){
 
-
+        $shops = Shop::all()->pluck('id');
         $product = Products::first();
         $product->updatePlatform();
 

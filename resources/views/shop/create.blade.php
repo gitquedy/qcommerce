@@ -8,7 +8,6 @@
 @section('content')
   <section id="basic-usage" class="container justify-content-md-center ">
       <div class="col-12">
-        
         <div class="card">
           <div class="row">
           <div class="col-8">

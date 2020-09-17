@@ -17,15 +17,6 @@
           <td></td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
-              <input type="checkbox" value="shop.manage" name="permissions[]" {{ $user->can('shop.manage') ? 'checked' : '' }}>
-              <span class="vs-checkbox">
-                <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
-              </span>
-              <span class="">Shops</span>
-            </div></fieldset>
-          </td>
-          <td>
-            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="order.manage" name="permissions[]"  {{ $user->can('order.manage') ? 'checked' : '' }}>
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-bag"></i></span>
@@ -42,7 +33,34 @@
               <span class="">Products</span>
             </div></fieldset>
           </td>
+          <td></td>
         </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th>Shop Access</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($shops as $items)
+        <tr>
+          <td></td>
+          @foreach($items as $shop)
+            <td>
+              <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+                <input type="checkbox" value="{{ $shop->id }}" name="shops[]" {{ $user->shopPermissions->contains('shop_id', $shop->id) ? 'checked' : '' }}>
+                <span class="vs-checkbox">
+                  <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
+                </span>
+                <span class="">{!! $shop->getImgSiteDisplay()!!}</span>
+              </div></fieldset>
+            </td>
+            @endforeach
+        </tr>
+        @endforeach
       </tbody>
        <thead>
         <tr>
@@ -146,18 +164,6 @@
           </td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
-              <input type="checkbox" value="warehouse.manage" name="permissions[]" {{ $user->can('warehouse.manage') ? 'checked' : '' }}>
-              <span class="vs-checkbox">
-                <span class="vs-checkbox--check"><i class="vs-icon feather icon-server"></i></span>
-              </span>
-              <span class="">Warehouse</span>
-            </div></fieldset>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>
-            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="adjustment.manage" name="permissions[]" {{ $user->can('adjustment.manage') ? 'checked' : '' }}>
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-repeat"></i></span>
@@ -165,6 +171,9 @@
               <span class="">Adjustment</span>
             </div></fieldset>
           </td>
+        </tr>
+        <tr>
+          <td></td>
           <td>
             <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
               <input type="checkbox" value="transfer.manage" name="permissions[]" {{ $user->can('transfer.manage') ? 'checked' : '' }}>
@@ -175,7 +184,34 @@
             </div></fieldset>
           </td>
           <td></td>
+          <td></td>
         </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th>Warehouse Access</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($warehouses as $items)
+        <tr>
+          <td></td>
+          @foreach($items as $warehouse)
+            <td>
+              <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+                <input type="checkbox" value="{{ $warehouse->id }}" name="warehouses[]" {{ $user->warehousePermissions->contains('warehouse_id', $warehouse->id) ? 'checked' : '' }}>
+                <span class="vs-checkbox">
+                  <span class="vs-checkbox--check"><i class="vs-icon feather icon-server"></i></span>
+                </span>
+                <span class="">{!! $warehouse->name!!}</span>
+              </div></fieldset>
+            </td>
+            @endforeach
+        </tr>
+        @endforeach
       </tbody>
       <thead>
         <tr>

@@ -23,11 +23,24 @@ class Business extends Model
 	}
 
 	public function shops(){
-		return $this->hasMany(Shop::class, 'business_id', 'id');
+		$user = Auth::user();
+
+		if($user->role == 'Staff'){
+			return $this->hasMany(Shop::class, 'business_id', 'id')->whereIn('id', $user->shopPermissions->pluck('shop_id'));
+		}else{
+			return $this->hasMany(Shop::class, 'business_id', 'id');
+		}
+		
 	}
 
 	public function warehouse(){
-		return $this->hasMany(Warehouse::class, 'business_id', 'id');
+		$user = Auth::user();
+
+		if($user->role == 'Staff'){
+			return $this->hasMany(Warehouse::class, 'business_id', 'id')->whereIn('id', $user->warehousePermissions->pluck('warehouse_id'));
+		}else{
+			return $this->hasMany(Warehouse::class, 'business_id', 'id');
+		}
 	}
 
 	public function settings() {
