@@ -210,11 +210,18 @@ class DepositController extends Controller
         }
         try {
             DB::beginTransaction();
-            $deposit->delete();
-            DB::commit();
-            $output = ['success' => 1,
+            if($deposit->amount <= Auth::user()->available_deposit()) {
+                $deposit->delete();
+                DB::commit();
+                $output = ['success' => 1,
                         'msg' => 'Deposit successfully deleted!'
                     ];
+            }
+            else {
+                $output = ['sucess' => 0,
+                        'msg' => 'Customer available deposit is lower than this deposit amount!'
+                    ];
+            }
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
             $output = ['success' => 0,

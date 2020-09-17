@@ -60,13 +60,7 @@ class ReportsController extends Controller
                     //                 }
                     //             })
                     ->addColumn('image', function(Sku $SKSU) {
-                                    $products = Products::where('seller_sku_id', $SKSU->id)->first();
-                                    if($products){
-                                       return  $products->Images;
-                                    }
-                                    else {
-                                        return asset('images/pages/no-img.jpg');
-                                    }
+                                    return $SKSU->SkuImage();
                                 })
                     // ->addColumn('brand_name', function(Sku $SKSU) {
                     //                 $Brand = Brand::find($SKSU->brand);
@@ -109,13 +103,7 @@ class ReportsController extends Controller
                 //                 }
                 //             })
                 ->addColumn('image', function(Sku $SKSU) {
-                                $products = Products::where('seller_sku_id', $SKSU->id)->first();
-                                if($products){
-                                   return  $products->Images;
-                                }
-                                else {
-                                    return asset('images/pages/no-img.jpg');
-                                }
+                                return $SKSU->SkuImage();
                             })
                 // ->addColumn('brand_name', function(Sku $SKSU) {
                 //                 $Brand = Brand::find($SKSU->brand);

@@ -237,7 +237,7 @@
 
     $(document).ready(function(){
       var str = $('#status').val(); 
-      hideShippingStatus(str);
+      hideShippingStatus($("input[name=status]:checked").val());
       $('input[name="site"]').change(function(){
         var site = $('input[name="site"]:checked').val();
         @if (isset($_GET['printed']))
