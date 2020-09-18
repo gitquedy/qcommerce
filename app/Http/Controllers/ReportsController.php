@@ -238,8 +238,7 @@ class ReportsController extends Controller
                }
                $shop_ids = $shops->pluck('id')->toArray();
                 $daterange = explode('/', $request->get('daterange'));
-                $order = Order::join('order_item', 'order.id', '=', 'order_item.order_id', 'left')
-                ->select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                $order = Order::select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('sum(order.price) as total_price'), DB::raw('sum(order.items_count) as total_item_count'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->orderBy('date', 'desc')
@@ -265,7 +264,7 @@ class ReportsController extends Controller
                                     $count += $item->quantity;
                                 }
                             }
-                            return $order->total_quantity + $count;
+                            return $order->total_item_count + $count;
                         })
                     ->addColumn('dateFormat', function(Order $order) {
                             return Utilities::format_date($order->date, 'M d,Y');
