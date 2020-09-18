@@ -206,7 +206,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::group(['middleware' => 'permission:deposit.manage'], function()
 	{
 		Route::resource('/deposit', 'DepositController');
-		Route::get('/deposit/delete/{deposit}', 'DepositController@delete');
+		Route::get('/deposit/delete/{deposit}', 'DepositController@delete')->name('deposit.delete');
 		Route::post('/deposit/viewDepositModal/{customer}', 'DepositController@viewDepositModal')->name('deposit.viewDepositModal');
 		Route::post('/deposit/addDepositModal/{customer}', 'DepositController@addDepositModal')->name('deposit.addDepositModal');
 		Route::post('/deposit/addDepositAjax', 'DepositController@addDepositAjax')->name('deposit.addDepositAjax');

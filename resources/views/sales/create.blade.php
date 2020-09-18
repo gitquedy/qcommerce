@@ -421,6 +421,19 @@
           }
         });
 
+        function reOrderItems(stored_items) {
+          var items = JSON.parse(localStorage.getItem(stored_items));
+          var item_list = []
+          var index = 0;
+          $.each(items, function(i, data) {
+              if(data) {
+                item_list[index] = data;
+                index++;
+              }
+          });
+          localStorage.setItem(stored_items, JSON.stringify(item_list));
+        }
+
         function reloadSales() {
           warehouse_reset = false;
           var sales = JSON.parse(localStorage.getItem("sales"));
@@ -441,10 +454,12 @@
             $('#add_sale_form').trigger('reset').trigger('change');
             $('.select2').trigger('change');
           }
+          reOrderItems("sales_items");
           var sales_items = JSON.parse(localStorage.getItem("sales_items"));
           var html = '';
           $("#sales_item_tables tbody").html(html);
-          $.each(sales_items, function(i, data) {
+          console.log(sales_items);
+          $.each(sales_items.reverse(), function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
             var price = data.price;
             var sub_total = price * qty;
@@ -460,6 +475,7 @@
                             '<input type="hidden" name="sales_item_array['+i+'][name]" value="'+data.name+'" />'+
                             '<input type="hidden" name="sales_item_array['+i+'][brand]" value="'+data.brand+'" />'+
                             '<input type="hidden" name="sales_item_array['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="sales_item_array['+i+'][sku_id]" value="'+data.id+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
@@ -569,23 +585,22 @@
             if(localStorage.getItem("sales_items")) {
               sales_items = JSON.parse(localStorage.getItem("sales_items"));            
             }
-            var i = datum.id;
-            if(!sales_items[i] && datum.quantity >= 1) {
-              sales_items[i] = {};
-              sales_items[i]['id']  = datum.id;
-              sales_items[i]['code']  = datum.code;
-              sales_items[i]['name']  = datum.name;
-              sales_items[i]['brand']  = datum.brand;
-              sales_items[i]['cost']  = datum.cost;
-              sales_items[i]['price']  = datum.price;
-              sales_items[i]['quantity']  = 1;
-              sales_items[i]['max_quantity']  = datum.quantity;
-              sales_items[i]['image']  = datum.image;
+            var item_index = sales_items.length;
+            var list_item_index = Object.values(sales_items).findIndex((si => si.id == datum.id));
+            if(list_item_index == -1 && datum.quantity >= 1) {
+              sales_items[item_index] = {};
+              sales_items[item_index]['id']  = datum.id;
+              sales_items[item_index]['code']  = datum.code;
+              sales_items[item_index]['name']  = datum.name;
+              sales_items[item_index]['brand']  = datum.brand;
+              sales_items[item_index]['cost']  = datum.cost;
+              sales_items[item_index]['price']  = datum.price;
+              sales_items[item_index]['quantity']  = 1;
+              sales_items[item_index]['max_quantity']  = datum.quantity;
+              sales_items[item_index]['image']  = datum.image;
             }
-            else if(sales_items[i]['quantity'] < datum.quantity) {
-              sales_items[i]['quantity']++;
-            }
-            else {
+            else if(sales_items[list_item_index]['quantity'] < datum.quantity) {
+              sales_items[list_item_index]['quantity']++;
             }
             localStorage.setItem("sales_items", JSON.stringify(sales_items));
             reloadSales();
@@ -616,9 +631,9 @@
             var input = $(this)
             var name = $(this).data('array_name');
             var val = $(this).val();
-            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            var sales_items = JSON.parse(localStorage.getItem("sales_items")).reverse();
             sales_items[id][name] = val;
-            localStorage.setItem("sales_items", JSON.stringify(sales_items));
+            localStorage.setItem("sales_items", JSON.stringify(sales_items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
@@ -657,17 +672,17 @@
                 break;
             }
             input.val(val).trigger('change');
-            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            var sales_items = JSON.parse(localStorage.getItem("sales_items")).reverse();
             sales_items[id][change] = val;
-            localStorage.setItem("sales_items", JSON.stringify(sales_items));
+            localStorage.setItem("sales_items", JSON.stringify(sales_items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var sales_items = JSON.parse(localStorage.getItem("sales_items"));
+            var sales_items = JSON.parse(localStorage.getItem("sales_items")).reverse();
             delete sales_items[id];
-            localStorage.setItem("sales_items", JSON.stringify(sales_items));
+            localStorage.setItem("sales_items", JSON.stringify(sales_items.reverse()));
             reloadSales();
         });
 

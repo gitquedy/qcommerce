@@ -135,8 +135,8 @@
                                         </tr>
                                       </thead>
                                       <tbody>
-                                        @foreach($adjustment->items as $item)
-                                        <tr data-id="{{$item->sku_id}}">
+                                        @foreach($adjustment->items as $index => $item)
+                                        <tr data-id="{{$index}}">
                                           <td>
                                             <div class="media">
                                               <img src="{{$item->image}}" alt="No Image Available" class="d-flex mr-1 product_image">
@@ -144,10 +144,11 @@
                                                 <h5 class="mt-0">{{$item->sku_name}}</h5>
                                                 {{($item->brand)?$item->sku_name:''}}
                                                 {{$item->sku_code}}
-                                                <input type="hidden" name="adjustment_item_array[{{$item->id}}][image]" class="original_sku_image" value="{{$item->image}}" />
-                                                <input type="hidden" name="adjustment_item_array[{{$item->id}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
-                                                <input type="hidden" name="adjustment_item_array[{{$item->id}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
-                                                <input type="hidden" name="adjustment_item_array[{{$item->id}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
+                                                <input type="hidden" name="adjustment_item_array[{{$index}}][image]" class="original_sku_image" value="{{$item->image}}" />
+                                                <input type="hidden" name="adjustment_item_array[{{$index}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
+                                                <input type="hidden" name="adjustment_item_array[{{$index}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
+                                                <input type="hidden" name="adjustment_item_array[{{$index}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
+                                                <input type="hidden" name="adjustment_item_array[{{$index}}][sku_id]" class="original_sku_id" value="{{$item->sku_id}}" />
                                               </div>
                                             </div>
                                           </td>
@@ -165,7 +166,7 @@
                                           </td>
                                           <td>
                                             <div class="media">
-                                              <select name="adjustment_item_array[{{$item->id}}][type]" data-array_name="type" class="form-control change_sku sku_select_tye original_sku_type" placeholder="Select Type">
+                                              <select name="adjustment_item_array[{{$index}}][type]" data-array_name="type" class="form-control change_sku sku_select_tye original_sku_type" placeholder="Select Type">
                                                 <option value="addition" @if($item->type == "addition") selected @endif>Addition</option>
                                                 <option value="subtraction" @if($item->type == "subtraction") selected @endif>Subtraction</option>
                                               </select>
@@ -177,7 +178,7 @@
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>
                                               </div>
                                               
-                                              <input type="number" name="adjustment_item_array[{{$item->id}}][quantity]" min="1" data-max="{{$datamax}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
+                                              <input type="number" name="adjustment_item_array[{{$index}}][quantity]" min="1" data-max="{{$datamax}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
                                               <div class="input-group-append d-none d-md-inline-block h-100">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>
                                               </div>
@@ -296,7 +297,7 @@
             var i = $(this).data('id');
             if(!items[i]) {
               items[i] = {};
-              items[i]['id']  = i;
+              items[i]['id']  = parseInt($(this).find('input.original_sku_id').val());
               items[i]['code']  = $(this).find('input.original_sku_code').val();
               items[i]['name']  = $(this).find('input.original_sku_name').val();
               items[i]['brand']  = $(this).find('input.original_sku_brand').val();
@@ -320,7 +321,22 @@
           }
         });
 
+
+        function reOrderItems(stored_items) {
+          var items = JSON.parse(localStorage.getItem(stored_items));
+          var item_list = []
+          var index = 0;
+          $.each(items, function(i, data) {
+              if(data) {
+                item_list[index] = data;
+                index++;
+              }
+          });
+          localStorage.setItem(stored_items, JSON.stringify(item_list));
+        }
+
         function reloadAdjustment() {
+          reOrderItems("edit_adjustment_items");
           warehouse_reset = false;
           var adjustment = JSON.parse(localStorage.getItem("edit_adjustment"));
           if(adjustment) {
@@ -341,9 +357,10 @@
             $('.select2').trigger('change');
           }
           var items = JSON.parse(localStorage.getItem("edit_adjustment_items"));
+          console.log(items);
           var html = '';
           $("#adjustment_item_tables tbody").html(html);
-          $.each(items, function(i, data) {
+          $.each(items.reverse(), function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
             var select_addition = (data.type == 'addition')?'selected':' ';
             var select_subtraction = (data.type == 'subtraction')?'selected':' ';
@@ -363,6 +380,7 @@
                             '<input type="hidden" name="adjustment_item_array['+i+'][name]" value="'+data.name+'" />'+
                             '<input type="hidden" name="adjustment_item_array['+i+'][brand]" value="'+data.brand+'" />'+
                             '<input type="hidden" name="adjustment_item_array['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="adjustment_item_array['+i+'][sku_id]" value="'+data.id+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
@@ -451,29 +469,29 @@
             if(localStorage.getItem("edit_adjustment_items")) {
               items = JSON.parse(localStorage.getItem("edit_adjustment_items"));            
             }
-            if(localStorage.getItem("original_edit_adjustment_items")) {
-              original_items = JSON.parse(localStorage.getItem("original_edit_adjustment_items"));            
-            }
-            var i = datum.id;
-            if(original_items[i]) {
-              datum.quantity = parseInt(original_items[i]['max_quantity']);
-            }
+            var item_index = items.length;
+            var list_item_index = Object.values(items).findIndex((ai => ai.id == datum.id));
 
-            if(!items[i]) {
-              items[i] = {};
-              items[i]['id']  = datum.id;
-              items[i]['code']  = datum.code;
-              items[i]['name']  = datum.name;
-              items[i]['brand']  = datum.brand;
-              items[i]['cost']  = datum.cost;
-              items[i]['quantity']  = 1;
-              items[i]['max_quantity']  = datum.quantity;
-              items[i]['image']  = datum.image;
+            if(localStorage.getItem("original_edit_adjustment_items")) {
+              var original_items = JSON.parse(localStorage.getItem("original_edit_adjustment_items"));            
+              var original_item_index = Object.values(original_items).findIndex((ai => ai.id == datum.id));
+              if(original_item_index != -1) {
+                datum.quantity = parseInt(original_items[original_item_index]['max_quantity']);
+              }
             }
-            else if(items[i]['type'] == 'subtraction' && items[i]['quantity'] < parseInt(datum.quantity)) {
-              items[i]['quantity']++;
+            if(list_item_index == -1) {
+              items[item_index] = {};
+              items[item_index]['id']  = datum.id;
+              items[item_index]['code']  = datum.code;
+              items[item_index]['name']  = datum.name;
+              items[item_index]['brand']  = datum.brand;
+              items[item_index]['cost']  = datum.cost;
+              items[item_index]['quantity']  = 1;
+              items[item_index]['max_quantity']  = datum.quantity;
+              items[item_index]['image']  = datum.image;
             }
-            else {
+            else if(items[list_item_index]['type'] == 'subtraction' && items[list_item_index]['quantity'] < parseInt(datum.quantity)) {
+              items[list_item_index]['quantity']++;
             }
             localStorage.setItem("edit_adjustment_items", JSON.stringify(items));
             reloadAdjustment();
@@ -504,9 +522,9 @@
             var input = $(this)
             var name = $(this).data('array_name');
             var val = $(this).val();
-            var adjustment_items = JSON.parse(localStorage.getItem("edit_adjustment_items"));
+            var adjustment_items = JSON.parse(localStorage.getItem("edit_adjustment_items")).reverse();
             adjustment_items[id][name] = val;
-            localStorage.setItem("edit_adjustment_items", JSON.stringify(adjustment_items));
+            localStorage.setItem("edit_adjustment_items", JSON.stringify(adjustment_items.reverse()));
         });
 
         $(document).on('keyup change blur', '.sku_select_tye', function() {
@@ -547,16 +565,16 @@
                 break;
             }
             input.val(val);
-            var items = JSON.parse(localStorage.getItem("edit_adjustment_items"));
+            var items = JSON.parse(localStorage.getItem("edit_adjustment_items")).reverse();
             items[id][change] = val;
-            localStorage.setItem("edit_adjustment_items", JSON.stringify(items));
+            localStorage.setItem("edit_adjustment_items", JSON.stringify(items.reverse()));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var items = JSON.parse(localStorage.getItem("edit_adjustment_items"));
+            var items = JSON.parse(localStorage.getItem("edit_adjustment_items")).reverse();
             delete items[id];
-            localStorage.setItem("edit_adjustment_items", JSON.stringify(items));
+            localStorage.setItem("edit_adjustment_items", JSON.stringify(items.reverse()));
             reloadAdjustment();
         });
 
@@ -619,7 +637,7 @@
               if(result.success == true){
                 toastr.success(result.msg);
                 $('.error').remove();
-                $("#adjustment_reset").trigger('click');
+                // $("#adjustment_reset").trigger('click');
                 setTimeout(function(){
                     window.location.replace(result.redirect);
                 }, 1500);

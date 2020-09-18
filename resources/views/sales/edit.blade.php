@@ -154,8 +154,8 @@
                                         </tr>
                                       </thead>
                                       <tbody>
-                                        @foreach($sales->items as $item)
-                                        <tr data-id="{{$item->sku_id}}">
+                                        @foreach($sales->items as $index => $item)
+                                        <tr data-id="{{$index}}">
                                           <td>
                                             <div class="media">
                                               <img src="{{$item->image}}" alt="No Image Available" class="d-flex mr-1 product_image">
@@ -163,16 +163,17 @@
                                                 <h5 class="mt-0">{{$item->sku_name}}</h5>
                                                 {{($item->brand)?$item->sku_name:''}}
                                                 {{$item->sku_code}}
-                                                <input type="hidden" name="sales_item_array[{{$item->id}}][image]" class="original_sku_image" value="{{$item->image}}" />
-                                                <input type="hidden" name="sales_item_array[{{$item->id}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
-                                                <input type="hidden" name="sales_item_array[{{$item->id}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
-                                                <input type="hidden" name="sales_item_array[{{$item->id}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
+                                                <input type="hidden" name="sales_item_array[{{$index}}][image]" class="original_sku_image" value="{{$item->image}}" />
+                                                <input type="hidden" name="sales_item_array[{{$index}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
+                                                <input type="hidden" name="sales_item_array[{{$index}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
+                                                <input type="hidden" name="sales_item_array[{{$index}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
+                                                <input type="hidden" name="sales_item_array[{{$index}}][sku_id]" class="original_sku_sku_id" value="{{$item->sku_id}}" />
                                               </div>
                                             </div>
                                           </td>
                                           <td class="text-right p-4">
-                                            <input type="hidden" name="sales_item_array[{{$item->id}}][real_unit_price]" class="original_sku_real_unit_price" value="{{$item->unit_price}}" />
-                                            <input type="number" name="sales_item_array[{{$item->id}}][price]" class="form-control change_sku text-right sku_input_price original_sku_price" value="{{$item->unit_price}}">
+                                            <input type="hidden" name="sales_item_array[{{$index}}][real_unit_price]" class="original_sku_real_unit_price" value="{{$item->unit_price}}" />
+                                            <input type="number" name="sales_item_array[{{$index}}][price]" class="form-control change_sku text-right sku_input_price original_sku_price" value="{{$item->unit_price}}">
                                           </td>
                                           <td>
                                             <div class="input-group">
@@ -183,7 +184,7 @@
                                               $warehouse_item = App\WarehouseItems::where('warehouse_id', $sales->warehouse_id)->where('sku_id', $item->sku_id)->first();
                                               $max_quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
                                               @endphp
-                                              <input type="number" name="sales_item_array[{{$item->id}}][quantity]" min="1" data-max="{{$max_quantity}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
+                                              <input type="number" name="sales_item_array[{{$index}}][quantity]" min="1" data-max="{{$max_quantity}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
                                               <div class="input-group-append d-none d-md-inline-block h-100">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>
                                               </div>
@@ -310,7 +311,7 @@
             var i = $(this).data('id');
             if(!items[i]) {
               items[i] = {};
-              items[i]['id']  = i;
+              items[i]['id']  = $(this).find('input.original_sku_id').val();
               items[i]['code']  = $(this).find('input.original_sku_code').val();
               items[i]['name']  = $(this).find('input.original_sku_name').val();
               items[i]['brand']  = $(this).find('input.original_sku_brand').val();
@@ -335,7 +336,21 @@
           }
         });
 
+        function reOrderItems(stored_items) {
+          var items = JSON.parse(localStorage.getItem(stored_items));
+          var item_list = []
+          var index = 0;
+          $.each(items, function(i, data) {
+              if(data) {
+                item_list[index] = data;
+                index++;
+              }
+          });
+          localStorage.setItem(stored_items, JSON.stringify(item_list));
+        }
+
         function reloadSales() {
+          reOrderItems("edit_sales_items");
           warehouse_reset = false;
           var sales = JSON.parse(localStorage.getItem("edit_sales"));
           if(sales) {
@@ -358,7 +373,7 @@
           var items = JSON.parse(localStorage.getItem("edit_sales_items"));
           var html = '';
           $("#sales_item_tables tbody").html(html);
-          $.each(items, function(i, data) {
+          $.each(items.reverse(), function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
             var price = data.price;
             var sub_total = price * qty;
@@ -481,32 +496,31 @@
             if(localStorage.getItem("edit_sales_items")) {
               items = JSON.parse(localStorage.getItem("edit_sales_items"));            
             }
+            var item_index = items.length;
+            var list_item_index = Object.values(items).findIndex((si => si.id == datum.id));
+            var add_qty = 0;
             if(localStorage.getItem("original_edit_sales_items")) {
-              original_items = JSON.parse(localStorage.getItem("original_edit_sales_items"));            
-            }
-            var i = datum.id;
-            if(original_items[i]) {
-              var add_qty = original_items[i]['quantity'];
-            }else {
-              var add_qty = 0;
+              original_items = JSON.parse(localStorage.getItem("original_edit_sales_items"));        
+              var original_item_index = Object.values(original_items).findIndex((si => si.id == datum.id));
+              if(original_item_index != -1) {
+                add_qty = parseInt(original_items[original_item_index]['quantity']);
+              }
             }
 
-            if(!items[i]) {
-              items[i] = {};
-              items[i]['id']  = datum.id;
-              items[i]['code']  = datum.code;
-              items[i]['name']  = datum.name;
-              items[i]['brand']  = datum.brand;
-              items[i]['cost']  = datum.cost;
-              items[i]['price']  = datum.price;
-              items[i]['quantity']  = 1;
-              items[i]['max_quantity']  = datum.quantity;
-              items[i]['image']  = datum.image;
+            if(list_item_index == -1) {
+              items[item_index] = {};
+              items[item_index]['id']  = datum.id;
+              items[item_index]['code']  = datum.code;
+              items[item_index]['name']  = datum.name;
+              items[item_index]['brand']  = datum.brand;
+              items[item_index]['cost']  = datum.cost;
+              items[item_index]['price']  = datum.price;
+              items[item_index]['quantity']  = 1;
+              items[item_index]['max_quantity']  = datum.quantity;
+              items[item_index]['image']  = datum.image;
             }
-            else if(items[i]['quantity'] < (parseInt(datum.quantity) + parseInt(add_qty))) {
-              items[i]['quantity']++;
-            }
-            else {
+            else if(items[list_item_index]['quantity'] < (parseInt(datum.quantity) + parseInt(add_qty))) {
+              items[list_item_index]['quantity']++;
             }
             localStorage.setItem("edit_sales_items", JSON.stringify(items));
             reloadSales();
@@ -537,9 +551,9 @@
             var input = $(this)
             var name = $(this).attr('name');
             var val = $(this).val();
-            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
+            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
             items[id][name] = val;
-            localStorage.setItem("edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
@@ -577,17 +591,17 @@
                 break;
             }
             input.val(val).trigger('change');
-            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
+            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
             items[id][change] = val;
-            localStorage.setItem("edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var items = JSON.parse(localStorage.getItem("edit_sales_items"));
+            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
             delete items[id];
-            localStorage.setItem("edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
             reloadSales();
         });
 
