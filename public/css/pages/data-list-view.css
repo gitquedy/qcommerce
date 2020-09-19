@@ -334,8 +334,8 @@ table.data-thumb-view.dataTable tbody tr {
 
 table.data-list-view.dataTable tbody tr:hover,
 table.data-thumb-view.dataTable tbody tr:hover {
-  -webkit-transform: translateY(-4px);
-          transform: translateY(-4px);
+  /*-webkit-transform: translateY(-4px);*/
+          /*transform: translateY(-4px);*/
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
