@@ -51,9 +51,9 @@ class Sku extends Model
 	}
     
     public static function syncStocks($warehouse_id, $items) {
-        foreach ($items as $id => $item) {
-            $sku = Sku::where('business_id','=', Auth::user()->business_id)->where('id','=', $id)->first();
-            $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $id)->first();
+        foreach ($items as $item) {
+            $sku = Sku::where('business_id','=', Auth::user()->business_id)->where('id','=', $item['sku_id'])->first();
+            $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $item['sku_id'])->first();
             if($sku){
                 $sku->quantity -= $item['quantity'];
                 $warehouse_item->quantity -= $item['quantity'];
