@@ -50,7 +50,7 @@
                             @php
                             $total_paid = 0;
                             foreach ($customer->sales as $sale) {
-                                if (in_array($sale->payment_status, ['pending', 'partial']) && $sale->status == 'completed') {
+                                if (in_array($sale->payment_status, ['paid', 'partial']) && $sale->status == 'completed') {
                                   $total_paid += $sale->paid;
                                 }
                             }
