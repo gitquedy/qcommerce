@@ -43,7 +43,7 @@
                                 }
                             }
                             @endphp
-                            <p class="display-4">{{number_format($total_sales, 2)}}</p>
+                            <p class="display-4" style="font-size: 2.5rem!important">{{number_format($total_sales, 2)}}</p>
                             <p class="text-warning">Total Sales</p>
                         </div>
                         <div class="card col-md-4 btn-outline-success mx-1 px-2 d-inline-block" style="max-width: 20rem;">
@@ -55,7 +55,7 @@
                                 }
                             }
                             @endphp
-                            <p class="display-4">{{number_format($total_paid, 2)}}</p>
+                            <p class="display-4" style="font-size: 2.5rem!important">{{number_format($total_paid, 2)}}</p>
                             <p class="text-success">Total Paid</p>
                         </div>
                         <div class="card col-md-4 btn-outline-danger mx-1 px-2 d-inline-block" style="max-width: 20rem;">
@@ -67,14 +67,14 @@
                                 }
                             }
                             @endphp
-                            <p class="display-4">{{number_format($balance, 2)}}</p>
+                            <p class="display-4" style="font-size: 2.5rem!important">{{number_format($balance, 2)}}</p>
                             <p class="text-danger">Balance</p>
                         </div>
                         <div class="card col-md-4 btn-outline-primary mx-1 px-2 d-inline-block" style="max-width: 20rem;">
                             @php
                             
                             @endphp
-                            <p class="display-4">{{number_format($customer->available_deposit(), 2)}}</p>
+                            <p class="display-4" style="font-size: 2.5rem!important">{{number_format($customer->available_deposit(), 2)}}</p>
                             <p class="text-primary">Deposit</p>
                         </div>
                       </div>
