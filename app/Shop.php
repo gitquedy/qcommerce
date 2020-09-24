@@ -24,7 +24,8 @@ class Shop extends Model
 {
     protected $table = 'shop';
 
-    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site', 'warehouse_id', 'domain'];
+    protected $fillable = ['business_id', 'name', 'short_name', 'refresh_token', 'access_token', 'expires_in', 'active', 'email', 'is_first_time', 'shop_id', 'site', 'warehouse_id', 'domain', 'pro_authentication_type', 'pro_username', 'pro_password', 'pro_status'
+        ];
 
     public static $statuses = [
               'shipped', 'ready_to_ship', 'pending', 'delivered', 'returned', 'failed', 'unpaid', 'canceled', 
