@@ -50,7 +50,7 @@
                             @php
                             $total_paid = 0;
                             foreach ($customer->sales as $sale) {
-                                if (in_array($sale->payment_status, ['pending', 'partial']) && $sale->status == 'completed') {
+                                if (in_array($sale->payment_status, ['paid', 'partial']) && $sale->status == 'completed') {
                                   $total_paid += $sale->paid;
                                 }
                             }
@@ -262,6 +262,9 @@
                                   <th>Note</th>
                                   <th>Created By</th>
                                   <th>Updated By</th>
+                                  @if (Auth::user()->role == "Owner")
+                                  <th>Action</th>
+                                  @endif
                                 </tr>
                               </thead>
                               <tbody>
@@ -273,7 +276,19 @@
                                       <td>{{number_format($deposit->amount, 2)}}</td>
                                       <td>{{$deposit->note}}</td>
                                       <td>{{$deposit->created_by_name->formatName()}}</td>
-                                      <td>{{($deposit->updated_by_name)?$deposit->updated_by_name->formatName():'--'}}</td>
+                                      <td>{{($deposit->updated_by_name)?$deposit->updated_by_name->formatName():'--'}}
+                                      </td>
+                                      @if (Auth::user()->role == "Owner")
+                                      <td>
+                                        <div class="btn-group mr-1 mb-1">
+                                          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                                          Action<span class="sr-only">Toggle Dropdown</span></button>
+                                          <div class="dropdown-menu">
+                                              <a class="dropdown-item modal_button" href="#" data-href="{{ route('deposit.delete', $deposit->id) }}" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      @endif
                                     </tr>
                                   @endforeach
                               </tbody>

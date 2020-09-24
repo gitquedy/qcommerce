@@ -210,7 +210,7 @@ class DepositController extends Controller
         }
         try {
             DB::beginTransaction();
-            if($deposit->amount <= Auth::user()->available_deposit()) {
+            if($deposit->amount <= $deposit->customer->available_deposit()) {
                 $deposit->delete();
                 DB::commit();
                 $output = ['success' => 1,
