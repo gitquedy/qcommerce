@@ -7,8 +7,9 @@ use Oseintow\Shopify\Facades\Shopify;
 use App\Shop;
 use Carbon\Carbon;
 use App\Order;
-use App\Products;
+use App\Products;   
 use App\OrderItem;
+use App\Utilities;
 use MarcinOrlowski\ResponseBuilder\ResponseBuilder;
 
 class ShopifyController extends Controller
@@ -73,24 +74,59 @@ class ShopifyController extends Controller
 
     public function test(Request $request){
 
-        $shops = Shop::all()->pluck('id');
-        $product = Products::first();
-        $product->updatePlatform();
+        // $shops = Shop::all()->pluck('id');
+        // $product = Products::first();
+        // $product->updatePlatform();
 
 
 
-                $shop = Shop::first();
+        //         $shop = Shop::first();
 
-        $params = [                
-                    'updated_at_min' => Carbon::parse('2018-01-01')->format('c'),
-                    'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
-                    'limit' => 250,
-                ];
+        // $params = [                
+        //             'updated_at_min' => Carbon::parse('2018-01-01')->format('c'),
+        //             'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
+        //             'limit' => 250,
+        //         ];
 
-        $products = Shopify::setShopUrl($shop->domain)
-                    ->setAccessToken($shop->access_token)
-                    ->get('admin/products.json', $params);
-                    dd($products);        
+        // $products = Shopify::setShopUrl($shop->domain)
+        //             ->setAccessToken($shop->access_token)
+        //             ->get('admin/products.json', $params);
+        //             dd($products);      
+        $shop = Shop::where('site', 'shopee')->first();
+
+         $client = $shop->shopeeGetClient();
+            $dates = Utilities::getDaterange('2018-01-01', Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+1 day');
+            $products = [];
+            $created_before_increment = 1;
+            foreach($dates as $date){
+                $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
+                $created_before_increment += 1;
+                $more = true;   
+                $offset = 0;
+                while($more){
+                    $params = [
+                        // 'update_time_from' => Carbon::createFromFormat('Y-m-d', $date)->timestamp,
+                        // 'update_time_to' => Carbon::createFromFormat('Y-m-d', $created_before)->timestamp,
+                        // 'pagination_entries_per_page' => 100,
+                        // 'pagination_offset' => $offset,
+                        'item_id' => 2314186038,
+                    ];
+                    $offset += 100;
+                    $result = $client->item->getItemDetail($params)->getData();
+                    dd($result);
+                    if(isset($result['items'])){
+                        $more = $result['more'];
+                        if(count($result['items']) > 0){
+                            foreach($result['items'] as $product){
+                                $products[] = $product;
+                            }
+                        }
+                    }else{
+                        $more = false;
+                    }
+                }
+            }
+            dd($products);
     }
 }
 

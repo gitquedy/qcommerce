@@ -144,14 +144,26 @@ class ShopController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function Store(Request $request)
     {
-        $validator = Validator::make($request->all(), ['name' => ['required', 'regex:/^[\pL\s\-]+$/u'], 'short_name' => 'required'], ['name.regex' => 'Only character\'s are allowed']);
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'regex:/^[\pL\s\-]+$/u'],
+            'short_name' => 'required',
+            'pro_username' => 'required_if:pro_status,1',
+            'pro_password' => 'required_if:pro_status,1',
+            'warehouse_id' => 'required',
+         ], [
+            'name.regex' => 'Only character\'s are allowed',
+            'warehouse_id.required' => 'Please select a warehouse',
+            'pro_username.required_if' => 'Username field is required',
+            'pro_password.required_if' => 'Password field is required',
+     ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
             }
         try {
+
             $data = $request->all();
             DB::beginTransaction();
             if($data['code'] != null && $data['shop_id'] == null && $data['shop'] == null){ // lazada
@@ -210,15 +222,15 @@ class ShopController extends Controller
                         ];
                     return response()->json($output);
                 }
-                $data = [
-                    'expires_in' => Carbon::now()->addDays(364),
-                    'site' => 'shopee',
-                    'shop_id' => $client['shop_id'],
-                    'name' => $data['name'],
-                    'short_name' => $data['short_name'],
-                    'business_id' => $request->user()->business_id,
-                    'warehouse_id' => $request->warehouse_id,
-                ];
+
+                $data['expires_in'] = Carbon::now()->addDays(364);
+                $data['site']= 'shopee';
+                $data['shop_id'] = $client['shop_id'];
+                $data['name']= $data['name'];
+                $data['short_name'] = $data['short_name'];
+                $data['business_id'] = $request->user()->business_id;
+                $data['warehouse_id'] = $request->warehouse_id;
+
                 $shop = Shop::create($data);
                 $output = ['success' => 1,
                         'msg' => 'Shop added successfully!',
@@ -227,16 +239,16 @@ class ShopController extends Controller
             }else if($data['code'] != null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
                 if(Shopify::verifyRequest($request->only(['code','shop', 'hmac', 'timestamp']))){
                     $accessToken = Shopify::setShopUrl($data['shop'])->getAccessToken($data['code']);
-                    $data = [
-                        'expires_in' => Carbon::now()->addDays(364),
-                        'domain' => $data['shop'],
-                        'access_token' => $accessToken,
-                        'site' => 'shopify',
-                        'name' => $data['name'],
-                        'short_name' => $data['short_name'],
-                        'business_id' => $request->user()->business_id,
-                        'warehouse_id' => $request->warehouse_id,
-                    ];
+
+                    $data['expires_in'] = Carbon::now()->addDays(364);
+                    $data['domain'] = $data['shop'];
+                    $data['access_token'] = $accessToken;
+                    $data['site'] = 'shopify';
+                    $data['name'] = $data['name'];
+                    $data['short_name'] = $data['short_name'];
+                    $data['business_id'] = $request->user()->business_id;
+                    $data['warehouse_id']= $request->warehouse_id;
+
                     $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
                     $output = ['success' => 1,
                             'msg' => 'Shop added successfully!',
