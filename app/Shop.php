@@ -698,9 +698,11 @@ class Shop extends Model
             $r->addApiParam('created_after', $date);
             $result = $c->execute($r, $this->access_token);
             $data = json_decode($result, true);
-            foreach($data['data'] as $payout){
-                $payout['shop_id'] = $this->id;
-                LazadaPayout::updateOrCreate(['shop_id' => $payout['shop_id'], 'statement_number' => $payout['statement_number']],$payout);
+            if(isset($data['data'])){
+                foreach($data['data'] as $payout){
+                    $payout['shop_id'] = $this->id;
+                    LazadaPayout::updateOrCreate(['shop_id' => $payout['shop_id'], 'statement_number' => $payout['statement_number']],$payout);
+                }
             }
         }
     }
