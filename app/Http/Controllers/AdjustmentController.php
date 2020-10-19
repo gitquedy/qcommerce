@@ -177,7 +177,7 @@ class AdjustmentController extends Controller
      * @param  \App\Adjustment  $adjustment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Adjustment $adjustment)
+    public function edit(Adjustment $adjustment, Request $request)
     {
         if($adjustment->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this adjustment');
