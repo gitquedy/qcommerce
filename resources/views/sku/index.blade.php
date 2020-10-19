@@ -41,6 +41,7 @@
             <!--<a class="dropdown-item" href="#">Print</a>-->
             <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.bulkremove') }}"> Delete</a>
             <a class="dropdown-item massAction" href="#" data-action="{{ route('sku.syncSkuProducts') }}">Sync Products</a>
+            <a class="dropdown-item" target="_blank" href="{{ route('sku.export') }}">Export Csv</a>
           </div>
         </div>
       </div>

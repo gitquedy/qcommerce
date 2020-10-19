@@ -78,10 +78,13 @@ class BarcodeController extends Controller
                             'pic' => $item['product_main_image'],
                             'name' => $item['name'],
                             'qty' => 1,
+                            'unit_price' => $item['item_price'],
+                            'sub_total' => $item['item_price'],
                         );
                     }
                     else {
                         $items[$sku]['qty'] += 1;
+                        $items[$sku]['sub_total'] += $item['item_price'];
                     }
                 }
                 
@@ -90,6 +93,7 @@ class BarcodeController extends Controller
                 $data = $client->order->getOrderDetails(['ordersn_list' => array_values([$order->ordersn])])->getData();
                 foreach ($data['orders'][0]['items'] as $item) {
                     $sku = $item['item_sku'];
+                    // die(var_dump($item));
                     if(!in_array($sku, $items_sku)) {
                         array_push($items_sku, $sku);
                         $items[$sku] = array(
@@ -97,10 +101,13 @@ class BarcodeController extends Controller
                             'pic' => '',
                             'name' => $item['item_name'],
                             'qty' => $item['variation_quantity_purchased'],
+                            'unit_price' => (int)  $item['variation_original_price'],
+                            'sub_total' => (int)  $item['variation_original_price'] * $item['variation_quantity_purchased'],
                         );
                     }
                     else {
                         $items[$sku]['qty'] += $item['variation_quantity_purchased'];
+                        $items[$sku]['sub_total'] +=  (int) $item['variation_original_price'];
                     }
                 }
             }else{

@@ -161,6 +161,7 @@
                                       <thead>
                                         <tr>
                                           <th class="text-center" width="80%">Product (Code - Name)</th>
+                                          <th class="text-center" width="10%">Current Stock</th>
                                           <th class="text-center" width="15%">Quantity</th>
                                           <th class="text-center" width="5%"><i class="feather icon-trash"></i></th>
                                         </tr>
@@ -171,6 +172,7 @@
                                       <tfoot>
                                         <tr>
                                           <th class="text-center text-muted text-sm">[Product (Code - Name)]</th>
+                                          <th class="text-center text-muted text-sm">[Current Stock]</th>
                                           <th class="text-center text-muted text-sm">[Quantity]</th>
                                           <th class="text-center text-muted"><i class="feather icon-trash"></i></th>
                                         </tr>
@@ -282,6 +284,9 @@
                             '<input type="hidden" name="transfer_item_array['+i+'][code]" value="'+data.code+'" />'+
                           '</div>'+
                         '</div>'+
+                      '</td>'+
+                      '<td>'+
+                        '<h4 class="text-center">'+data.max_quantity+'</h4>'+
                       '</td>'+
                       '<td>'+
                       '<div class="input-group">'+

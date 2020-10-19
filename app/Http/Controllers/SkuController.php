@@ -530,6 +530,13 @@ class SkuController extends Controller
             ]);
     }
 
+    public function export(Request $request){
+        $skus = Sku::select('code','name','brand','category','supplier','cost','price','alert_quantity')->where('business_id', $request->user()->business_id)->get()->toArray();
+        $columns = ['code','name','brand','category','supplier','cost','price','alert_quantity'];
+
+        return sku::getCsv($columns, $skus, 'Sku ' . Carbon::now(). '.csv');
+    }
+
     public function submitImport(Request $request) {
         try {
             if(Excel::import(new SkuImport,request()->file('file'))) {

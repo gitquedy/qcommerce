@@ -238,7 +238,7 @@
             </div>
             <div class="card">
                 <div class="card-header d-flex justify-content-between pb-0">
-                    <h4 class="card-title">Warehouse Stocks </h4>
+                    <h4 class="card-title">Warehouse Stocks Value </h4>
                     <div class="dropdown chart-dropdown">
                         <button class="btn btn-sm border-0 dropdown-toggle px-0" type="button" id="dropdownItem4"
                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -467,13 +467,13 @@
     function refresh_pie(ele,type){
         
         if(ele==undefined){
-            $('#dropdownItem3').html("This Month");
+            $('#dropdownItem3').html("Today");
         }else{
            $('#dropdownItem3').html($(ele).html()); 
         }
         
         if(type==undefined){
-            type = 'This_Month';
+            type = 'Today';
         }
         
         

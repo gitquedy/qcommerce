@@ -60,9 +60,11 @@
             <table class="table">
               <thead>
                 <tr>
-                  {{-- 
+             
                   <th>Customer Name</th>
+                  <th>Order Number</th>
                   <th>Date</th>
+                  {{-- 
                   <th>Payment</th>
                   <th>Price</th>
                   <th>Item Count</th> --}}
@@ -71,9 +73,9 @@
               <tbody>
                 <tr>
                   <td id="customer_name" class="clear_order"></td>
-                  {{-- 
                   <td id="order_number" class="clear_order"></td>
                   <td id="date" class="clear_order"></td>
+                   {{-- 
                   <td id="payment" class="clear_order"></td>
                   <td id="price" class="clear_order"></td>
                   <td id="item_count" class="clear_order"></td> --}}
@@ -97,10 +99,15 @@
                   <th>Image</th>
                   <th>Name</th>
                   <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Sub Total</th>
                 </tr>
               </thead>
               <tbody id="items_list" class="clear_order">
               </tbody>
+              <tfoot id="foot_list" class="clear_order">
+                
+              </tfoot>
             </table>
           </div>
         </div>
@@ -236,8 +243,8 @@
           $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
           $("#shop_id").val(order.shop_id);
           $("#order_id").val(order.id);
-          // $("#order_number").html("<h5>"+order.id+"</h5>");
-          // $("#date").html("<h5>"+order.created_at+"</h5>");
+          $("#order_number").html("<h5>"+order.ordersn+"</h5>");
+          $("#date").html("<h5>"+order.created_at+"</h5>");
           // $("#payment").html("<h5>"+order.payment_method+"</h5>");
           // $("#price").html("<h5>"+order.price+"</h5>");
           // $("#item_count").html("<h5>"+order.items_count+"</h5>");
@@ -245,14 +252,26 @@
           if(order.packed == 0) {
             $("#packed_div").show();
           }
+          var total_qty = 0;
+          var total_price = 0;
           $.each(items, function(index, item) {
+            total_qty += item.qty;
+            total_price += item.sub_total;
             $("#items_list").append(
               '<tr><td><img src="'+item.pic+'" class="product_image"></td>'+
               '<td><p>'+item.name+'</p></td>'+
-              '<td><h4><input type="hidden" name="items['+item.sku+']" value="'+item.qty+'" />x'+item.qty+'</h4></td></tr>'
+              '<td><h4><input type="hidden" name="items['+item.sku+']" value="'+item.qty+'" />x'+item.qty+'</h4></td>' +
+              '<td><p>'+item.unit_price+'</p></td>'+
+              '<td><p>'+item.sub_total+'</p></td></tr>'
               );
           });
+
+          var total = +order.shipping_fee + +total_price;
+          $("#foot_list").append("<tr><th>-</th><th>-</th><th>Total Qty: "+ total_qty + "</th><th>Total Amount:</th><th>"+ total_price +"</th></tr>");
+          $("#foot_list").append("<tr><th>-</th><th>-</th><th>-</th><th>Shipping Fee:</th><th>"+ order.shipping_fee +"</th></tr>");
+          $("#foot_list").append("<tr><th>-</th><th>-</th><th>-</th><th>Grand Total:</th><th>"+ total +"</th></tr>");
         }
+
       }
     });
   });
