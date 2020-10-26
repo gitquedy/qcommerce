@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Inventory')
+@section('title', 'Expenses')
 
 @section('vendor-style')
         {{-- vednor files --}}
