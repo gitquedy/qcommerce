@@ -12,6 +12,7 @@ use App\OrderRef;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class PaymentController extends Controller
 {
@@ -88,20 +89,33 @@ class PaymentController extends Controller
      */
     public function destroy(Payment $payment)
     {
-        $sales = $payment->sale;
-        if($sales->business_id != Auth::user()->business_id){
+        $record = $payment->payable;
+        if($record->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this sale');
         }
         try {
             DB::beginTransaction();
-            $sales->paid -= $payment->amount;
-            if($sales->grand_total != $sales->paid && $sales->paid == 0) {
-                $sales->payment_status = "pending";
+            if($payment->payable_type == "Sales"){
+                $sales = $record;
+                $sales->paid -= $payment->amount;
+                if($sales->grand_total != $sales->paid && $sales->paid == 0) {
+                    $sales->payment_status = "pending";
+                }
+                else if($sales->grand_total != $sales->paid && $sales->paid != 0) {
+                    $sales->payment_status = "partial";
+                }
+                $sales->save();
+            }else if($payment->payable_type == "Expense"){
+                $expense = $record;
+                $expense->paid -= $payment->amount;
+                if($expense->amount != $expense->paid && $expense->paid == 0) {
+                    $expense->payment_status = "pending";
+                }
+                else if($expense->grand_total != $expense->paid && $expense->paid != 0) {
+                    $expense->payment_status = "partial";
+                }
+                $expense->save();
             }
-            else if($sales->grand_total != $sales->paid && $sales->paid != 0) {
-                $sales->payment_status = "partial";
-            }
-            $sales->save();
             $payment->delete();
             DB::commit();
             $output = ['success' => 1,
@@ -118,7 +132,7 @@ class PaymentController extends Controller
     }
 
     public function delete(Request $request, Payment $payment){
-      if($payment->sale->business_id != Auth::user()->business_id){
+      if($payment->payable->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to delete this payment');
       }
         $action = action('PaymentController@destroy', $payment);
@@ -126,21 +140,37 @@ class PaymentController extends Controller
         return view('layouts.delete', compact('action' , 'title'));
     }
 
-    public function viewPaymentModal(Sales $sales, Request $request) {
-        $business_id = Auth::user()->business_id;
-        $payments = Payment::where('sales_id', $sales->id)->get();
-        return view('payment.modal.viewPayment', compact('sales','payments'));
+    public function viewPaymentModal($type, $id, Request $request) {
+        $types = config('app.morph_payments');
+    
+        // ensure type exists
+        if(!in_array($type, array_keys($types))) {
+            abort(404);
+        }
+        // ensure item exists
+        $record = $types[$type]::findOrFail($id);
+
+        return view('payment.modal.viewPayment', compact('record', 'type'));
     }
 
-    public function addPaymentModal(Sales $sales, Request $request) {
-        $business_id = Auth::user()->business_id;
-        return view('payment.modal.addPayment', compact('sales'));
+    public function addPaymentModal($type, $id, Request $request) {
+        $types = config('app.morph_payments');
+    
+        // ensure type exists
+        if(!in_array($type, array_keys($types))) {
+            abort(404);
+        }
+        // ensure item exists
+        $record = $types[$type]::findOrFail($id);
+        return view('payment.modal.addPayment', compact('record', 'type'));
     }
 
     public function addPaymentAjax(Request $request) {
+        $types = config('app.morph_payments');
         $validator = Validator::make($request->all(),[
-            'sales_id' => 'required',
-            'customer_id' => 'required',
+            'payable_id' => 'required',
+            'payable_type' => 'required|in:'. implode(array_keys($types), ','),
+            // 'customer_id' => 'required',
             'date' => 'required|date|max:255',
             'reference_no' => 'nullable',
             'amount' => 'required|numeric|min:0',
@@ -168,7 +198,8 @@ class PaymentController extends Controller
             $data = $request->all();
             $data = new Payment;
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
-            $data->sales_id = $request->sales_id;
+            $data->payable_id = $request->payable_id;
+            $data->payable_type = $request->payable_type;
             $data->customer_id = $request->customer_id;
             $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
             $data->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_pay();
@@ -190,18 +221,35 @@ class PaymentController extends Controller
                 if (!$request->reference_no) {
                     $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
                 }
-                $sale = Sales::whereId($request->sales_id)->first();
-                $sale->paid += $request->amount;
-                if($sale->grand_total == $sale->paid) {
-                    $sale->payment_status = "paid";
+                $record = $types[$request->payable_type]::findOrFail($request->payable_id);
+                if($request->payable_type == 'Sales'){
+                    $sale = $record;
+                    $sale->paid += $request->amount;
+                    if($sale->grand_total == $sale->paid) {
+                        $sale->payment_status = "paid";
+                    }
+                    else if($sale->paid == 0) {
+                        $sale->payment_status = "pending";
+                    }
+                    else if($sale->paid > 0 && $sale->paid < $sale->grand_total) {
+                        $sale->payment_status = "partial";
+                    }
+                    $sale->save();
+                }else if($request->payable_type == "Expense"){
+                    $expense = $record;
+                    $expense->paid += $request->amount;
+                    if($expense->amount == $expense->paid) {
+                        $expense->payment_status = "paid";
+                    }
+                    else if($expense->paid == 0) {
+                        $expense->payment_status = "pending";
+                    }
+                    else if($expense->paid > 0 && $expense->paid < $expense->amount) {
+                        $expense->payment_status = "partial";
+                    }
+                    $expense->save();
                 }
-                else if($sale->paid == 0) {
-                    $sale->payment_status = "pending";
-                }
-                else if($sale->paid > 0 && $sale->paid < $sale->grand_total) {
-                    $sale->payment_status = "partial";
-                }
-                $sale->save();
+                
                 $output = ['success' => 1,
                     'customer' => $data,
                     'msg' => 'Payment added successfully!',

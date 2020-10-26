@@ -81,7 +81,7 @@
                 <div class="form-group">
                     <label>Amount</label>
                     <div class="position-relative has-icon-left">
-                      <input type="text" class="form-control" name="amount" placeholder="Amount">
+                      <input type="text" class="form-control" name="amount" placeholder="Amount" id="amount">
                       <div class="form-control-position"> 
                         <i class="feather icon-dollar-sign"></i>
                       </div>
@@ -132,6 +132,164 @@
             </div>
           </div>
       </div>
+      <br>
+      <br>
+      <h4 class="card-title">Payment</h4>
+      <hr>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+              <label>Payment Referencce No.</label>
+              <div class="position-relative has-icon-left">
+                <input type="text" class="form-control update_input" name="payment_reference_no" placeholder="Reference No.">
+                <div class="form-control-position"> 
+                  <i class="feather icon-hash"></i>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Paid Amount</label>
+                <div class="position-relative has-icon-left">
+                  <input type="number" name="paid" class="form-control update_input check_max_quantity" value="0" max="0">
+                  <div class="form-control-position"> 
+                    <i class="feather icon-dollar-sign"></i>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label>Payment Type</label>
+            <div class="position-relative has-icon-left">
+              <select name="payment_type" id="payment_type" class="form-control select2">
+                <option value="cash">Cash</option>
+                <option value="gift_certificate">Gift Card</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="cheque">Cheque</option>
+                <option value="deposit">Deposit</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="form-control-position"> 
+                <i class="feather icon-credit-card"></i>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="credit_card payment_type_ext" style="display: none;">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card border-light">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="cc_no">Credit Card No.</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="cc_no" class="form-control input-number" placeholder="Credit Card No.">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-credit-card"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="cc_no">Holder Name</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="cc_holder" class="form-control" placeholder="Holder Name">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-user"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="cc_type">Card Type</label>
+                    <div class="position-relative has-icon-left">
+                      <select name="cc_type" class="form-control select2">
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">Master Card</option>
+                        <option value="amex">Amex</option>
+                        <option value="discover">Discover</option>
+                      </select>
+                      <div class="form-control-position"> 
+                        <i class="feather icon-credit-card"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="cc_no">Month</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="cc_month" class="form-control input-number" placeholder="Month">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-credit-card"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <label for="cc_no">Year</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="cc_year" class="form-control input-number" placeholder="Year">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-credit-card"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cheque payment_type_ext" style="display: none;">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card border-light">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="cheque_no">Cheque No.</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="cheque_no" class="form-control input-number" placeholder="Cheque No.">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-credit-card"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gift_certificate payment_type_ext" style="display: none;">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card border-light">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="gift_card_no">Gift Card No.</label>
+                    <div class="position-relative has-icon-left">
+                      <input type="text" name="gift_card_no" class="form-control input-number" placeholder="Gift Card No.">
+                      <div class="form-control-position"> 
+                        <i class="feather icon-gift"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <label for="note">Payment Note</label>
+          <textarea name="note" id="" cols="20" rows="5" class="form-control" placeholder="Note"></textarea>
+        </div>
+      </div>
+      <br><br>
       <div class="row">
         <div class="col-6">
          <div class="col-12">
@@ -204,6 +362,16 @@
         $(this).val('').trigger('change');
       } 
   });
+
+  $('#payment_type').on('change', function() {
+      $('.payment_type_ext').hide('fast');
+      $('.'+$(this).val()).show('fast');
+    });
+
+  $('#amount').on('change', function() {
+      $("input[name=paid]").attr('max', $(this).val()).trigger('change');
+    });
+
 
 </script>
 <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>

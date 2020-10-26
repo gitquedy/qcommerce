@@ -7,7 +7,7 @@
   </style>
   <div class="modal-content">
   	<div class="modal-header">
-		<h4 class="modal-title" id="modal-title">Payments for {{$sales->reference_no}}</h4>
+		<h4 class="modal-title" id="modal-title">Payments for {{$record->reference_no}}</h4>
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
 	<div class="modal-body">
@@ -25,7 +25,7 @@
             </tr>
           </thead>
           <tbody>
-            @forelse($payments as $pay)
+            @forelse($record->payments as $pay)
               <tr>
                 <td>{{$pay->date}}</td>
                 <td>{{$pay->reference_no}}</td>

@@ -235,5 +235,11 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Shopify' => Oseintow\Shopify\Facades\Shopify::class,
     ],
+    
+    'morph_payments' => [
+        'Sales' => 'App\Sales',
+        'Expense' => 'App\Expense',
+        // ...
+    ]
 
 ];

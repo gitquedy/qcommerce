@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 use Auth;
+use App\Payment;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Sales extends Model
 {
@@ -36,7 +38,8 @@ class Sales extends Model
     }
 
     public function payments(){
-        return $this->hasMany(Payment::class, 'sales_id', 'id');
+        // return $this->hasMany(Payment::class, 'sales_id', 'id');
+        return $this->morphMany(Payment::class, 'payable', 'payable_type');
     }
 
     public function warehouse() {

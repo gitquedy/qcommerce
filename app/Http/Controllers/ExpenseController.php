@@ -17,7 +17,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Settings;
 use App\OrderRef;
-use Illuminate\Support\Facades\File; 
+use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
+use App\Payment;
 
 class ExpenseController extends Controller
 {
@@ -59,15 +61,52 @@ class ExpenseController extends Controller
             ->addColumn('date_formatted', function(Expense $Expense) {
                 return Utilities::format_date($Expense->date,'M d, Y');
             })
+            ->addColumn('balance', function(Expense $Expense) {
+                return number_format($Expense->amount - $Expense->paid, 2);
+            })
+            ->editColumn('paid', function(Expense $Expense) {
+                            return number_format($Expense->paid, 2);
+                        })
+            ->editColumn('payment_status', function(Expense $Expense) {
+                switch ($Expense->payment_status) {
+                    case 'paid':
+                            return '<span class="badge badge-pill badge-success">Paid</span>';
+                        break;
+                    case 'pending':
+                            return '<span class="badge badge-pill badge-warning">Pending</span>';
+                        break;
+                    case 'partial':
+                            return '<span class="badge badge-pill badge-info">Partial</span>';
+                        break;
+                    case 'due':
+                            return '<span class="badge badge-pill badge-danger">Due</span>';
+                        break;
+                    
+                    default:
+                            return '<span class="badge badge-pill badge-secondary">Unknown</span>';
+                        break;
+                }
+            })
             ->addColumn('action', function(Expense $Expense) {
-                            return '<div class="btn-group dropup mr-1 mb-1">
+
+                if($Expense->payment_status != 'paid') {
+                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', ['type' => 'Expense', 'id' =>  $Expense->id]).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
+                    }
+                    else {
+                        $add_payment = '';
+                    }
+                $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal',['type' => 'Expense', 'id' =>  $Expense->id]).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
+                            return'<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu"> 
+                    <a class="dropdown-item toggle_view_modal" href="" data-action="'.action('ExpenseController@show', $Expense->id).'"><i class="fa fa-eye" aria-hidden="true"></i> View Expense</a>
+                    ' . $add_payment . $view_payments .  '
                                         <a class="dropdown-item fa fa-edit" href="'.action('ExpenseController@edit',$Expense->id).'" > Edit</a>
                     <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $Expense->reference_no .' ?" data-text="This Action is irreversible." data-href="'.action('ExpenseController@destroy',$Expense->id).'" > Delete</a>      
                     </div></div>';
                  })
+                ->rawColumns(['payment_status', 'action'])
                 ->make(true);
         }
             
@@ -109,7 +148,17 @@ class ExpenseController extends Controller
             'amount' => ['required', 'regex:/^\d*(\.\d{1,2})?$/'], //float or whole number
             'attachment' => ['nullable', 'mimes:jpeg,png,xls,xlsx,csv,pdf,doc,docx'],
             'note' => 'nullable|string|max:255',
-            'expense_category_id' => ['required', 'exists:expense_category,id']
+            'expense_category_id' => ['required', 'exists:expense_category,id'],
+            'payment_reference_no' => 'nullable',
+            'payment_type' => Rule::requiredIf($request->paid > 0),
+            'gift_card_no' => Rule::requiredIf($request->payment_type == 'gift_certificate' && $request->paid > 0),
+            'cc_no' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_holder' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_type' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_month' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cc_year' => Rule::requiredIf($request->payment_type == 'credit_card' && $request->paid > 0),
+            'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque' && $request->paid > 0),
+            'payment_note' => 'nullable',
         ]);
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
@@ -137,7 +186,41 @@ class ExpenseController extends Controller
 
             $data['date'] = Carbon::parse($request->date)->format('Y-m-d');
 
-            Expense::create($data);
+            $total = $request->amount;
+
+            if($total == $request->paid) {
+                $data['payment_status'] = "paid";
+            }
+            else if($request->paid == 0) {
+                $data['payment_status'] = "pending";
+            }
+            else if($request->paid > 0 && $request->paid < $total) {
+                $data['payment_status'] = "partial";
+            }
+
+            $expense = Expense::create($data);
+
+            if($request->paid) {
+                $payment = new Payment;
+                $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
+                $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
+                $payment->amount = $request->paid;
+                $payment->payment_type = $request->payment_type;
+                $payment->gift_card_no = $request->gift_card_no;
+                $payment->cc_no = $request->cc_no;
+                $payment->cc_holder = $request->cc_holder;
+                $payment->cc_type = $request->cc_type;
+                $payment->cc_month = $request->cc_month;
+                $payment->cc_year = $request->cc_year;
+                $payment->cheque_no = $request->cheque_no;
+                $payment->status = 'received';
+                $payment->note = $request->note;
+                $payment->created_by = $request->user()->id;
+                $expense->payments()->save($payment);
+                if (!$request->payment_reference_no) {
+                    $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
+                }
+            }
             $output = ['success' => 1,
                 'msg' => 'Expense added successfully!',
                 'redirect' => action('ExpenseController@index')
@@ -162,7 +245,8 @@ class ExpenseController extends Controller
      */
     public function show(Expense $expense)
     {
-        //
+        $payments = $expense->payments;
+        return view('expense.show', compact('expense','payments'));
     }
 
     /**
@@ -278,6 +362,7 @@ class ExpenseController extends Controller
         $expenses = Expense::whereIn('id', $ids)->where('business_id', $request->user()->business_id)->get();
         foreach($expenses as $expense){
             File::delete('images/expenses/' . $expense->attachment);
+            $expense->payments()->delete();
             $expense->delete();
         }
         $output = ['success' => 1,

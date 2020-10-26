@@ -23,6 +23,8 @@ class CreateExpenseTable extends Migration
             $table->string('date');
             $table->string('reference_no');
             $table->float('amount', 10, 2);
+            $table->float('paid', 10, 2);
+            $table->string('payment_status');
             $table->string('note')->default(null)->nullable();
             $table->string('attachment')->default(null)->nullable();
             $table->integer('created_by');

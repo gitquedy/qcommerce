@@ -90,7 +90,7 @@ class SalesController extends Controller
             ->addColumn('action', function(Sales $sales) {
                     $view = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('SalesController@viewSalesModal', $sales->id).'"><i class="fa fa-eye" aria-hidden="true"></i> View Sale</a>';
                     if($sales->payment_status != 'paid') {
-                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', $sales->id).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
+                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', ['type' => 'Sales', 'id' =>  $sales->id]).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
                     }
                     else {
                         $add_payment = '';
@@ -102,7 +102,7 @@ class SalesController extends Controller
                     else {
                         $edit = '';
                     }
-                    $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal', $sales->id).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
+                    $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal',['type' => 'Sales', 'id' =>  $sales->id]).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
 
                     $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
 
@@ -233,7 +233,6 @@ class SalesController extends Controller
             }
             if($request->paid) {
                 $payment = new Payment;
-                $payment->sales_id = $sales->id;
                 $payment->customer_id = $sales->customer_id;
                 $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
@@ -249,7 +248,7 @@ class SalesController extends Controller
                 $payment->status = 'received';
                 $payment->note = $request->note;
                 $payment->created_by = $user->id;
-                $payment->save();
+                $sales->payments()->save($payment);
                 if (!$request->payment_reference_no) {
                     $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
                 }
@@ -432,6 +431,7 @@ class SalesController extends Controller
         }
         try {
             DB::beginTransaction();
+            $sales->payments()->delete();
             $sales->delete();
             DB::commit();
             $output = ['success' => 1,
@@ -458,7 +458,8 @@ class SalesController extends Controller
 
     public function viewSalesModal(Sales $sales, Request $request) {
         $business_id = Auth::user()->business_id;
-        $payments = Payment::where('sales_id', $sales->id)->get();
+        $payments = $sales->payments;
         return view('sales.modal.viewSales', compact('sales','payments'));
     }
 }
+

@@ -61,7 +61,9 @@
             <th>Warehouse</th>
             <th>Category</th>
             <th>Amount</th>
-            <th>Note</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Payment Status</th>
             <th>Created By</th>
             <th>Updated By</th>
             <th>Action</th>
@@ -70,9 +72,7 @@
       </table>
     </div>
     {{-- DataTable ends --}}
-    
-
-
+  
   </section>
   {{-- Data list view end --}}
 @endsection
@@ -92,6 +92,20 @@
   {{-- Page js files --}}
   <!-- datatables -->
   <script type="text/javascript">
+    $(document).on('click', '.toggle_view_modal', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).data('action'),
+            method: "POST",
+            data: {},
+            success:function(result)
+            {
+                $('.view_modal').html(result).modal();
+            }
+        });
+    });
+  </script> 
+  <script type="text/javascript">
   var columnns = [
             { data: 'id',
             name: 'id' ,
@@ -106,7 +120,9 @@
             { data: 'warehouse_name', name: 'warehouse_name' },
             { data: 'category_name', name: 'category_name' },
             { data: 'amount_formatted', name: 'amount_formatted' },
-            { data: 'note', name: 'note' },
+            { data: 'paid', name: 'paid' },
+            { data: 'balance', name: 'balance' },
+            { data: 'payment_status', name: 'payment_status' },
             { data: 'created_by_name', name: 'created_by_name' },
             { data: 'updated_by_name', name: 'updated_by_name' },
             { data: 'action', name: 'action', class: 'text-center' },

@@ -183,7 +183,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/expense-category/storeModal', 'ExpenseCategoryController@storeModal');
 
 
-		Route::resource('/expense', 'ExpenseController')->except(['destroy']);
+		Route::resource('/expense', 'ExpenseController')->except(['show','destroy']);
+		Route::post('/expense/{expense}', 'ExpenseController@show');
 		Route::get('/expense/delete/{expense}', 'ExpenseController@destroy');
 		Route::post('/expense/massDelete', 'ExpenseController@massDelete')->name('expense.massDelete');
 
@@ -238,8 +239,8 @@ Route::group(['middleware' => 'auth'], function()
 	{
 		Route::resource('/payment', 'PaymentController');
 		Route::get('/payment/delete/{payment}', 'PaymentController@delete')->name('payment.delete');
-		Route::post('/payment/viewPaymentModal/{sales}', 'PaymentController@viewPaymentModal')->name('payment.viewPaymentModal');
-		Route::post('/payment/addPaymentModal/{sales}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
+		Route::post('/payment/viewPaymentModal/{type}/{id}', 'PaymentController@viewPaymentModal')->name('payment.viewPaymentModal');
+		Route::post('/payment/addPaymentModal/{type}/{id}', 'PaymentController@addPaymentModal')->name('payment.addPaymentModal');
 		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');
 		Route::post('/payment/addMMultiPaymentModal/{customer}', 'PaymentController@addMultiPaymentModal')->name('payment.addMultiPaymentModal');
 		Route::post('/payment/addMMultiPaymentAjax', 'PaymentController@addMultiPaymentAjax')->name('payment.addMultiPaymentAjax');

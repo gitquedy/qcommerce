@@ -8,7 +8,7 @@ class Expense extends Model
 {
     protected $table = 'expense';
 
-    protected $fillable = ['expense_category_id', 'warehouse_id', 'business_id', 'date', 'reference_no', 'amount', 'note', 'attachment', 'created_by', 'updated_by'];
+    protected $fillable = ['expense_category_id', 'warehouse_id', 'business_id', 'date', 'paid', 'payment_status', 'reference_no', 'amount', 'note', 'attachment', 'created_by', 'updated_by'];
 
     public function category(){
     	return $this->belongsTo(ExpenseCategory::class, 'expense_category_id', 'id');
@@ -29,4 +29,8 @@ class Expense extends Model
     public function updated_by_name(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
 	}
+
+    public function payments(){
+        return $this->morphMany(Payment::class, 'payable', 'payable_type');
+    }
 }

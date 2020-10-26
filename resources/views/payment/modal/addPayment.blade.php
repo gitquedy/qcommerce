@@ -10,9 +10,12 @@
   </style>
   <div class="modal-content">
   	<div class="modal-header">
-		<h4 class="modal-title" id="modal-title">Add Payment for {{$sales->reference_no}}</h4>
-    <input type="hidden" name="sales_id" value="{{$sales->id}}">
-    <input type="hidden" name="customer_id" value="{{$sales->customer_id}}">
+		<h4 class="modal-title" id="modal-title">Add Payment for {{$record->reference_no}}</h4>
+    <input type="hidden" name="payable_id" value="{{$record->id}}">
+    <input type="hidden" name="payable_type" value="{{$type}}">
+    @if(in_array($type, ['Sales', 'Purchases']))
+    <input type="hidden" name="customer_id" value="{{$record->customer_id}}">
+    @endif
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
 	<div class="modal-body">
@@ -43,7 +46,11 @@
       <div class="row">
         <div class="col-md-12">
           @php
-          $balance = $sales->grand_total - $sales->paid;
+          if($type == "Sales" || $type == "Purchases"){
+            $balance = $record->grand_total - $record->paid;
+          }else if($type == "Expense"){
+           $balance = $record->amount - $record->paid;
+          }
           @endphp
           <div class="card border-light">
             <div class="card-header">
@@ -52,10 +59,10 @@
                   <p class="text-secondary" >Balance : <span class="text-warning">{{$balance}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$sales->grand_total}}</span></p>
+                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$record->grand_total}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$sales->paid}}</span></p>
+                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$record->paid}}</span></p>
                 </div>
               </div>
             </div>
@@ -78,7 +85,9 @@
                       <option value="gift_certificate">Gift Card</option>
                       <option value="credit_card">Credit Card</option>
                       <option value="cheque">Cheque</option>
-                      <option value="deposit">Deposit</option>
+                      @if(in_array($type, ['Sales']))
+                        <option value="deposit">Deposit</option>
+                      @endif
                       <option value="other">Other</option>
                     </select>
                     <div class="form-control-position"> 
@@ -173,17 +182,19 @@
                   </div>
                 </div>
               </div>
+              @if(in_array($type, ['Sales']))
               <div class="deposit payment_type_ext" style="display: none">
                 <hr>
                 <div class="row">
                   <div class="col-md-6">
                     <label for="gift_card_no">Current Deposit Balance:</label>
                     <div class="position-relative has-icon-left">
-                      <h3 class="text-primary">{{ number_format($sales->customer->available_deposit(), 2) }}</h3>
+                      <h3 class="text-primary">{{ number_format($record->customer->available_deposit(), 2) }}</h3>
                     </div>
                   </div>
                 </div>
               </div>
+              @endif
             </div>
           </div>
         </div>
