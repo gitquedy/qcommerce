@@ -18,8 +18,6 @@ class Category extends Model
     
     protected $fillable = ['business_id','code', 'name','updated_at', 'created_at'];
     
-    
-    
     public static function auth_category(){
         
         $business_id = Auth::user()->business_id;

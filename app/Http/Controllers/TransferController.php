@@ -98,7 +98,7 @@ class TransferController extends Controller
         $warehouses = $request->user()->business->warehouse;
         return view('transfer.create', compact('breadcrumbs','warehouses'));
     }
-
+    
     /**
      * Store a newly created resource in storage.
      *

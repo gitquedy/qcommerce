@@ -63,7 +63,7 @@
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="text" class="form-control datepicker update_input" name="date" value="{{date('m/d/Y')}}" readonly>
+                                      <input type="text" class="form-control datepicker update_input" name="date" value="{{date('m/d/Y')}}">
                                       <div class="form-control-position"> 
                                         <i class="feather icon-calendar"></i>
                                       </div>

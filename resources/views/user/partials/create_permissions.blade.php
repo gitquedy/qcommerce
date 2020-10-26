@@ -183,8 +183,24 @@
               <span class="">Transfer</span>
             </div></fieldset>
           </td>
-          <td></td>
-          <td></td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="purchase.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
+              </span>
+              <span class="">Purchases</span>
+            </div></fieldset>
+          </td>
+          <td>
+            <fieldset><div class="vs-checkbox-con vs-checkbox-primary">
+              <input type="checkbox" value="expense.manage" name="permissions[]">
+              <span class="vs-checkbox">
+                <span class="vs-checkbox--check"><i class="vs-icon feather icon-dollar-sign"></i></span>
+              </span>
+              <span class="">Expense</span>
+            </div></fieldset>
+          </td>
         </tr>
       </tbody>
       <thead>

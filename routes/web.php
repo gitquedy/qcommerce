@@ -63,9 +63,6 @@ Route::group(['middleware' => 'auth'], function()
 
 	Route::group(['middleware' => 'permission:shop.manage'], function()
 	{
-
-		
-
 		Route::get('/shop/reSyncProducts/{shop}', 'ShopController@reSyncProducts')->name('shop.reSyncProducts');
 		Route::get('/shop/reSyncOrders/{shop}', 'ShopController@reSyncOrders')->name('shop.reSyncOrders');
 
@@ -174,6 +171,18 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/category/delete/{id}', 'CategoryController@delete')->name('category.delete');
 		Route::post('/category/bulkremove', 'CategoryController@bulkremove')->name('category.bulkremove');
 		Route::post('/category/add_ajax/', 'CategoryController@add_ajax')->name('category.add_ajax');
+	});
+
+	Route::group(['middleware' => 'permission:expense.manage'], function()
+	{
+		Route::resource('/expense-category', 'ExpenseCategoryController')->except(['show', 'destroy']);
+		Route::get('/expense-category/destroy/{expense_category}', 'ExpenseCategoryController@destroy')->name('expense.category.destroy');
+		Route::post('/expense-category/massDelete', 'ExpenseCategoryController@massDelete')->name('expense.category.massDelete');
+
+
+		Route::resource('/expense', 'ExpenseController')->except(['destroy']);
+		Route::get('/expense/delete/{expense}', 'ExpenseController@destroy');
+		Route::post('/expense/massDelete', 'ExpenseController@massDelete')->name('expense.massDelete');
 	});
 	
 

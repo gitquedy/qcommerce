@@ -5,6 +5,8 @@ use App\User;
 use App\Business;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Settings;
+use App\OrderRef;
 
 class UsersTableSeeder extends Seeder
 {
@@ -40,6 +42,8 @@ class UsersTableSeeder extends Seeder
             ['name' => 'deposit.manage'],
             ['name' => 'payment.manage'],
             ['name' => 'settings.manage'],
+            ['name' => 'purchase.manage'],
+            ['name' => 'expense.manage'],
         ];
         foreach($permissions as $permission){
             Permission::create($permission);
@@ -74,6 +78,13 @@ class UsersTableSeeder extends Seeder
             'email' => 'dev@quedy.com',
             'role' => 'Owner',
             'password' => Hash::make('admin123'),
+        ]);
+
+        $settings = Settings::create([
+            'business_id' => 2,
+        ]);
+        $order_refs = OrderRef::create([
+            'settings_id' => $settings->id,
         ]);
 
         $admin->givePermissionTo($owner_permissions);

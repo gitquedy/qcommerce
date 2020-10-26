@@ -51,4 +51,8 @@ class Business extends Model
     	return Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->first();
     }
 
+    public function expense_categories(){
+    	return $this->hasMany(ExpenseCategory::class, 'business_id', 'id');
+    }
+
 }

@@ -225,6 +225,39 @@
                 </li>
             @endcan
 
+             @can('expense.manage')
+                <li class="nav-item">
+                    <a href="#">
+                        <i class="fa fa-money"></i>
+                        <span class="menu-title" data-i18n="">Expenses</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'expense' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{ action('ExpenseController@index') }}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List of Expenses</span>
+                            </a>
+                        </li>
+
+                        <li class="{{ $request->segment(1) == 'expense' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{ action('ExpenseController@create') }}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add new Expense</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'expense-category' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{action('ExpenseCategoryController@index')}}" >
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Expense Categories</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+
+
+       
+
             @can('barcode.manage')
             <li class="nav-item {{ $request->segment(1) == 'barcode' && $request->segment(2) == '' ? 'active' : '' }}">
                 <a href="{{url('/barcode')}}">
@@ -322,10 +355,6 @@
                     </ul>
                 </li>
             @endif -->
-
-
-
-
 
 
             <hr>

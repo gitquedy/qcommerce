@@ -28,16 +28,9 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        
-        
-        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CategoryController@index'), 'name'=>"Category"], ['name'=>"list of Category"]
         ];
-        
-        
-
-        
     if ( request()->ajax()) {
         
             $business_id = Auth::user()->business_id;
@@ -341,22 +334,5 @@ class CategoryController extends Controller
                         'msg' => $success,
                     ];
         return response()->json($output);
-        
-        
     }
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
 }

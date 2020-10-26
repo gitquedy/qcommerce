@@ -165,6 +165,16 @@ class UserController extends Controller
             return response()->json(['msg' => 'Kindly check atleast two warehouse in order use transfer module.' ,'error' => []]);
           }
         }
+        if($permissions->contains('expense.manage')){
+          if(collect($request->warehouses)->count() <= 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use expense module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('purchase.manage')){
+          if(collect($request->warehouses)->count() <= 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use purchase module.' ,'error' => []]);
+          }
+        }
         try {
             $data = $request->all();
             // return response()->json($data);
@@ -195,7 +205,7 @@ class UserController extends Controller
 
             if($request->has('warehouses')){
               $permissions[] = 'warehouse.manage';
-              $warehouses = Shop::whereIn('id', $request->warehouses)->get();
+              $warehouses = Warehouse::whereIn('id', $request->warehouses)->get();
               foreach($warehouses as $warehouse){
                 WarehousePermission::create([
                   'warehouse_id' => $warehouse->id,
@@ -296,6 +306,16 @@ class UserController extends Controller
             return response()->json(['msg' => 'Kindly check atleast two warehouse in order to use transfer module.' ,'error' => []]);
           }
         }
+        if($permissions->contains('expense.manage')){
+          if(collect($request->warehouses)->count() <= 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use expense module.' ,'error' => []]);
+          }
+        }
+        if($permissions->contains('purchase.manage')){
+          if(collect($request->warehouses)->count() <= 0){
+            return response()->json(['msg' => 'Kindly check atleast one warehouse in order use purchase module.' ,'error' => []]);
+          }
+        }
 
         try {
             $data = $request->only(['first_name', 'last_name', 'email']);
@@ -330,7 +350,7 @@ class UserController extends Controller
 
             if($request->has('warehouses')){
               $permissions[] = 'warehouse.manage';
-              $warehouses = Shop::whereIn('id', $request->warehouses)->get();
+              $warehouses = Warehouse::whereIn('id', $request->warehouses)->get();
               foreach($warehouses as $warehouse){
                 WarehousePermission::create([
                   'warehouse_id' => $warehouse->id,
