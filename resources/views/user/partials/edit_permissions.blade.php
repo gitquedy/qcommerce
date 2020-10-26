@@ -189,7 +189,7 @@
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-shopping-cart"></i></span>
               </span>
-              <span class="">Purchases</span>
+              <span class="">Expenses</span>
             </div></fieldset>
           </td>
           <td>
@@ -198,7 +198,7 @@
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-dollar-sign"></i></span>
               </span>
-              <span class="">Expenses</span>
+              <span class="">Purchases</span>
             </div></fieldset>
           </td>
         </tr>

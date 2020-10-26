@@ -179,10 +179,15 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/expense-category/destroy/{expense_category}', 'ExpenseCategoryController@destroy')->name('expense.category.destroy');
 		Route::post('/expense-category/massDelete', 'ExpenseCategoryController@massDelete')->name('expense.category.massDelete');
 
+		Route::post('/expense-category/createModal', 'ExpenseCategoryController@createModal');
+		Route::post('/expense-category/storeModal', 'ExpenseCategoryController@storeModal');
+
 
 		Route::resource('/expense', 'ExpenseController')->except(['destroy']);
 		Route::get('/expense/delete/{expense}', 'ExpenseController@destroy');
 		Route::post('/expense/massDelete', 'ExpenseController@massDelete')->name('expense.massDelete');
+
+
 	});
 	
 

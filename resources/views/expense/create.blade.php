@@ -92,11 +92,14 @@
                 <div class="form-group">
                     <label>Category</label>
                     <div class="position-relative has-icon-left">
-                      <select name="expense_category_id" class="form-control select2" placeholder="Select Warehouse">
+                      <select name="expense_category_id" id="select_category" class="form-control select2" placeholder="Select Warehouse">
                         <option disabled selected hidden></option>
-                        @foreach($categories as $category)
+                        <option value="add_new">Add New Expense Category</option>
+                        @forelse($categories as $category)
                           <option value="{{ $category->id }}">{{ $category->displayName() }}</option>
-                        @endforeach
+                        @empty
+                        <option value="" disabled="">Please Add Expense Category</option>
+                        @endforelse
                       </select>
                       <div class="form-control-position"> 
                         <i class="feather icon-list"></i>
@@ -175,6 +178,22 @@
       if(selected == 'add_new') {
         $.ajax({
           url :  "{{ route('warehouse.addWarehouseModal') }}",
+          type: "POST",
+          success: function (response) {
+            if(response) {
+              $(".view_modal").html(response).modal('show');
+            }
+          }
+        });
+        $(this).val('').trigger('change');
+      } 
+  });
+
+  $('select[name=expense_category_id]').on('change', function() {
+      var selected = $(this).find('option:selected').val();
+      if(selected == 'add_new') {
+        $.ajax({
+          url :  "{{ action('ExpenseCategoryController@createModal') }}",
           type: "POST",
           success: function (response) {
             if(response) {

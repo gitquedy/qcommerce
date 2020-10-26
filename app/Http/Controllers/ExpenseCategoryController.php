@@ -85,47 +85,6 @@ class ExpenseCategoryController extends Controller
         
     }
     
-    public function add_ajax(Request $request){
-        
-        $duplicate_check = Category::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
-        
-        if($duplicate_check>0){
-            $output = ['success' => 0,
-                        'msg' => "Duplicate Category Code !",
-                    ];
-            return response()->json($output);
-        }
-        
-        
-        $Category = new Category();
-        $Category->business_id = Auth::user()->business_id;
-        $Category->code = $request->code;
-        $Category->name = $request->name;
-        
-        if($request->parent!=""){
-        $Category->parent = $request->parent;    
-        }else{
-        $Category->parent = 0;    
-        }
-        
-        
-        if($Category->save()){
-            $output = ['success' => 1,
-                        'msg' => "Success !",
-                        'id'=>$Category->id
-                    ];
-            
-        }else{
-            $output = ['success' => 0,
-                        'msg' => "Error !",
-                    ];
-        }
-        
-        return response()->json($output);
-        
-    }
-    
-    
     public function edit(ExpenseCategory $expense_category,Request $request){        
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CategoryController@index'), 'name'=>"Category"], ['name'=>"Category Edit"]
@@ -180,6 +139,54 @@ class ExpenseCategoryController extends Controller
         $output = ['success' => 1,
                         'msg' => 'Successfully deleted expense categories.',
                     ];
+        return response()->json($output);
+    }
+
+    public function createModal(Request $request){
+        $select_id = ($request->id)?$request->id:'select_category';
+        return view('expense_category.create_modal', compact('select_id'));
+    }
+
+    public function storeModal(Request $request) {
+        $validator = Validator::make($request->all(),[
+            'code' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+        ]);
+
+
+        $duplicate_check = ExpenseCategory::where('code','=',$request->code)->where('business_id','=',Auth::user()->business_id)->get()->count();
+        
+        if($duplicate_check > 0){
+            return response()->json(['msg' => 'Please check for errors' ,'error' => ['code' => 'Duplicate Code']]);
+        }
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        $user = Auth::user();
+        try {
+            $data = $request->all();
+            $data['business_id'] = $request->user()->business_id;
+            $expense_category = ExpenseCategory::create($data);
+            if($expense_category->exists){
+                $output = ['success' => 1,
+                    'select_id' => $request->select_id,
+                    'option_id' => $expense_category->id,
+                    'option_name' => $expense_category->displayName(),
+                    'msg' => 'Category added successfully!'
+                ];
+                DB::commit();
+            }else{
+                $output = ['success' => 0,
+                        'msg' => 'Sorry something went wrong, please try again later.'
+                    ];
+            }
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
         return response()->json($output);
     }
 }
