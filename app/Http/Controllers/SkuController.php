@@ -474,6 +474,26 @@ class SkuController extends Controller
         return response()->json($result);
             
     } 
+
+    public function searchPurchase($search)
+    {
+        if($search != '') {
+            $sku = Sku::where(function($query) use ($search){
+                $query->where('name', 'LIKE', '%'. $search. '%');
+                $query->orWhere('code', 'LIKE', '%'. $search. '%');
+            });
+            $sku->select('sku.*');
+            $result = $sku->get();
+            foreach ($result as &$r) {
+                $r->image = $r->SkuImage();
+            }
+        }
+        else {
+            $result = [];
+        }
+        return response()->json($result);
+            
+    } 
     
     public function delete($id, Request $request){
         $business_id = Auth::user()->business_id;

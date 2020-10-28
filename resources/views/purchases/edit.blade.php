@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Edit Sale')
+@section('title', 'Edit Purchase')
 
 @section('mystyle')
 <style>
@@ -34,7 +34,7 @@
      }
 
 
-     input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
         display: none;
         -webkit-appearance: none;
@@ -52,19 +52,19 @@
       <div class="col-md-12 col-12">
           <div class="card">
               <div class="card-header">
-                  <h4 class="card-title">Sale Details</h4>
+                  <h4 class="card-title">Purchase Details</h4>
               </div>
               <div class="card-content">
                   <div class="card-body">
-                      <form action="{{ action('SalesController@update', $sales->id) }}" method="POST" id="add_sale_form" class="form" enctype="multipart/form-data">
-                          @method('PUT')
+                      <form action="{{ action('PurchasesController@update', $purchase->id) }}" method="POST" id="add_purchase_form" class="form" enctype="multipart/form-data">
                           @csrf
+                          @method('put')
                           <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="text" class="form-control datepicker update_input" name="date" value="{{ date('m/d/Y', strtotime($sales->date)) }}" readonly>
+                                      <input type="text" class="form-control datepicker update_input" name="date" value="{{ date('m/d/Y', strtotime($purchase->date)) }}" readonly>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-calendar"></i>
                                       </div>
@@ -75,7 +75,7 @@
                                 <div class="form-group">
                                     <label>Referencce No.</label>
                                     <div class="position-relative has-icon-left">
-                                      <input type="text" class="form-control update_input" name="reference_no" placeholder="Reference No." value="{{$sales->reference_no}}">
+                                      <input type="text" class="form-control update_input" name="reference_no" placeholder="Reference No." value="{{$purchase->reference_no}}">
                                       <div class="form-control-position"> 
                                         <i class="feather icon-hash"></i>
                                       </div>
@@ -90,7 +90,7 @@
                                         <option value="" disabled selected></option>
                                         <option value="add_new">Add New Warehouse</option>
                                         @forelse($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}" @if($sales->warehouse_id == $warehouse->id) selected @endif>{{ $warehouse->name }}</option>
+                                        <option value="{{ $warehouse->id }}" {{ $warehouse->id == $purchase->warehouse_id ? 'selected' : ''  }}>{{ $warehouse->name }}</option>
                                         @empty
                                         <option value="" disabled="">Please Add Warehouse</option>
                                         @endforelse
@@ -103,15 +103,15 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Customer</label>
+                                    <label>Supplier</label>
                                     <div class="position-relative has-icon-left">
-                                      <select name="customer_id" id="select_customer" class="form-control select2 update_select" placeholder="Select Customer">
+                                      <select name="supplier_id" id="select_supplier" class="form-control select2 update_select" placeholder="Select Supplier">
                                         <option value="" disabled selected></option>
-                                        <option value="add_new">Add New Customer</option>
-                                        @forelse($customers as $customer)
-                                        <option value="{{ $customer->id }}" @if($sales->customer_id == $customer->id) selected @endif>{{ $customer->formatName() }}</option>
+                                        <option value="add_new">Add New Supplier</option>
+                                        @forelse($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" {{ $purchase->supplier_id == $supplier->id ? 'selected' : '' }}>{{ $supplier->company }}</option>
                                         @empty
-                                        <option value="" disabled="">Please Add Customeer</option>
+                                        <option value="" disabled="">Please Add Supplier</option>
                                         @endforelse
                                       </select>
                                       <div class="form-control-position"> 
@@ -147,14 +147,14 @@
                                       <thead>
                                         <tr>
                                           <th class="text-center" width="55%">Product (Code - Name)</th>
-                                          <th class="text-center" width="15%">Unit Price</th>
+                                          <th class="text-center" width="15%">Unit Cost</th>
                                           <th class="text-center" width="10%">Quantity</th>
                                           <th class="text-center" width="15%">Subtotal (PHP)</th>
                                           <th class="text-center" width="5%"><i class="feather icon-trash"></i></th>
                                         </tr>
                                       </thead>
                                       <tbody>
-                                        @foreach($sales->items as $index => $item)
+                                        @foreach($purchase->items as $index => $item)
                                         <tr data-id="{{$index}}">
                                           <td>
                                             <div class="media">
@@ -163,28 +163,24 @@
                                                 <h5 class="mt-0">{{$item->sku_name}}</h5>
                                                 {{($item->brand)?$item->sku_name:''}}
                                                 {{$item->sku_code}}
-                                                <input type="hidden" name="sales_item_array[{{$index}}][image]" class="original_sku_image" value="{{$item->image}}" />
-                                                <input type="hidden" name="sales_item_array[{{$index}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
-                                                <input type="hidden" name="sales_item_array[{{$index}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
-                                                <input type="hidden" name="sales_item_array[{{$index}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
-                                                <input type="hidden" name="sales_item_array[{{$index}}][sku_id]" class="original_sku_sku_id" value="{{$item->sku_id}}" />
+                                                <input type="hidden" name="purchases_items_array[{{$index}}][image]" class="original_sku_image" value="{{$item->image}}" />
+                                                <input type="hidden" name="purchases_items_array[{{$index}}][name]" class="original_sku_name" value="{{$item->sku_name}}" />
+                                                <input type="hidden" name="purchases_items_array[{{$index}}][brand]" class="original_sku_brand" value="{{$item->sku_brand}}" /> 
+                                                <input type="hidden" name="purchases_items_array[{{$index}}][code]" class="original_sku_code" value="{{$item->sku_code}}" />
+                                                <input type="hidden" name="purchases_items_array[{{$index}}][sku_id]" class="original_sku_sku_id" value="{{$item->sku_id}}" />
                                               </div>
                                             </div>
                                           </td>
                                           <td class="text-right p-4">
-                                            <input type="hidden" name="sales_item_array[{{$index}}][real_unit_price]" class="original_sku_real_unit_price" value="{{$item->unit_price}}" />
-                                            <input type="number" name="sales_item_array[{{$index}}][price]" class="form-control change_sku text-right sku_input_price original_sku_price" value="{{$item->unit_price}}">
+                                            <input type="hidden" name="purchases_items_array[{{$index}}][real_unit_price]" class="original_sku_real_unit_price" value="{{$item->unit_price}}" />
+                                            <input type="number" name="purchases_items_array[{{$index}}][price]" class="form-control change_sku text-right sku_input_price original_sku_price" value="{{$item->unit_price}}">
                                           </td>
                                           <td>
                                             <div class="input-group">
                                               <div class="input-group-prepend d-none d-md-inline-block">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>
                                               </div>
-                                              @php
-                                              $warehouse_item = App\WarehouseItems::where('warehouse_id', $sales->warehouse_id)->where('sku_id', $item->sku_id)->first();
-                                              $max_quantity = isset($warehouse_item->quantity)?$warehouse_item->quantity:0;
-                                              @endphp
-                                              <input type="number" name="sales_item_array[{{$index}}][quantity]" min="1" data-max="{{$max_quantity}}" class="form-control text-right change_sku sku_input_quantity check_max_quantity original_sku_quantity" value="{{$item->quantity}}">
+                                              <input type="number" name="purchases_items_array[{{$index}}][quantity]" min="1" class="form-control text-right change_sku sku_input_quantity original_sku_quantity" value="{{$item->quantity}}">
                                               <div class="input-group-append d-none d-md-inline-block h-100">
                                                 <span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>
                                               </div>
@@ -196,10 +192,34 @@
                                       <tfoot>
                                         <tr>
                                           <th class="text-center text-muted text-sm">[Product (Code - Name)]</th>
-                                          <th class="text-center text-muted text-sm">[Unit Price]</th>
+                                          <th class="text-center text-muted text-sm">[Unit Cost]</th>
                                           <th class="text-center text-muted text-sm">[Quantity]</th>
                                           <th class="text-right font-weight-bold"><span class="mr-3">Total</span><span class="sales_total"></span></th>
                                           <th class="text-center text-muted"><i class="feather icon-trash"></i></th>
+                                        </tr>
+                                        <tr>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-right font-weight-bold"><span class="mr-3">Shipping Fee</span><span class="shipping_fee"></span></th>
+                                        </tr>
+                                        <tr>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-right font-weight-bold"><span class="mr-3">Other Fees</span><span class="other_fee"></span></th>
+                                        </tr>
+                                        <tr>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-right font-weight-bold"><span class="mr-3">Discount</span><span class="discount_fee"></span></th>
+                                        </tr>
+                                        <tr>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-center text-muted text-sm"></th>
+                                          <th class="text-right font-weight-bold"><span class="mr-3">Grand Total</span><span class="grand_total"></span><input type="hidden" name="grand_total"></th>
                                         </tr>
                                       </tfoot>
                                     </table>
@@ -210,15 +230,14 @@
                           <br>
                           <br>
                           <div class="row">
-                            @if($sales->status == 'pending')
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Status</label>
                                     <div class="position-relative has-icon-left">
                                       <select name="status" class="form-control select2 update_select" placeholder="Select Status">
-                                        <option value="completed" @if($sales->status == "completed") selected @endif>Completed</option>
-                                        <option value="pending" @if($sales->status == "pending") selected @endif>Pending</option>
-                                        <option value="canceled" @if($sales->status == "canceled") selected @endif>Canceled</option>
+                                        <option value="received" {{ $purchase->status == 'received' ? 'selected' : '' }}>Received</option>
+                                        <option value="pending" {{ $purchase->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="ordered" {{ $purchase->status == 'ordered' ? 'selected' : '' }}>Ordered</option>
                                       </select>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-activity"></i>
@@ -226,7 +245,48 @@
                                     </div>
                                 </div>
                             </div>
-                            @endif
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Shipping Fee</label>
+                                    <div class="position-relative has-icon-left">
+                                      <input type="number" name="shipping_fee" class="form-control update_input update_footer" placeholder="Shipping Fee" value="{{ $purchase->shipping_fee }}">
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-truck"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Other Fee's</label>
+                                    <div class="position-relative has-icon-left">
+                                      <input type="number" name="other_fees" class="form-control update_input update_footer" placeholder="Other Fee's" value="{{ $purchase->other_fees }}">
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-dollar-sign"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                    <label>Discount Amount</label>
+                                    <div class="position-relative has-icon-left">
+                                      <input type="number" name="discount" class="form-control update_input update_footer" placeholder="Discount Amount" value="{{ $purchase->discount }}">
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-dollar-sign"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <label for="note">Note</label>
+                              <textarea name="note" id="" cols="20" rows="5" class="form-control" placeholder="Note"></textarea>
+                            </div>
                           </div>
                     <div class="form-group col-12">
                     </div>
@@ -240,12 +300,9 @@
                         </div>
                       </form>
                   </div>
-
               </div>
           </div>
       </div>
-
-
   </div>
 </section>
 <!-- // Basic Floating Label Form section end -->
@@ -254,17 +311,18 @@
 <script type="text/javascript">
     jQuery(document).ready(function($) {
         var warehouse_reset = false;
+
         $('#add_prodduct_input').on('focus', function() {
-          var customer = $('#select_customer').val();
+          var supplier = $('#select_supplier').val();
           var warehouse = $('#select_warehouse').val();
-          if(!customer && !warehouse) {
-            alert('Please select customer and warehouse first!');
+          if(!supplier && !warehouse) {
+            alert('Please select supplier and warehouse first!');
             $('#select_warehouse').focus();
           }
           else {
-            if(!customer) {
-              alert('Please select customer first!');
-              $('#select_customer').focus();
+            if(!supplier) {
+              alert('Please select supplier first!');
+              $('#select_supplier').focus();
             }
             if(!warehouse) {
               alert('Please select warehouse first!');
@@ -276,57 +334,67 @@
         $('#select_warehouse').on('change', function() {
             if (warehouse_reset) {
               $("#sales_item_tables tbody").html('');
-              localStorage.removeItem("edit_sales_items");
+              localStorage.removeItem("edit_purchase_items");
             }
         });
 
-        localStorage.removeItem("edit_sales_items");
-        localStorage.removeItem("edit_sales");
-        localStorage.removeItem("original_edit_sales_items");
-        
-        function first_run() {
+        $('#select_warehouse').on('change', function() {
+            $("#adjustment_item_tables tbody").html('');
+        });
+
+        $('#payment_type').on('change', function() {
+          $('.payment_type_ext').hide('fast');
+          $('.'+$(this).val()).show('fast');
+        });
+
+        localStorage.removeItem("edit_purchase_items");
+        localStorage.removeItem("edit_purchase");
+        first_run();
+        function first_run(){
           $('input.update_input').each(function() {
-              var sales = {};
-              if(localStorage.getItem("edit_sales")) {
-                sales = JSON.parse(localStorage.getItem("edit_sales"));            
+              var purchase = {};
+              if(localStorage.getItem("edit_purchase")) {
+                purchase = JSON.parse(localStorage.getItem("edit_purchase"));            
               }
               var name = $(this).attr('name');
-              sales[name] = $(this).val();
-              localStorage.setItem("edit_sales", JSON.stringify(sales));
+              purchase[name] = $(this).val();
+              localStorage.setItem("edit_purchase", JSON.stringify(purchase));
           });
           $('select.update_select').each(function() {
-              var sales = {};
-              if(localStorage.getItem("edit_sales")) {
-                sales = JSON.parse(localStorage.getItem("edit_sales"));            
+              var purchase = {};
+              if(localStorage.getItem("edit_purchase")) {
+                purchase = JSON.parse(localStorage.getItem("edit_purchase"));            
               }
               var name = $(this).attr('name');
-              sales[name] = $(this).find('option:selected').val();
-              localStorage.setItem("edit_sales", JSON.stringify(sales)); 
+              purchase[name] = $(this).find('option:selected').val();
+              localStorage.setItem("edit_purchase", JSON.stringify(purchase)); 
           });
+
           $("#sales_item_tables > tbody > tr").each(function() {
             var items = {};
-            if(localStorage.getItem("edit_sales_items")) {
-              items = JSON.parse(localStorage.getItem("edit_sales_items"));            
+            if(localStorage.getItem("edit_purchase_items")) {
+              items = JSON.parse(localStorage.getItem("edit_purchase_items"));            
             }
             var i = $(this).data('id');
             if(!items[i]) {
               items[i] = {};
-              items[i]['id']  = $(this).find('input.original_sku_id').val();
+              items[i]['id']  = $(this).find('input.original_sku_sku_id').val();
+              items[i]['sku_id']  = $(this).find('input.original_sku_sku_id').val();
               items[i]['code']  = $(this).find('input.original_sku_code').val();
               items[i]['name']  = $(this).find('input.original_sku_name').val();
               items[i]['brand']  = $(this).find('input.original_sku_brand').val();
-              items[i]['cost']  = $(this).find('input.original_sku_cost').val();
+              items[i]['cost']  = $(this).find('input.original_sku_price').val();
               items[i]['price']  = $(this).find('input.original_sku_price').val();
               items[i]['quantity']  = $(this).find('input.original_sku_quantity').val();
-              items[i]['max_quantity']  = $(this).find('input.original_sku_quantity').data("max");
               items[i]['image']  = $(this).find('img.product_image').attr('src');
             }
-            localStorage.setItem("edit_sales_items", JSON.stringify(items));
-            localStorage.setItem("original_edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("edit_purchase_items", JSON.stringify(items));
             reloadSales();
           })
           warehouse_reset = true;
         }
+
+        
 
 
         $(window).keydown(function(event){
@@ -350,11 +418,10 @@
         }
 
         function reloadSales() {
-          reOrderItems("edit_sales_items");
           warehouse_reset = false;
-          var sales = JSON.parse(localStorage.getItem("edit_sales"));
-          if(sales) {
-            $.each(sales, function(index, value){
+          var purchase = JSON.parse(localStorage.getItem("edit_purchase"));
+          if(purchase) {
+            $.each(purchase, function(index, value){
                 $('input[name='+index+']').val(value);
                 $('select[name='+index+']').val(value).trigger('change');
                 $('.datepicker').daterangepicker({
@@ -367,16 +434,18 @@
             });
           }
           else {
-            $('#add_sale_form').trigger('reset').trigger('change');
+            $('#add_purchase_form').trigger('reset').trigger('change');
             $('.select2').trigger('change');
           }
-          var items = JSON.parse(localStorage.getItem("edit_sales_items"));
+          reOrderItems("edit_purchase_items");
+          var edit_purchase_items = JSON.parse(localStorage.getItem("edit_purchase_items"));
           var html = '';
           $("#sales_item_tables tbody").html(html);
-          $.each(items.reverse(), function(i, data) {
+          console.log(edit_purchase_items);
+          $.each(edit_purchase_items.reverse(), function(i, data) {
             var qty = (data.quantity)?data.quantity:1;
-            var price = data.price;
-            var sub_total = price * qty;
+            var cost = data.cost;
+            var sub_total = cost * qty;
             html += '<tr data-id="'+i+'">'+
                       '<td>'+
                         '<div class="media">'+
@@ -385,23 +454,25 @@
                             '<h5 class="mt-0">'+data.name+'</h5>'+
                             ((data.brand)?data.brand+'<br>':'')+
                             data.code+
-                            '<input type="hidden" name="sales_item_array['+i+'][image]" value="'+data.image+'" />'+
-                            '<input type="hidden" name="sales_item_array['+i+'][name]" value="'+data.name+'" />'+
-                            '<input type="hidden" name="sales_item_array['+i+'][brand]" value="'+data.brand+'" />'+
-                            '<input type="hidden" name="sales_item_array['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="purchases_items_array['+i+'][image]" value="'+data.image+'" />'+
+                            '<input type="hidden" name="purchases_items_array['+i+'][name]" value="'+data.name+'" />'+
+                            '<input type="hidden" name="purchases_items_array['+i+'][brand]" value="'+data.brand+'" />'+
+                            '<input type="hidden" name="purchases_items_array['+i+'][code]" value="'+data.code+'" />'+
+                            '<input type="hidden" name="purchases_items_array['+i+'][sku_id]" value="'+data.id+'" />'+
                           '</div>'+
                         '</div>'+
                       '</td>'+
                       '<td class="text-right p-4">'+
-                        '<input type="hidden" name="sales_item_array['+i+'][real_unit_price]" value="'+data.price+'" />'+
-                        '<input type="number" name="sales_item_array['+i+'][price]" class="form-control change_sku text-right sku_input_price" value="'+data.price+'">'+
+                        // '<label class="label-price">'+data.price+'</label>'+
+                        '<input type="hidden" name="purchases_items_array['+i+'][real_unit_price]" value="'+data.cost+'" />'+
+                        '<input type="number" name="purchases_items_array['+i+'][price]" data-array_name="cost" class="form-control change_sku text-right sku_input_price" value="'+data.cost+'">'+
                       '</td>'+
                       '<td>'+
                       '<div class="input-group">'+
                         '<div class="input-group-prepend d-none d-md-inline-block">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="subtract"><i class="feather icon-minus" ></i></span>'+
                         '</div>'+
-                        '<input type="number" name="sales_item_array['+i+'][quantity]" min="1" data-max="'+data.max_quantity+'" class="form-control text-right change_sku sku_input_quantity check_max_quantity" value="'+qty+'">'+
+                        '<input type="number" name="purchases_items_array['+i+'][quantity]" data-array_name="quantity" min="1" class="form-control text-right change_sku sku_input_quantity" value="'+qty+'">'+
                         '<div class="input-group-append d-none d-md-inline-block h-100">'+
                           '<span class="input-group-text btn btn-sm btn-outline-secondary update_sku py-1" style="cursor:pointer" data-change="quantity" data-action="add"><i class="feather icon-plus" ></i></span>'+
                         '</div>'+
@@ -419,8 +490,8 @@
 
         function recalculate(tr) {
           var quantity = tr.find('input.sku_input_quantity').val();
-          var price = tr.find('input.sku_input_price').val();
-          var sub_total = price * quantity;
+          var cost = tr.find('input.sku_input_price').val();
+          var sub_total = cost * quantity;
           tr.find('.sub_total').html(addCommas(sub_total.toFixed(2)));
           recalculateTotal();
         }
@@ -429,12 +500,22 @@
           var total = 0;
           $("#sales_item_tables > tbody > tr").each(function() {
             var i = $(this).data('id');
-            var qty = ($(this).find('input.sku_input_price').val())?$(this).find('input.sku_input_price').val():1;
-            var price = $(this).find('input.sku_input_quantity').val();
-            var sub_total = price * qty;
+            var cost = ($(this).find('input.sku_input_price').val())?$(this).find('input.sku_input_price').val():1;
+            var qty = $(this).find('input.sku_input_quantity').val();
+            var sub_total = cost * qty;
             total += sub_total;
           })
-          $("input[name=paid]").attr('max', total).trigger('change');
+          var shipping_fee = isNaN(parseFloat($("input[name=shipping_fee]").val())) == true ? '' : parseFloat($("input[name=shipping_fee]").val());
+          var other_fees = isNaN(parseFloat($("input[name=other_fees]").val())) == true ? '' : parseFloat($("input[name=other_fees]").val());
+          var discount = isNaN(parseFloat($("input[name=discount]").val())) == true ? '' : parseFloat($("input[name=discount]").val());
+          var grand_total = (total + shipping_fee + other_fees) - discount;
+
+          $('input[name=grand_total]').val(grand_total);
+          $(".shipping_fee").html("+" + addCommas(shipping_fee.toFixed(2)));
+          $(".other_fee").html("+" + addCommas(other_fees.toFixed(2)));
+          $(".discount_fee").html("-" + addCommas(discount.toFixed(2)));
+          $(".grand_total").html(addCommas(grand_total.toFixed(2)));
+          $("input[name=paid]").attr('max', grand_total).trigger('change');
           $(".sales_total").html(addCommas(total.toFixed(2)));
         }
 
@@ -448,10 +529,10 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%WAREHOUSE%/%QUERY%/%CID%/true',
+                url: '{{ route('sku.searchPurchase') }}/%WAREHOUSE%/%QUERY%/%CID%/true',
                 replace: function(url, query) {
                     var wid = ($('#select_warehouse').val())?$('#select_warehouse').val():'none';
-                    var cid = ($('#select_customer').val())?$('#select_customer').val():'none';
+                    var cid = ($('#select_supplier').val())?$('#select_supplier').val():'none';
                     return url.replace('%WAREHOUSE%', wid).replace('%QUERY%', query).replace('%CID%', cid);
                 }
             },
@@ -462,19 +543,20 @@
         $(".search-input").typeahead({
             hint: true,
             highlight: true,
-            minLength: 1,
+            minLength: 1
         }, {
             source: engine.ttAdapter(),
+
+            // This will be appended to "tt-dataset-" to form the class name of the suggestion menu.
             name: 'search-input',
+
+            // the key from the array we want to display (name,id,email,etc...)
             templates: {
                 empty: [
                     '<div class="list-group search-results-dropdown"><div class="list-group-item">Nothing found.</div></div>'
                 ],
                 header: [
                     '<ul class="list-group search-results-dropdown w-100">'
-                ],
-                footer: [
-                    '</ul>'
                 ],
                 suggestion: function (data) {
                     return '<li class="list-group-item list-group-item-action w-100">'+
@@ -492,68 +574,58 @@
 
         $(".search-input").on('typeahead:selected', function (event, datum, name) {
             $(this).typeahead("val", "");
-            var items = {};
-            if(localStorage.getItem("edit_sales_items")) {
-              items = JSON.parse(localStorage.getItem("edit_sales_items"));            
+            var edit_purchase_items = {};
+            if(localStorage.getItem("edit_purchase_items")) {
+              edit_purchase_items = JSON.parse(localStorage.getItem("edit_purchase_items"));            
             }
-            var item_index = items.length;
-            var list_item_index = Object.values(items).findIndex((si => si.id == datum.id));
-            var add_qty = 0;
-            if(localStorage.getItem("original_edit_sales_items")) {
-              original_items = JSON.parse(localStorage.getItem("original_edit_sales_items"));        
-              var original_item_index = Object.values(original_items).findIndex((si => si.id == datum.id));
-              if(original_item_index != -1) {
-                add_qty = parseInt(original_items[original_item_index]['quantity']);
-              }
-            }
-
+            var item_index = edit_purchase_items.length;
+            var list_item_index = Object.values(edit_purchase_items).findIndex((si => si.id == datum.id));
             if(list_item_index == -1) {
-              items[item_index] = {};
-              items[item_index]['id']  = datum.id;
-              items[item_index]['code']  = datum.code;
-              items[item_index]['name']  = datum.name;
-              items[item_index]['brand']  = datum.brand;
-              items[item_index]['cost']  = datum.cost;
-              items[item_index]['price']  = datum.price;
-              items[item_index]['quantity']  = 1;
-              items[item_index]['max_quantity']  = datum.quantity;
-              items[item_index]['image']  = datum.image;
+              edit_purchase_items[item_index] = {};
+              edit_purchase_items[item_index]['id']  = datum.id;
+              edit_purchase_items[item_index]['code']  = datum.code;
+              edit_purchase_items[item_index]['name']  = datum.name;
+              edit_purchase_items[item_index]['brand']  = datum.brand;
+              edit_purchase_items[item_index]['cost']  = datum.cost;
+              edit_purchase_items[item_index]['price']  = datum.price;
+              edit_purchase_items[item_index]['quantity']  = 1;
+              edit_purchase_items[item_index]['image']  = datum.image;
             }
-            else if(items[list_item_index]['quantity'] < (parseInt(datum.quantity) + parseInt(add_qty))) {
-              items[list_item_index]['quantity']++;
+            else if(edit_purchase_items[list_item_index]['quantity'] < datum.quantity) {
+              edit_purchase_items[list_item_index]['quantity']++;
             }
-            localStorage.setItem("edit_sales_items", JSON.stringify(items));
+            localStorage.setItem("edit_purchase_items", JSON.stringify(edit_purchase_items));
             reloadSales();
         });
 
         $(document).on('change', '.update_select', function() {
-            var sales = {};
-            if(localStorage.getItem("edit_sales")) {
-              sales = JSON.parse(localStorage.getItem("edit_sales"));            
+            var purchase = {};
+            if(localStorage.getItem("edit_purchase")) {
+              purchase = JSON.parse(localStorage.getItem("edit_purchase"));            
             }
             var name = $(this).attr('name');
-            sales[name] = $(this).find('option:selected').val();
-            localStorage.setItem("edit_sales", JSON.stringify(sales)); 
+            purchase[name] = $(this).find('option:selected').val();
+            localStorage.setItem("purchase", JSON.stringify(purchase)); 
         });
 
         $(document).on('change', '.update_input', function() {
-            var sales = {};
-            if(localStorage.getItem("edit_sales")) {
-              sales = JSON.parse(localStorage.getItem("edit_sales"));            
+            var purchase = {};
+            if(localStorage.getItem("edit_purchase")) {
+              purchase = JSON.parse(localStorage.getItem("edit_purchase"));            
             }
             var name = $(this).attr('name');
-            sales[name] = $(this).val();
-            localStorage.setItem("edit_sales", JSON.stringify(sales));
+            purchase[name] = $(this).val();
+            localStorage.setItem("purchase", JSON.stringify(purchase));
         });
 
         $(document).on('change', '.change_sku', function() {
             var id = $(this).closest('tr').data('id');
             var input = $(this)
-            var name = $(this).attr('name');
+            var name = $(this).data('array_name');
             var val = $(this).val();
-            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
-            items[id][name] = val;
-            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
+            var edit_purchase_items = JSON.parse(localStorage.getItem("edit_purchase_items")).reverse();
+            edit_purchase_items[id][name] = val;
+            localStorage.setItem("edit_purchase_items", JSON.stringify(edit_purchase_items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
@@ -563,6 +635,7 @@
             var val = parseInt($(this).val());
             if(val > max) {
               $(this).val(max).trigger('change');
+              console.log("check_max_quantity");
             }
         });
 
@@ -574,10 +647,7 @@
             var val = input.val();
             switch(action) {
               case 'add': 
-                var max = input.data('max');
-                  if(val < max) {
                     val++;
-                  }
                 break;
               case 'subtract':
                   if(val > 1) {
@@ -591,17 +661,17 @@
                 break;
             }
             input.val(val).trigger('change');
-            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
-            items[id][change] = val;
-            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
+            var edit_purchase_items = JSON.parse(localStorage.getItem("edit_purchase_items")).reverse();
+            edit_purchase_items[id][change] = val;
+            localStorage.setItem("edit_purchase_items", JSON.stringify(edit_purchase_items.reverse()));
             recalculate($(this).closest('tr'));
         });
 
         $(document).on('click', '.remove_sku', function() {
             var id = $(this).closest('tr').data('id');
-            var items = JSON.parse(localStorage.getItem("edit_sales_items")).reverse();
-            delete items[id];
-            localStorage.setItem("edit_sales_items", JSON.stringify(items.reverse()));
+            var edit_purchase_items = JSON.parse(localStorage.getItem("edit_purchase_items")).reverse();
+            delete edit_purchase_items[id];
+            localStorage.setItem("edit_purchase_items", JSON.stringify(edit_purchase_items.reverse()));
             reloadSales();
         });
 
@@ -613,20 +683,21 @@
         });
 
         $("#sale_reset").on('click', function() {
-            localStorage.removeItem("edit_sales_items");
-            localStorage.removeItem("edit_sales");
-            var origitems = JSON.parse(localStorage.getItem("original_edit_sales_items"));
-            localStorage.setItem("edit_sales_items", JSON.stringify(origitems));
+            localStorage.removeItem("edit_purchase_items");
+            localStorage.removeItem("edit_purchase");
             reloadSales();
         });
 
-        $('.select2').select2();
+        $(".select2").select2({
+            dropdownAutoWidth: true,
+            width: '100%'
+        });
 
-        $('select[name=customer_id]').on('change', function() {
+        $('select[name=supplier_id]').on('change', function() {
             var selected = $(this).find('option:selected').val();
             if(selected == 'add_new') {
               $.ajax({
-                url :  "{{ route('customer.addCustomerModal') }}",
+                url :  "{{ route('supplier.addSupplierModal') }}",
                 type: "POST",
                 success: function (response) {
                   if(response) {
@@ -653,6 +724,10 @@
               });
               $(this).val('').trigger('change');
             } 
+        });
+
+        $('.update_footer').change(function(){
+          recalculateTotal();
         });
 
     });
@@ -692,7 +767,7 @@
                  $('.error').remove();
                     $.each(result.error, function(index, val){
                       var elem = $('[name="'+ index +'"]');
-                      if(index == 'sales_item_array') {
+                      if(index == 'purchases_items_array') {
                         $('#sales_item_tables').after('<label class="text-danger error">' + val + '</label>');
                       }
                       else if(elem.hasClass('select2-hidden-accessible')) {

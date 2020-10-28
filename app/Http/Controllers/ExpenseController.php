@@ -214,7 +214,7 @@ class ExpenseController extends Controller
                 $payment->cc_year = $request->cc_year;
                 $payment->cheque_no = $request->cheque_no;
                 $payment->status = 'received';
-                $payment->note = $request->note;
+                $payment->note = $request->payment_note;
                 $payment->created_by = $request->user()->id;
                 $expense->payments()->save($payment);
                 if (!$request->payment_reference_no) {

@@ -22,6 +22,18 @@ class Business extends Model
 		return $this->hasMany(User::class, 'business_id', 'id');
 	}
 
+	public function sales(){
+		return $this->hasMany(Sales::class, 'business_id', 'id');
+	}
+
+	public function purchases(){
+		return $this->hasMany(Purchases::class, 'business_id', 'id');
+	}
+
+	public function suppliers(){
+		return $this->hasMany(Supplier::class, 'business_id', 'id');
+	}
+
 	public function shops(){
 		$user = Auth::user();
 

@@ -267,6 +267,29 @@
             </li>
             @endcan
 
+            @can('purchase.manage')
+                <li class="nav-item ">
+                    <a href="">
+                        <i class="feather icon-shopping-cart"></i>
+                        <span class="menu-title" data-i18n="">Purchases</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'purchases' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('purchases')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List Purchases</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'purchases' && $request->segment(2) == 'create' ? 'active' : '' }}">
+                            <a href="{{url('purchases/create')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Add Purchase</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+
             @can('supplier.manage')
                 <li class="nav-item">
                     <a href="">

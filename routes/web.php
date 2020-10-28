@@ -124,6 +124,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
 		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
+		Route::get('/sku/searchPurchase/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@searchPurchase')->name('sku.searchPurchase');
+
 	});
 
 	Route::group(['middleware' => 'permission:warehouse.manage'], function()
@@ -159,6 +161,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/supplier/delete/{id}', 'SupplierController@delete')->name('supplier.delete');
 		Route::post('/supplier/bulkremove', 'SupplierController@bulkremove')->name('supplier.bulkremove');
 		Route::post('/supplier/add_ajax', 'SupplierController@add_ajax')->name('supplier.add_ajax');
+		Route::post('/supplier/addSupplierModal', 'SupplierController@addSupplierModal')->name('supplier.addSupplierModal');
+		Route::post('/supplier/addSupplierAjax', 'SupplierController@addSupplierAjax')->name('supplier.addSupplierAjax');
 	});
 
 	Route::group(['middleware' => 'permission:category.manage'], function()
@@ -233,6 +237,14 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/sales', 'SalesController');
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 		Route::post('/sales/viewSalesModal/{sales}', 'SalesController@viewSalesModal')->name('sales.viewSalesModal');
+	});
+
+	Route::group(['middleware' => 'permission:purchase.manage'], function()
+	{
+		Route::resource('/purchases', 'PurchasesController')->except(['destroy']);
+		Route::delete('/purchases/{purchases}', 'PurchasesController@destroy');
+		Route::get('/purchases/delete/{purchases}', 'PurchasesController@delete');
+		Route::post('/purchases/viewPurchasesModal/{purchases}', 'PurchasesController@viewPurchasesModal')->name('purchases.viewPurchasesModal');
 	});
 
 	Route::group(['middleware' => 'permission:payment.manage'], function()

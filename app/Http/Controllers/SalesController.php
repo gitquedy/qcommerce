@@ -31,7 +31,7 @@ class SalesController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales"], ['name'=>"Sales List"]
         ];
         if ( request()->ajax()) {
-           $sales = Sales::orderBy('updated_at', 'desc');
+           $sales = Sales::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
             return Datatables($sales)   
             ->addColumn('customer_name', function(Sales $sales) {
                 if($sales->customer_id) {
@@ -286,7 +286,7 @@ class SalesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
 
         $sales = Sales::findOrFail($id);
@@ -423,11 +423,11 @@ class SalesController extends Controller
     public function destroy($id)
     {
         $sales = Sales::findOrFail($id);
-        if ($sales->status == 'completed') {
-            Sku::returnStocks($sales->warehouse_id, $sales->items);
-        }
         if($sales->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this sale');
+        }
+        if ($sales->status == 'completed') {
+            Sku::returnStocks($sales->warehouse_id, $sales->items);
         }
         try {
             DB::beginTransaction();

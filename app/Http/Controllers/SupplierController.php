@@ -51,6 +51,52 @@ class SupplierController extends Controller
         ]);
     }
 
+    public function addSupplierModal(Request $request) {
+        $business_id = Auth::user()->business_id;
+        $select_id = ($request->id)?$request->id:'select_supplier';
+        return view('supplier.modal.create', compact('price_group', 'select_id'));
+    }
+
+    public function addSupplierAjax(Request $request) {
+        $validator = Validator::make($request->all(),[
+            'company' => 'required',
+            'contact_person' => 'required',
+            'phone' => 'present',
+            'email' => 'present'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        $user = Auth::user();
+        try {
+            
+            DB::beginTransaction();
+            $data = $request->all();
+            $data['business_id'] = $request->user()->business_id;
+            $supplier = Supplier::create($data);
+            if ($supplier->id) {
+                $output = ['success' => 1,
+                    'select_id' => $request->select_id,
+                    'option_id' => $supplier->id,
+                    'option_name' => $supplier->company,
+                    'msg' => 'Supplier added successfully!',
+                    'redirect' => action('SupplierController@index')
+                ];
+                DB::commit();
+            }
+
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+
 
     public function add_ajax(Request $request){
         $request->validate([

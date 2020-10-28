@@ -286,7 +286,7 @@
       <div class="row">
         <div class="col-md-12">
           <label for="note">Payment Note</label>
-          <textarea name="note" id="" cols="20" rows="5" class="form-control" placeholder="Note"></textarea>
+          <textarea name="payment_note" id="" cols="20" rows="5" class="form-control" placeholder="Note"></textarea>
         </div>
       </div>
       <br><br>

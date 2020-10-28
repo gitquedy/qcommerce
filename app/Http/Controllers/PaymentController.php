@@ -9,6 +9,7 @@ use App\Payment;
 use App\Customer;
 use App\Settings;
 use App\OrderRef;
+use App\Purchases;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +116,16 @@ class PaymentController extends Controller
                     $expense->payment_status = "partial";
                 }
                 $expense->save();
+            }else if($payment->payable_type == "Purchases"){
+                $purchase = $record;
+                $purchase->paid -= $payment->amount;
+                if($purchase->grand_total != $purchase->paid && $purchase->paid == 0) {
+                    $purchase->payment_status = "pending";
+                }
+                else if($purchase->grand_total != $purchase->paid && $purchase->paid != 0) {
+                    $purchase->payment_status = "partial";
+                }
+                $purchase->save();
             }
             $payment->delete();
             DB::commit();
@@ -170,7 +181,6 @@ class PaymentController extends Controller
         $validator = Validator::make($request->all(),[
             'payable_id' => 'required',
             'payable_type' => 'required|in:'. implode(array_keys($types), ','),
-            // 'customer_id' => 'required',
             'date' => 'required|date|max:255',
             'reference_no' => 'nullable',
             'amount' => 'required|numeric|min:0',
@@ -216,7 +226,6 @@ class PaymentController extends Controller
             $data->note = $request->note;
             $data->created_by = $user->id;
             DB::beginTransaction();
-            
             if ($data->save()) {
                 if (!$request->reference_no) {
                     $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
@@ -248,8 +257,20 @@ class PaymentController extends Controller
                         $expense->payment_status = "partial";
                     }
                     $expense->save();
+                }else if($request->payable_type == 'Purchases'){
+                    $purchases = $record;
+                    $purchases->paid += $request->amount;
+                    if($purchases->grand_total == $purchases->paid) {
+                        $purchases->payment_status = "paid";
+                    }
+                    else if($purchases->paid == 0) {
+                        $purchases->payment_status = "pending";
+                    }
+                    else if($purchases->paid > 0 && $purchases->paid < $purchases->grand_total) {
+                        $purchases->payment_status = "partial";
+                    }
+                    $purchases->save();
                 }
-                
                 $output = ['success' => 1,
                     'customer' => $data,
                     'msg' => 'Payment added successfully!',
@@ -331,10 +352,7 @@ class PaymentController extends Controller
                     $sale->payment_status = "partial";
                 }
                 $sale->save();
-
-
                 $result = false;
-
                 $data = new Payment;
                 $data->sales_id = $sale->id;
                 $data->customer_id = $request->customer_id;

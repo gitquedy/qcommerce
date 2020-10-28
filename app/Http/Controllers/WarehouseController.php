@@ -214,7 +214,7 @@ class WarehouseController extends Controller
     }
 
     public function addWarehouseModal(Request $request) {
-        $select_id = ($request->id)?$request->id:'select_category';
+        $select_id = ($request->id)?$request->id:'select_warehouse';
         return view('warehouse.modal.addWarehouse', compact('select_id'));
     }
 

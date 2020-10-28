@@ -239,6 +239,7 @@ return [
     'morph_payments' => [
         'Sales' => 'App\Sales',
         'Expense' => 'App\Expense',
+        'Purchases' => 'App\Purchases',
         // ...
     ]
 
