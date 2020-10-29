@@ -354,7 +354,8 @@ class PaymentController extends Controller
                 $sale->save();
                 $result = false;
                 $data = new Payment;
-                $data->sales_id = $sale->id;
+                $data->payable_id = $sale->id;
+                $data->payable_type = "Sales";
                 $data->customer_id = $request->customer_id;
                 $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $data->reference_no = $reference_no;
