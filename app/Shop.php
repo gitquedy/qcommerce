@@ -486,68 +486,73 @@ class Shop extends Model
     }
 
     public function syncShopifyOrders($date = '2018-01-01'){
-        $shop = $this;
-        $since_id = 0;
-        do{
-            $params = [
-                'status' => 'any',
-                'limit' => 250,
-                'since_id' => $since_id,
-                'updated_at_min' => Carbon::parse($date)->format('c'),
-                'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
-            ];
-            $orders = Shopify::setShopUrl($shop->domain)
-                            ->setAccessToken($shop->access_token)
-                            ->get("admin/api/2020-07/orders.json", $params);
-
-            if(count($orders) != 0){
-                $since_id = $orders->last()->id;
-            }
-
-            $orders->each(function($order) use($shop){
-                // dd($order);
-                $printed = count($order->fulfillments) == 0 ? false : true;
-                $orders_details = [
-                        'ordersn' => $order->id,
-                        'payment_method' => $order->payment_gateway_names[0],
-                        'price' => $order->total_line_items_price,
-                        'shop_id' => $shop->id,
-                        'site' => 'shopify',
-                        'items_count' => count($order->line_items),
-                        'status' => $order->fulfillment_status == 'fulfilled' ? 'closed' : 'open',
-                        'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
-                        'shipping_fee' => $order->total_shipping_price_set->shop_money->amount,
-                        'customer_first_name' => 'No Customer',
-                        'printed' => $printed,
-                        'created_at' => Carbon::parse($order->created_at)->toDateTimeString(),
-                        'updated_at' => Carbon::parse($order->updated_at)->toDateTimeString(),
+        try {
+            $shop = $this;
+            $since_id = 0;
+            do{
+                $params = [
+                    'status' => 'any',
+                    'limit' => 250,
+                    'since_id' => $since_id,
+                    'updated_at_min' => Carbon::parse($date)->format('c'),
+                    'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
                 ];
-                // return $order;
-                $record = Order::updateOrCreate(
-                    ['ordersn' => $orders_details['ordersn']], $orders_details);
-                foreach($order->line_items as $item){
-                        $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
-                        if($product != null){
-                            $item_detail = [
-                                'order_id' => $record->id,
-                                'product_id' => $product->id,
-                                'quantity' => $item->quantity,
-                                'price' => $item->price,
-                                'created_at' => $record->created_at,
-                                'updated_at' => $record->updated_at
-                            ];
-                            OrderItem::updateOrCreate(
-                                ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
-                            );
-                        }
-                    } //items
-            }); // orders
-        }while(count($orders) != 0);
+                $orders = Shopify::setShopUrl($shop->domain)
+                                ->setAccessToken($shop->access_token)
+                                ->get("admin/api/2020-07/orders.json", $params);
+
+                if(count($orders) != 0){
+                    $since_id = $orders->last()->id;
+                }
+
+                $orders->each(function($order) use($shop){
+                    // dd($order);
+                    $printed = count($order->fulfillments) == 0 ? false : true;
+                    $orders_details = [
+                            'ordersn' => $order->id,
+                            'payment_method' => $order->payment_gateway_names[0],
+                            'price' => $order->total_line_items_price,
+                            'shop_id' => $shop->id,
+                            'site' => 'shopify',
+                            'items_count' => count($order->line_items),
+                            'status' => $order->fulfillment_status == 'fulfilled' ? 'closed' : 'open',
+                            'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
+                            'shipping_fee' => $order->total_shipping_price_set->shop_money->amount,
+                            'customer_first_name' => 'No Customer',
+                            'printed' => $printed,
+                            'created_at' => Carbon::parse($order->created_at)->toDateTimeString(),
+                            'updated_at' => Carbon::parse($order->updated_at)->toDateTimeString(),
+                    ];
+                    // return $order;
+                    $record = Order::updateOrCreate(
+                        ['ordersn' => $orders_details['ordersn']], $orders_details);
+                    foreach($order->line_items as $item){
+                            $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
+                            if($product != null){
+                                $item_detail = [
+                                    'order_id' => $record->id,
+                                    'product_id' => $product->id,
+                                    'quantity' => $item->quantity,
+                                    'price' => $item->price,
+                                    'created_at' => $record->created_at,
+                                    'updated_at' => $record->updated_at
+                                ];
+                                OrderItem::updateOrCreate(
+                                    ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                                );
+                            }
+                        } //items
+                }); // orders
+            }while(count($orders) != 0);
+        } catch (Exception $e) {
+            //
+        }
     }
 
     public function syncShopifyProducts($updated_at_min = '2018-01-01'){
         if ($this->site == 'shopify'){
-            $since_id = 0;
+           try {
+             $since_id = 0;
             do{
                 $params = [                
                     'updated_at_min' => Carbon::parse($updated_at_min)->format('c'),
@@ -582,6 +587,9 @@ class Shop extends Model
                         $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                 });
             }while(count($products) != 0);
+           } catch (Exception $e) {
+               //
+           }
         }
     }
 

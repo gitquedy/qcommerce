@@ -239,7 +239,7 @@ class ShopController extends Controller
             }else if($data['code'] != null && $data['shop'] != null && $data['shop_id'] == null){ // shopify
                 if(Shopify::verifyRequest($request->only(['code','shop', 'hmac', 'timestamp']))){
                     $accessToken = Shopify::setShopUrl($data['shop'])->getAccessToken($data['code']);
-
+    
                     $data['expires_in'] = Carbon::now()->addDays(364);
                     $data['domain'] = $data['shop'];
                     $data['access_token'] = $accessToken;
@@ -272,6 +272,64 @@ class ShopController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+    public function createShopifyTemp(Request $request){
+        $breadcrumbs = [
+                    ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Shopify Shop"]
+                ];
+        $warehouses = $request->user()->business->warehouse;
+        return view('shop.shopify_temp.create',compact('breadcrumbs', 'warehouses'));
+    }
+
+
+    public function storeShopiyTemp(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'regex:/^[\pL\s\-]+$/u'],
+            'domain' => 'required',
+            'short_name' => 'required',
+            'api_password' => 'required',
+            // 'pro_username' => 'required_if:pro_status,1',
+            // 'pro_password' => 'required_if:pro_status,1',
+            'warehouse_id' => 'required',
+         ], [
+            'name.regex' => 'Only character\'s are allowed',
+            'warehouse_id.required' => 'Please select a warehouse',
+            // 'pro_username.required_if' => 'Username field is required',
+            // 'pro_password.required_if' => 'Password field is required',
+     ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+        try {
+            $data = $request->all();
+            $data['expires_in'] = Carbon::now()->addDays(364);
+            $data['domain'] = 'https://' . $data['domain'] . '.myshopify.com/';
+            $data['access_token'] = $data['api_password'];
+            $data['site'] = 'shopify';
+            $data['name'] = $data['name'];
+            $data['short_name'] = $data['short_name'];
+            $data['business_id'] = $request->user()->business_id;
+            $data['warehouse_id']= $request->warehouse_id;
+
+            $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
+
+            $output = ['success' => 1,
+                            'msg' => 'Shop added successfully!',
+                            'redirect' => action('ShopController@index')
+                        ];
+
+        } catch (\Exception $e) {
+                    \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+                    $output = ['success' => 0,
+                                'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                            ];
+                     DB::rollBack();
+                }
+                return response()->json($output);
+
     }
 
     public function edit(Shop $shop){

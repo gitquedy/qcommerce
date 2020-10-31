@@ -71,9 +71,13 @@ Route::group(['middleware' => 'auth'], function()
 
 
 		 
-		
+		Route::get('/shop/createShopifyTemp', 'ShopController@createShopifyTemp');
+		Route::post('/shop/storeShopiyTemp', 'ShopController@storeShopiyTemp');
 		Route::get('/shop/form', 'ShopController@form')->name('shop.form');
 		Route::resource('/shop', 'ShopController');
+
+
+		
 
 
 		Route::group(['prefix' => 'shopify'], function(){

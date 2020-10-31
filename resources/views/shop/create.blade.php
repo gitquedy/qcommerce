@@ -28,12 +28,12 @@
                   </div>
                 </div><br>
                 <div class="row" id="shopify">
-                  <div class="col-md-8">
+                  <!-- <div class="col-md-8">
                     <div class="form-group">
                       <label>Domain</label>
                       <input class="form-control" id="domain" placeholder="Domain e.g. qcommerce.myshopify.com">
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 <br>
                 <p><b>Step 1</b> : <button class="btn btn-primary continue"><i class="fa fa-check"></i> Connect Shop by clicking here</button></p>
@@ -106,19 +106,30 @@
       $('.sel2').select2({
         templateResult: formatState
       });
-      $('.continue').click(function(){
+      // $('.continue').click(function(){ //shopify live
+      //   var channel = $('#channel').find(":selected").val();
+      //   if(channel == 'shopify'){
+      //     var domain = $("#domain").val();
+      //     if(domain == ''){
+      //       alert('Domain is required');
+      //       return;
+      //     }
+      //     window.location.href = $('#channel').find(":selected").data('url') + '?channel=' + domain;
+      //   }else{
+      //     window.location.href = $('#channel').find(":selected").data('url');
+      //   }
+      // });
+
+      $('.continue').click(function(){ //temp shopify
         var channel = $('#channel').find(":selected").val();
         if(channel == 'shopify'){
-          var domain = $("#domain").val();
-          if(domain == ''){
-            alert('Domain is required');
-            return;
-          }
-          window.location.href = $('#channel').find(":selected").data('url') + '?channel=' + domain;
+          window.location.href = "{{ action('ShopController@createShopifyTemp') }}";
+          return;
         }else{
           window.location.href = $('#channel').find(":selected").data('url');
         }
       });
+
       $('select[name=channel]').on('change', function() {
         if(this.value == 'shopify'){
           $("#shopify").slideDown();
