@@ -8,10 +8,14 @@ class Expense extends Model
 {
     protected $table = 'expense';
 
-    protected $fillable = ['expense_category_id', 'warehouse_id', 'business_id', 'date', 'paid', 'payment_status', 'reference_no', 'amount', 'note', 'attachment', 'created_by', 'updated_by'];
+    protected $fillable = ['expense_category_id', 'supplier_id', 'warehouse_id', 'business_id', 'date', 'paid', 'payment_status', 'reference_no', 'amount', 'note', 'attachment', 'created_by', 'updated_by'];
 
     public function category(){
     	return $this->belongsTo(ExpenseCategory::class, 'expense_category_id', 'id');
+    }
+
+    public function supplier(){
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
 
     public function attachment_link(){

@@ -20,6 +20,7 @@ class CreateExpenseTable extends Migration
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('business')->onDelete('cascade');
+            $table->unsignedBigInteger('supplier_id');
             $table->string('date');
             $table->string('reference_no');
             $table->float('amount', 10, 2);

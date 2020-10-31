@@ -106,20 +106,27 @@
                       </div>
                   </div>
                   <div class="col-md-4">
-                      <div class="form-group">
-                          <label>Attachment</label>
-                          <label>Currently: <a target="_blank" href="{{ $expense->attachment_link() }}"> {{ $expense->attachment }}</a></label>
-                          <div class="position-relative has-icon-left">
-                            <input type="file" class="form-control" name="attachment" placeholder="Attachment">
-                            <div class="form-control-position"> 
-                              <i class="feather icon-file"></i>
-                            </div>
-                          </div>
+                  <div class="form-group">
+                    <label>Biller</label>
+                    <div class="position-relative has-icon-left">
+                      <select name="supplier_id" id="select_supplier" class="form-control select2 update_select" placeholder="Select Biller">
+                        <option value="" disabled selected></option>
+                        <option value="add_new">Add New Supplier/Biller</option>
+                        @forelse($suppliers as $supplier)
+                        <option value="{{ $supplier->id }}">{{ $supplier->company }}</option>
+                        @empty
+                        <option value="" disabled="">Please Add Supplier/Biller</option>
+                        @endforelse
+                      </select>
+                      <div class="form-control-position"> 
+                        <i class="feather icon-user"></i>
                       </div>
+                    </div>
                   </div>
                 </div>
+                </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-8">
                       <div class="form-group">
                           <label>Note:</label>
                           <div class="position-relative has-icon-left">
@@ -129,6 +136,18 @@
                             </div>
                       </div>
                   </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Attachment</label>
+                        <label>Currently: <a target="_blank" href="{{ $expense->attachment_link() }}"> {{ $expense->attachment }}</a></label>
+                        <div class="position-relative has-icon-left">
+                          <input type="file" class="form-control" name="attachment" placeholder="Attachment">
+                          <div class="form-control-position"> 
+                            <i class="feather icon-file"></i>
+                          </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -188,6 +207,22 @@
         $(this).val('').trigger('change');
       } 
   });
+
+  $('select[name=supplier_id]').on('change', function() {
+        var selected = $(this).find('option:selected').val();
+        if(selected == 'add_new') {
+          $.ajax({
+            url :  "{{ route('supplier.addSupplierModal') }}",
+            type: "POST",
+            success: function (response) {
+              if(response) {
+                $(".view_modal").html(response).modal('show');
+              }
+            }
+          });
+          $(this).val('').trigger('change');
+        } 
+    });
  </script>
  <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
  

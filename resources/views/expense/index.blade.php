@@ -59,6 +59,7 @@
             <th>Date</th>
             <th>Reference No</th>
             <th>Warehouse</th>
+            <th>Biller</th>
             <th>Category</th>
             <th>Amount</th>
             <th>Paid</th>
@@ -118,6 +119,7 @@
             { data: 'date_formatted', name: 'date_formatted' },
             { data: 'reference_no', name: 'reference_no' },
             { data: 'warehouse_name', name: 'warehouse_name' },
+            { data: 'biller_name', name: 'biller_name' },
             { data: 'category_name', name: 'category_name' },
             { data: 'amount_formatted', name: 'amount_formatted' },
             { data: 'paid', name: 'paid' },

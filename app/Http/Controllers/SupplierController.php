@@ -19,7 +19,7 @@ class SupplierController extends Controller
     public function index()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Suppliers"], ['name'=>"List of Suppliers"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Suppliers/Billers"], ['name'=>"List of Suppliers/Billers"]
         ];
         
         if ( request()->ajax()) {
@@ -136,7 +136,7 @@ class SupplierController extends Controller
     public function create()
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Suppliers"], ['name'=>"Supplier  Create"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Suppliers/Billers"], ['name'=>"Supplier/Billers Create"]
         ];
         
         
@@ -195,7 +195,7 @@ class SupplierController extends Controller
             return redirect('/supplier');
         }
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Supplier"], ['name'=>"Supplier Edit"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Supplier/Biller"], ['name'=>"Supplier/Biller Edit"]
         ];
         
         return view('supplier.edit', [

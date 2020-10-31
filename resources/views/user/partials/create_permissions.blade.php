@@ -150,7 +150,7 @@
               <span class="vs-checkbox">
                 <span class="vs-checkbox--check"><i class="vs-icon feather icon-users"></i></span>
               </span>
-              <span class="">Suppliers</span>
+              <span class="">Suppliers/Billers</span>
             </div></fieldset>
           </td>
           <td>

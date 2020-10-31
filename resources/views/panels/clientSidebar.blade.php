@@ -294,20 +294,20 @@
                 <li class="nav-item">
                     <a href="">
                         <i class="feather icon-truck"></i>
-                        <span class="menu-title" data-i18n="">Suppliers</span>
+                        <span class="menu-title" data-i18n="">Suppliers / Billers</span>
                         
                     </a>
                     <ul class="menu-content">
                         <li class="{{ $request->segment(1) == 'supplier' && $request->segment(2) == '' ? 'active' : '' }}">
                             <a href="{{url('/supplier')}}">
                                 <i class="feather icon-circle"></i>
-                                <span class="menu-title" data-i18n="">List of Suppliers</span>
+                                <span class="menu-title" data-i18n="">List of Suppliers / Billers</span>
                             </a>
                         </li>
                         <li class="{{ $request->segment(1) == 'supplier' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{route('supplier.create')}}">
                                 <i class="feather icon-circle"></i>
-                                <span class="menu-title" data-i18n="">Add new Supplier</span>
+                                <span class="menu-title" data-i18n="">Add new Supplier / Billers</span>
                             </a>
                         </li>
                     </ul>

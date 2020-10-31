@@ -4,7 +4,7 @@
 		@csrf
   <div class="modal-content">
   	<div class="modal-header">
-		<h4 class="modal-title" id="modal-title">Add Supplier
+		<h4 class="modal-title" id="modal-title">Add Supplier/Biller
 		</h4>
     <input type="hidden" name="select_id" value="{{$select_id}}" readonly>
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
