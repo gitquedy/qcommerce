@@ -42,7 +42,7 @@ class ExpenseController extends Controller
                 return $Expense->warehouse->name;
             })
             ->addColumn('category_name', function(Expense $Expense) {
-                return $Expense->category ? $Expense->category->displayName() : '--';
+                return $Expense->category ? $Expense->category->name : '--';
             })
             ->addColumn('created_by_name', function(Expense $Expense) {
                 return $Expense->created_by_name->formatName();

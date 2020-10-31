@@ -529,11 +529,11 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.searchPurchase') }}/%WAREHOUSE%/%QUERY%/%CID%/true',
+                url: '{{ route('sku.searchPurchase') }}/%QUERY%/',
                 replace: function(url, query) {
                     var wid = ($('#select_warehouse').val())?$('#select_warehouse').val():'none';
                     var cid = ($('#select_supplier').val())?$('#select_supplier').val():'none';
-                    return url.replace('%WAREHOUSE%', wid).replace('%QUERY%', query).replace('%CID%', cid);
+                    return url.replace('%QUERY%', query);
                 }
             },
             datumTokenizer: Bloodhound.tokenizers.whitespace('search_product'),
