@@ -113,7 +113,7 @@
                         <option value="" disabled selected></option>
                         <option value="add_new">Add New Supplier/Biller</option>
                         @forelse($suppliers as $supplier)
-                        <option value="{{ $supplier->id }}">{{ $supplier->company }}</option>
+                        <option value="{{ $supplier->id }}" {{ $supplier->id == $expense->supplier_id ? 'selected' : '' }}>{{ $supplier->company }}</option>
                         @empty
                         <option value="" disabled="">Please Add Supplier/Biller</option>
                         @endforelse

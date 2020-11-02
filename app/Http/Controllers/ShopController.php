@@ -467,6 +467,9 @@ class ShopController extends Controller
               }else if($shop->site == 'lazada'){
                 $shop->syncLazadaOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
               }
+              else if($shop->site == 'shopify'){
+                $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }
               $output = ['success' => 1,
                   'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',
               ];
