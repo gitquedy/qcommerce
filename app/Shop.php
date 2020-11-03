@@ -510,7 +510,7 @@ class Shop extends Model
                     $printed = count($order->fulfillments) == 0 ? false : true;
                     $orders_details = [
                             'ordersn' => $order->id,
-                            'payment_method' => $order->payment_gateway_names[0],
+                            'payment_method' => isset($order->payment_gateway_names[0]) ?  $order->payment_gateway_names[0] : 'Unknown',
                             'price' => $order->total_line_items_price,
                             'shop_id' => $shop->id,
                             'site' => 'shopify',
