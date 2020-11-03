@@ -56,6 +56,14 @@ class Sku extends Model
             $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $item['sku_id'])->first();
             if($sku){
                 $sku->quantity -= $item['quantity'];
+                if($warehouse_item == null){
+                    $warehouse_item = WarehouseItems::create(
+                    ['warehouse_id' => $warehouse_id,
+                     'sku_id' => $item->sku->id,
+                     'quantity' => 0
+                    ]
+                    );
+                }
                 $warehouse_item->quantity -= $item['quantity'];
                 $warehouse_item->save();
                 $sku->save();
@@ -70,6 +78,14 @@ class Sku extends Model
             $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $item->sku_id)->first();
             if($sku){
                 $sku->quantity += $item['quantity'];
+                if($warehouse_item == null){
+                    $warehouse_item = WarehouseItems::create(
+                    ['warehouse_id' => $warehouse_id,
+                     'sku_id' => $item->sku->id,
+                     'quantity' => 0
+                    ]
+                    );
+                }
                 $warehouse_item->quantity += $item['quantity'];
                 $warehouse_item->save();
                 $sku->save();
