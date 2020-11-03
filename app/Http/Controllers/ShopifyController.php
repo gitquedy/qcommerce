@@ -73,29 +73,68 @@ class ShopifyController extends Controller
     }
 
     public function test(Request $request){
+       try {
+            $date = '2020-11-03';
+            $shop = Shop::first();
+            $since_id = 0;
+            do{
+                $params = [
+                    'status' => 'any',
+                    'limit' => 250,
+                    'since_id' => $since_id,
+                    'updated_at_min' => Carbon::parse($date)->format('c'),
+                    'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
+                ];
+                $orders = Shopify::setShopUrl($shop->domain)
+                                ->setAccessToken($shop->access_token)
+                                ->get("admin/api/2020-07/orders.json", $params);
+                dd($orders);
+                if(count($orders) != 0){
+                    $since_id = $orders->last()->id;
+                }
 
-        // $shops = Shop::all()->pluck('id');
-        // $product = Products::first();
-        // $product->updatePlatform();
-
-
-
-        //         $shop = Shop::first();
-
-        // $params = [                
-        //             'updated_at_min' => Carbon::parse('2018-01-01')->format('c'),
-        //             'updated_at_max' => Carbon::now()->addDays(2)->format('c'),
-        //             'limit' => 250,
-        //         ];
-
-        // $products = Shopify::setShopUrl($shop->domain)
-        //             ->setAccessToken($shop->access_token)
-        //             ->get('admin/products.json', $params);
-        //             dd($products);      
-
-        $products = Shopify::setShopUrl(env('SHOPIFY_TEMP_DOMAIN'))->setAccessToken(env('SHOPIFY_TEMP_PASSWORD'))->get("admin/products.json");
-        dd($products);
-      
+                $orders->each(function($order) use($shop){
+                    // dd($order);
+                    $printed = count($order->fulfillments) == 0 ? false : true;
+                    $orders_details = [
+                            'ordersn' => $order->id,
+                            'payment_method' => isset($order->payment_gateway_names[0]) ?  $order->payment_gateway_names[0] : 'None',
+                            'price' => $order->total_line_items_price,
+                            'shop_id' => $shop->id,
+                            'site' => 'shopify',
+                            'items_count' => count($order->line_items),
+                            'status' => $order->fulfillment_status == 'fulfilled' ? 'closed' : 'open',
+                            'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
+                            'shipping_fee' => $order->total_shipping_price_set->shop_money->amount,
+                            'customer_first_name' => 'No Customer',
+                            'printed' => $printed,
+                            'created_at' => Carbon::parse($order->created_at)->toDateTimeString(),
+                            'updated_at' => Carbon::parse($order->updated_at)->toDateTimeString(),
+                    ];
+                    // return $order;
+                    $record = Order::updateOrCreate(
+                        ['ordersn' => $orders_details['ordersn']], $orders_details);
+                    foreach($order->line_items as $item){
+                            $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
+                            if($product != null){
+                                $item_detail = [
+                                    'order_id' => $record->id,
+                                    'product_id' => $product->id,
+                                    'quantity' => $item->quantity,
+                                    'price' => $item->price,
+                                    'created_at' => $record->created_at,
+                                    'updated_at' => $record->updated_at
+                                ];
+                                OrderItem::updateOrCreate(
+                                    ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                                );
+                            }
+                        } //items
+                }); // orders
+            }while(count($orders) != 0);
+        } catch (Exception $e) {
+            //
+        }
     }
 }
 

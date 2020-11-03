@@ -161,7 +161,7 @@ class PurchasesController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
-        try {
+        // try {
             DB::beginTransaction();
             $user = Auth::user();
             $supplier = Supplier::where('business_id', $user->business_id)->where('id', $request->supplier_id)->first();
@@ -227,6 +227,8 @@ class PurchasesController extends Controller
             }
             if($request->paid) {
                 $payment = new Payment;
+                $payment->people_id = $purchase->supplier_id;
+                $payment->people_type = "Supplier";
                 $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
                 $payment->amount = $request->paid;
@@ -251,13 +253,13 @@ class PurchasesController extends Controller
                 'redirect' => action('PurchasesController@index')
             ];
             DB::commit();
-        } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
-            $output = ['success' => 0,
-                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
-                    ];
-             DB::rollBack();
-        }
+        // } catch (\Exception $e) {
+        //     \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+        //     $output = ['success' => 0,
+        //                 'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+        //             ];
+        //      DB::rollBack();
+        // }
         return response()->json($output);
     }
 

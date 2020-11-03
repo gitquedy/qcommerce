@@ -1,6 +1,6 @@
 
 <div class="modal-dialog modal-lg" role="document">
-	<form action="{{ route('payment.addMultiPaymentAjaxSales') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
+	<form action="{{ route('payment.addMultiPaymentAjaxPurchases') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
   @method('POST')
 	@csrf
   <style>
@@ -11,7 +11,7 @@
   <div class="modal-content">
   	<div class="modal-header">
 		<h4 class="modal-title" id="modal-title">Add MultiPayment</h4>
-    <input type="hidden" name="customer_id" value="{{$customer->id}}">
+    <input type="hidden" name="supplier_id" value="{{$supplier->id}}">
     <button type="button" class="close no-print" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	</div>
 	<div class="modal-body">
@@ -46,16 +46,16 @@
               @php
                 $total_balance = 0;
               @endphp
-              @foreach ($sales as $sale)
-              <input type="hidden" name="sales_id[]" value="{{$sale->id}}">
+              @foreach ($purchases as $po)
+              <input type="hidden" name="purchases_id[]" value="{{$po->id}}">
               @php
               $balance = 0;
-              $balance = $sale->grand_total - $sale->paid;
+              $balance = $po->grand_total - $po->paid;
               $total_balance += $balance;
               @endphp
               <div class="row">
                 <div class="col-12">
-                  <p>Sales Reference No.: <b>{{$sale->reference_no}}</b></p>
+                  <p>Sales Reference No.: <b>{{$po->reference_no}}</b></p>
                 </div>
               </div>
               <div class="row  w-100">
@@ -63,10 +63,10 @@
                   <p class="text-secondary" >Balance : <span class="text-warning">{{$balance}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$sale->grand_total}}</span></p>
+                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$po->grand_total}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$sale->paid}}</span></p>
+                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$po->paid}}</span></p>
                 </div>
               </div>
               @endforeach
@@ -91,7 +91,7 @@
                       <option value="gift_certificate">Gift Card</option>
                       <option value="credit_card">Credit Card</option>
                       <option value="cheque">Cheque</option>
-                      <option value="deposit">Deposit</option>
+                      <!-- <option value="deposit">Deposit</option> -->
                       <option value="other">Other</option>
                     </select>
                     <div class="form-control-position"> 
@@ -182,17 +182,6 @@
                       <div class="form-control-position"> 
                         <i class="feather icon-gift"></i>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="deposit payment_type_ext" style="display: none">
-                <hr>
-                <div class="row">
-                  <div class="col-md-6">
-                    <label for="gift_card_no">Current Deposit Balance:</label>
-                    <div class="position-relative has-icon-left">
-                      <h3 class="text-primary">{{ number_format($customer->available_deposit(), 2) }}</h3>
                     </div>
                   </div>
                 </div>

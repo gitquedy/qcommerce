@@ -38,8 +38,8 @@ class Customer extends Model
           break;
       }
     }
-    
-    public function fullName(){
+  
+  public function fullName(){
         return $this->first_name . ' ' . $this->last_name;
     }
 
@@ -54,9 +54,10 @@ class Customer extends Model
     public function sales(){
         return $this->hasMany(Sales::class, 'customer_id', 'id');
     }
-    
+
     public function payments(){
-        return $this->hasMany(Payment::class, 'customer_id', 'id');
+        // return $this->hasMany(Payment::class, 'customer_id', 'id');
+        return $this->morphMany(Payment::class, 'people', 'people_type');
     }
 
     public function available_deposit(){

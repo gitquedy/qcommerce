@@ -92,7 +92,7 @@ class Shop extends Model
     }
 
     
-    public function syncOrders($date = '2018-01-01', $step = '+1 day'){
+public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
             $this->update(['active' => 2]);
             if($this->site == 'lazada'){

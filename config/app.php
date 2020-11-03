@@ -240,6 +240,8 @@ return [
         'Sales' => 'App\Sales',
         'Expense' => 'App\Expense',
         'Purchases' => 'App\Purchases',
+        'Customer' => 'App\Customer',
+        'Supplier' => 'App\Supplier',
         // ...
     ]
 

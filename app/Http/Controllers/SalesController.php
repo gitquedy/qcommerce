@@ -233,7 +233,9 @@ class SalesController extends Controller
             }
             if($request->paid) {
                 $payment = new Payment;
-                $payment->customer_id = $sales->customer_id;
+                // $payment->customer_id = $sales->customer_id;
+                $payment->people_id = $sales->customer_id;
+                $payment->people_type = "Customer";
                 $payment->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $payment->reference_no = ($request->payment_reference_no)?$request->payment_reference_no:$genref->getReference_pay();
                 $payment->amount = $request->paid;

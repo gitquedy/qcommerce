@@ -30,13 +30,14 @@ class SupplierController extends Controller
            $Supplier = Supplier::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
             return Datatables::eloquent($Supplier)
-            ->addColumn('action', function(Supplier $SUP) {
+            ->addColumn('action', function(Supplier $supplier) {
                             return '<div class="btn-group dropup mr-1 mb-1">
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                             Action<span class="sr-only">Toggle Dropdown</span></button>
                             <div class="dropdown-menu">
-                            <a class="dropdown-item fa fa-edit" href="'.route('supplier.edit',['supplier'=>$SUP->id]).'" > Edit</a>
-                            <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SUP->name .' ?" data-text="This Action is irreversible." data-href="'.route('supplier.delete', ['id'=>$SUP->id]).'" > Delete</a>
+                            <a class="dropdown-item" href="'. action('SupplierController@show', $supplier->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
+                            <a class="dropdown-item fa fa-edit" href="'.route('supplier.edit',['supplier'=>$supplier->id]).'" > Edit</a>
+                            <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $supplier->name .' ?" data-text="This Action is irreversible." data-href="'.route('supplier.delete', ['id'=>$supplier->id]).'" > Delete</a>
                             </div>
                             </div>';
                         })
@@ -177,8 +178,10 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        //
-       return redirect('/supplier');
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SupplierController@index'), 'name'=>"Supplier List"], ['name'=>"View Supplier"]
+        ];
+        return view('supplier.show', compact('breadcrumbs', 'supplier'));
     }
 
     /**

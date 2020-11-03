@@ -246,7 +246,10 @@
         var default_status = '';
         if(site == 'lazada'){
           default_status = 'pending';
-        }else{
+        }else if(site == 'shopify'){
+          default_status = 'Open';
+        }
+        else{
           default_status = 'READY_TO_SHIP'
         }
         url = "{{ action('OrderController@index')}}?site=" + site + "&status=" + default_status;

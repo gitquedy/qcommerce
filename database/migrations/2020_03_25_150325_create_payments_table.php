@@ -19,8 +19,10 @@ class CreatePaymentsTable extends Migration
             $table->string('payable_type');
             // $table->unsignedBigInteger('sales_id');
             // $table->foreign('sales_id')->references('id')->on('sales')->onDelete('cascade');
-            $table->unsignedBigInteger('customer_id')->nullable();
-            $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
+            // $table->unsignedBigInteger('customer_id')->nullable();
+            // $table->foreign('customer_id')->references('id')->on('customer')->onDelete('SET NULL');
+            $table->unsignedBigInteger('people_id')->nullable();
+            $table->string('people_type')->nullable();
             $table->string('reference_no');
             $table->date('date');
             $table->string('payment_type');

@@ -15,7 +15,7 @@ class Supplier extends Model
      * @var array
      */
     protected $fillable = [
-        'company', 'contact_person', 'phone', 'email', 'business_id', 'created_at', 'updated_at'
+        'company', 'contact_person', 'phone', 'email', 'business_id', 'created_at', 'updated_at', 'business_id'
     ];
 
 
@@ -28,6 +28,17 @@ class Supplier extends Model
         return $result;
         
     }
-    
 
+    public function business(){
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
+
+    public function purchases(){
+        return $this->hasMany(Purchases::class, 'supplier_id', 'id');
+    }
+    
+    public function payments(){
+        // return $this->hasMany(Payment::class, 'customer_id', 'id');
+        return $this->morphMany(Payment::class, 'people', 'people_type');
+    }
 }

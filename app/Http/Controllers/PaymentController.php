@@ -7,6 +7,7 @@ use Validator;
 use App\Sales;
 use App\Payment;
 use App\Customer;
+use App\Supplier;
 use App\Settings;
 use App\OrderRef;
 use App\Purchases;
@@ -205,12 +206,21 @@ class PaymentController extends Controller
         }
         $user = Auth::user();
         try {
+            $record = $types[$request->payable_type]::findOrFail($request->payable_id);
             $data = $request->all();
             $data = new Payment;
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
+
+            if($request->payable_type == 'Sales'){
+                $data->people_id = $record->customer_id;
+                $data->people_type = 'Customer';
+            }else if($request->payable_type == 'Purchases'){
+                $data->people_id = $record->supplier_id;
+                $data->people_type = 'Supplier';
+            }
             $data->payable_id = $request->payable_id;
             $data->payable_type = $request->payable_type;
-            $data->customer_id = $request->customer_id;
+            // $data->customer_id = $request->customer_id;
             $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
             $data->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_pay();
             $data->amount = $request->amount;
@@ -230,7 +240,6 @@ class PaymentController extends Controller
                 if (!$request->reference_no) {
                     $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
                 }
-                $record = $types[$request->payable_type]::findOrFail($request->payable_id);
                 if($request->payable_type == 'Sales'){
                     $sale = $record;
                     $sale->paid += $request->amount;
@@ -295,7 +304,119 @@ class PaymentController extends Controller
         return view('payment.modal.addMultiPayment', compact('sales', 'customer'));
     }
 
-    public function addMultiPaymentAjax(Request $request) {
+    public function addMultiPaymentModalPurchase(Supplier $supplier, Request $request) {
+        $business_id = Auth::user()->business_id;
+        $purchases = $supplier->purchases()->whereIn('id', $request->ids)->get();
+
+        return view('payment.modal.addMultiPaymentPurchase', compact('purchases', 'supplier'));
+    }
+
+    public function addMultiPaymentAjaxPurchases(Request $request) {
+        $validator = Validator::make($request->all(),[
+            'purchases_id' => 'required',
+            'supplier_id' => 'required',
+            'date' => 'required|date|max:255',
+            'reference_no' => 'nullable',
+            'amount' => 'required|numeric|min:0',
+            'payment_type' => 'required',
+            'gift_card_no' => Rule::requiredIf($request->payment_type == 'gift_certificate'),
+            'cc_no' => Rule::requiredIf($request->payment_type == 'credit_card'),
+            'cc_holder' => Rule::requiredIf($request->payment_type == 'credit_card'),
+            'cc_type' => Rule::requiredIf($request->payment_type == 'credit_card'),
+            'cc_month' => Rule::requiredIf($request->payment_type == 'credit_card'),
+            'cc_year' => Rule::requiredIf($request->payment_type == 'credit_card'),
+            'cheque_no' => Rule::requiredIf($request->payment_type == 'cheque'),
+            'note' => 'nullable',
+        ]);
+        if ($request->supplier_id) {
+            $supplier = Supplier::findOrFail($request->supplier_id);
+        }
+        if ($validator->fails()) {
+            return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
+        }
+        $user = Auth::user();
+        try {
+            $continue = true;
+            $total_paid = $request->amount;
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
+            $reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_pay();
+
+            DB::beginTransaction();
+            $purchases = $supplier->purchases()->whereIn('id', $request->purchases_id)->get();
+            foreach ($purchases as $po) {
+              if($total_paid != 0) {
+                $amount_paid = 0;
+                if($total_paid < ($po->grand_total - $po->paid)) {
+                  $amount_paid = $total_paid;
+                  $total_paid = 0;
+                }
+                else {
+                  $amount_paid = ($po->grand_total - $po->paid);
+                  $total_paid -= $amount_paid;
+                }
+                $po->paid += $amount_paid;
+                if($po->grand_total == $po->paid) {
+                    $po->payment_status = "paid";
+                }
+                else if($po->paid == 0) {
+                    $po->payment_status = "pending";
+                }
+                else if($po->paid > 0 && $po->paid < $po->grand_total) {
+                    $po->payment_status = "partial";
+                }
+                $po->save();
+                $result = false;
+                $data = new Payment;
+                $data->payable_id = $po->id;
+                $data->payable_type = "Purchases";
+                $data->people_id = $request->supplier_id;
+                $data->people_type = 'Supplier';
+                $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
+                $data->reference_no = $reference_no;
+                $data->amount = $amount_paid;
+                $data->payment_type = $request->payment_type;
+                $data->gift_card_no = $request->gift_card_no;
+                $data->cc_no = $request->cc_no;
+                $data->cc_holder = $request->cc_holder;
+                $data->cc_type = $request->cc_type;
+                $data->cc_month = $request->cc_month;
+                $data->cc_year = $request->cc_year;
+                $data->cheque_no = $request->cheque_no;
+                $data->status = 'received';
+                $data->note = $request->note;
+                $data->created_by = $user->id;
+                $result = $data->save();
+                if($continue && !$result) {
+                  $continue = false;
+                }
+              }
+            }
+            
+            if ($continue) {
+                if (!$request->reference_no) {
+                    $increment = OrderRef::where('settings_id', $genref->id)->update(['pay' => DB::raw('pay + 1')]);
+                }
+                $output = ['success' => 1,
+                    'customer' => $data,
+                    'msg' => 'Payment added successfully!',
+                    'reload' => true,
+                ];
+                DB::commit();
+            }
+
+          
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+             DB::rollBack();
+        }
+        return response()->json($output);
+    }
+    
+
+    public function addMultiPaymentAjaxSales(Request $request) {
         $validator = Validator::make($request->all(),[
             'sales_id' => 'required',
             'customer_id' => 'required',
@@ -356,7 +477,8 @@ class PaymentController extends Controller
                 $data = new Payment;
                 $data->payable_id = $sale->id;
                 $data->payable_type = "Sales";
-                $data->customer_id = $request->customer_id;
+                $data->people_id = $request->customer_id;
+                $data->people_type = 'Customer';
                 $data->date =  date("Y-m-d H:i:s", strtotime($request->date));
                 $data->reference_no = $reference_no;
                 $data->amount = $amount_paid;
