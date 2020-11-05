@@ -273,7 +273,7 @@ class LazopClient
 				$resp = $this->curl_get($requestUrl, $apiParams,$request->headerParams);			
 			}
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
 			$this->logApiError($requestUrl,"HTTP_ERROR_" . $e->getCode(),$e->getMessage());
 			throw $e;
