@@ -58,8 +58,6 @@
                             <p class="display-4" style="font-size: 2.5rem!important">{{number_format($total_expense, 2)}}</p>
                             <p class="text-warning">Total Expenses</p>
                         </div>
-                      </div>
-                      <div class="row text-center">
                         <div class="card col-md-4 btn-outline-success mx-1 px-2 d-inline-block" style="max-width: 20rem;">
                             @php
                             $total_paid = 0;
@@ -95,6 +93,7 @@
                             <p class="text-danger">Balance</p>
                         </div>
                       </div>
+                        
                       <br>
                       <ul class="nav nav-tabs" id="view_profile_tabs" role="tablist">
                         <li class="nav-item">
