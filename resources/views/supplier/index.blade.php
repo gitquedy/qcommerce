@@ -59,6 +59,7 @@
             <th>Contact Person</th>
             <th>Mobile Number</th>
             <th>Email</th>
+            <th>Balance</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -99,6 +100,7 @@
             { data: 'contact_person', name: 'contact_person'},
             { data: 'phone', name: 'phone'},
             { data: 'email', name: 'email'},
+            { data: 'balance', name: 'balance'},
             { data: 'action', name: 'action', orderable : false},
         ];
   var table_route = {

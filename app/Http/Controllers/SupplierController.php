@@ -30,6 +30,20 @@ class SupplierController extends Controller
            $Supplier = Supplier::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
             return Datatables::eloquent($Supplier)
+            ->addColumn('balance', function(Supplier $supplier) {
+                $balance = 0;
+                foreach ($supplier->purchases as $purchase) {
+                    if (in_array($purchase->payment_status, ['pending', 'partial']) && $purchase->status == 'received') {
+                      $balance += $purchase->grand_total - $purchase->paid;
+                    }
+                }
+                foreach ($supplier->expenses as $expense) {
+                    if (in_array($expense->payment_status, ['pending', 'partial'])) {
+                      $balance += $expense->amount - $expense->paid;
+                    }
+                }
+                return number_format($balance, 2);
+            })
             ->addColumn('action', function(Supplier $supplier) {
                             return '<div class="btn-group dropup mr-1 mb-1">
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
