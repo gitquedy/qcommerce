@@ -105,7 +105,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-md-4">
+                <!--   <div class="col-md-4">
                   <div class="form-group">
                     <label>Biller</label>
                     <div class="position-relative has-icon-left">
@@ -123,7 +123,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 </div>
                 <div class="row">
                   <div class="col-md-8">

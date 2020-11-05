@@ -289,7 +289,7 @@ class ExpenseController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'date' => 'required|date',
-            'supplier_id' => ['required', 'exists:suppliers,id'],
+            // 'supplier_id' => ['required', 'exists:suppliers,id'],
             'reference_no' => 'nullable|string|max:255',
             'warehouse_id' => 'required|exists:warehouses,id',
             'amount' => ['required', 'regex:/^\d*(\.\d{1,2})?$/'], //float or whole number
@@ -297,7 +297,7 @@ class ExpenseController extends Controller
             'note' => 'nullable|string|max:255',
             'expense_category_id' => ['required', 'exists:expense_category,id']
         ],[
-            'supplier_id.required' => 'The biller field is required.'
+            // 'supplier_id.required' => 'The biller field is required.'
         ]);
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);

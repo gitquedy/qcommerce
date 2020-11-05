@@ -305,7 +305,7 @@ class PurchasesController extends Controller
         $validator = Validator::make($request->all(),[
             'date' => 'required|date',
             'reference_no' => 'nullable|string|max:255',
-            'supplier_id' => 'required',
+            // 'supplier_id' => 'required',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'paid' => 'nullable',
@@ -325,9 +325,9 @@ class PurchasesController extends Controller
         [
             'purchases_items_array.required' => 'Please add Items.',
         ]);
-        if ($request->supplier_id) {
-            $supplier = Supplier::findOrFail($request->supplier_id);
-        }
+        // if ($request->supplier_id) {
+        //     $supplier = Supplier::findOrFail($request->supplier_id);
+        // }
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
@@ -335,13 +335,13 @@ class PurchasesController extends Controller
             $old_status = $purchase->status;
             DB::beginTransaction();
             $user = Auth::user();
-            $supplier = Supplier::where('business_id', $user->business_id)->where('id', $request->supplier_id)->first();
+            // $supplier = Supplier::where('business_id', $user->business_id)->where('id', $request->supplier_id)->first();
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $total = 0;
             // $data['business_id'] = $user->business_id;
             $data['supplier_id'] = $request->supplier_id;
             $data['warehouse_id'] = $request->warehouse_id;
-            $data['supplier_name'] = $supplier->company;
+            // $data['supplier_name'] = $supplier->company;
             $data['date'] = date("Y-m-d H:i:s", strtotime($request->date));
             $data['reference_no'] = ($request->reference_no)?$request->reference_no:$genref->getReference_po();
             $data['note'] = $request->note;

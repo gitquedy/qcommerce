@@ -320,7 +320,7 @@ class SalesController extends Controller
         $validator = Validator::make($request->all(),[
             'date' => 'required|date',
             'reference_no' => 'nullable|string|max:255',
-            'customer_id' => 'required',
+            // 'customer_id' => 'required',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'sales_item_array' => 'required|array',
@@ -335,13 +335,13 @@ class SalesController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
+            // $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
             $total = 0;
             $sales->business_id = $user->business_id;
-            $sales->customer_id = $request->customer_id;
+            // $sales->customer_id = $request->customer_id;
             $sales->warehouse_id = $request->warehouse_id;
-            $sales->customer_first_name = $customer->first_name;
-            $sales->customer_last_name = $customer->last_name;
+            // $sales->customer_first_name = $customer->first_name;
+            // $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
             if ($request->reference_no) {
                 $sales->reference_no = $request->reference_no;

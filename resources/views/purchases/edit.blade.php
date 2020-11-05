@@ -101,7 +101,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                          <!--   <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Supplier</label>
                                     <div class="position-relative has-icon-left">
@@ -119,7 +119,7 @@
                                       </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                           </div>
                           <br>
                           <br>
