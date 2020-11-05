@@ -45,7 +45,7 @@ class syncProducts extends Command
             foreach($shops as $shop){
                 $shop->syncShopeeProducts(Carbon::now()->subDays(15)->format('Y-m-d'), '+2 day');
                 $test = $shop->syncLazadaProducts();
-                // echo "TEST LOGS :: ".json_encode($test);
+                // echo "TEpST LOGS :: ".json_encode($test);
                 $shop->touch();
                 $sku_id = $shop->products()->where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
                 Sku::reSyncStocks($sku_id, true);

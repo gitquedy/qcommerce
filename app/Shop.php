@@ -137,7 +137,8 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
     }
 
     public function syncLazadaOrders($date = "2018-01-01"){
-        $orders = [];
+        try {
+            $orders = [];
             $after = Carbon::parse($date)->format('c');
             $before = Carbon::now()->addDays(2)->format('c');
             $offset = 0;
@@ -217,6 +218,9 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     return $order;
                 }, $orders);
             }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
     }
 
     public function syncShippingDetails($start_date, $end_date) {
