@@ -46,12 +46,31 @@
                             <p class="display-4" style="font-size: 2.5rem!important">{{number_format($total_po, 2)}}</p>
                             <p class="text-warning">Total Purchases</p>
                         </div>
+                        <div class="card col-md-4 btn-outline-primary mx-1 px-2 d-inline-block" style="max-width: 20rem;">
+                            @php
+                            $total_expense = 0;
+                            foreach ($supplier->expenses as $expense) {
+                                if (in_array($expense->payment_status, ['pending', 'partial'])) {
+                                  $total_expense += $expense->amount;
+                                }
+                            }
+                            @endphp
+                            <p class="display-4" style="font-size: 2.5rem!important">{{number_format($total_expense, 2)}}</p>
+                            <p class="text-warning">Total Expenses</p>
+                        </div>
+                      </div>
+                      <div class="row text-center">
                         <div class="card col-md-4 btn-outline-success mx-1 px-2 d-inline-block" style="max-width: 20rem;">
                             @php
                             $total_paid = 0;
                             foreach ($supplier->purchases as $po) {
                                 if (in_array($po->payment_status, ['paid', 'partial']) && $po->status == 'received') {
                                   $total_paid += $po->paid;
+                                }
+                            }
+                            foreach ($supplier->expenses as $expense) {
+                                if (in_array($expense->payment_status, ['paid', 'partial'])) {
+                                  $total_paid += $expense->paid;
                                 }
                             }
                             @endphp
@@ -66,14 +85,14 @@
                                   $balance += $po->grand_total - $po->paid;
                                 }
                             }
+                            foreach ($supplier->expenses as $expense) {
+                                if (in_array($expense->payment_status, ['pending', 'partial'])) {
+                                  $balance += $expense->amount - $expense->paid;
+                                }
+                            }
                             @endphp
                             <p class="display-4" style="font-size: 2.5rem!important">{{number_format($balance, 2)}}</p>
                             <p class="text-danger">Balance</p>
-                        </div>
-                        <div class="card col-md-4 btn-outline-primary mx-1 px-2 d-inline-block" style="max-width: 20rem;">
-                            @php
-                            
-                            @endphp
                         </div>
                       </div>
                       <br>
@@ -82,8 +101,11 @@
                           <a class="nav-link active" id="po-tab" data-toggle="tab" href="#tab_po" role="tab" aria-controls="Purchases" aria-selected="true">Purchases</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" id="payments-tab" data-toggle="tab" href="#tab_payments" role="tab" aria-controls="Payments" aria-selected="false">Payments</a>
+                          <a class="nav-link" id="payments-tab" data-toggle="tab" href="#tab_expenses" role="tab" aria-controls="tab_expenses" aria-selected="false">Expenses</a>
                         </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="payments-tab" data-toggle="tab" href="#tab_payments" role="tab" aria-controls="Payments" aria-selected="false">Payments</a>
+                        </li>  
                       </ul>
                       <div class="tab-content" id="view_profile_tab_content">
                         <div class="tab-pane fade show active" id="tab_po" role="tabpanel" aria-labelledby="tab_po">
@@ -174,6 +196,76 @@
                             {{-- DataTable ends --}}
                           </section>
                         </div>
+
+                        <div class="tab-pane fade show" id="tab_expenses" role="tabpanel" aria-labelledby="tab_expenses">
+                          <div class="action-btns">
+                            <div class="btn-dropdown mr-1 mb-1">
+                              <div class="btn-group dropdown actions-dropodown">
+                                <button type="button" class="btn btn-white px-1 py-1 dropdown-toggle waves-effect waves-light"
+                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Actions
+                                </button>
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item massAction" href="#" data-action_type="view_modal" data-action="{{ route('payment.addMultiPaymentModalExpense', $supplier->id) }}"><i class="fa fa-dollar" aria-hidden="true"></i> Add MultiPayment</a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <section id="data-list-view" class="data-list-view-header">
+                            {{-- DataTable starts --}}
+                            <div class="table-responsive">
+                              <table class="table data-list-view">
+                                <thead>
+                                  <tr>
+                                    <th></th>
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Reference No</th>
+                                    <th class="text-center">Grand Total</th>
+                                    <th class="text-center">Paid</th>
+                                    <th class="text-center">Balance</th>
+                                    <th class="text-center">Payment Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  @foreach($supplier->expenses as $expense)
+                                    <tr data-id="{{$expense->id}}">
+                                      <td></td>
+                                      <td class="text-center">{{$expense->date}}</td>
+                                      <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $expense->id) }}">{{$expense->reference_no}}</a></td>
+                                      <td class="text-right">{{number_format($expense->grand_total, 2)}}</td>
+                                      <td class="text-right">{{number_format($expense->paid, 2)}}</td>
+                                      <td class="text-right">{{number_format($expense->grand_total - $expense->paid, 2)}}</td>
+                                      <td class="text-center">
+                                        @php
+                                        switch ($expense->payment_status) {
+                                            case 'paid':
+                                                    echo '<span class="badge badge-pill badge-success">Paid</span>';
+                                                break;
+                                            case 'pending':
+                                                    echo '<span class="badge badge-pill badge-warning">Pending</span>';
+                                                break;
+                                            case 'partial':
+                                                    echo '<span class="badge badge-pill badge-info">Partial</span>';
+                                                break;
+                                            case 'due':
+                                                    echo '<span class="badge badge-pill badge-danger">Due</span>';
+                                                break;
+                                            
+                                            default:
+                                                    echo '<span class="badge badge-pill badge-secondary">Unknown</span>';
+                                                break;
+                                        }
+                                        @endphp
+                                      </td>
+                                    </tr>
+                                  @endforeach
+                                </tbody>
+                              </table>
+                            </div>
+                            {{-- DataTable ends --}}
+                          </section>
+                        </div>
+
                         <div class="tab-pane fade" id="tab_payments" role="tabpanel" aria-labelledby="tab_payments">
                           <div class="action-btns">
                             <div class="btn-dropdown mr-1 mb-1">

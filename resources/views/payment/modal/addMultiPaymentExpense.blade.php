@@ -1,6 +1,6 @@
 
 <div class="modal-dialog modal-lg" role="document">
-	<form action="{{ route('payment.addMultiPaymentAjaxPurchases') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
+	<form action="{{ route('payment.addMultiPaymentAjaxExpenses') }}" id="add_payment_ajax" method="POST" class="form" enctype='multipart/form-data'>
   @method('POST')
 	@csrf
   <style>
@@ -46,16 +46,16 @@
               @php
                 $total_balance = 0;
               @endphp
-              @foreach ($purchases as $po)
-              <input type="hidden" name="purchases_id[]" value="{{$po->id}}">
+            @foreach ($expenses as $expense)
+              <input type="hidden" name="expenses_id[]" value="{{$expense->id}}">
               @php
               $balance = 0;
-              $balance = $po->grand_total - $po->paid;
+              $balance = $expense->amount - $expense->paid;
               $total_balance += $balance;
               @endphp
               <div class="row">
                 <div class="col-12">
-                  <p>Purchase Reference No.: <b>{{$po->reference_no}}</b></p>
+                  <p>Expense Reference No.: <b>{{$expense->reference_no}}</b></p>
                 </div>
               </div>
               <div class="row  w-100">
@@ -63,13 +63,13 @@
                   <p class="text-secondary" >Balance : <span class="text-warning">{{$balance}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$po->grand_total}}</span></p>
+                  <p class="text-secondary" >Total Amount : <span class="text-primary">{{$expense->amount}}</span></p>
                 </div>
                 <div class="col-md-4">
-                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$po->paid}}</span></p>
+                  <p class="text-secondary" >Total Paid : <span class="text-primary">{{$expense->paid}}</span></p>
                 </div>
               </div>
-              @endforeach
+            @endforeach
               <h4>Total Balance :  {{number_format($total_balance, 2)}}</h4>
             </div>
             <div class="card-body">

@@ -260,9 +260,12 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/payment/addPaymentAjax', 'PaymentController@addPaymentAjax')->name('payment.addPaymentAjax');
 		Route::post('/payment/addMMultiPaymentModal/{customer}', 'PaymentController@addMultiPaymentModal')->name('payment.addMultiPaymentModal');
 		Route::post('/payment/addMultiPaymentModalPurchase/{supplier}', 'PaymentController@addMultiPaymentModalPurchase')->name('payment.addMultiPaymentModalPurchase');
+		Route::post('/payment/addMultiPaymentModalExpense/{supplier}', 'PaymentController@addMultiPaymentModalExpense')->name('payment.addMultiPaymentModalExpense');
 
 		Route::post('/payment/addMultiPaymentAjaxSales', 'PaymentController@addMultiPaymentAjaxSales')->name('payment.addMultiPaymentAjaxSales');
 		Route::post('/payment/addMultiPaymentAjaxPurchases', 'PaymentController@addMultiPaymentAjaxPurchases')->name('payment.addMultiPaymentAjaxPurchases');
+		Route::post('/payment/addMultiPaymentAjaxExpenses', 'PaymentController@addMultiPaymentAjaxExpenses')->name('payment.addMultiPaymentAjaxExpenses');
+		
 	});
 
 	Route::group(['middleware' => 'permission:settings.manage'], function()
