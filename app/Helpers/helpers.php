@@ -214,11 +214,7 @@ class Helper
         $result['order_shipped'] = $order_shipped;
         $result['order_delivered'] = $order_delivered;
     
-        return $result;
-        
-        
-        
-        
+        return $result;  
     }
 
     

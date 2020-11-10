@@ -404,7 +404,7 @@ $(window).on("load", function () {
 
   revenueChart.render();
 
-
+  // up to here
   // Goal Overview  Chart
   // -----------------------------
 

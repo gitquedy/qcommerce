@@ -42,7 +42,7 @@
                             <i class="feather icon-users text-primary font-medium-5"></i>
                         </div>
                     </div>
-                    <h2 class="text-bold-700 mt-1">₱ {!!$monthly_sales!!}</h2>
+                    <h2 class="text-bold-700 mt-1 monthlySalesValue">₱ 0</h2>
                     <p class="mb-0">Sales This Month</p>
                 </div>
                 <div class="card-content">
@@ -58,7 +58,7 @@
                             <i class="feather icon-credit-card text-success font-medium-5"></i>
                         </div>
                     </div>
-                    <h2 class="text-bold-700 mt-1">₱ {!!$today_sales!!}</h2>
+                    <h2 class="text-bold-700 mt-1 todaySalesValue">₱ 0</h2>
                     <p class="mb-0">Sales Today</p>
                 </div>
                 <div class="card-content">
@@ -74,7 +74,7 @@
                             <i class="feather icon-shopping-cart text-danger font-medium-5"></i>
                         </div>
                     </div>
-                    <h2 class="text-bold-700 mt-1">{!!$today_order_count!!}</h2>
+                    <h2 class="text-bold-700 mt-1 todayOrderCount" >0</h2>
                     <p class="mb-0">Orders Today</p>
                 </div>
                 <div class="card-content">
@@ -90,7 +90,7 @@
                             <i class="feather icon-package text-warning font-medium-5"></i>
                         </div>
                     </div>
-                    <h2 class="text-bold-700 mt-1">{!!$shipped_counter!!}</h2>
+                    <h2 class="text-bold-700 mt-1 shippedCounter">0</h2>
                     <p class="mb-0">Pending Order</p>
                 </div>
                 <div class="card-content">
@@ -100,27 +100,6 @@
         </div>
       </div>
       
-      <?php
-      
-      
-      $pre_month_sale = 0;
-      $current_month_sale = 0;
-    
-      if(isset($combine_chart['pre'])){
-          foreach($combine_chart['pre'] as $preVAL){
-              $pre_month_sale += $preVAL;
-          }
-      }
-      
-      if(isset($combine_chart['current'])){
-          foreach($combine_chart['current'] as $currentVAL){
-              $current_month_sale += $currentVAL;
-          }
-      }
-      
-      
-      
-      ?>
       <div class="row">
           <div class="col-lg-8 col-md-6 col-12">
               <div class="card">
@@ -135,14 +114,14 @@
                                   <p class="mb-50 text-bold-600">This Month</p>
                                   <h2 class="text-bold-400">
                                       <sup class="font-medium-1">₱</sup>
-                                      <span class="text-success"><?php echo number_format($current_month_sale); ?></span>
+                                      <span class="text-success currentMonthlySale">0</span>
                                   </h2>
                               </div>
                               <div>
                                   <p class="mb-50 text-bold-600">Last Month</p>
                                   <h2 class="text-bold-400">
                                       <sup class="font-medium-1">₱</sup>
-                                      <span><?php echo number_format($pre_month_sale); ?></span>
+                                      <span class="preMonthSale">0</span>
                                   </h2>
                               </div>
 
@@ -159,7 +138,7 @@
                   <div class="card-content">
                       <div class="card-body pb-0">
                           <div class="d-flex justify-content-start">
-                              <table class="table">
+                              <table class="table shopInfoTable" id="shopInfoTable">
                                 <thead>
                                   <tr>
                                     <th colspan="2">Shop Information</th>
@@ -169,17 +148,17 @@
                                     <th class="text-right">This Month</th>
                                   </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach($Shop as $s)
+                                <tbody class="shopInfoTableTbody">
+                                  @foreach($Shop as $s)
                                       <tr>
                                         <td class="shop_logo" ><img src="{{ asset('images/shop/icon/'.$s->site.'.png') }}" alt=""></td>
                                         <td><b>{{$s->name}}</b><br><small><span class="text-seccondary">{{$s->short_name}}</span> @if($s->active) <span class="text-success ml-1">Active</span> @else <span class="text-danger ml-1">Inactive</span> @endif</small></td>
-                                        <td class="text-right pr-1">{{$s->shop_info_data_today}}</td>
-                                        <td class="text-right pr-1">{{$s->shop_info_data_yesterday}}</td>
-                                        <td class="text-right pr-1">{{$s->shop_info_data_week}}</td>
-                                        <td class="text-right pr-1">{{$s->shop_info_data_month}}</td>
+                                        <td class="text-right pr-1 shop_info_data_today{{ $s->id }}">{{$s->shop_info_data_today}}</td>
+                                        <td class="text-right pr-1 shop_info_data_yesterday{{ $s->id }}">{{$s->shop_info_data_yesterday}}</td>
+                                        <td class="text-right pr-1 shop_info_data_week{{ $s->id }}">{{$s->shop_info_data_week}}</td>
+                                        <td class="text-right pr-1 shop_info_data_month{{ $s->id }}">{{$s->shop_info_data_month}}</td>
                                       </tr>
-                                    @endforeach
+                                    @endforeach          
                                 </tbody>
                               </table>
                           </div>
@@ -210,28 +189,17 @@
                         <div id="customer-chart"></div>
                     </div>
                     <ul class="list-group list-group-flush customer-info"  id="shop_area">
-                        @foreach($Shop as $shop_key => $ShopsVAL)
-                      <li class="list-group-item d-flex justify-content-between ">
+
+                      <li class="list-group-item d-flex justify-content-between">
                           <div class="series-info">
                               <i class="fa fa-circle font-small-3 "></i>
-                              <span class="text-bold-600">{!!$ShopsVAL->name!!}</span>
+                              <span class="text-bold-600"></span>
                           </div>
                           <div class="product-result">
                               <span>
-                                  <?php
-                                  $total = 0;
-                                      foreach($monthly as $MONTH_VAL){
-                                        if($ShopsVAL->id==$MONTH_VAL->shop_id){
-                                            $total++;
-                                        }
-                                      }
-                                      
-                                      echo $total;
-                                  ?>
                               </span>
                           </div>
                       </li>
-                      @endforeach
                       
                     </ul>
                 </div>
@@ -244,9 +212,8 @@
                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           All
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownItem4">
-                            <a class="dropdown-item"  onclick="refresh_stock_pie(this,'all')" >All</a>
-                          @foreach ($warehouses as $w) 
+                        <div class="dropdown-menu dropdown-menu-right warehouseStocksDropDown" aria-labelledby="dropdownItem4">
+                          @foreach ($Warehouses as $w) 
                             <a class="dropdown-item"  onclick="refresh_stock_pie(this,{{$w->id}})" >{{$w->name}}</a>
                           @endforeach
                         </div>
@@ -257,26 +224,6 @@
                         <div id="warhouse_stocks_chart"></div>
                     </div>
                     <ul class="list-group list-group-flush stock-info"  id="warehouses_area">
-                      @foreach ($warehouses as $w) 
-                        <li class="list-group-item d-flex justify-content-between ">
-                          <div class="series-info">
-                              <i class="fa fa-circle font-small-3 "></i>
-                              <span class="text-bold-600">{{$w->name}}</span>
-                          </div>
-                          <div class="product-result">
-                              <span>
-                                  <?php
-                                    $total = 0;
-                                   foreach($w->items as $item) {
-                                      $total += $item->sku->price * $item->quantity;
-                                   }
-
-                                   echo number_format($total, 2);
-                                  ?>
-                              </span>
-                          </div>
-                        </li>
-                      @endforeach
                     </ul>
                 </div>
             </div>
@@ -296,161 +243,29 @@
 @section('vendor-script')
 
 <script>
-
-
-    //laravel_vars 
-    
-
-
-    var chart_days = [];
-    var line1 = [];
-    var line2 = [];
-    
-    <?php
-    $tmp_pre_val = 0;
-    if(isset($combine_chart['pre'])){
-          foreach($combine_chart['pre'] as $key => $preVAL){
-              $tmp_pre_val += $preVAL;
-              ?>
-              chart_days.push(<?php echo $key;?>);
-              line2.push(<?php echo $tmp_pre_val;?>);
-              <?php
-          }
-     }
-     
-     $tmp_current_val = 0;
-     
-     if(isset($combine_chart['current'])){
-          foreach($combine_chart['current'] as $key_cur => $currentVAL){ 
-              if($key_cur<=date('d')){
-              $tmp_current_val += $currentVAL;
-              ?>
-              line1.push(<?php echo $tmp_current_val;?>);
-         <?php } }
-      }
-      ?>
-      
-      
-      var system_colours = [];
-      
-      <?php
-      
-      if(isset($colour)){
-          foreach($colour as $colourVAL){ 
-              ?>
-              system_colours.push('#<?php echo $colourVAL;?>');
-         <?php } 
-      }
-      ?>
-      
-      
-      var pie_chart_labels = [];
-      var pie_chart_serize = [];
-      
-      <?php 
-      
-      foreach($Shop as $shop_key => $ShopsVAL){ 
-          
-      $total = 0;
-          foreach($monthly as $MONTH_VAL){
-            if($ShopsVAL->id==$MONTH_VAL->shop_id){
-                $total++;
-            }
-          }
-          ?>
-          pie_chart_labels.push('<?php echo $ShopsVAL->short_name;?>');
-          pie_chart_serize.push(parseFloat('<?php echo $total;?>'));
-                                      
-    <?php } ?>
-      
-      var warehouse_pie_chart_labels = [];
-      var warehouse_pie_chart_serize = [];
-      
-      <?php 
-      
-      foreach($warehouses as $shop_key => $warehouseVAL){ 
-          
-          $total = 0;
-            foreach($warehouseVAL->items as $item) {
-              $total += $item->sku->price * $item->quantity;
-            }
-          ?>
-          warehouse_pie_chart_labels.push('<?php echo $warehouseVAL->name;?>');
-          warehouse_pie_chart_serize.push(parseFloat('<?php echo $total;?>'));
-                                      
-    <?php } ?>
-    
-    
-    
-    
-    
-    var line_chart_1_vals = [];
-    var line_chart_1_cats = [];
-    
-    
-    <?php if(isset($six_month_data)){ 
-        foreach($six_month_data as $sixKEY => $six_month_dataVAL){ ?>
-        
-        line_chart_1_vals.push(parseFloat("<?php echo $six_month_dataVAL;?>"));
-        line_chart_1_cats.push('<?php echo $sixKEY; ?>');
-        
-        <?php } }  ?>
-        
-        
-        var hour_sales_val = [];
-        var hour_sales_label = [];
-        
-        
-        
-    <?php if(isset($hour_data)){ 
-        foreach($hour_data as $KeyHourSales => $VALHourSales){ ?>
-        
-        hour_sales_val.push(parseFloat("<?php echo $VALHourSales;?>"));
-        hour_sales_label.push('<?php echo $KeyHourSales; ?>');
-        
-        <?php } }  ?>
-        
-        var hour_order_val = [];
-        var hour_order_label = [];
-        
-        
-        
-        
-        <?php if(isset($hour_orders)){ 
-        foreach($hour_orders as $KeyHourORD => $VALHourORD){ ?>
-        
-        hour_order_val.push(parseFloat("<?php echo $VALHourORD;?>"));
-        hour_order_label.push('<?php echo $KeyHourORD; ?>');
-        
-        <?php } }  ?>
-        
-        
-        
-        
-        var shop_pie_data = [];
-        
-        <?php if(isset($Shop_pie)){ ?>
-        
-        var shop_pie_json = '<?php echo json_encode($Shop_pie);?>';
-        
-        shop_pie_data = JSON.parse(shop_pie_json);
-        
-        console.log(shop_pie_data);
-        
-        <?php } ?>
-        
-        var warehouse_pie_data = [];
-        
-        <?php if(isset($Warehouse_stocks_pie)){ ?>
-        
-        var warehouse_pie_json = '<?php echo json_encode($Warehouse_stocks_pie);?>';
-        
-        warehouse_pie_data = JSON.parse(warehouse_pie_json);
-        
-        console.log(warehouse_pie_data);
-        
-        <?php } ?>
-      
+function number_format (number, decimals, dec_point, thousands_sep) {
+    // Strip all characters but numerical ones.
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+    var n = !isFinite(+number) ? 0 : +number,
+        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+        s = '',
+        toFixedFix = function (n, prec) {
+            var k = Math.pow(10, prec);
+            return '' + Math.round(n * k) / k;
+        };
+    // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+    }
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    return s.join(dec);
+}
 </script>
 
 
@@ -459,115 +274,123 @@
 @endsection
 @section('myscript')
         {{-- Page js files --}}
-        <script src="{{ asset(mix('js/scripts/pages/dashboard-ecommerce.js')) }}"></script>
-        <script>
-
-
-
-    function refresh_pie(ele,type){
-        
-        if(ele==undefined){
-            $('#dropdownItem3').html("Today");
-        }else{
-           $('#dropdownItem3').html($(ele).html()); 
-        }
-        
-        if(type==undefined){
-            type = 'Today';
-        }
-        
-        
-        $('#customer-chart').html('');
-        
-        
-        var li_string = '';
-        
-        var store_names = [];
-        var store_values = [];
-        
-        $.each(shop_pie_data, function( index, valuePIE ) {
-            
-            var main_amount = 0;
-            
-            if(type=='Today'){
-                main_amount = valuePIE.today;
-            }
-            if(type=='This_Month'){
-                main_amount = valuePIE.monthly;
-            }
-            if(type=='Last_7_Days'){
-                main_amount = valuePIE.last7;
-            }
-            if(type=='Last_30_Days'){
-                main_amount = valuePIE.last30;
+        <script type="text/javascript">
+          var $primary = '#7367F0';
+          var $success = '#28C76F';
+          var $danger = '#EA5455';
+          var $warning = '#FF9F43';
+          var $info = '#00cfe8';
+          var $primary_light = '#A9A2F6';
+          var $danger_light = '#f29292';
+          var $success_light = '#55DD92';
+          var $warning_light = '#ffc085';
+          var $info_light = '#1fcadb';
+          var $strok_color = '#b9c3cd';
+          var $label_color = '#e7e7e7';
+          var $white = '#fff';
+          var shop_pie_data = [];
+          var warehouse_pie_data = [];
+          function refresh_pie(ele,type){
+            if(ele==undefined){
+                $('#dropdownItem3').html("Today");
+            }else{
+               $('#dropdownItem3').html($(ele).html()); 
             }
             
-            if(type=='Yesterday'){
-                main_amount = valuePIE.yesterday;
+            if(type==undefined){
+                type = 'Today';
             }
             
-            store_names.push(valuePIE.name);
-            store_values.push(parseFloat(main_amount));
-
-          li_string += '<li class="list-group-item d-flex justify-content-between ">'+
-                              '<div class="series-info">'+
-                                  '<i class="fa fa-circle font-small-3 "></i>'+
-                                  '<span class="text-bold-600">'+valuePIE.name +'</span>'+
-                              '</div>'+
-                              '<div class="product-result">'+
-                                  '<span>'+main_amount+
-                                  '</span>'+
-                              '</div>'+
-                          '</li>';
-          
-        });
-        
-         pie_chart_labels = store_names;
-         pie_chart_serize = store_values;
-        
-        $('#shop_area').html(li_string);
-        
-                var customerChartoptions = {
-        chart: {
-          type: 'pie',
-          height: 330,
-          dropShadow: {
-            enabled: false,
-            blur: 5,
-            left: 1,
-            top: 1,
-            opacity: 0.2
-          },
-          toolbar: {
-            show: false
-          }
-        },
-        labels: pie_chart_labels,
-        series: pie_chart_serize,
-        dataLabels: {
-          enabled: false
-        },
-        legend: { show: false },
-        stroke: {
-          width: 5
-        },
-        fill: {
-          type: 'gradient'
-        }
-      }
-    
-      var customerChart = new ApexCharts(
-        document.querySelector("#customer-chart"),
-        customerChartoptions
-      );
-    
-      customerChart.render();
+            
+            $('#customer-chart').html('');
+            
+            
+            var li_string = '';
+            
+            var store_names = [];
+            var store_values = [];
+            
+            $.each(shop_pie_data, function( index, valuePIE ) {
                 
-    
-    }
-    
+                var main_amount = 0;
+                
+                if(type=='Today'){
+                    main_amount = valuePIE.today;
+                }
+                if(type=='This_Month'){
+                    main_amount = valuePIE.monthly;
+                }
+                if(type=='Last_7_Days'){
+                    main_amount = valuePIE.last7;
+                }
+                if(type=='Last_30_Days'){
+                    main_amount = valuePIE.last30;
+                }
+                
+                if(type=='Yesterday'){
+                    main_amount = valuePIE.yesterday;
+                }
+                
+                store_names.push(valuePIE.name);
+                store_values.push(parseFloat(main_amount));
+
+              li_string += '<li class="list-group-item d-flex justify-content-between ">'+
+                                  '<div class="series-info">'+
+                                      '<i class="fa fa-circle font-small-3 "></i>'+
+                                      '<span class="text-bold-600">'+valuePIE.name +'</span>'+
+                                  '</div>'+
+                                  '<div class="product-result">'+
+                                      '<span>'+main_amount+
+                                      '</span>'+
+                                  '</div>'+
+                              '</li>';
+              
+            });
             
-    function refresh_stock_pie(ele,type){
+             pie_chart_labels = store_names;
+             pie_chart_serize = store_values;
+            
+            $('#shop_area').html(li_string);
+            
+                    var customerChartoptions = {
+            chart: {
+              type: 'pie',
+              height: 330,
+              dropShadow: {
+                enabled: false,
+                blur: 5,
+                left: 1,
+                top: 1,
+                opacity: 0.2
+              },
+              toolbar: {
+                show: false
+              }
+            },
+            labels: pie_chart_labels,
+            series: pie_chart_serize,
+            dataLabels: {
+              enabled: false
+            },
+            legend: { show: false },
+            stroke: {
+              width: 5
+            },
+            fill: {
+              type: 'gradient'
+            }
+          }
+        
+          var customerChart = new ApexCharts(
+            document.querySelector("#customer-chart"),
+            customerChartoptions
+          );
+        
+          customerChart.render();
+        }
+
+
+        function refresh_stock_pie(ele,type){
         
         if(ele==undefined){
             $('#dropdownItem4').html("All");
@@ -587,9 +410,7 @@
         var warehouse_names = [];
         var warehouse_values = [];
         $.each(warehouse_pie_data, function( index, valuePIE ) {
-            console.log(type+" == "+index);
             if(type == index || type == "all") {
-              console.log("true");
                 warehouse_names.push(valuePIE.name);
                 warehouse_values.push(parseFloat(valuePIE.total));
 
@@ -605,11 +426,8 @@
                               '</li>';  
             }
             else {
-              console.log("false");
             }
         });
-        console.log(warehouse_names);
-        console.log(warehouse_values);
         warehouse_pie_chart_labels = warehouse_names;
         warehouse_pie_chart_serize = warehouse_values;
         $('#warehouses_area').html(li_string);
@@ -664,22 +482,547 @@
         document.querySelector("#warhouse_stocks_chart"),
         StocksChartoptions
       );
-    
       warehouseStocksChart.render();
+    }
+
+    function refreshRevenueCharts(chart_days, line1, line2){
+      if(chart_days.length==0){
+         chart_days = ['01', '05', '09', '13', '17', '21', '26', '31'];  
+      }
+      if(line1.length==0){
+         line1 = [80, 47000, 44800, 47500, 45500, 48000, 46500, 48600];  
+      }
+      if(line2.length==0){
+         line2 = [70, 48000, 45500, 46600, 44500, 46500, 45000, 47000]; 
+      }
+
+      $('#revenue-chart').html('');
+
+      var revenueChartoptions = {
+      chart: {
+        height: 270,
+        toolbar: { show: false },
+        type: 'line',
+      },
+      stroke: {
+        curve: 'smooth',
+        dashArray: [0, 8],
+        width: [4, 2],
+      },
+      grid: {
+        borderColor: $label_color,
+      },
+      legend: {
+        show: false,
+      },
+      colors: [$danger_light, $strok_color],
+
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          inverseColors: false,
+          gradientToColors: [$primary, $strok_color],
+          shadeIntensity: 1,
+          type: 'horizontal',
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 100, 100, 100]
+        },
+      },
+      markers: {
+        size: 0,
+        hover: {
+          size: 5
+        }
+      },
+      xaxis: {
+        labels: {
+          style: {
+            colors: $strok_color,
+          }
+        },
+        axisTicks: {
+          show: false,
+        },
+        categories: chart_days,
+        axisBorder: {
+          show: false,
+        },
+        tickPlacement: 'on',
+      },
+      yaxis: {
+        tickAmount: 5,
+        decimalsInFloat: false,
+        labels: {
+          style: {
+            color: $strok_color,
+          },
+          formatter: function (val) {
+              if(val!=undefined){
+              return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+              }
+            
+          }
+        }
+      },
+      tooltip: {
+        x: { show: false }
+      },
+      series: [{
+        name: "This Month",
+        data: line1
+      },
+      {
+        name: "Last Month",
+        data: line2
+      }
+      ],
+
+    }
+
+    var revenueChart = new ApexCharts(
+      document.querySelector("#revenue-chart"),
+      revenueChartoptions
+    );
+
+    revenueChart.render();
+    }
+
+    // here
+
+    function refreshGainedLineChart(line_chart_1_vals, line_chart_1_cats ){
+      $('#line-area-chart-1').html('');
+      var gainedlineChartoptions = {
+      chart: {
+        height: 100,
+        type: 'area',
+        toolbar: {
+          show: false,
+        },
+        sparkline: {
+          enabled: true
+        },
+        grid: {
+          show: false,
+          padding: {
+            left: 0,
+            right: 0
+          }
+        },
+      },
+      colors: [$primary],
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 2.5
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 0.9,
+          opacityFrom: 0.7,
+          opacityTo: 0.5,
+          stops: [0, 80, 100]
+        }
+      },
+      series: [{
+        name: 'Monthly Sales',
+        data: line_chart_1_vals
+      }],
+
+      xaxis: {
+        categories: line_chart_1_cats
+      },
+      yaxis: [{
+        y: 0,
+        offsetX: 0,
+        offsetY: 0,
+        padding: { left: 0, right: 0 },
+        
+        
+      }],
+      tooltip: {
+        x: { show: true },
+        y: {formatter: function (val) {
+              return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            
+          }}
+      }
+    }
+
+    var gainedlineChart = new ApexCharts(
+      document.querySelector("#line-area-chart-1"),
+      gainedlineChartoptions
+    );
+
+    gainedlineChart.render();
+    }
+
+
+
+  // Line Area Chart - 2
+  // ----------------------------------
+
+  function refreshRevenueChart(hour_sales_val, hour_sales_label){
+    $('#line-area-chart-2').html('');
+    var revenuelineChartoptions = {
+    chart: {
+      height: 100,
+      type: 'area',
+      toolbar: {
+        show: false,
+      },
+      sparkline: {
+        enabled: true
+      },
+      grid: {
+        show: false,
+        padding: {
+          left: 0,
+          right: 0
+        }
+      },
+    },
+    colors: [$success],
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2.5
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 0.9,
+        opacityFrom: 0.7,
+        opacityTo: 0.5,
+        stops: [0, 80, 100]
+      }
+    },
+    series: [{
+      name: 'Hourly sales',
+      data: hour_sales_val
+    }],
+
+     xaxis: {
+            categories: hour_sales_label,
+            },
+    yaxis: [{
+      y: 0,
+      offsetX: 0,
+      offsetY: 0,
+      padding: { left: 0, right: 0 },
+    }],
+    tooltip: {
+      x: { show: true },
+      y: {formatter: function (val) {
+            return (val).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+          
+        }}
+    },
+  }
+
+  var revenuelineChart = new ApexCharts(
+    document.querySelector("#line-area-chart-2"),
+    revenuelineChartoptions
+  );
+
+  revenuelineChart.render();
+  }
+  
+  
+
+
+  // Line Area Chart - 3
+  // ----------------------------------
+
+  function refreshSalesChart(hour_order_val, hour_order_label){
+    $('#line-area-chart-3').html('');
+    var saleslineChartoptions = {
+    chart: {
+      height: 100,
+      type: 'area',
+      toolbar: {
+        show: false,
+      },
+      sparkline: {
+        enabled: true
+      },
+      grid: {
+        show: false,
+        padding: {
+          left: 0,
+          right: 0
+        }
+      },
+    },
+    colors: [$danger],
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2.5
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 0.9,
+        opacityFrom: 0.7,
+        opacityTo: 0.5,
+        stops: [0, 80, 100]
+      }
+    },
+    series: [{
+      name: 'Hourly Orders',
+      data: hour_order_val
+    }],
+
+    xaxis: {
+            categories: hour_order_label,
+            },
+    yaxis: [{
+      y: 0,
+      offsetX: 0,
+      offsetY: 0,
+      padding: { left: 0, right: 0 },
+    }],
+    tooltip: {
+      x: { show: true }
+    },
+  }
+
+  var saleslineChart = new ApexCharts(
+    document.querySelector("#line-area-chart-3"),
+    saleslineChartoptions
+  );
+
+  saleslineChart.render();
+  }
+
+  // Line Area Chart - 4
+  // ----------------------------------
+
+  function refreshOrderLineChart(hour_order_val, hour_order_label){
+    $('#line-area-chart-4').html('');
+      var orderlineChartoptions = {
+      chart: {
+        height: 100,
+        type: 'area',
+        toolbar: {
+          show: false,
+        },
+        sparkline: {
+          enabled: true
+        },
+        grid: {
+          show: false,
+          padding: {
+            left: 0,
+            right: 0
+          }
+        },
+      },
+      colors: [$warning],
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 2.5
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 0.9,
+          opacityFrom: 0.7,
+          opacityTo: 0.5,
+          stops: [0, 80, 100]
+        }
+      },
+      series: [{
+        name: 'Hourly Orders',
+        data: hour_order_val
+      }],
+
+      xaxis: {
+              categories: hour_order_label,
+              },
+      yaxis: [{
+        y: 0,
+        offsetX: 0,
+        offsetY: 0,
+        padding: { left: 0, right: 0 },
+      }],
+      tooltip: {
+        x: { show: false }
+      },
+    }
+
+    var orderlineChart = new ApexCharts(
+      document.querySelector("#line-area-chart-4"),
+      orderlineChartoptions
+    );
+
+    orderlineChart.render();
+  }
+
+
+
+    // to here
+</script>
+        <script>
+
+      function refreshAll(){
+          $.ajax({
+          url : "{{ action('DashboardController@index') }}",
+          type : 'GET',
+          success: function(result){  
+            console.log(result);
+            $('.monthlySalesValue').html(result.monthly_sales);
+            $('.todaySalesValue').html(result.today_sales);
+            $('.todayOrderCount').html(result.today_order_count);
+            $('.shippedCounter').html(result.shipped_counter);
+
+            var pie_chart_labels = [];
+            var pie_chart_serize = [];
+            $.each(result.Shop, function( index, value ) {
+              var total = 0;
+              $('.shop_info_data_today'+ value.id).html(value.shop_info_data_today);
+              $('.shop_info_data_yesterday'+ value.id).html(value.shop_info_data_yesterday);
+              $('.shop_info_data_week'+ value.id).html(value.shop_info_data_week);
+              $('.shop_info_data_month'+ value.id).html(value.shop_info_data_month);
+              $.each(result.monthly, function( i, monthly ) {
+                if(value.id==monthly.shop_id){
+                  pie_chart_labels.push(value.short_name);
+                  pie_chart_serize.push(parseFloat(total));
+                }
+              });
+            });
+
+            var currentMonthlySale = 0;
+            var pre_month_sale = 0; 
+            var chart_days = [];
+            var line1 = [];
+            var line2 = [];
+            var current_sale = 0;
+
+            if (typeof result.combine_chart.current !== 'undefined') {
+                $.each(result.combine_chart.current, function( index, value ) {
+                  currentMonthlySale += value;
+                  if(index <= "{{ date('d') }}"){
+                      current_sale += value;
+                      line1.push(current_sale);
+                  }
+                });
+            }
+
+            if (typeof result.combine_chart.pre !== 'undefined') {
+                $.each(result.combine_chart.pre, function( index, value ) {
+                  pre_month_sale += value;
+                  chart_days.push(index);
+                  line2.push(pre_month_sale);
+                });
+            }
+            $('.currentMonthlySale').html(number_format(currentMonthlySale, 2));
+            $('.preMonthSale').html(number_format(pre_month_sale, 2));
+      
+              
+              var system_colours = [];
+         
+
+              if (typeof result.colour !== 'undefined') {
+                $.each(result.colour, function( index, value ) {
+                  system_colours.push(value);
+                });
+              }
+              
+              var warehouse_pie_chart_labels = [];
+              var warehouse_pie_chart_serize = [];
+              $.each(result.warehouses, function( index, value ) {
+                var total = 0;
+                $.each(result.items, function( i_index, i_value ) {
+                  total += i_value.sku.price * i_value.quantity;
+                });
+                 warehouse_pie_chart_labels.push(value.name);
+                 warehouse_pie_chart_serize.push(parseFloat(total));
+              });
+              
+            var line_chart_1_vals = [];
+            var line_chart_1_cats = [];
+            
+            if (typeof result.six_month_data !== 'undefined') {
+              $.each(result.six_month_data, function( index, value ) {
+                line_chart_1_vals.push(parseFloat(value));
+                line_chart_1_cats.push(index);
+              });
+            }
+
+            var hour_sales_val = [];
+            var hour_sales_label = [];
+
+            if (typeof result.hour_data !== 'undefined') {
+              $.each(result.hour_data, function( index, value ) {
+                hour_sales_val.push(parseFloat(value));
+                hour_sales_label.push(index);
+              });
+            }
+
+            var hour_order_val = [];
+            var hour_order_label = [];
                 
-    
-    }    
-        
-        
-        
+                
+                
+            if (typeof result.hour_orders !== 'undefined') {
+              $.each(result.hour_orders, function( index, value ) {
+                hour_order_val.push(parseFloat(value));
+                hour_order_label.push(index);
+
+              });
+            }
+
+            
+
+            if (typeof result.Shop_pie !== 'undefined') {
+              var shop_pie_json = JSON.stringify(result.Shop_pie);;
+              shop_pie_data = JSON.parse(shop_pie_json);
+            }
+
+
+            
+
+            if (typeof result.Warehouse_stocks_pie !== 'undefined') {
+              var warehouse_pie_json = JSON.stringify(result.Warehouse_stocks_pie);;
+              warehouse_pie_data = JSON.parse(warehouse_pie_json);
+            }
+
+            refresh_pie();
+            refresh_stock_pie();
+            refreshRevenueCharts(chart_days, line1, line2);
+
+            refreshGainedLineChart(line_chart_1_vals, line_chart_1_cats );
+            refreshRevenueChart(hour_sales_val, hour_sales_label);
+            refreshSalesChart(hour_order_val, hour_order_label);
+            refreshOrderLineChart(hour_order_val, hour_order_label);
+          },
+            error: function(jqXhr, json, errorThrown){
+              console.log(jqXhr);
+              console.log(json);
+              console.log(errorThrown);
+          }
+        });
+      }
         
         $(document).ready(function(){
-          refresh_pie();
-          refresh_stock_pie();
-          notification();
+          refreshAll();
+          window.setInterval(refreshAll, 100000);
         });
-    
 </script>
+<!-- <script src="{{ asset(mix('js/scripts/pages/dashboard-ecommerce.js')) }}"></script> -->
 @endsection
 
 
