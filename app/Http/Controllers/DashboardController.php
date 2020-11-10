@@ -46,9 +46,10 @@ class DashboardController extends Controller
         $Shop[$Shop_Index]->shop_info_data_yesterday = Sales::get_dashboard_performance('yesterday');
         $Shop[$Shop_Index]->shop_info_data_week = Sales::get_dashboard_performance('week');
         $Shop[$Shop_Index]->shop_info_data_month = Sales::get_dashboard_performance('month');
+        $colour = Helper::get_colours();
 
         if ( request()->ajax()) {
-            $colour = Helper::get_colours();
+            
             /* monthly */
             
             $monthly = Order::get_dashboard_orders('','month');
