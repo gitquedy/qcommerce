@@ -250,12 +250,17 @@ class Order extends Model
 
         $result = $query->get();
         $total = 0;
+
         
         foreach($result as $r) {
             if ($r->site == 'lazada') {
                 $total += (float) str_replace(",","",$r->price);
             }
             elseif ($r->site == 'shopee') {
+                // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
+                $total += (float) str_replace(",","",$r->price);
+            }
+            elseif ($r->site == 'shopify') {
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
                 $total += (float) str_replace(",","",$r->price);
             }
