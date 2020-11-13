@@ -39,7 +39,7 @@ class syncShopeePayout extends Command
      */
     public function handle()
     {
-        $shops = Shop::where('site', 'lazada')->get();
+        $shops = Shop::where('site', 'shopee')->get();
         foreach($shops as $shop){
             $shop->syncShopeePayout(Carbon::now()->subDays(30)->format('Y-m-d'));
             $shop->touch();
