@@ -488,7 +488,12 @@ class Order extends Model
 
     public function getImgAndIdDisplay(){
         // return  $this->shop->getImgSiteDisplay();
-    return '<div class="text-primary font-medium-2 text-bold-600">'. $this->ordersn .' </div>' . $this->shop->getImgSiteDisplay();
+        $order_no = $this->ordersn;
+
+        if($this->site == 'shopify'){
+            $order_no = $this->ordersn . ' #' . $this->order_no;
+        }
+        return '<div class="text-primary font-medium-2 text-bold-600">'. $order_no .' </div>' . $this->shop->getImgSiteDisplay();
     }
 
     public function OrderID(){

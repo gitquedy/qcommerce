@@ -85,7 +85,7 @@ class OrderController extends Controller
                 }
               }
            }else if ($request->get('site') == 'shopify'){
-            $orders->orderByRaw('CASE WHEN status = "open" THEN 1 WHEN status = "closed" THEN 2 else 4 END');
+            $orders->orderByRaw('CASE WHEN status = "open" THEN 1 WHEN status = "closed" THEN 2 else 3 END');
            }
 
            if($request->printed){
