@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Validator;
 use Auth;
 use Yajra\DataTables\Facades\DataTables;
+use Oseintow\Shopify\Facades\Shopify;
 
 class BarcodeController extends Controller
 {
@@ -57,10 +58,10 @@ class BarcodeController extends Controller
                 })->get()->first(); //shopee, lazada if null search in shopify with dif query
 
         if($order == null){
-           $order = Order::select('*')->join('shop', 'shop.id' , '=' , 'order.shop_id')->where('order.site', 'shopify')->whereIn('order.shop_id',$Shop_array)
+           $order = DB::table('order')->join('shop', 'shop.id' , '=' , 'order.shop_id')
+           ->select('order.*', 'shop.short_name')->where('order.site', 'shopify')->whereIn('order.shop_id',$Shop_array)
            ->where(DB::raw("CONCAT(shop.short_name, order.order_no)"), 'LIKE',  $input )->get()->first();
         }
-        // dd($order);
         if($order) {
             $items = [];
             $items_sku = [];
@@ -119,18 +120,19 @@ class BarcodeController extends Controller
                     }
                 }
             }else if($order->site == 'shopify'){
-                foreach($order->products as $order_item){
-                    $product = $order_item->product;
-                    if($product){
-                        $items[$product->SkuId] = [
-                            'sku' => $product->SkuId,
-                            'pic' => $product->Images,
-                            'name' => $product->name,
-                            'qty' => $order_item->quantity,
-                            'unit_price' => $order_item->price,
-                            'sub_total' => $order_item->price * $order_item->quantity,
-                        ];
-                    }
+                $order_items = Shopify::setShopUrl($shop->domain)
+                ->setAccessToken($shop->access_token)
+                ->get("admin/api/2020-07/orders/". $order->ordersn .".json");
+                foreach($order_items['line_items'] as $item){
+                    $sku = $item->variant_id;
+                    $items[$sku] = [
+                        'sku' => $sku,
+                        'pic' => '',
+                        'name' => $item->name,
+                        'qty' => $item->quantity,
+                        'unit_price' => $item->price,
+                        'sub_total' => $item->price * $item->quantity,
+                    ];
                 }
             }
             else{
@@ -166,13 +168,14 @@ class BarcodeController extends Controller
         $result = false;
         $order = Order::where('id',$request->order_id)->first();
         if($order->packed == 0){
-            $order->packed = 1;
+            // $order->packed = 1;
             $order->save();
             foreach ($request->items as $sku => $qty) {
+                
                 $shop_id = $request->shop_id;
                 $shop = Shop::find($shop_id);
                 $warehouse_id = $shop->warehouse_id;
-                $prod = Products::where('SellerSku', $sku)->where('shop_id', $shop_id)->first();
+                $prod = Products::where('SellerSku', $sku)->orWhere('item_id', $sku)->where('shop_id', $shop_id)->first();
                 if(isset($prod->seller_sku_id)) {
                     $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
                     $sku->quantity -= $qty;

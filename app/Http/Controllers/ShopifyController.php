@@ -74,9 +74,7 @@ class ShopifyController extends Controller
 
     public function test(Request $request){
        $shop = Shop::first();
-       $order = Shopify::setShopUrl($shop->domain)
-                ->setAccessToken($shop->access_token)
-                ->get("admin/api/2020-07/orders/3024875552954.json");
+       
         dd($order);
     }
 }
