@@ -98,12 +98,12 @@ class ExpenseController extends Controller
             ->addColumn('action', function(Expense $Expense) {
 
                 if($Expense->payment_status != 'paid') {
-                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', ['type' => 'Expense', 'id' =>  $Expense->id]).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
+                        $add_payment = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@addPaymentModal', ['type' => 'Expenses', 'id' =>  $Expense->id]).'"><i class="fa fa-dollar" aria-hidden="true"></i> Add Payment</a>';
                     }
                     else {
                         $add_payment = '';
                     }
-                $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal',['type' => 'Expense', 'id' =>  $Expense->id]).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
+                $view_payments = '<a class="dropdown-item toggle_view_modal" href="" data-action="'.action('PaymentController@viewPaymentModal',['type' => 'Expenses', 'id' =>  $Expense->id]).'"><i class="fa fa-money" aria-hidden="true"></i> View Payments</a>';
                             return'<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
