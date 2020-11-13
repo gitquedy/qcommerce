@@ -60,7 +60,7 @@ class BarcodeController extends Controller
             $items_sku = [];
             $shop = Shop::whereId($order->shop_id)->get()->first();
             if($order->site == 'lazada'){
-                $code = $order->ordersn;
+                $code = $order->ordersn;    
                 $api_key = Lazop::get_api_key();
                 $api_secret = Lazop::get_api_secret();
                 $accessToken = $shop->access_token;
@@ -70,21 +70,23 @@ class BarcodeController extends Controller
                 $response = $client->execute($r, $accessToken);
                 $data = json_decode($response, true);
                 foreach ($data['data'] as $item) {
-                    $sku = $item['sku'];
-                    if(!in_array($sku, $items_sku)) {
-                        array_push($items_sku, $sku);
-                        $items[$sku] = array(
-                            'sku' => $sku,
-                            'pic' => $item['product_main_image'],
-                            'name' => $item['name'],
-                            'qty' => 1,
-                            'unit_price' => $item['item_price'],
-                            'sub_total' => $item['item_price'],
-                        );
-                    }
-                    else {
-                        $items[$sku]['qty'] += 1;
-                        $items[$sku]['sub_total'] += $item['item_price'];
+                    if($item['cancel_return_initiator'] == ""){
+                        $sku = $item['sku'];
+                        if(!in_array($sku, $items_sku)) {
+                            array_push($items_sku, $sku);
+                            $items[$sku] = array(
+                                'sku' => $sku,
+                                'pic' => $item['product_main_image'],
+                                'name' => $item['name'],
+                                'qty' => 1,
+                                'unit_price' => $item['item_price'],
+                                'sub_total' => $item['item_price'],
+                            );
+                        }
+                        else {
+                            $items[$sku]['qty'] += 1;
+                            $items[$sku]['sub_total'] += $item['item_price'];
+                        }
                     }
                 }
                 
