@@ -48,7 +48,7 @@
           @php
           if($type == "Sales" || $type == "Purchases"){
             $balance = $record->grand_total - $record->paid;
-          }else if($type == "Expense"){
+          }else if($type == "Expenses"){
            $balance = $record->amount - $record->paid;
           }
           @endphp
