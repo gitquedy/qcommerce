@@ -238,7 +238,7 @@ return [
     
     'morph_payments' => [
         'Sales' => 'App\Sales',
-        'Expense' => 'App\Expense',
+        'Expenses' => 'App\Expense',
         'Purchases' => 'App\Purchases',
         'Customer' => 'App\Customer',
         'Supplier' => 'App\Supplier',
