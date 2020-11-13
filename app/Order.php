@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout'
+		    	'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout', 'order_no'
 			];
 
     public $timestamps = false;

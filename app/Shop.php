@@ -510,10 +510,10 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                 }
 
                 $orders->each(function($order) use($shop){
-                    // dd($order);
                     $printed = count($order->fulfillments) == 0 ? false : true;
                     $orders_details = [
                             'ordersn' => $order->id,
+                            'order_no' => $order->number,
                             'payment_method' => isset($order->payment_gateway_names[0]) ?  $order->payment_gateway_names[0] : 'Unknown',
                             'price' => $order->total_line_items_price,
                             'shop_id' => $shop->id,
@@ -522,7 +522,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                             'status' => $order->fulfillment_status == 'fulfilled' ? 'closed' : 'open',
                             'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
                             'shipping_fee' => $order->total_shipping_price_set->shop_money->amount,
-                            'customer_first_name' => 'No Customer',
+                            'customer_first_name' => isset($order->customer) ? $order->customer->first_name . ' ' . $order->customer->last_name : 'No Customer',
                             'printed' => $printed,
                             'created_at' => Carbon::parse($order->created_at)->toDateTimeString(),
                             'updated_at' => Carbon::parse($order->updated_at)->toDateTimeString(),
@@ -534,8 +534,9 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                             $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
                             if($product != null){
                                 $item_detail = [
-                                    'order_id' => $record->id,
                                     'product_id' => $product->id,
+                                    'order_id' => $record->id,
+                                    'product_details' => $product->id,
                                     'quantity' => $item->quantity,
                                     'price' => $item->price,
                                     'created_at' => $record->created_at,
