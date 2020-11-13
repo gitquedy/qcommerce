@@ -168,7 +168,7 @@ class BarcodeController extends Controller
         $result = false;
         $order = Order::where('id',$request->order_id)->first();
         if($order->packed == 0){
-            // $order->packed = 1;
+            $order->packed = 1;
             $order->save();
             foreach ($request->items as $sku => $qty) {
                 
