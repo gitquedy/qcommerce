@@ -245,7 +245,7 @@
           $("#order_id").val(order.id);
           var order_no = '';
           if(order.order_no != null{
-            order_no = " #" + order.order_no
+            order_no = " #" + order.order_no;
           }
           $("#order_number").html("<h5>"+order.ordersn + order_no + "</h5>");
           $("#date").html("<h5>"+order.created_at+"</h5>");
