@@ -243,7 +243,11 @@
           $("#customer_name").html("<h5>"+order.customer_first_name+"</h5>");
           $("#shop_id").val(order.shop_id);
           $("#order_id").val(order.id);
-          $("#order_number").html("<h5>"+order.ordersn + " #"+ order.order_no + "</h5>");
+          var order_no = '';
+          if(order.order_no != null{
+            order_no = " #" + order.order_no
+          }
+          $("#order_number").html("<h5>"+order.ordersn + order_no + "</h5>");
           $("#date").html("<h5>"+order.created_at+"</h5>");
           // $("#payment").html("<h5>"+order.payment_method+"</h5>");
           // $("#price").html("<h5>"+order.price+"</h5>");
