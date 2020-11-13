@@ -230,7 +230,7 @@
                                     <tr data-id="{{$expense->id}}">
                                       <td></td>
                                       <td class="text-center">{{$expense->date}}</td>
-                                      <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('SalesController@viewSalesModal', $expense->id) }}">{{$expense->reference_no}}</a></td>
+                                      <td class="text-center"><a class="toggle_view_modal" href="" data-action="{{ action('ExpenseController@show', $expense->id) }}">{{$expense->reference_no}}</a></td>
                                       <td class="text-right">{{number_format($expense->amount, 2)}}</td>
                                       <td class="text-right">{{number_format($expense->paid, 2)}}</td>
                                       <td class="text-right">{{number_format($expense->amount - $expense->paid, 2)}}</td>
