@@ -88,7 +88,7 @@ class PurchasesController extends Controller
                         $add_payment = '';
                     }
 
-                    if ($purchase->status == 'pending') {
+                    if ($purchase->status == 'pending' || $purchase->status == 'ordered') {
                         $edit = '<a class="dropdown-item" href="'. action('PurchasesController@edit', $purchase->id) .'"><i class="fa fa-edit" aria-hidden="true"></i> Edit</a>';
                     }
                     else {
