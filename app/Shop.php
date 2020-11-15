@@ -513,7 +513,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     $printed = count($order->fulfillments) == 0 ? false : true;
                     $orders_details = [
                             'ordersn' => $order->id,
-                            'order_no' => $order->number,
+                            'order_no' => $order->order_number,
                             'payment_method' => isset($order->payment_gateway_names[0]) ?  $order->payment_gateway_names[0] : 'Unknown',
                             'price' => $order->total_line_items_price,
                             'shop_id' => $shop->id,
