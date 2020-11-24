@@ -73,13 +73,13 @@ class ShopifyController extends Controller
     }
 
     public function test(Request $request){
-       $shop = Shop::first();
+      $shop = Shop::where('site', 'shopify')->first();
        
-       $order = Shopify::setShopUrl($shop->domain)
+       $order_items = Shopify::setShopUrl($shop->domain)
                 ->setAccessToken($shop->access_token)
-                ->get("admin/api/2020-07/orders/2806629302433.json");
-       
-        dd($order);
+                ->get("admin/api/2020-07/orders/3055414706362.json");
+        
+        dd($order_items);
     }
 }
 
