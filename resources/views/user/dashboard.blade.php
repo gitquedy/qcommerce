@@ -914,7 +914,7 @@ function number_format (number, decimals, dec_point, thousands_sep) {
             if (typeof result.combine_chart.current !== 'undefined') {
                 $.each(result.combine_chart.current, function( index, value ) {
                   currentMonthlySale += value;
-                  if(index <= "{{ date('d') }}"){
+                  if(parseInt(index) <= "{{ date('d') }}"){
                       current_sale += value;
                       line1.push(current_sale);
                   }

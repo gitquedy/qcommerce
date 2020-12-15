@@ -101,7 +101,7 @@ class BarcodeController extends Controller
                 $client = $shop->shopeeGetClient();
                 $data = $client->order->getOrderDetails(['ordersn_list' => array_values([$order->ordersn])])->getData();
                 foreach ($data['orders'][0]['items'] as $item) {
-                    $sku = $item['item_sku'];
+                    $sku = $item['item_id'];
                     // die(var_dump($item));
                     if(!in_array($sku, $items_sku)) {
                         array_push($items_sku, $sku);
