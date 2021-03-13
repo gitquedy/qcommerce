@@ -21,9 +21,9 @@ class Products extends Model
     
     protected $fillable = ['seller_sku_id', 'item_id', 'shop_id', 'name','site','SkuId','SellerSku','price','special_price','Images','Status', 'Url','quantity','created_at','updated_at', 'inventory_item_id'];
     
-    public static $lazadaStatuses = ['active', 'inactive', 'deleted', 'image-missing', 'pending', 'rejected', 'sold-out'];
+    public static $lazadaStatuses = ['active', 'image-missing', 'pending', 'rejected', 'sold-out']; //'inactive', 'deleted',
 
-    public static $shopeeStatuses = ['NORMAL', 'DELETED', 'BANNED', 'UNLIST', 'sold-out'];
+    public static $shopeeStatuses = ['NORMAL', 'sold-out']; //'DELETED', 'BANNED', 'UNLIST'
 
     public static $shopifyStatuses = ['active', 'archived', 'draft'];
 
