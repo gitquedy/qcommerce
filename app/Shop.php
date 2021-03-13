@@ -646,9 +646,11 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
 
     public function shopeeSaveProductsPerItem($products){
         $client = $this->shopeeGetClient();
+        $qproduct_item_ids = $this->products->pluck('item_id')->toArray();
+        $sproduct_item_ids = [];
         foreach($products as $product){
             if(isset($product['item_id'])){
-                $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData(); 
+                $product_details = $client->item->getItemDetail(['item_id' => $product['item_id']])->getData();
                 if (isset($product_details['item'])) {
                     if(count($product_details['item']) > 0){
                         $product_details = [
@@ -665,12 +667,18 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                         'created_at' => Carbon::createFromTimestamp($product_details['item']['create_time'])->toDateTimeString(),
                         'updated_at' => Carbon::createFromTimestamp($product_details['item']['update_time'])->toDateTimeString(),
                         ];
-                        $record = Products::updateOrCreate(
-                        ['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+
+                        if (!in_array($product_details['Status'], ['UNLIST', 'DELETED'])) {
+                            $sproduct_item_ids[] = $product_details['item_id'];
+                            $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+                        }
                     }
                 }
             }
         }
+        $delete_ids = array_diff($qproduct_item_ids, $sproduct_item_ids);
+        $delete = $this->products()->whereIn('item_id', $delete_ids)->delete();
+        return true;
     }
 
     public function totalSales(){
