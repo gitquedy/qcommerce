@@ -439,19 +439,17 @@ class SkuController extends Controller
                 $query->orWhere('code', 'LIKE', '%'. $search. '%');
             });
             $sku->select('sku.*','warehouse_items.quantity');
-            if ($warehouse != 'none') {
-                if ($withQTY) {
-                    $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
-                    $sku->where('warehouse_items.warehouse_id', $warehouse);
-                    $sku->where('warehouse_items.quantity', '>=', 1);
-                }
-                else {
-                    $sku->leftjoin('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
-                }
+            if ($withQTY) {
+                $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                $sku->where('warehouse_items.warehouse_id', $warehouse);
+                $sku->where('warehouse_items.quantity', '>=', 1);
+            }
+            else {
+                $sku->leftjoin('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
             }
             $result = $sku->get();
             foreach ($result as &$r) {
-                if($warehouse != 'none' && !$withQTY) {
+                if(!$withQTY) {
                     $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first();
                     $r->quantity = ($qty)?$qty->quantity:0;
                 }

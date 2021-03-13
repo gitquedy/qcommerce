@@ -442,7 +442,8 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             $result = $c->execute($r,$this->access_token);
             $data = json_decode($result, true);
             $products = [];
-            $delete_item_ids = $this->products->pluck('item_id')->toArray();
+            $qproduct_item_ids = $this->products->pluck('item_id')->toArray();
+            $lproduct_item_ids = [];
             if($data['code'] == "0"){
                 $count = isset($data['data']['total_products'])  ? $data['data']['total_products'] : 0;
                 if(isset($data['data']['products'])){
@@ -482,8 +483,17 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     'updated_at' => date('Y-m-d H:i:s'),
                     ];
 
+                    if ($product_details['Status'] == "active") {
+                        $lproduct_item_ids[] = $product_details['item_id'];
+                    }
+
                     $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                 }
+
+                $delete_ids = array_diff($qproduct_item_ids, $lproduct_item_ids);
+                $delete = $this->products()->whereIn('item_id', $delete_ids)->delete();
+
+
                 return $product_update_or_create_result;
             }
         }
