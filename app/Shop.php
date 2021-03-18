@@ -444,7 +444,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             $products = [];
             $qproduct_item_ids = $this->products->pluck('item_id')->toArray();
             $lproduct_item_ids = [];
-            if($data['code'] == "0"){
+            if(isset($data['code']) && $data['code'] == "0"){
                 $count = isset($data['data']['total_products'])  ? $data['data']['total_products'] : 0;
                 if(isset($data['data']['products'])){
                     $products = $data['data']['products'];
@@ -458,7 +458,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     $r->addApiParam('limit','20');
                     $result = $c->execute($r,$this->access_token);
                     $data = json_decode($result, true);
-                    if($data['code'] == "0"){
+                    if(isset($data['code']) && $data['code'] == "0"){
                          if(isset($data['data']['products'])){
                             $products = array_merge($products, $data['data']['products']);
                         }
