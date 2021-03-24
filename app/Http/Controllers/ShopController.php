@@ -413,7 +413,7 @@ class ShopController extends Controller
             try {
             // $ids 
               if($shop->site == 'shopee'){
-                $shop->syncShopeeProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+                $shop->syncShopeeProducts(); //Carbon::now()->subDays(30)->format('Y-m-d')
               }else if($shop->site == 'lazada'){
                 $shop->syncLazadaProducts();
               }else if($shop->site == 'shopify'){
