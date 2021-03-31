@@ -98,9 +98,9 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             if($this->site == 'lazada'){
                 $data = $this->syncLazadaOrders($date);
             }else if($this->site == 'shopee'){
-                $this->syncShopeeOrders($date);
+                $data = $this->syncShopeeOrders($date);
             }else if($this->site == 'shopify'){
-                $this->syncShopifyOrders($date);
+                $data = $this->syncShopifyOrders($date);
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -109,7 +109,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                         'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
                     ];
         }
-        // return $data;
+        return $data;
     }
 
     public function syncProducts($date = '2018-01-01'){

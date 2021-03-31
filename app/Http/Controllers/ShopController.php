@@ -103,6 +103,11 @@ class ShopController extends Controller
         ]);
     }
     
+
+    public function show() {
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *
