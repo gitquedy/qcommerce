@@ -95,12 +95,13 @@ class Shop extends Model
 public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
             $this->update(['active' => 2]);
+            print_r($this->name."(".$this->site.") :: ".$this->id."  --  ");
             if($this->site == 'lazada'){
-                $data = $this->syncLazadaOrders($date);
+                $this->syncLazadaOrders($date);
             }else if($this->site == 'shopee'){
-                $data = $this->syncShopeeOrders($date);
+                $this->syncShopeeOrders($date);
             }else if($this->site == 'shopify'){
-                $data = $this->syncShopifyOrders($date);
+                $this->syncShopifyOrders($date);
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -109,7 +110,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                         'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
                     ];
         }
-        return $data;
+        // return $data;
     }
 
     public function syncProducts($date = '2018-01-01'){
@@ -154,6 +155,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                 $r->addApiParam('sort_by','updated_at');
                 $result = $c->execute($r, $this->access_token);
                 $data = json_decode($result, true);
+
                 if(isset($data['data']['count'])){
                     $count = $data['data']['count'];
                     $offset += $count;
@@ -180,8 +182,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     unset($order['order_number']);
                     $order = array_merge($order, ['status' => $status, 'shop_id' => $this->id, 'site' => 'lazada']);
                     unset($order['order_id']);     
-                    $record = Order::updateOrCreate(
-                    ['ordersn' => $order['ordersn']], $order);
+                    $record = Order::updateOrCreate(['ordersn' => $order['ordersn']], $order);
                     $c = $this->lazadaGetClient();
                     $r = new LazopRequest("/order/items/get",'GET');
                     $r->addApiParam("order_id", $order['ordersn']);
@@ -315,6 +316,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
     public function shopeeGetOrdersPerDate($date){
         $client = $this->shopeeGetClient();
         $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+1 day');
+
         $orders  = [];
         $created_before_increment = 1;
         foreach($dates as $date){
@@ -331,6 +333,9 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                 ];
                 $offset += 100;
                 $result = $client->order->getOrdersList($params)->getData();
+                if ($result['error']) {
+                    return;
+                }
                 if(isset($result['orders'])){
                     $more = $result['more'];
                     if(count($result['orders']) > 0){

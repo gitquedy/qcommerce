@@ -42,6 +42,7 @@ class syncOrders extends Command
     public function handle()
     {
         $shops = Shop::all();
+
         foreach($shops as $shop){
             $shop->syncOrders(Carbon::now()->subDays(90)->format('Y-m-d'), '+1 day');
             $shop->touch();
