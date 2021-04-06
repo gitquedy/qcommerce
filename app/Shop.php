@@ -448,6 +448,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             $data = json_decode($result, true);
             $products = [];
             $qproduct_item_ids = $this->products->pluck('item_id')->toArray();
+            // print json_encode([count($qproduct_item_ids), $data['data']['total_products']]);
             $lproduct_item_ids = [];
             if(isset($data['code']) && $data['code'] == "0"){
                 $count = isset($data['data']['total_products'])  ? $data['data']['total_products'] : 0;
@@ -459,12 +460,12 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     $r = new LazopRequest('/products/get','GET');
                     $r->addApiParam('created_after', '2018-01-01T00:00:00+08:00');
                     $r->addApiParam('created_before', date('Y-m-d').'T00:00:00+08:00');
-                    $r->addApiParam('offset',$offset);
+                    $r->addApiParam('offset', $offset);
                     $r->addApiParam('limit','20');
                     $result = $c->execute($r,$this->access_token);
                     $data = json_decode($result, true);
                     if(isset($data['code']) && $data['code'] == "0"){
-                         if(isset($data['data']['products'])){
+                        if(isset($data['data']['products'])){
                             $products = array_merge($products, $data['data']['products']);
                         }
                     }
@@ -490,12 +491,13 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
 
                     if ($product_details['Status'] == "active") {
                         $lproduct_item_ids[] = $product_details['item_id'];
+                        $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                     }
 
-                    $record = Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
                 }
 
                 $delete_ids = array_diff($qproduct_item_ids, $lproduct_item_ids);
+                // print json_encode([$qproduct_item_ids, $lproduct_item_ids, $delete_ids]);die();
                 $delete = $this->products()->whereIn('item_id', $delete_ids)->delete();
 
 
