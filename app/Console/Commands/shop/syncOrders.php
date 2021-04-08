@@ -42,8 +42,9 @@ class syncOrders extends Command
     public function handle()
     {
         $shops = Shop::all();
-
-        foreach($shops as $shop){
+        $total = count($shops);
+        foreach($shops as $index => $shop){
+            echo $shop->id.'-'.$shop->name.'('.$shop->site.') ('.($index + 1).'/'.$total.')  --  ';
             $shop->syncOrders(Carbon::now()->subDays(90)->format('Y-m-d'), '+1 day');
             $shop->touch();
             echo 'Synced Orders Successfully ' . date('d-m-Y H:i:s') . PHP_EOL;
