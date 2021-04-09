@@ -439,7 +439,7 @@ class SkuController extends Controller
                 $query->orWhere('code', 'LIKE', '%'. $search. '%');
             });
             $sku->select('sku.*','warehouse_items.quantity');
-            if ($withQTY) {
+            if ($withQTY === true) {
                 $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
                 $sku->where('warehouse_items.warehouse_id', $warehouse);
                 $sku->where('warehouse_items.quantity', '>=', 1);
@@ -449,7 +449,7 @@ class SkuController extends Controller
             }
             $result = $sku->get();
             foreach ($result as &$r) {
-                if(!$withQTY) {
+                if($withQTY !== true) {
                     $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first();
                     $r->quantity = ($qty)?$qty->quantity:0;
                 }
@@ -471,7 +471,7 @@ class SkuController extends Controller
         }
         return response()->json($result);
             
-    } 
+    }
 
     public function searchPurchase($search)
     {
