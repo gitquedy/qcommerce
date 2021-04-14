@@ -39,6 +39,16 @@ class Products extends Model
     public function getImgAndIdDisplay(){
         return '<div class="text-primary font-medium-2 text-bold-600">'. $this->item_id .' </div>' . $this->shop->getImgSiteDisplay();
     }
+
+    public function getWarehouseQuantity() {
+        $warehouse = $this->sku->warehouse_items()->where('warehouse_id', $this->shop->warehouse_id)->first();
+        if ($warehouse) {
+            return $warehouse->quantity;
+        }
+        else {
+            return 0;
+        }
+    }
     
     public static function get_product_query(){
         $query = DB::table('products')
@@ -360,8 +370,7 @@ class Products extends Model
     }
 
     public function updateWarehouseQuantity(){
-        $warehouse_item = $this->sku->warehouse_items->first();
-        $this->update(['quantity' => isset($warehouse_item->quantity) ? $warehouse_item->quantity : 0]);
+        $this->update(['quantity' => $this->getWarehouseQuantity()]);
     }
 
     public function updatePlatform(){ // price qty SellerSku

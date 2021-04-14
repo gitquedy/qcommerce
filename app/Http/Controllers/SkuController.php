@@ -324,7 +324,7 @@ class SkuController extends Controller
                     'seller_sku_id' => $sku->id,
                     'price' => $sku->price,
                     // 'SellerSku' => $sku->code,
-                    'quantity' => $sku->quantity
+                    'quantity' => $product->getWarehouseQuantity()
                 ];  
 
                 $result = $product->update($data);
@@ -378,7 +378,6 @@ class SkuController extends Controller
                         ->rawColumns(['shop', 'action'])
                         ->make(true);
         }
-        
         return view('sku.listproducts', [
             'sku' => $sku,
             'breadcrumbs' => $breadcrumbs,
