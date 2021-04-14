@@ -749,6 +749,7 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             $dates = Utilities::getDaterange($date, Carbon::now()->addDays(1)->format('Y-m-d'), 'Y-m-d', '+5 day');
             $transaction_list  = [];
             $created_before_increment = 1;
+            // dd($dates);
             foreach($dates as $date){
                 $created_before = array_key_exists($created_before_increment, $dates) ? $dates[$created_before_increment] : $date;
                 $created_before_increment += 1;
@@ -764,13 +765,21 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     ];
                     $offset += 100;
                     $result = $client->shop->getTransactionList($params)->getData();
-                    if(isset($result['transaction_list'])){
-                        $more = $result['has_more'];
-                        if(count($result['transaction_list']) > 0){
-                            foreach($result['transaction_list'] as $transaction){
-                                $transaction_list[] = $transaction;
+
+
+
+                    if (!isset($result['error'])) {
+                        if(isset($result['transaction_list'])){
+                            $more = $result['has_more'];
+                            if(count($result['transaction_list']) > 0){
+                                foreach($result['transaction_list'] as $transaction){
+                                    $transaction_list[] = $transaction;
+                                }
                             }
                         }
+                    }
+                    else {
+                        $more = false;
                     }
                 }
             }

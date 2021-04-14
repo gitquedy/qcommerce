@@ -43,7 +43,7 @@ class Utilities extends Model
         $current = strtotime($step, $current);
     }
 
-    if (!in_array($last, $dates)) {
+    if (!in_array(date($output_format, $last), $dates)) {
         $dates[] = date($output_format, $last);
     }
 
