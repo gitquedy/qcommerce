@@ -34,6 +34,9 @@ class Order extends Model
      public static $shopify_statuses = [
         'Open','Closed',
      ];
+     public static $woocommerce_statuses = [
+        'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed', 'trash'
+     ];
 
      
 

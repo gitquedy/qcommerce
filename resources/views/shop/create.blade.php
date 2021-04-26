@@ -24,6 +24,7 @@
                       <option value="lazada" data-url="{{ App\Lazop::getAuthLink() }}">Lazada</option>
                       <option value="shopee" data-url="{{ App\Shopee::getAuthLink() }}">Shopee</option>
                       <option value="shopify" data-url="{{ action('ShopifyController@install') }}">Shopify</option>
+                      <option value="woocommerce">WooCommerce</option>
                     </select>
                   </div>
                 </div><br>
@@ -77,6 +78,17 @@
                       height="64" width="64" />
                   </a>
                 </div>
+                 <div class="media">
+                  <div class="media-body text-right">
+                    <h4 class="media-heading">WooCommerce </h4>
+                    WooCommerce is an open-source e-commerce plugin for WordPress. It is designed for small to large-sized online merchants using WordPress. Launched on September 27, 2011.
+                  </div>
+                  <a class="media-right" href="#">
+                    <img class="media-object rounded-circle"
+                      src="{{ asset('images/shop/800x800/woocommerce.png') }}"  alt="Generic placeholder image"
+                      height="64" width="64" />
+                  </a>
+                </div>
               </div>
           </div>
           </div>
@@ -125,7 +137,12 @@
         if(channel == 'shopify'){
           window.location.href = "{{ action('ShopController@createShopifyTemp') }}";
           return;
-        }else{
+        }
+        else if(channel == 'woocommerce'){ //woocommerce temp
+          window.location.href = "{{ action('ShopController@createWoocommerceTemp') }}";
+          return;
+        }
+        else{
           window.location.href = $('#channel').find(":selected").data('url');
         }
       });
@@ -137,6 +154,14 @@
           $("#shopify").slideUp();
         }
       });
+
+      // $('select[name=channel]').on('change', function() {
+      //   if(this.value == 'woocommerce'){
+      //     $("#woocommerce").slideDown();
+      //   }else{
+      //     $("#woocommerce").slideUp();
+      //   }
+      // });
 
       // $(".select2").select2({
       //       dropdownAutoWidth: true,

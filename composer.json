@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.24",
-        "facade/ignition": "^2.5",
+        "automattic/woocommerce": "^3.0",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^6.0",

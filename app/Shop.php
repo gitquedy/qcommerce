@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\LazadaPayout;
 use App\ShopeePayout;
+use App\Woocommerce;
 use App\Order;
 use App\OrderItem;
 use App\Products;
@@ -19,6 +20,7 @@ use Auth;
 use DB;
 use App\Policies\ShopPolicy;
 use Oseintow\Shopify\Facades\Shopify;
+use Automattic\WooCommerce\Client;
 
 class Shop extends Model
 {
@@ -69,6 +71,9 @@ class Shop extends Model
                    $orders->where('status','COMPLETED');
                 }
             }
+            else if($this->site == 'woocommerce'){
+                $orders->where('status', $status);
+            }
             
         }
         return $orders;
@@ -92,7 +97,7 @@ class Shop extends Model
     }
 
     
-public function syncOrders($date = '2018-01-01', $step = '+1 day'){
+    public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {
             $this->update(['active' => 2]);
             if($this->site == 'lazada'){
@@ -101,6 +106,8 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                 $this->syncShopeeOrders($date);
             }else if($this->site == 'shopify'){
                 $this->syncShopifyOrders($date);
+            }else if($this->site == 'woocommerce'){
+                $this->syncWoocommerceOrders();
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -121,6 +128,8 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                 $this->syncShopeeProducts($date);
             }else if($this->site == 'shopify'){
                 $this->syncShopifyProducts($date);
+            }else if($this->site == 'woocommerce'){
+                $this->syncWoocommerceProducts();
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -546,22 +555,22 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
                     $record = Order::updateOrCreate(
                         ['ordersn' => $orders_details['ordersn']], $orders_details);
                     foreach($order->line_items as $item){
-                            $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
-                            if($product != null){
-                                $item_detail = [
-                                    'product_id' => $product->id,
-                                    'order_id' => $record->id,
-                                    'product_details' => $product->id,
-                                    'quantity' => $item->quantity,
-                                    'price' => $item->price,
-                                    'created_at' => $record->created_at,
-                                    'updated_at' => $record->updated_at
-                                ];
-                                OrderItem::updateOrCreate(
-                                    ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
-                                );
-                            }
-                        } //items
+                        $product = Products::where('shop_id', $shop->id)->where('item_id', $item->variant_id)->first();
+                        if($product != null){
+                            $item_detail = [
+                                'product_id' => $product->id,
+                                'order_id' => $record->id,
+                                'product_details' => $product->id,
+                                'quantity' => $item->quantity,
+                                'price' => $item->price,
+                                'created_at' => $record->created_at,
+                                'updated_at' => $record->updated_at
+                            ];
+                            OrderItem::updateOrCreate(
+                                ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
+                            );
+                        }
+                    } //items
                 }); // orders
             }while(count($orders) != 0);
         } catch (Exception $e) {
@@ -647,6 +656,110 @@ public function syncOrders($date = '2018-01-01', $step = '+1 day'){
             }
             $this->shopeeSaveProductsPerItem($products);
         }
+    }
+
+    //Woocommerce
+    public function syncWoocommerceProducts() {
+        $woocommerce = $this->woocommerceGetClient();
+
+        $page = 1;
+        $products = [];
+        $all_products = [];
+        do{
+            try {
+                $products = $woocommerce->get('products', array('per_page' => 10, 'page' => $page));
+            }catch(HttpClientException $e){
+                die("Can't get products: $e");
+            }
+            $all_products = array_merge($all_products, $products);
+            $page++;
+        } while (count($products) > 0);
+
+        foreach($all_products as $product) {
+            $product = (array)$product;
+            $product_details = [
+            'shop_id' => $this->id,
+            'site' => 'woocommerce',
+            'SkuId' => $product['sku'],
+            'SellerSku' => $product['sku'],
+            'item_id' => $product['id'],
+            'price' => $product['price'],
+            'Images' => ((array)($product['images'][0]))['src'],
+            'name' => $product['name'],
+            'Status' => $product['stock_status'],
+            'quantity' => $product['stock_quantity'],
+            'created_at' => Carbon::createFromTimestamp($product['date_created'])->toDateTimeString(),
+            'updated_at' => Carbon::createFromTimestamp($product['date_modified'])->toDateTimeString(), 
+            ];
+            
+            Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
+        }
+        return;
+    }
+
+    public function syncWoocommerceOrders() {
+        $woocommerce = $this->woocommerceGetClient();
+
+        $page = 1;
+        $orders = [];
+        $all_orders = [];
+        do{
+            try {
+                $orders = $woocommerce->get('orders', array('per_page' => 10, 'page' => $page));
+            }catch(HttpClientException $e){
+                die("Can't get products: $e");
+            }
+            $all_orders = array_merge($all_orders, $orders);
+            $page++;
+        } while (count($orders) > 0);
+
+        foreach($all_orders as $order) {
+            $order = (array)$order;
+            $printed = $order['status'] == 'completed' ? true : false;
+            $order_details = [
+                'ordersn' => $order['id'],
+                'order_no' => $order['order_key'],
+                'payment_method' => $order['payment_method'],
+                'price' => $order['total'],
+                'shop_id' => $this->id,
+                'site' => 'woocommerce',
+                'items_count' => count($order['line_items']),
+                'status' => $order['status'],
+                // 'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
+                'shipping_fee' => $order['shipping_total'],
+                // 'customer_first_name' => isset($order->customer) ? $order->customer->first_name . ' ' . $order->customer->last_name : 'No Customer',
+                'printed' => $printed,
+                'created_at' => Carbon::parse($order['date_created'])->toDateTimeString(),
+                'updated_at' => Carbon::parse($order['date_modified'])->toDateTimeString(),
+            ];
+            $record = Order::updateOrCreate(['ordersn' => $order_details['ordersn']], $order_details);
+            
+            foreach($order['line_items'] as $item) {
+                // $item = (array)$item;
+                $product = Products::where('shop_id', $this->id)->where('item_id', $item->product_id)->first();
+                if($product != null) {
+                    $item_detail = [
+                        'product_id' => $product->id,
+                        'order_id' => $record->id,
+                        'product_details' => $product->id,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'created_at' => $record->created_at,
+                        'updated_at' => $record->updated_at
+                    ];
+                    OrderItem::updateOrCreate(['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail);
+                }
+            }
+        }
+        return;
+    }
+
+    public function woocommerceGetClient() {
+        return new Client(Woocommerce::getDomain($this->id), Woocommerce::getConsumerKey($this->id), Woocommerce::getConsumerSecret($this->id), [
+            'wp_api' => true,
+            'version' => 'wc/v3',
+            'verify_ssl' => false,
+        ]);
     }
 
     public function shopeeSaveProductsPerItem($products){

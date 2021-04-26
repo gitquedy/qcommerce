@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\Order;
 use App\Shop;
+use App\Woocommerce;
 use App\Utilities;
 use Carbon\Carbon;
 use App\Library\lazada\LazopRequest;
 use App\Library\lazada\LazopClient;
 use App\Library\lazada\UrlConstants;
 use Oseintow\Shopify\Facades\Shopify;
+// use Automattic\WooCommerce\Client;
 use Auth;
 use DB;
 
@@ -26,6 +28,8 @@ class Products extends Model
     public static $shopeeStatuses = ['NORMAL', 'sold-out']; //'DELETED', 'BANNED', 'UNLIST'
 
     public static $shopifyStatuses = ['active', 'archived', 'draft'];
+
+    public static $woocommerceStatuses = ['instock', 'outofstock', 'onbackorder']; //'draft', 'pending', 'private', 'publish'
 
 
     public function shop(){

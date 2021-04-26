@@ -19,6 +19,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Shopee;
 use Oseintow\Shopify\Facades\Shopify;
+// use Automattic\WooCommerce\Client;
 
 
 class ShopController extends Controller
@@ -287,7 +288,6 @@ class ShopController extends Controller
         return view('shop.shopify_temp.create',compact('breadcrumbs', 'warehouses'));
     }
 
-
     public function storeShopiyTemp(Request $request){
 
         $validator = Validator::make($request->all(), [
@@ -335,6 +335,63 @@ class ShopController extends Controller
                 }
                 return response()->json($output);
 
+    }
+
+    // Woocommerce Temp
+    public function createWoocommerceTemp(Request $request){
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Woocommerce Shop"]
+        ];
+        $warehouses = $request->user()->business->warehouse;
+        return view('shop.woocommerce_temp.create',compact('breadcrumbs', 'warehouses'));
+    }
+
+    public function storeWoocommerceTemp(Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'regex:/^[\pL\s\-]+$/u'],
+            'domain' => 'required',
+            'short_name' => 'required',
+            'consumer_key' => 'required',
+            'consumer_secret' => 'required',
+            // 'pro_username' => 'required_if:pro_status,1',
+            // 'pro_password' => 'required_if:pro_status,1',
+            'warehouse_id' => 'required',
+         ], [
+            'name.regex' => 'Only character\'s are allowed',
+            'warehouse_id.required' => 'Please select a warehouse',
+            // 'pro_username.required_if' => 'Username field is required',
+            // 'pro_password.required_if' => 'Password field is required',
+     ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+        try {
+            $data = $request->all();
+            $data['expires_in'] = Carbon::now()->addDays(364);
+            $data['domain'] = 'https://' . $data['domain'];
+            $data['access_token'] = $data['consumer_key'];
+            $data['refresh_token'] = $data['consumer_secret'];
+            $data['site'] = 'woocommerce';
+            $data['name'] = $data['name'];
+            $data['short_name'] = $data['short_name'];
+            $data['business_id'] = $request->user()->business_id;
+            $data['warehouse_id']= $request->warehouse_id;
+
+            $shop = Shop::updateOrCreate(['domain' => $data['domain']],$data);
+
+            $output = ['success' => 1,
+                            'msg' => 'Shop added successfully!',
+                            'redirect' => action('ShopController@index')
+                        ];
+        } catch (\Exception $e) {
+                    \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+                    $output = ['success' => 0,
+                                'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                            ];
+                     DB::rollBack();
+                }
+                return response()->json($output);
     }
 
     public function edit(Shop $shop){
@@ -395,6 +452,8 @@ class ShopController extends Controller
                 $shop->syncLazadaProducts();
               }else if($shop->site == 'shopify'){
                 $shop->syncShopifyProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'woocommerce'){
+                $shop->syncWoocommerceProducts();
               }
 
               $output = ['success' => 1,
@@ -422,6 +481,8 @@ class ShopController extends Controller
                 $shop->syncLazadaProducts();
               }else if($shop->site == 'shopify'){
                 $shop->syncShopifyProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'woocommerce'){
+                $shop->syncWoocommerceProducts();
               }
 
               $output = ['success' => 1,
@@ -444,7 +505,16 @@ class ShopController extends Controller
         $shops = Shop::where('business_id', $request->user()->business_id)->whereIn('id', $request->get('ids'))->get();
         foreach($shops as $shop){
             try {
-                  $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                if($shop->site == 'shopee'){
+                    $shop->syncShopeeOrders(Carbon::now()->subDays(30)->format('Y-m-d')); //Carbon::now()->subDays(30)->format('Y-m-d')
+                }else if($shop->site == 'lazada'){
+                    $shop->syncLazadaOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                }else if($shop->site == 'shopify'){
+                    $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                }else if($shop->site == 'woocommerce'){
+                    $shop->syncWoocommerceOrders();
+                }    
+                //   $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                   $output = ['success' => 1,
                       'msg' => 'Orders successfully synced',
                   ];
@@ -473,6 +543,8 @@ class ShopController extends Controller
               }
               else if($shop->site == 'shopify'){
                 $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+              }else if($shop->site == 'woocommerce'){
+                $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
               }
               $output = ['success' => 1,
                   'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',

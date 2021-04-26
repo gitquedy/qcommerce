@@ -48,6 +48,7 @@ class syncProducts extends Command
             $shop->syncShopeeProducts(); //Carbon::now()->subDays(15)->format('Y-m-d'), '+2 day'
             $shop->syncLazadaProducts();
             $shop->syncShopifyProducts(Carbon::now()->subDays(30)->format('Y-m-d'));
+            $shop->syncWoocommerceProducts();
             $shop->touch();
             $skus = $shop->products()->where('seller_sku_id', '!=', null)->groupBy('seller_sku_id')->pluck('seller_sku_id');
             foreach ($skus as $sku) {

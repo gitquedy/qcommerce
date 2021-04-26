@@ -43,7 +43,11 @@ class OrderController extends Controller
            $statuses = Order::$shopify_statuses;
            $all_shops = $all_shops->where('site', 'shopify');
            // $selectedStatuses = ['pending','ready_to_ship','shipped'];
-        }
+        }else if ($request->get('site') == 'woocommerce'){
+            $statuses = Order::$woocommerce_statuses;
+            $all_shops = $all_shops->where('site', 'woocommerce');
+            // $selectedStatuses = [];
+         }
         if($request->get('status')){
           $selectedStatus = $request->get('status');
         }

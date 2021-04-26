@@ -70,7 +70,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/shop/massResyncOrders/', 'ShopController@massResyncOrders')->name('shop.massResyncOrders');
 
 
-		 
+		Route::get('/shop/createWoocommerceTemp', 'ShopController@createWoocommerceTemp');
+		Route::post('/shop/storeWoocommerceTemp', 'ShopController@storeWoocommerceTemp');
 		Route::get('/shop/createShopifyTemp', 'ShopController@createShopifyTemp');
 		Route::post('/shop/storeShopiyTemp', 'ShopController@storeShopiyTemp');
 		Route::get('/shop/form', 'ShopController@form')->name('shop.form');
@@ -86,6 +87,21 @@ Route::group(['middleware' => 'auth'], function()
 			Route::get('/test', 'ShopifyController@test');
 		});
 	});
+
+	//WooCommerce
+	// Route::group(['middleware' => 'permission:shop.manage'], function()
+	// {
+		// Route::get('/shop/createWoocommerceTemp', 'ShopController@createWoocommerceTemp');
+		// Route::post('/shop/storeWoocommerceTemp', 'ShopController@storeWoocommerceTemp');
+		// Route::get('/shop/form', 'ShopController@form')->name('shop.form');
+		// Route::resource('/shop', 'ShopController');
+
+		// Route::group(['prefix' => 'woocommerce'], function(){
+		// 	Route::get('/install', 'WoocommerceController@install');
+			// Route::get('/getAccessToken', 'ShopifyController@getAccessToken');
+			// Route::get('/test', 'ShopifyController@test');
+		// });
+	// });
 	
 	Route::group(['middleware' => 'permission:barcode.manage'], function()
 	{
