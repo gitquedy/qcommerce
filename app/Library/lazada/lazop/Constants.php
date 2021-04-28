@@ -1,5 +1,5 @@
 <?php
-namespace App\Library\Lazada\Lazop;
+namespace App\Library\lazada;
 class Constants
 {
 	static $log_level_debug = "DEBUG";

@@ -1,5 +1,5 @@
 <?php
-namespace App\Library\Lazada\Lazop;
+namespace App\Library\lazada;
 class LazopLogger
 {
 	public $conf = array(
