@@ -49,8 +49,8 @@
             "database/factories"
         ],
         "files": [
-            "App/Helpers/Helpers.php",
-            "App/Library/Lazada/LazopSdk.php"
+            "app/Helpers/Helper.php",
+            "app/Library/Lazada/LazopSdk.php"
         ]
     },
     "autoload-dev": {
