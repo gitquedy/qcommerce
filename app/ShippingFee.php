@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use App\Lazop;
 use App\Shop;
 use Carbon\Carbon;
-use App\Library\lazada\lazop\LazopRequest;
-use App\Library\lazada\lazop\LazopClient;
-use App\Library\lazada\lazop\UrlConstants;
+use App\Library\Lazada\Lazop\LazopRequest;
+use App\Library\Lazada\Lazop\LazopClient;
+use App\Library\Lazada\Lazop\UrlConstants;
 use DB;
 use Auth;
 
