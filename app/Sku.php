@@ -12,9 +12,9 @@ use App\Category;
 use App\Products;
 use App\Utilities;
 use Carbon\Carbon;
-use App\Library\lazada\LazopRequest;
-use App\Library\lazada\LazopClient;
-use App\Library\lazada\UrlConstants;
+use App\Library\Lazada\lazop\LazopRequest;
+use App\Library\Lazada\lazop\LazopClient;
+use App\Library\Lazada\lazop\UrlConstants;
 use Illuminate\Database\Eloquent\Model;
 
 class Sku extends Model

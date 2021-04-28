@@ -3,9 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Library\lazada\LazopRequest;
-use App\Library\lazada\LazopClient;
-use App\Library\lazada\UrlConstants;
+use App\Library\Lazada\lazop\LazopRequest;
+use App\Library\Lazada\lazop\LazopClient;
+use App\Library\Lazada\lazop\UrlConstants;
 
 class Lazop extends Model
 {

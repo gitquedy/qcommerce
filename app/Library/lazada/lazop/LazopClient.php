@@ -1,5 +1,5 @@
 <?php
-namespace App\Library\lazada;
+namespace App\Library\Lazada\lazop;
 class LazopClient
 {
 	public $appkey;
