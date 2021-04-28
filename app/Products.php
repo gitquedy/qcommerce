@@ -13,6 +13,7 @@ use App\Library\Lazada\lazop\LazopRequest;
 use App\Library\Lazada\lazop\LazopClient;
 use App\Library\Lazada\lazop\UrlConstants;
 use Oseintow\Shopify\Facades\Shopify;
+// use Automattic\WooCommerce\Client;
 use Auth;
 use DB;
 
@@ -458,14 +459,6 @@ class Products extends Model
                 ->setAccessToken($this->shop->access_token)
                 ->put('/admin/api/2020-07/products/'. $this->SkuId .'.json', $productParams);
             }
-        }
-        else if ($this->site == 'woocommerce') {
-            $data = [
-                'price' => $this->price,
-                'stock_quantity' => $this->quantity
-            ];
-            $client = $this->shop->woocommerceGetClient();
-            $client->put('products/' . $this->item_id, $data);
         }
     }
 

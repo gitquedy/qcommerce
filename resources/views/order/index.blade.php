@@ -46,12 +46,12 @@
               <label for="site3" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopify' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopify.png')}}" alt="">
                 Shopify
-                <span id="badge_shopify_total" class="badge badge-secondary"></span>
+                <span id="badge_shopee_total" class="badge badge-secondary"></span>
               </label>
               <label for="site4" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'woocommerce' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/woocommerce.png')}}" alt="">
                 WooCommerce
-                <span id="badge_woocommerce_total" class="badge badge-secondary"></span>
+                <span id="badge_shopee_total" class="badge badge-secondary"></span>
               </label>
               <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
               <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>

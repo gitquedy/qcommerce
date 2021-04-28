@@ -39,10 +39,10 @@
                     <label>Domain</label>
                     <fieldset>
                       <div class="input-group">
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2">https://</span>
-                        </div>
                         <input type="text" name="domain" class="form-control" placeholder="Domain" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                          <span class="input-group-text" id="basic-addon2"></span>
+                        </div>
                       </div>
                     </fieldset>
                 </div>

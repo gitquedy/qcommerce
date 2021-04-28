@@ -461,7 +461,7 @@ class OrderController extends Controller
                 }
                 $data[$status] = $orders->where('status', $status)->count();
             }
-        }else if ($request->site == 'shopee') {
+        }else{
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
                 $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
@@ -475,39 +475,19 @@ class OrderController extends Controller
                 $data[$status] = $orders->where('status', $status)->count();
             }
         }
-        else if($request->site == 'woocommerce') {
-            $woocommerce_statuses = Order::$woocommerce_statuses;
-            foreach($woocommerce_statuses as $status){
-                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce');
-                if(count($daterange) == 2){
-                    if($daterange[0] == $daterange[1]){
-                        $orders = $orders->whereDate('created_at', [$daterange[0]]);
-                    }else{
-                        $orders = $orders->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
-                        
-                    }
-                }
-                $data[$status] = $orders->where('status', $status)->count();
-            }
-        }
-
         $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending']);
         $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP']);
-        $data['woocommerce_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereIn('status', ['pending', 'processing', 'on-hold']);
         if(count($daterange) == 2){
             if($daterange[0] == $daterange[1]){
                 $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);
                 $data['shopee_total'] = $data['shopee_total']->whereDate('created_at', [$daterange[0]]);
-                $data['woocommerce_total'] = $data['woocommerce_total']->whereDate('created_at', [$daterange[0]]);
             }else{
                 $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
                 $data['shopee_total'] = $data['shopee_total']->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
-                $data['woocommerce_total'] = $data['woocommerce_total']->whereDate('created_at', '>=', $daterange[0])->whereDate('created_at', '<=', $daterange[1]);
             }
         }
         $data['lazada_total'] = $data['lazada_total']->count();
         $data['shopee_total'] = $data['shopee_total']->count();
-        $data['woocommerce_total'] = $data['woocommerce_total']->count();
         return response()->json(['data' => $data]); 
     }
 }
