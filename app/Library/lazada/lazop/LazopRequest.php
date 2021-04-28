@@ -1,5 +1,5 @@
 <?php
-namespace App\Library\lazada;
+namespace App\Library\Lazada\Lazop;
 class LazopRequest
 {
 	public $apiName;

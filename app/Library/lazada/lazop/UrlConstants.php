@@ -1,5 +1,5 @@
 <?php
-namespace App\Library\lazada;
+namespace App\Library\Lazada\Lazop;
 class UrlConstants
 {
 	public static $api_gateway_url_sg = "https://api.lazada.sg/rest";

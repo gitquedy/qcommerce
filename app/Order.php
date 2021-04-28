@@ -7,9 +7,9 @@ use App\Shop;
 use App\Lazop;
 use App\Utilities;
 use Carbon\Carbon;
-use App\Library\lazada\LazopRequest;
-use App\Library\lazada\LazopClient;
-use App\Library\lazada\UrlConstants;
+use App\Library\Lazada\Lazop\LazopRequest;
+use App\Library\Lazada\Lazop\LazopClient;
+use App\Library\Lazada\Lazop\UrlConstants;
 use DB;
 use Auth;
 
