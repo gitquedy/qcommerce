@@ -687,7 +687,7 @@ class Shop extends Model
             'Images' => ((array)($product['images'][0]))['src'],
             'name' => $product['name'],
             'Status' => $product['stock_status'],
-            'quantity' => $product['stock_quantity'],
+            'quantity' => ($product['stock_quantity'])? $product['stock_quantity'] : 0,
             'created_at' => Carbon::createFromTimestamp($product['date_created'])->toDateTimeString(),
             'updated_at' => Carbon::createFromTimestamp($product['date_modified'])->toDateTimeString(), 
             ];
