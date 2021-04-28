@@ -684,10 +684,14 @@ class Shop extends Model
             'SellerSku' => $product['sku'],
             'item_id' => $product['id'],
             'price' => $product['price'],
-            'Images' => ((array)($product['images'][0]))['src'],
+            'Images' => ($product['images']) ? ((array)($product['images'][0]))['src'] : '',
             'name' => $product['name'],
             'Status' => $product['stock_status'],
+<<<<<<< HEAD
             'quantity' => ($product['stock_quantity'])? $product['stock_quantity'] : 0,
+=======
+            'quantity' => (($product['stock_quantity']) ? $product['stock_quantity'] : 0),
+>>>>>>> :bug: Fixed dashboard shop performance
             'created_at' => Carbon::createFromTimestamp($product['date_created'])->toDateTimeString(),
             'updated_at' => Carbon::createFromTimestamp($product['date_modified'])->toDateTimeString(), 
             ];
@@ -707,7 +711,7 @@ class Shop extends Model
             try {
                 $orders = $woocommerce->get('orders', array('per_page' => 10, 'page' => $page));
             }catch(HttpClientException $e){
-                die("Can't get products: $e");
+                die("Can't get orders: $e");
             }
             $all_orders = array_merge($all_orders, $orders);
             $page++;

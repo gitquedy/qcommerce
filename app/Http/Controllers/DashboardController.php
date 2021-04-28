@@ -66,6 +66,9 @@ class DashboardController extends Controller
                     // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $monthlyVAL->id)->first();
                     $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
                 }
+                else if ($monthlyVAL->site == 'woocommerce') {
+                    $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
+                }
             }
 
             $pos_monthly = Sales::get_dashboard_sales('', 'month');
@@ -89,6 +92,9 @@ class DashboardController extends Controller
                 }
                 elseif ($todayVAL->site == 'shopify') {
                     // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $todayVAL->id)->first();
+                    $today_sales += (float) str_replace(",","",$todayVAL->price);
+                }
+                else if ($todayVAL->site == 'woocommerce') {
                     $today_sales += (float) str_replace(",","",$todayVAL->price);
                 }
             }
@@ -159,6 +165,9 @@ class DashboardController extends Controller
                             // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
                             $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                         }
+                        else if ($two_monthVAL->site == 'woocommerce') {
+                            $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                        }
                         // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                     }
                 }
@@ -189,6 +198,9 @@ class DashboardController extends Controller
                         }
                         elseif ($two_monthVAL->site == 'shopify') {
                             // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                            $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                        }
+                        else if ($two_monthVAL->site == 'woocommerce') {
                             $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                         }
                         // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
@@ -490,6 +502,9 @@ class DashboardController extends Controller
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $monthlyVAL->id)->first();
                 $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
             }
+            else if ($monthlyVAL->site == 'woocommerce') {
+                $monthly_sales += (float) str_replace(",","",$monthlyVAL->price);
+            }
         }
 
         $pos_monthly = Sales::get_dashboard_sales('', 'month');
@@ -513,6 +528,9 @@ class DashboardController extends Controller
             }
             elseif ($todayVAL->site == 'shopify') {
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $todayVAL->id)->first();
+                $today_sales += (float) str_replace(",","",$todayVAL->price);
+            }
+            else if ($todayVAL->site == 'woocommerce') {
                 $today_sales += (float) str_replace(",","",$todayVAL->price);
             }
         }
@@ -583,6 +601,9 @@ class DashboardController extends Controller
                         // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
                         $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                     }
+                    else if ($two_monthVAL->site == 'woocommerce') {
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                    }
                     // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                 }
             }
@@ -613,6 +634,9 @@ class DashboardController extends Controller
                     }
                     elseif ($two_monthVAL->site == 'shopify') {
                         // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $two_monthVAL->id)->first();
+                        $daily_total += (float) str_replace(",","",$two_monthVAL->price);
+                    }
+                    else if ($two_monthVAL->site == 'woocommerce') {
                         $daily_total += (float) str_replace(",","",$two_monthVAL->price);
                     }
                     // $daily_total += (float) str_replace(",","",$two_monthVAL->price);
