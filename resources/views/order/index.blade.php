@@ -46,12 +46,12 @@
               <label for="site3" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopify' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/shopify.png')}}" alt="">
                 Shopify
-                <span id="badge_shopee_total" class="badge badge-secondary"></span>
+                <span id="badge_shopify_total" class="badge badge-secondary"></span>
               </label>
               <label for="site4" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'woocommerce' ?  'active' : ''}}">
                 <img class="shop_logo" src="{{asset('images/shop/icon/woocommerce.png')}}" alt="">
                 WooCommerce
-                <span id="badge_shopee_total" class="badge badge-secondary"></span>
+                <span id="badge_woocommerce_total" class="badge badge-secondary"></span>
               </label>
               <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
               <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
@@ -180,7 +180,6 @@
           },
         });     
       }
-
     function showAllChild() {
         $('.data-list-view').DataTable().rows().every(function(){
             // If row has details collapsed
@@ -232,7 +231,6 @@
   }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
-
   function format ( d ) {
     var html = '<div class="card mb-0 border border-secondary"><div class="card-body w-50 py-1">'+d.item_list+'</div></div>';
     return html;
@@ -240,7 +238,6 @@
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
 <script type="text/javascript">
-
     $(document).ready(function(){
       var str = $('#status').val(); 
       hideShippingStatus($("input[name=status]:checked").val());
@@ -261,19 +258,16 @@
         url = "{{ action('OrderController@index')}}?site=" + site + "&status=" + default_status;
         window.location.href = url;
       });
-
       // $('#status').change(function(){
       //   var str = $(this).val(); 
       //   alert(str);
       //   hideShippingStatus(str);
       // });
-
       $(document).on('change', 'input[name=status]', function() {
           var str = $("input[name=status]:checked").val();
           hideShippingStatus(str);
       });
       
-
       function hideShippingStatus(str){
         if(str == 'READY_TO_SHIP'){
           $('.shipping_status').show();
@@ -281,7 +275,6 @@
           $('.shipping_status').hide();
         }
       }
-
   });  
   
   function print_label(){
@@ -304,9 +297,7 @@
     $('#mass_print_form').submit();
     
   }
-
   $(document).on("click", '.printPackingList', function () {
-
    var selected_ids = [];
     
    $(".dt-checkboxes").each(function(){

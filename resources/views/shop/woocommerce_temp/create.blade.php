@@ -39,10 +39,10 @@
                     <label>Domain</label>
                     <fieldset>
                       <div class="input-group">
-                        <input type="text" name="domain" class="form-control" placeholder="Domain" aria-describedby="basic-addon2">
                         <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2"></span>
+                          <span class="input-group-text" id="basic-addon2">https://</span>
                         </div>
+                        <input type="text" name="domain" class="form-control" placeholder="Domain" aria-describedby="basic-addon2">
                       </div>
                     </fieldset>
                 </div>
@@ -140,7 +140,6 @@
 @endsection
 @section('myscript')
 <script>
-
   $('.datepicker').daterangepicker({
       singleDatePicker: true,
       showDropdowns: true,
@@ -148,12 +147,10 @@
       maxYear: parseInt(moment().format('YYYY'),10),
       setDate: null
   });
-
   $(".select2").select2({
       dropdownAutoWidth: true,
       width: '100%'
     });
-
   $('select[name=warehouse_id]').on('change', function() {
       var selected = $(this).find('option:selected').val();
       if(selected == 'add_new') {
@@ -169,10 +166,6 @@
         $(this).val('').trigger('change');
       } 
   });
-
-
-
-
 </script>
 <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 
