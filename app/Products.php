@@ -461,8 +461,9 @@ class Products extends Model
         }
         else if ($this->site == 'woocommerce') {
             $data = [
-                'price' => $this->price,
-                'stock_quantity' => $this->quantity
+                'manage_stock' => true,
+                'stock_quantity' => $this->quantity,
+                'regular_price' => (string)$this->price,
             ];
             $client = $this->shop->woocommerceGetClient();
             $client->put('products/' . $this->item_id, $data);
