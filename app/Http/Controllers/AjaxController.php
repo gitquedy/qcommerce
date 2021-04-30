@@ -24,8 +24,8 @@ class AjaxController extends Controller
         
 
         
-        $orders = Order::select('id','created_at')->whereIn('shop_id',$Shop_array)->whereIn('status',['pending', 'READY_TO_SHIP', 'RETRY_SHIP', 'UNPAID'])->whereNull('seen')->get();
-        
+        $orders = Order::select('id','created_at', 'site', 'price', 'shop_id')->whereIn('shop_id',$Shop_array)->whereIn('status',['pending', 'READY_TO_SHIP', 'RETRY_SHIP', 'UNPAID','processing', 'on-hold'])->whereNull('seen')->get();
+
         $Products_unseen = Products::select('id','created_at')->whereIn('shop_id',$Shop_array)->where('seen','=',0)->get()->toArray();
         
         
@@ -120,6 +120,14 @@ class AjaxController extends Controller
         $data['order_string'] = $order_last_time;
         $data['total_new_products'] = count($Products_unseen);
         $data['last_product_time'] = $last_product_time;
+        
+        if ($orders) {
+            foreach($orders as $order) {
+                $order['short_name'] = Shop::where('id', $order->shop_id)->pluck('short_name')->first();
+            }
+        }
+
+        $data['order_value'] = $orders;
         
         $resp = array('status'=>'success','data'=>$data);
         

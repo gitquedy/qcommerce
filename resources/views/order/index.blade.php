@@ -251,7 +251,7 @@
           default_status = 'pending';
         }else if(site == 'shopify'){
           default_status = 'Open';
-        }else if(site = 'woocommerce') {
+        }else if(site == 'woocommerce') {
           default_status = 'processing';
         }
         else{
