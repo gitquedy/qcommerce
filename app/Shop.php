@@ -682,7 +682,7 @@ class Shop extends Model
             'SellerSku' => $product->sku,
             'item_id' => $product->id,
             'price' => floatval(($product->price)?$product->price:0),
-            'Images' => ($product->images) ? ((array)($product->images[0]))['src'] : '',
+            'Images' => ($product->images) ? $product->images[0]->src : '',
             'name' => $product->name,
             'Status' => $product->stock_status,
             'quantity' => ($product->stock_quantity) ? $product->stock_quantity : 0,
@@ -712,28 +712,23 @@ class Shop extends Model
         } while (count($orders) > 0);
 
         foreach($all_orders as $order) {
-            $order = (array)$order;
-            $printed = $order['status'] == 'completed' ? true : false;
             $order_details = [
-                'ordersn' => $order['id'],
-                'order_no' => $order['order_key'],
-                'payment_method' => $order['payment_method'],
-                'price' => $order['total'],
+                'ordersn' => $order->id,
+                'order_no' => $order->order_key,
+                'payment_method' => $order->payment_method,
+                'price' => $order->total,
                 'shop_id' => $this->id,
                 'site' => 'woocommerce',
-                'items_count' => count($order['line_items']),
-                'status' => $order['status'],
-                // 'tracking_no' => count($order->fulfillments) ? $order->fulfillments[0]->tracking_number : '',
-                'shipping_fee' => $order['shipping_total'],
-                // 'customer_first_name' => isset($order->customer) ? $order->customer->first_name . ' ' . $order->customer->last_name : 'No Customer',
-                'printed' => $printed,
-                'created_at' => Carbon::parse($order['date_created'])->toDateTimeString(),
-                'updated_at' => Carbon::parse($order['date_modified'])->toDateTimeString(),
+                'items_count' => count($order->line_items),
+                'status' => $order->status,
+                'shipping_fee' => $order->shipping_total,
+                'printed' => ($order->status == 'completed') ? true : false,
+                'created_at' => Carbon::parse($order->date_created)->toDateTimeString(),
+                'updated_at' => Carbon::parse($order->date_modified)->toDateTimeString(),
             ];
             $record = Order::updateOrCreate(['ordersn' => $order_details['ordersn']], $order_details);
             
-            foreach($order['line_items'] as $item) {
-                // $item = (array)$item;
+            foreach($order->line_items as $item) {
                 $product = Products::where('shop_id', $this->id)->where('item_id', $item->product_id)->first();
                 if($product != null) {
                     $item_detail = [
