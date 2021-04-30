@@ -26,16 +26,16 @@ class AjaxController extends Controller
         
         $orders = Order::select('id','created_at', 'site', 'price', 'shop_id')->whereIn('shop_id',$Shop_array)->whereIn('status',['pending', 'READY_TO_SHIP', 'RETRY_SHIP', 'UNPAID','processing', 'on-hold'])->whereNull('seen')->get();
 
-        $Products_unseen = Products::select('id','created_at')->whereIn('shop_id',$Shop_array)->where('seen','=',0)->get()->toArray();
+        $Products_unseen = Products::select('id','created_at', 'site', 'shop_id')->whereIn('shop_id',$Shop_array)->where('seen','=',0)->get();
         
         
         
         $max_unseen_product = 0;
         
         foreach($Products_unseen as $Products_unseenVAL){
-         if($max_unseen_product<strtotime($Products_unseenVAL['created_at'])){
-             $max_unseen_product = strtotime($Products_unseenVAL['created_at']);
-         }   
+            if($max_unseen_product<strtotime($Products_unseenVAL['created_at'])){
+                $max_unseen_product = strtotime($Products_unseenVAL['created_at']);
+            }   
         }
         
         $last_product = date('Y-m-d H:i:s',$max_unseen_product);
@@ -127,7 +127,14 @@ class AjaxController extends Controller
             }
         }
 
+        if ($Products_unseen) {
+            foreach($Products_unseen as $product) {
+                $product['short_name'] = Shop::where('id', $product->shop_id)->pluck('short_name')->first();
+            }
+        }
+
         $data['order_value'] = $orders;
+        $data['product_value'] = $Products_unseen;
         
         $resp = array('status'=>'success','data'=>$data);
         

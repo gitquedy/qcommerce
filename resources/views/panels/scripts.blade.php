@@ -120,7 +120,7 @@
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><img width="40px" height="40px" src="/images/shop/icon/' +  site[i] + '.png" class="img-flag" /></div>'+
                                         '<div class="media-body">'+
-                                            '<h6 class="primary media-heading">You have ' + shop_order_count[i] + ' new order!</h6><small class="notification-text">' + shop_short_name[i] + ' - Php' + shop_total_order_price[i] + '</small>'+
+                                            '<h6 class="primary media-heading">You have ' + shop_order_count[i] + ' new orders!</h6><small class="notification-text">' + shop_short_name[i] + ' - Php' + shop_total_order_price[i] + '</small>'+
                                         '</div><small>'+
                                             '<time class="media-meta" >'+main_data.order_string+'</time></small>'+
                                     '</div>'+
@@ -129,15 +129,38 @@
                 }
                 
                 if(main_data.total_new_products>0){
-                   not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=lazada">'+
+
+                  var shop = [];
+                  for (var i = 0; i < main_data.product_value.length; i++) {
+                    shop.push(main_data.product_value[i].short_name);
+                  }
+
+                  var result = countOccurences(shop);
+                  var shop_short_name = result[0];
+                  var shop_product_count = result[1];
+                  var site = new Array(shop_short_name.length).fill('');
+
+                  for (var i = 0; i < shop_short_name.length; i++) {
+                    for (var j = 0; j < main_data.product_value.length; j++) {
+                      if (shop_short_name[i] == main_data.product_value[j].short_name) {
+                        site[i] = main_data.product_value[j].site;
+                        break;
+                      }
+                    }
+                  }
+
+                  for (var i = 0; i < shop_short_name.length; i++) {
+
+                    not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=' + site[i] + '">'+
                                     '<div class="media d-flex align-items-start">'+
-                                        '<div class="media-left"><i class="feather icon-package font-medium-5 primary"></i></div>'+
+                                        '<div class="media-left"><img width="40px" height="40px" src="/images/shop/icon/' +  site[i] + '.png" class="img-flag" /></div>'+
                                         '<div class="media-body">'+
-                                            '<h6 class="primary media-heading">You have '+main_data.total_new_products+' new product</h6><small class="notification-text"> Click to see now</small>'+
+                                            '<h6 class="primary media-heading">You have ' + shop_product_count[i] + ' new product</h6><small class="notification-text">' + shop_short_name[i] + '</small>'+
                                         '</div><small>'+
                                             '<time class="media-meta" >'+main_data.last_product_time+'</time></small>'+
                                     '</div>'+
                                 '</a>';
+                  }
                 }          
                 $('#notification_area').html(not_string);
             }
