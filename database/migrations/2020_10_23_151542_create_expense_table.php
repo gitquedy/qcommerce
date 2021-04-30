@@ -26,7 +26,7 @@ class CreateExpenseTable extends Migration
             $table->float('amount', 10, 2);
             $table->float('paid', 10, 2);
             $table->string('payment_status');
-            $table->string('note')->default(null)->nullable();
+            $table->text('note')->nullable();
             $table->string('attachment')->default(null)->nullable();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
