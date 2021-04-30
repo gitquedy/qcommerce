@@ -267,6 +267,10 @@ class Order extends Model
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
                 $total += (float) str_replace(",","",$r->price);
             }
+            elseif ($r->site == 'woocommerce') {
+                // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();
+                $total += (float) str_replace(",","",$r->price);
+            }
         }
 
 

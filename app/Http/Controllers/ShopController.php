@@ -19,7 +19,6 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Shopee;
 use Oseintow\Shopify\Facades\Shopify;
-// use Automattic\WooCommerce\Client;
 
 
 class ShopController extends Controller
