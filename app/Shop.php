@@ -674,22 +674,20 @@ class Shop extends Model
             $all_products = array_merge($all_products, $products);
             $page++;
         } while (count($products) > 0);
-
         foreach($all_products as $product) {
-            $product = (array)$product;
             $product_details = [
             'shop_id' => $this->id,
             'site' => 'woocommerce',
-            'SkuId' => $product['sku'],
-            'SellerSku' => $product['sku'],
-            'item_id' => $product['id'],
-            'price' => $product['price'],
-            'Images' => ($product['images']) ? ((array)($product['images'][0]))['src'] : '',
-            'name' => $product['name'],
-            'Status' => $product['stock_status'],
-            'quantity' => ($product['stock_quantity']) ? $product['stock_quantity'] : 0,
-            'created_at' => Carbon::createFromTimestamp($product['date_created'])->toDateTimeString(),
-            'updated_at' => Carbon::createFromTimestamp($product['date_modified'])->toDateTimeString(), 
+            'SkuId' => $product->sku,
+            'SellerSku' => $product->sku,
+            'item_id' => $product->id,
+            'price' => floatval(($product->price)?$product->price:0),
+            'Images' => ($product->images) ? ((array)($product->images[0]))['src'] : '',
+            'name' => $product->name,
+            'Status' => $product->stock_status,
+            'quantity' => ($product->stock_quantity) ? $product->stock_quantity : 0,
+            'created_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_created)))->toDateTimeString(),
+            'updated_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_modified)))->toDateTimeString(),
             ];
             
             Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
