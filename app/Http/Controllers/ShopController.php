@@ -511,7 +511,7 @@ class ShopController extends Controller
                 }else if($shop->site == 'shopify'){
                     $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }else if($shop->site == 'woocommerce'){
-                    $shop->syncWoocommerceOrders();
+                    $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }    
                 //   $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                   $output = ['success' => 1,

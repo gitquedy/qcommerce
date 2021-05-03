@@ -686,8 +686,10 @@ class Shop extends Model
             'name' => $product->name,
             'Status' => $product->stock_status,
             'quantity' => ($product->stock_quantity) ? $product->stock_quantity : 0,
-            'created_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_created)))->toDateTimeString(),
-            'updated_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_modified)))->toDateTimeString(),
+            // 'created_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_created)))->toDateTimeString(),
+            // 'updated_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_modified)))->toDateTimeString(),
+            'created_at' => Carbon::parse($product->date_created)->toDateTimeString(),
+            'updated_at' => Carbon::parse($product->date_modified)->toDateTimeString(),
             ];
             
             Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);

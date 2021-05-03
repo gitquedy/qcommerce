@@ -52,6 +52,44 @@
 
               return [a, b];
             }
+
+            function timeDifference(current, previous) {
+              var msPerMinute = 60 * 1000;
+              var msPerHour = msPerMinute * 60;
+              var msPerDay = msPerHour * 24;
+              var msPerMonth = msPerDay * 30;
+
+              var elapsed = current - previous;
+              var difference = '';
+
+              if (elapsed < msPerHour) {
+                  difference += Math.round(elapsed/msPerMinute);
+                  difference += Math.round(elapsed/msPerMinute) > 1 ? ' minutes ' : ' minute ';   
+              }
+
+              else if (elapsed < msPerDay ) {
+                  difference += Math.round(elapsed/msPerHour );
+                  difference += Math.round(elapsed/msPerHour) > 1 ? ' hours ' : ' hour ';
+                  if (elapsed%msPerHour != 0) {
+                    difference += Math.round((elapsed%msPerHour)/msPerMinute);
+                    diffrence += Math.round((elapsed%msPerHour)/msPerMinute) > 1 ? ' minutes' : ' minute ';
+                  }
+              }
+
+              else if (elapsed < msPerMonth) {
+                  difference += Math.round(elapsed/msPerDay);
+                  difference += Math.round(elapsed/msPerDay) > 1 ? ' days ' : ' day ';
+                  if (elapsed%msPerDay != 0) {
+                    difference += Math.round((elapsed%msPerDay)/msPerHour);
+                    difference += Math.round((elapsed%msPerDay)/msPerHour) > 1 ? ' hours ' : ' hour ';
+                  }
+                  if (elapsed%msPerHour != 0) {
+                    difference += Math.round((elapsed%msPerHour)/msPerMinute);
+                    difference += Math.round((elapsed%msPerHour)/msPerMinute) > 1 ? ' minutes' : ' minute ';
+                  }
+              }
+              return difference;
+            }
             
             function notification_refresh(main_data){
                 if(last_notification_count != "first" && last_notification_count < main_data.total) {
@@ -83,20 +121,16 @@
                   var shop_order_count = result[1];
                   var shop_total_order_price = new Array(shop_short_name.length).fill(0);
                   var site = new Array(shop_short_name.length).fill('');
+                  var time = new Array(shop_short_name.length).fill('');
 
                   for (var i = 0; i < shop_short_name.length; i++) {
                     for (var j = 0; j < main_data.order_value.length; j++) {
                       if (shop_short_name[i] == main_data.order_value[j].short_name) {
                         shop_total_order_price[i] += main_data.order_value[j].price;
-                      }
-                    }
-                  }
-
-                  for (var i = 0; i < shop_short_name.length; i++) {
-                    for (var j = 0; j < main_data.order_value.length; j++) {
-                      if (shop_short_name[i] == main_data.order_value[j].short_name) {
-                        site[i] = main_data.order_value[j].site;
-                        break;
+                        if (site[i] == '') {
+                          site[i] = main_data.order_value[j].site;
+                          time[i] = main_data.order_value[j].created_at;
+                        }
                       }
                     }
                   }
@@ -116,13 +150,15 @@
                       var site_link = 'woocommerce&status=processing';
                     }
 
+                    var new_orders = shop_order_count[i] > 1 ? ' new orders' : ' new order';
+
                     not_string += '<a class="d-flex justify-content-between" href="{{url("/order")}}?site=' + site_link + '">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><img width="40px" height="40px" src="/images/shop/icon/' +  site[i] + '.png" class="img-flag" /></div>'+
                                         '<div class="media-body">'+
-                                            '<h6 class="primary media-heading">You have ' + shop_order_count[i] + ' new orders!</h6><small class="notification-text">' + shop_short_name[i] + ' - Php' + shop_total_order_price[i] + '</small>'+
+                                            '<h6 class="primary media-heading">You have ' + shop_order_count[i] + new_orders + '</h6><small class="notification-text">' + shop_short_name[i] + ' - Php' + shop_total_order_price[i] + '</small>'+
                                         '</div><small>'+
-                                            '<time class="media-meta" >'+main_data.order_string+'</time></small>'+
+                                            '<time class="media-meta" >' + timeDifference(new Date(), new Date(time[i])) + ' ago</time></small>'+
                                     '</div>'+
                                 '</a>';
                   }
@@ -139,11 +175,13 @@
                   var shop_short_name = result[0];
                   var shop_product_count = result[1];
                   var site = new Array(shop_short_name.length).fill('');
+                  var time = new Array(shop_short_name.length).fill('');
 
                   for (var i = 0; i < shop_short_name.length; i++) {
                     for (var j = 0; j < main_data.product_value.length; j++) {
                       if (shop_short_name[i] == main_data.product_value[j].short_name) {
                         site[i] = main_data.product_value[j].site;
+                        time[i] = main_data.product_value[j].created_at;
                         break;
                       }
                     }
@@ -151,13 +189,15 @@
 
                   for (var i = 0; i < shop_short_name.length; i++) {
 
+                    var new_products = shop_product_count[i] > 1 ? ' new products' : ' new product';
+
                     not_string += '<a class="d-flex justify-content-between" href="{{url("/product")}}?site=' + site[i] + '">'+
                                     '<div class="media d-flex align-items-start">'+
                                         '<div class="media-left"><img width="40px" height="40px" src="/images/shop/icon/' +  site[i] + '.png" class="img-flag" /></div>'+
                                         '<div class="media-body">'+
-                                            '<h6 class="primary media-heading">You have ' + shop_product_count[i] + ' new product</h6><small class="notification-text">' + shop_short_name[i] + '</small>'+
+                                            '<h6 class="primary media-heading">You have ' + shop_product_count[i] + new_products + '</h6><small class="notification-text">' + shop_short_name[i] + '</small>'+
                                         '</div><small>'+
-                                            '<time class="media-meta" >'+main_data.last_product_time+'</time></small>'+
+                                            '<time class="media-meta" >' + timeDifference(new Date(), new Date(time[i])) + ' ago</time></small>'+
                                     '</div>'+
                                 '</a>';
                   }
