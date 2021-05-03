@@ -72,7 +72,7 @@
                   difference += Math.round(elapsed/msPerHour) > 1 ? ' hours ' : ' hour ';
                   if (elapsed%msPerHour != 0) {
                     difference += Math.round((elapsed%msPerHour)/msPerMinute);
-                    diffrence += Math.round((elapsed%msPerHour)/msPerMinute) > 1 ? ' minutes' : ' minute ';
+                    difference += Math.round((elapsed%msPerHour)/msPerMinute) > 1 ? ' minutes' : ' minute ';
                   }
               }
 
