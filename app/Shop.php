@@ -725,6 +725,7 @@ class Shop extends Model
                 'status' => $order->status,
                 'shipping_fee' => $order->shipping_total,
                 'printed' => ($order->status == 'completed') ? true : false,
+                'customer_first_name' => $order->billing->first_name . ' ' . $order->billing->last_name,
                 'created_at' => Carbon::parse($order->date_created)->toDateTimeString(),
                 'updated_at' => Carbon::parse($order->date_modified)->toDateTimeString(),
             ];
@@ -736,7 +737,6 @@ class Shop extends Model
                     $item_detail = [
                         'product_id' => $product->id,
                         'order_id' => $record->id,
-                        'product_details' => $product->id,
                         'quantity' => $item->quantity,
                         'price' => $item->price,
                         'created_at' => $record->created_at,

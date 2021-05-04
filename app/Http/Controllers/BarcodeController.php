@@ -54,7 +54,7 @@ class BarcodeController extends Controller
                 {
                     $query->where('tracking_no','=', $input)
                     ->orWhere('id','=',$input)
-                    ->orWhere('ordersn', $input);
+                    ->orWhere('ordersn', '=', $input);
                 })->get()->first(); //shopee, lazada if null search in shopify with dif query
 
         if($order == null){
@@ -132,6 +132,20 @@ class BarcodeController extends Controller
                         'qty' => $item->quantity,
                         'unit_price' => $item->price,
                         'sub_total' => $item->price * $item->quantity,
+                    ];
+                }
+            } else if ($order->site == 'woocommerce') {
+                $client = $shop->woocommerceGetClient();
+                $order_items = $client->get('orders/' . $order->order_no);
+                foreach ($order_items->line_items as $item) {
+                    $sku = $item->sku;
+                    $items[$sku] = [
+                        'sku' => $sku,
+                        'pic' => '',
+                        'name' => $item->name,
+                        'qty' => $item->quantity,
+                        'unit_price' => $item->price,
+                        'sub_total' => (double)$item->subtotal,
                     ];
                 }
             }
