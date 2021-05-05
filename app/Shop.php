@@ -107,7 +107,7 @@ class Shop extends Model
             }else if($this->site == 'shopify'){
                 $this->syncShopifyOrders($date);
             }else if($this->site == 'woocommerce'){
-                $this->syncWoocommerceOrders();
+                $this->syncWoocommerceOrders($date);
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -663,7 +663,6 @@ class Shop extends Model
         $woocommerce = $this->woocommerceGetClient();
 
         $page = 1;
-        $products = [];
         $all_products = [];
         do{
             try {
@@ -697,15 +696,16 @@ class Shop extends Model
         return;
     }
 
-    public function syncWoocommerceOrders() {
+    public function syncWoocommerceOrders($date) {
         $woocommerce = $this->woocommerceGetClient();
 
         $page = 1;
-        $orders = [];
         $all_orders = [];
+        $after = Carbon::parse($date)->format('c');
+        $before = Carbon::now()->addDays(2)->format('c');
         do{
             try {
-                $orders = $woocommerce->get('orders', array('per_page' => 10, 'page' => $page));
+                $orders = $woocommerce->get('orders', array('per_page' => 10, 'page' => $page, 'after' => $after, 'before' => $before));
             }catch(HttpClientException $e){
                 die("Can't get orders: $e");
             }
