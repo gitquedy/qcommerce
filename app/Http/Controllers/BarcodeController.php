@@ -137,8 +137,14 @@ class BarcodeController extends Controller
             } else if ($order->site == 'woocommerce') {
                 $client = $shop->woocommerceGetClient();
                 $order_items = $client->get('orders/' . $order->ordersn);
+                // $count = count($order_items->$line_items);
+                $count = 0;
                 foreach ($order_items->line_items as $item) {
                     $sku = $item->sku;
+                    if ($sku == '') {
+                        $count++;
+                        $sku = 'item' . $count;
+                    }
                     $items[$sku] = [
                         'sku' => $sku,
                         'pic' => '',
