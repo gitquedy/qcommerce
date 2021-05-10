@@ -687,8 +687,8 @@ class Shop extends Model
             'quantity' => ($product->stock_quantity) ? $product->stock_quantity : 0,
             // 'created_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_created)))->toDateTimeString(),
             // 'updated_at' => Carbon::createFromTimestamp(date("Y-m-d H:i:s",strtotime($product->date_modified)))->toDateTimeString(),
-            'created_at' => Carbon::parse($product->date_created)->toDateTimeString(),
-            'updated_at' => Carbon::parse($product->date_modified)->toDateTimeString(),
+            'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($product->date_created) + 8 * 3600))->toDateTimeString(),
+            'updated_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($product->date_modified) + 8 * 3600))->toDateTimeString(),
             ];
             
             Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
@@ -726,8 +726,10 @@ class Shop extends Model
                 'shipping_fee' => $order->shipping_total,
                 'printed' => ($order->status == 'completed') ? true : false,
                 'customer_first_name' => $order->billing->first_name . ' ' . $order->billing->last_name,
-                'created_at' => Carbon::parse($order->date_created)->toDateTimeString(),
-                'updated_at' => Carbon::parse($order->date_modified)->toDateTimeString(),
+                // 'created_at' => Carbon::parse($order->date_created)->toDateTimeString(),
+                // 'updated_at' => Carbon::parse($order->date_modified)->toDateTimeString(),
+                'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($order->date_created) + 8 * 3600))->toDateTimeString(),
+                'updated_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($order->date_modified) + 8 * 3600))->toDateTimeString(),
             ];
             $record = Order::updateOrCreate(['ordersn' => $order_details['ordersn']], $order_details);
             
