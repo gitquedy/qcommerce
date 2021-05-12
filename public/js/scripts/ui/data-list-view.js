@@ -15,7 +15,7 @@ $(document).ready(function () {
   "use strict";
     table = $(".data-list-view").DataTable({
         processing: true,
-        serverSide: false,
+        serverSide: true,
         ajax: table_route,
         columns: columnns,
         createdRow: created_row_function,
