@@ -23,7 +23,7 @@ class Sku extends Model
     	
     
     // protected $fillable = ['business_id','item_id', 'shop_id', 'SellerSku', 'primary_category', 'name', 'brand', 'supplier' , 'cost', 'price', 'quantity', 'Available', 'updated_at', 'created_at'];
-    protected $fillable = ['business_id','code', 'name', 'brand', 'category', 'supplier', 'cost', 'price' , 'quantity', 'alert_quantity'];
+    protected $fillable = ['business_id','code', 'name', 'brand', 'category', 'supplier', 'cost', 'price' , 'quantity', 'alert_quantity', 'type'];
     
     public function SkuImage() {
         if($this->products->first()) {
@@ -49,6 +49,10 @@ class Sku extends Model
 	public function warehouse_items() {
 		return $this->hasMany(WarehouseItems::class, 'sku_id', 'id');
 	}
+
+    public function set_items() {
+        return $this->hasMany(SetItem::class, 'sku_set_id', 'id');
+    }
     
     public static function syncStocks($warehouse_id, $items) {
         foreach ($items as $item) {

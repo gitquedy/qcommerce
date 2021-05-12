@@ -42,15 +42,15 @@
           @csrf
           <div class="row">
               <div class="col-md-6 form-group">
-                  <lable>SKU Code</lable>
+                  <label>SKU Code</label>
                   <input class="form-control" name="code">
               </div>
               <div class="col-md-6 form-group">
-                  <lable>Product Name</lable>
+                  <label>Product Name</label>
                   <input class="form-control" name="name">
               </div>
 <!--           <div class="col-md-6 form-group">
-                <lable>Brand</lable>
+                <label>Brand</label>
                 <div class="form-group">
                     <div class="input-group">
                       <select class="form-control s280" id="brand" name="brand" style="width:80% !important">
@@ -66,7 +66,7 @@
                   </div>
             </div>
             <div class="col-md-6 form-group">
-                <lable>Category</lable>
+                <label>Category</label>
                 <div class="form-group">
                     <div class="input-group">
                       <select class="form-control s280" name="category" id="category">
@@ -82,7 +82,7 @@
                   </div>
             </div> -->
               <div class="col-md-6 form-group">
-                  <lable>Supplier</lable>
+                  <label>Supplier</label>
                   <div class="form-group">
                       <div class="input-group">
                         <select class="form-control s280" name="supplier" id="supplier">
@@ -100,16 +100,28 @@
                     </div>
               </div>
               <div class="col-md-6 form-group">
-                  <lable>Cost</lable>
+                  <label>Cost</label>
                   <input type="number" step="any" class="form-control" name="cost">
               </div>
               <div class="col-md-6 form-group">
-                  <lable>Price</lable>
+                  <label>Price</label>
                   <input type="number" step="any" class="form-control" name="price">
               </div>
               <div class="col-md-6 form-group">
-                  <lable>Alert Quantity</lable>
+                  <label>Alert Quantity</label>
                   <input type="number" class="form-control"  name="alert_quantity">
+              </div>
+              <div class="col-md-6 form-group">
+                  <label>Product Type</label>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <select class="form-control s280" name="type" id="type">
+                        <option value="" disabled selected></option>
+                        <option  value="single">Single</option>
+                        <option  value="set">Set</option>
+                      </select>
+                    </div>
+                  </div>
               </div>
               <div class="col-md-12 text-right">
                   <br/>
@@ -148,11 +160,11 @@
          <form  onsubmit="process_add_brand(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
-                  <lable>Code</lable>
+                  <label>Code</label>
                   <input class="form-control" id="brand_code" required>
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Name</lable>
+                  <label>Name</label>
                   <input class="form-control" id="brand_name" required>
               </div>
           </div>
@@ -196,15 +208,15 @@
          <form  onsubmit="process_add_category(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
-                  <lable>Code</lable>
+                  <label>Code</label>
                   <input class="form-control" id="category_code" required>
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Name</lable>
+                  <label>Name</label>
                   <input class="form-control" id="category_name" required>
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Parent Category</lable>
+                  <label>Parent Category</label>
                   <select class="form-control s2" name="category_parent" id="category2" >
                               <option value="">select</option>
                     
@@ -249,19 +261,19 @@
          <form  onsubmit="process_add_supplier(event)" >
           <div class="row">
               <div class="col-md-12 form-group">
-                  <lable>Company</lable>
+                  <label>Company</label>
                   <input class="form-control" id="company" required>
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Contact Person</lable>
+                  <label>Contact Person</label>
                   <input class="form-control" id="contact_person" required>
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Mobile Number</lable>
+                  <label>Mobile Number</label>
                   <input class="form-control" id="phone">
               </div>
               <div class="col-md-12 form-group">
-                  <lable>Email</lable>
+                  <label>Email</label>
                   <input class="form-control" id="email">
               </div>
           </div>

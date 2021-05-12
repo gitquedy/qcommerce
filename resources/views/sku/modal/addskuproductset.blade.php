@@ -1,5 +1,5 @@
 <div class="modal-dialog modal-md" role="document">
-	<form action="{{ route('sku.addproduct') }}" id="add_sku_product" method="POST" class="form" enctype='multipart/form-data'>
+	<form action="{{ route('sku.addproductset') }}" id="add_sku_product_set" method="POST" class="form" enctype='multipart/form-data'>
     @method('POST')
 		@csrf
   <div class="modal-content">
@@ -11,21 +11,21 @@
 	<div class="modal-body">
     <input type="hidden" id="sku_id" name="sku_id" value="{{$id}}">
     <div class="text-bold-600 font-medium-2">
-      Shop:
+      SKU:
     </div>
     <div class="form-group">
-      <select name="shop" id="ap_shop" class="select2 form-control ap_reset">
+      <select name="sku" id="ap_sku" class="select2 form-control ap_reset">
         <option value="" disabled hidden selected></option>
-        @foreach($all_shops as $shop)
-          <option value="{{ $shop->id }}">{{ $shop->name . ' (' . $shop->short_name . ')' }} - {{ ucfirst($shop->site) }}</option>
-        @endforeach
+          @foreach($all_skus as $sku)
+            <option value="{{ $sku->id }}">{{ $sku->name . ' (' . $sku->code . ')' }}</option>
+          @endforeach
       </select>
     </div>
     <div class="text-bold-600 font-medium-2">
-      Product:
+      Quantity:
     </div>
     <div class="form-group">
-      <select name="product" id="ap_product" class="select2 form-control ap_reset"></select>
+      <input type="number" class="form-control" name="quantity">
     </div>
   </div>
 	<div>
@@ -44,27 +44,27 @@
           width: '100%'
         });
 
-       $(".view_modal").on('change', '#ap_shop', function() {
-          $("#ap_product").html('').trigger('change');
-          $.ajax({
-            url :  "{{ route('product.ajaxlistproduct') }}",
-            type: "POST",
-            dataType: "JSON",
-            data: 'shop_id='+$(this).val(),
-            success: function (response) {
-              if(response) {
-                $("#ap_product").html('').trigger('change');
-                $.each(response, function(k, prod) {
-                    var disabled = (prod['seller_sku_id'])?'disabled':'';
-                    var newOption = '<option value="'+prod['id']+'" '+disabled+'>'+prod['name']+'</option>';
-                    $(".modal #ap_product").append(newOption).trigger('change');
-                });
-              }
-            }
-          });
-       });
+      //  $(".view_modal").on('change', '#ap_sku', function() {
+      //     $("#ap_product").html('').trigger('change');
+      //     $.ajax({
+      //       url :  "{{ route('sku.ajaxlistsku') }}",
+      //       type: "POST",
+      //       dataType: "JSON",
+      //       data: 'shop_id='+$(this).val(),
+      //       success: function (response) {
+      //         if(response) {
+      //           $("#ap_product").html('').trigger('change');
+      //           $.each(response, function(k, prod) {
+      //               var disabled = (prod['seller_sku_id'])?'disabled':'';
+      //               var newOption = '<option value="'+prod['id']+'" '+disabled+'>'+prod['name']+'</option>';
+      //               $(".modal #ap_product").append(newOption).trigger('change');
+      //           });
+      //         }
+      //       }
+      //     });
+      //  });
 
-       $("#add_sku_product").submit(function(e) {
+       $("#add_sku_product_set").submit(function(e) {
           e.preventDefault();
           $.ajax({
             url :  $(this).attr('action'),
@@ -74,6 +74,7 @@
             success: function (response) {
               if(response) {
                 $('.view_modal').html('').modal('toggle');
+                location.reload();
               }
             }
           });

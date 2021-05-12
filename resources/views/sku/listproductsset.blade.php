@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Link SKU Products')
+@section('title', 'Link SKU Set')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -101,12 +101,12 @@
                 <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                     <input type="checkbox">
                 </th>
-                <th>Shop</th>
+                <!-- <th>Shop</th> -->
                 <!-- <th>Model</th> -->
                 <th>Image</th>
                 <th>Name</th>
-                <th>Price</th>
                 <th>Quantity</th>
+                <th>Price</th>
                 <th>Actions</th>
                 
               </tr>
@@ -144,7 +144,7 @@
                 className:'dt-checkboxes-cell'
                 
             },
-            { data: 'shop', name: 'shop'},
+            // { data: 'shop', name: 'shop'},
             // { data: 'model', name: 'model'},
             { data: 'image', name: 'image', orderable : false,
             "render": function (data){
@@ -153,21 +153,21 @@
                 
             },
             { data: 'name', name: 'name' },
-            { data: 'price', name: 'price'},
-            { data: 'quantity', name: 'quantity'},
+            { data: 'set_quantity', name: 'set_quantity'},
+            { data: 'unit_price', name: 'unit_price'},
             { data: 'action', name: 'action', orderable : false}
         ];
   var table_route = {
-          url: '{{ route('sku.skuproducts', $sku->id) }}',
+          url: '{{ route('sku.skuproductsset', $sku->id) }}',
           data: function (data) {
                 // data.timings = $("#timings").val();
             }
         };
   var buttons = [
-            { text: "<i class='feather icon-link'></i> Link Products",
+            { text: "<i class='feather icon-link'></i> Link/Edit Set",
             action: function() {
               $.ajax({
-                url :  "{{ route('sku.addproductmodal') }}",
+                url :  "{{ route('sku.addproductsetmodal') }}",
                 type: "POST",
                 data: 'id={{$sku->id}}',
                 success: function (response) {
