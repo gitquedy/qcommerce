@@ -103,6 +103,7 @@
                 </th>
                 <!-- <th>Shop</th> -->
                 <!-- <th>Model</th> -->
+                <th>Code</th>
                 <th>Image</th>
                 <th>Name</th>
                 <th>Quantity</th>
@@ -146,6 +147,7 @@
             },
             // { data: 'shop', name: 'shop'},
             // { data: 'model', name: 'model'},
+            { data: 'code', name: 'code' },
             { data: 'image', name: 'image', orderable : false,
             "render": function (data){
                     return '<img src="'+data+'" class="product_image">';

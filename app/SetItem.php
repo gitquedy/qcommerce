@@ -9,7 +9,7 @@ class SetItem extends Model
 {
 	protected $table = 'set_item';
 
-    protected $fillable = ['sku_set_id', 'sku_single_id', 'name', 'set_quantity', 'unit_price', 'created_at' , 'updated_at'];
+    protected $fillable = ['sku_set_id', 'sku_single_id', 'code', 'name', 'set_quantity', 'unit_price', 'created_at' , 'updated_at'];
 
     // public $timestamps = false;
 

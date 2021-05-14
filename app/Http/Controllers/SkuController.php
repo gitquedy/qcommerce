@@ -50,7 +50,7 @@ class SkuController extends Controller
             $business_id = Auth::user()->business_id;
             
                
-           $Sku = Sku::where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
+           $Sku = Sku::with('products')->where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
            
            
             return Datatables::eloquent($Sku)
@@ -500,6 +500,7 @@ class SkuController extends Controller
         $data = [
             'sku_set_id' => $sku_set->id,
             'sku_single_id' => $sku_product->id,
+            'code' => $sku_product->code,
             'name' => $sku_product->name,
             'unit_price' => $sku_product->price,
             // 'SellerSku' => $sku->code,

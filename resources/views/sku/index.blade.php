@@ -130,7 +130,7 @@
               },
             },
             { data: 'name', name: 'name'},
-            { data: 'link_shop', name: 'link_shop'},
+            { data: 'link_shop', name: 'products.shop_id'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity'},
