@@ -507,14 +507,16 @@ class SkuController extends Controller
             'set_quantity' => $quantity
         ];  
 
-        SetItem::updateOrCreate(['sku_set_id' => $sku_set->id, 'sku_single_id' => $sku_product->id], $data);
+        $result = SetItem::updateOrCreate(['sku_set_id' => $sku_set->id, 'sku_single_id' => $sku_product->id], $data);
 
         $sku_set_quantity = $this->computeSetQuantity($sku_set->id);
         $sku_set->update(['quantity' => $sku_set_quantity]); //update sku parent's quantity based on the computation
 
-        foreach($sku_set->products as $product) {
-            $result = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
-            $response = $product->updatePlatform();
+        if (isset($sku_set->products)) {
+            foreach($sku_set->products as $product) {
+                $result_prod = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
+                $response = $product->updatePlatform();
+            }
         }
   
         print json_encode($result);
@@ -560,9 +562,11 @@ class SkuController extends Controller
             $sku_set_quantity = $this->computeSetQuantity($request->sku_id);
             $sku->update(['quantity' => $sku_set_quantity]);
 
-            foreach($sku->products as $product) {
-                $result = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
-                $response = $product->updatePlatform();
+            if (isset($sku->products)) {
+                foreach($sku->products as $product) {
+                    $result = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
+                    $response = $product->updatePlatform();
+                }
             }
         }
         print json_encode($return);
