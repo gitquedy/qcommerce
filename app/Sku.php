@@ -135,4 +135,19 @@ class Sku extends Model
         };
         return response()->stream($callback, 200, $headers);
     }
+
+    public function computeSetQuantity() {
+        if ($this->type == 'set') {
+            $set_items = SetItem::get_set_item_query()->where('sku_set_id', $this->id)->get();
+
+            $quantity_array = array();
+            foreach ($set_items as $item) {
+                $quantity_array[] = (int)($item->single_quantity / $item->set_quantity); //computation for available sku parent quantity based on sku child's quantity per set
+            }
+
+            $set_quantity = min($quantity_array); //computation for available sku parent quantity based on sku child's quantity per set
+
+            return $set_quantity;
+        }
+    }
 }

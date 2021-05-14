@@ -239,6 +239,7 @@ class BarcodeController extends Controller
                     }
                     //set products
                     else if ($prod->sku->type == 'set') {
+                        //sku child
                         foreach ($sku->set_items as $set_item) {
                             $sku = Sku::whereId($set_item->sku_single_id)->where('business_id', Auth::user()->business_id)->first();
                             $set_quantity = $set_item->set_quantity;
@@ -256,18 +257,18 @@ class BarcodeController extends Controller
                             $result = $sku->save();
 
                             $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
-                            foreach ($Sku_prod as $prod) {
-                                $shop_id = $prod->shop_id;
-                                $prod = Products::where('id', $prod->id)->first();
-                                $prod->quantity = $warehouse_item->quantity;
-                                $prod->save();
+                            foreach ($Sku_prod as $product) {
+                                $shop_id = $product->shop_id;
+                                $product = Products::where('id', $product->id)->first();
+                                $product->quantity = $warehouse_item->quantity;
+                                $product->save();
                                     $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                                     <Request>
                                         <Product>
                                             <Skus>
                                                 <Sku>
-                                                    <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                                    <quantity>'.$prod->quantity.'</quantity>
+                                                    <SellerSku>'.$product->SellerSku.'</SellerSku>
+                                                    <quantity>'.$product->quantity.'</quantity>
                                                 </Sku>
                                             </Skus>
                                         </Product>
@@ -278,6 +279,37 @@ class BarcodeController extends Controller
                                     // }
                                     $prod->updatePlatform();
                                 }
+                            }
+                        }
+                        
+                        //sku parent
+                        $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
+                        $sku->quantity = $sku->computeSetQuantity();
+                        $result = $sku->save();
+
+                        $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
+                        foreach ($Sku_prod as $prod) {
+                            $shop_id = $prod->shop_id;
+                            $prod = Products::where('id', $prod->id)->first();
+                            // $prod->quantity = $warehouse_item->quantity;
+                            $prod->quantity = $sku->computeSetQuantity();
+                            $prod->save();
+                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
+                                <Request>
+                                    <Product>
+                                        <Skus>
+                                            <Sku>
+                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
+                                                <quantity>'.$prod->quantity.'</quantity>
+                                            </Sku>
+                                        </Skus>
+                                    </Product>
+                                </Request>';
+                            if(env('lazada_sku_sync', true)){
+                                // if($prod->site == 'lazada'){
+                                //     $response = $prod->product_price_quantity_update($xml);
+                                // }
+                                $prod->updatePlatform();
                             }
                         }
                     }

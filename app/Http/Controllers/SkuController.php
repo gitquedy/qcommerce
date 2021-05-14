@@ -336,7 +336,7 @@ class SkuController extends Controller
                     ];
                 }
                 else if ($sku->type == 'set') {
-                    $sku_set_quantity = $this->computeSetQuantity($sku->id);
+                    $sku_set_quantity = $sku->computeSetQuantity();
 
                     $data = [
                         'seller_sku_id' => $sku->id,
@@ -423,25 +423,19 @@ class SkuController extends Controller
            
             $Sku_prod = SetItem::whereIn('sku_single_id', $Sku_array)->where('sku_set_id','=',$sku->id)->orderBy('updated_at', 'desc');
 
-            // $sku_set_quantity = $this->computeSetQuantity($sku->id);
-            // $sku->update(['quantity' => $sku_set_quantity]);
            
             return Datatables::eloquent($Sku_prod)
-                    //     ->addColumn('shop', function(Products $product) {
-                    //         return $product->shop->getImgSiteDisplay();
-                    //             })
                         ->addColumn('image', function(SetItem $setitem) {
                             $sku_single = Sku::where('id', $setitem->sku_single_id)->first();
                             return $sku_single->SkuImage();
                         })
                         ->addColumn('action', function(SetItem $setitem) {
-                            // $sku_set = Sku::where('id', $setitem->sku_set_id)->first();
                             return '<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to Unlink '. $setitem->name .' ?" data-text="This SKU Product will no longer sync to this SKU Set." data-method="POST" data-href="'.route('sku.removeskuproductset',['id'=>$setitem->id, 'sku_id'=>$setitem->sku->id]).'" > Unlink</a>
-                        
+                        <a class="dropdown-item" href="'.route('sku.skuproducts',$setitem->sku->id).'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
                     </div></div>';
                                 })
                         ->rawColumns(['action'])
@@ -509,7 +503,7 @@ class SkuController extends Controller
 
         $result = SetItem::updateOrCreate(['sku_set_id' => $sku_set->id, 'sku_single_id' => $sku_product->id], $data);
 
-        $sku_set_quantity = $this->computeSetQuantity($sku_set->id);
+        $sku_set_quantity = $sku_set->computeSetQuantity();
         $sku_set->update(['quantity' => $sku_set_quantity]); //update sku parent's quantity based on the computation
 
         if (isset($sku_set->products)) {
@@ -520,19 +514,6 @@ class SkuController extends Controller
         }
   
         print json_encode($result);
-    }
-
-    public function computeSetQuantity($id) {
-        $set_item = SetItem::get_set_item_query()->where('sku_set_id', $id)->get();
-
-        $quantity_array = array();
-        foreach ($set_item as $item) {
-            $quantity_array[] = (int)($item->single_quantity / $item->set_quantity); //computation for available sku parent quantity based on sku child's quantity per set
-        }
-
-        $set_quantity = min($quantity_array); //computation for available sku parent quantity based on sku child's quantity per set
-
-        return $set_quantity;
     }
 
     public function removeskuproduct(Request $request){
@@ -559,7 +540,7 @@ class SkuController extends Controller
             $return = array('success' => true, 'msg' => "SKU Unlink Successfully.");
 
             $sku = Sku::where('id', $request->sku_id)->first();
-            $sku_set_quantity = $this->computeSetQuantity($request->sku_id);
+            $sku_set_quantity = $sku->computeSetQuantity();
             $sku->update(['quantity' => $sku_set_quantity]);
 
             if (isset($sku->products)) {
