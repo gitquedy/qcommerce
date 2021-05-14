@@ -35,7 +35,7 @@ class Order extends Model
         'Open','Closed',
      ];
      public static $woocommerce_statuses = [
-        'pending', 'processing', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed', 'trash'
+        'pending', 'processing', 'on-hold', 'shipped', 'completed', 'cancelled', 'refunded', 'failed', 'trash'
      ];
 
      
