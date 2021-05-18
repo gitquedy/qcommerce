@@ -112,17 +112,44 @@
                   <input type="number" class="form-control"  name="alert_quantity">
               </div>
               <div class="col-md-6 form-group">
-                  <label>Product Type</label>
-                  <div class="form-group">
-                    <div class="input-group">
-                      <select class="form-control s280" name="type" id="type">
-                        <option value="" disabled selected></option>
-                        <option  value="single">Single</option>
-                        <option  value="set">Set</option>
+                <label>Product Type</label>
+                <div class="form-group">
+                  <div class="input-group">
+                    <select class="form-control s280" name="type" id="type">
+                      <option value="" disabled selected></option>
+                      <option  value="single">Single</option>
+                      <option  value="set">Set</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="text-bold-600 font-medium-2 col-md-12 form-group optional set" style="display:none">
+                Add Products to Set
+                <hr>
+                <div class="row">
+                  <div class="text-bold-600 font-medium-1 col-md-6">
+                    SKU:
+                    <div class="form-group">
+                      <select name="sku" id="ap_sku" class="select2 form-control ap_reset">
+                        <option value="" disabled hidden selected></option>
+                          @foreach($all_skus as $sku)
+                            <option value="{{ $sku->id }}">{{ $sku->name . ' (' . $sku->code . ')' }}</option>
+                          @endforeach
                       </select>
                     </div>
                   </div>
+                  <div class="text-bold-600 font-medium-1 col-md-4">
+                    Quantity:
+                    <div class="form-group">
+                      <input type="number" class="form-control" name="quantity" id="quantity">
+                    </div>
+                  </div>
+                  <div class="align-self-center col-md-2">
+                    <button type="button" onclick="addProducts(event)" class="btn btn-primary no-print btn_save"><i class="fa fa-link"></i> Add Product </button>
+                  </div>
+                </div>
               </div>
+              <div class="col-md-12 form-group" id="products_list"></div>
               <div class="col-md-12 text-right">
                   <br/>
                   <button class="btn btn-primary">Save</button>
@@ -440,7 +467,41 @@ function process_add_supplier(e){
     });
 }
 
+$("#type").change(function () {
+    // hide all optional elements
+    $('.optional').css('display','none');
 
+    $("#type option:selected").each(function () {
+        if($(this).val() == "set") {
+            $('.set').css('display','block');
+        }
+    });
+});
+
+function addProducts(e) {
+  if ($("#ap_sku").val()){
+    var product_row = '<div class="row product_row">'+
+                        '<div class="form-group col-md-6 sku">'+
+                          '<input type="hidden" class="form-control id" name="sku_id[]" value="'+$("#ap_sku").val()+'">'+
+                          '<input class="form-control" name="sku_name[]" value="'+$("#ap_sku option:selected").text()+'" readonly>'+
+                        '</div>'+
+                        '<div class="form-group col-md-4"><input type="number" class="form-control" name="set_quantity[]" value="'+$("#quantity").val()+'"></div>'+
+                        '<div class="col-md-2"><button type="button" onclick="removeProduct(event)" class="btn btn-danger remove">\u00D7</button></div>'+
+                      '</div>';
+    $('#products_list').append(product_row);
+    $("#ap_sku option:selected").attr('disabled','disabled');
+    $('#ap_sku').prop('selectedIndex',0);
+    $('input[name=quantity]').val('');
+  }
+}
+
+function removeProduct(e) {
+  $(document).on('click', '.remove', function() {
+    var sku_val = $(this).parent().siblings('.sku').children('.id').val();
+    $("#ap_sku option[value="+sku_val+"]").removeAttr('disabled');
+    $(this).parent().parent().remove();
+  });
+}
 
 
 </script>

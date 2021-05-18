@@ -141,7 +141,7 @@ class SkuController extends Controller
     }
     
     
-    public function create(){
+    public function create(Request $request){
         $user = Auth::user();
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"SKU  Create"]
@@ -150,13 +150,16 @@ class SkuController extends Controller
         // $Category = Category::auth_category();
         // $Brand = Brand::auth_brand();
         $Supplier = Supplier::auth_supplier();
+        $all_skus = Sku::where('business_id', $request->user()->business_id)->where('type', 'single')->orderBy('updated_at', 'desc')->get();
         
         return view('sku.create', [
             'breadcrumbs' => $breadcrumbs,
             // 'Category'=> $Category,
             // 'Brand'=> $Brand,
             'Supplier' => $Supplier
-            ]);
+            ],
+            compact ('all_skus')
+        );
         
     }
     
@@ -171,7 +174,11 @@ class SkuController extends Controller
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
-            'type' => 'required'
+            'type' => 'required',
+            'sku_name' => 'required|array',
+            'sku_name.*' => 'required',
+            'set_quantity' => 'required|array',
+            'set_quantity.*' => 'required|numeric',
         ]);
         // if ($validator->fails()) {
         //     return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
@@ -194,7 +201,20 @@ class SkuController extends Controller
         }else{
             $request->session()->flash('flash_error',"something Went wrong !");
         }
-        
+
+        //code for adding products in set during sku creation
+        for ($index = 0; $index < count($request->sku_id); $index++) {
+            $setitem = new SetItem();
+            $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
+            $setitem->sku_set_id = $sku->id;
+            $setitem->sku_single_id = $request->sku_id[$index];
+            $setitem->code = $item->code;
+            $setitem->name = $item->name;
+            $setitem->unit_price = $item->price;
+            $setitem->set_quantity = $request->set_quantity[$index];
+            $setitem->save();
+        }
+
         return redirect('/sku/skuproducts/'.$sku->id);
         
     }
@@ -474,10 +494,11 @@ class SkuController extends Controller
             'seller_sku_id' => $sku->id,
             'price' => $sku->price,
             // 'SellerSku' => $sku->code,
-            'quantity' => $sku->quantity
+            'quantity' => $sku->quantity,
         ];  
 
         $result = $product->update($data);
+        $product->update(['quantity' => $product->getWarehouseQuantity()]);
 
         $response = $product->updatePlatform();
   
