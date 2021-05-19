@@ -175,11 +175,15 @@ class SkuController extends Controller
             'price' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
             'type' => 'required',
-            'sku_name' => 'required|array',
-            'sku_name.*' => 'required',
-            'set_quantity' => 'required|array',
-            'set_quantity.*' => 'required|numeric',
         ]);
+        if ($request->type == 'set') {
+            $request->validate([
+                'sku_name' => 'required|array',
+                'sku_name.*' => 'required',
+                'set_quantity' => 'required|array',
+                'set_quantity.*' => 'required|numeric',
+            ]);
+        }
         // if ($validator->fails()) {
         //     return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         // }
@@ -203,16 +207,18 @@ class SkuController extends Controller
         }
 
         //code for adding products in set during sku creation
-        for ($index = 0; $index < count($request->sku_id); $index++) {
-            $setitem = new SetItem();
-            $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
-            $setitem->sku_set_id = $sku->id;
-            $setitem->sku_single_id = $request->sku_id[$index];
-            $setitem->code = $item->code;
-            $setitem->name = $item->name;
-            $setitem->unit_price = $item->price;
-            $setitem->set_quantity = $request->set_quantity[$index];
-            $setitem->save();
+        if ($request->type == 'set') {
+            for ($index = 0; $index < count($request->sku_id); $index++) {
+                $setitem = new SetItem();
+                $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
+                $setitem->sku_set_id = $sku->id;
+                $setitem->sku_single_id = $request->sku_id[$index];
+                $setitem->code = $item->code;
+                $setitem->name = $item->name;
+                $setitem->unit_price = $item->price;
+                $setitem->set_quantity = $request->set_quantity[$index];
+                $setitem->save();
+            }
         }
 
         return redirect('/sku/skuproducts/'.$sku->id);
@@ -236,6 +242,7 @@ class SkuController extends Controller
         ];
         
         $Sku = Sku::find($id);
+        $all_skus = Sku::with('set_items')->where('business_id', $request->user()->business_id)->where('type', 'single')->orderBy('updated_at', 'desc')->get();
         
         // $Category = Category::auth_category();
         // $Brand = Brand::auth_brand();
@@ -248,7 +255,9 @@ class SkuController extends Controller
             // 'Category'=> $Category,
             // 'Brand'=> $Brand,
             'Supplier' => $Supplier
-            ]);
+            ],
+            compact ('all_skus')
+        );
         
     }
     
@@ -269,7 +278,16 @@ class SkuController extends Controller
             'cost' => 'required|numeric',
             'price' => 'required|numeric',
             'alert_quantity' => 'required|numeric',
+            'type' => 'required',
         ]);
+        if ($request->type == 'set') {
+            $request->validate([
+                'sku_name' => 'required|array',
+                'sku_name.*' => 'required',
+                'set_quantity' => 'required|array',
+                'set_quantity.*' => 'required|numeric',
+            ]);
+        }
         $sku = Sku::find($request->id);
         $sku->code = $request->code;
         $sku->name = $request->name;
@@ -279,17 +297,54 @@ class SkuController extends Controller
         $sku->cost = $request->cost;
         $sku->price = $request->price;
         $sku->alert_quantity = $request->alert_quantity;
+        $sku->type = $request->type;
+
+        if ($request->type == 'set') {
+            for ($index = 0; $index < count($request->sku_id); $index++) {
+                $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
+                $data = [
+                    'sku_set_id' => $sku->id,
+                    'sku_single_id' => $request->sku_id[$index],
+                    'code' => $item->code,
+                    'name' => $item->name,
+                    'unit_price' => $item->price,
+                    'set_quantity' => $request->set_quantity[$index],
+                ];
+                SetItem::updateOrCreate(['sku_set_id' => $sku->id, 'sku_single_id' => $request->sku_id[$index]], $data);
+            }
+            foreach ($sku->set_items as $item) {
+                if (!in_array($item->sku_single_id, $request->sku_id)) {
+                    $item->delete();
+                }
+            }
+        }
         
         if($sku->save()){
             foreach ($sku->products as $product) {
-                $data = [
-                    'seller_sku_id' => $sku->id,
-                    'price' => $sku->price,
-                    // 'SellerSku' => $sku->code,
-                    'quantity' => $sku->quantity
-                ];
+                if ($sku->type == 'single') {
+                    $data = [
+                        'seller_sku_id' => $sku->id,
+                        'price' => $sku->price,
+                        // 'SellerSku' => $sku->code,
+                        'quantity' => $sku->quantity
+                    ];
+    
+                    $result = $product->update($data);
+                    $product->update(['quantity' => $product->getWarehouseQuantity()]);
+                }
+                else if ($sku->type == 'set') {
+                    $sku_set_quantity = $sku->computeSetQuantity();
 
-                $result = $product->update($data);
+                    $data = [
+                        'seller_sku_id' => $sku->id,
+                        'price' => $sku->price,
+                        // 'SellerSku' => $sku->code,
+                        // 'quantity' => $product->getWarehouseQuantity()
+                        'quantity' => $sku_set_quantity
+                    ];
+
+                    $result = $product->update($data);
+                }
 
                 $response = $product->updatePlatform();
             }

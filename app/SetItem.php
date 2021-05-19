@@ -26,8 +26,8 @@ class SetItem extends Model
 
     // public function toArray(){
     // 	$data = parent::toArray();
-    // 	if($this->product){
-    // 		$data['product_details'] = $this->product;
+    // 	if($this->sku){
+    // 		$data['item_details'] = $this->sku;
     // 	}
     // 	return $data;
     // }

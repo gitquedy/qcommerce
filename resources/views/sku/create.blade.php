@@ -123,7 +123,7 @@
                   </div>
                 </div>
               </div>
-              <div class="text-bold-600 font-medium-2 col-md-12 form-group optional set" style="display:none">
+              <div class="text-bold-600 font-medium-2 col-md-12 form-group set" style="display:none">
                 Add Products to Set
                 <hr>
                 <div class="row">
@@ -149,7 +149,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-12 form-group" id="products_list"></div>
+              <div class="col-md-12 form-group set" id="products_list"></div>
               <div class="col-md-12 text-right">
                   <br/>
                   <button class="btn btn-primary">Save</button>
@@ -468,14 +468,11 @@ function process_add_supplier(e){
 }
 
 $("#type").change(function () {
-    // hide all optional elements
-    $('.optional').css('display','none');
-
-    $("#type option:selected").each(function () {
-        if($(this).val() == "set") {
-            $('.set').css('display','block');
-        }
-    });
+  if ($("#type option:selected").val() == 'set') {
+    $('.set').css('display','block');
+  }else{
+    $('.set').css('display','none');
+  }
 });
 
 function addProducts(e) {
