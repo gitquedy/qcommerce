@@ -145,20 +145,33 @@ class ReportsController extends Controller
                 $no_of_products = $request->get('no_of_products');
             }
 
-            $orderItems = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
-                ->join('order', 'order.id', '=', 'order_item.order_id')
-                ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
-                ->whereIn('order.shop_id', $shop_ids)
-                ->whereNotIn('order.status', Order::statusNotIncludedInSales())
-                ->groupBy('order_item.product_id')
-                ->orderBy('total_quantity', 'desc')->take($no_of_products);
+            $Skus = Products::select('products.seller_sku_id', 'sku.code as sku_code', 'sku.name as sku_name', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+                            ->join('order_item', 'order_item.product_id','=','products.id')
+                            ->join('order', 'order.id','=','order_item.order_id')
+                            ->join('sku', 'sku.id','=','products.seller_sku_id')
+                            ->whereIn('order.shop_id', $shop_ids)
+                            ->whereNotIn('order.status', Order::statusNotIncludedInSales())
+                            ->groupBy('products.seller_sku_id')
+                            ->groupBy('sku.code')
+                            ->groupBy('sku.name')
+                            ->orderBy('total_quantity', 'desc')
+                            ->take($no_of_products);
+
+            // $Skus = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
+            //     ->join('order', 'order.id', '=', 'order_item.order_id')
+            //     ->rightJoin('sku', 'sku.id', '=', 'products.seller_sku_id')
+            //     ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+            //     ->whereIn('order.shop_id', $shop_ids)
+            //     ->whereNotIn('order.status', Order::statusNotIncludedInSales())
+            //     ->groupBy('products.seller_sku_id')
+            //     ->orderBy('total_quantity', 'desc')->take($no_of_products);
 
             $daterange = explode('/', $request->get('daterange'));
             if(count($daterange) == 2){
                 if($daterange[0] == $daterange[1]){
-                    $orderItems->whereDate('order_item.created_at', [$daterange[0]]);
+                    $Skus->whereDate('order_item.created_at', [$daterange[0]]);
                 }else{
-                    $orderItems->whereDate('order_item.created_at', '>=', $daterange[0])->whereDate('order_item.created_at', '<=', $daterange[1]);
+                    $Skus->whereDate('order_item.created_at', '>=', $daterange[0])->whereDate('order_item.created_at', '<=', $daterange[1]);
                 }
                 
             }
@@ -173,21 +186,19 @@ class ReportsController extends Controller
                 
             }
 
-           $orderItems = $orderItems->get();
+           $Skus = $Skus->get();
            $pos_sales = $pos_sales->get();
             $data = ['count' => 0];
             $report = [];
-            foreach($orderItems as $orderItem){
-                $sku = $orderItem->product->SellerSku;
-                $report[$sku]['seller_sku'] = $orderItem->product->SellerSku;
-                $report[$sku]['product_name'] = $orderItem->product->name;
-                $report[$sku]['total_price'] =  $orderItem->total_price;
-                $report[$sku]['total_quantity'] =  $orderItem->total_quantity;
+            foreach($Skus as $sku){
+                $report[$sku->id]['seller_sku'] = $sku->sku_code;
+                $report[$sku->id]['product_name'] = $sku->sku_name;
+                $report[$sku->id]['total_price'] =  $sku->total_price;
+                $report[$sku->id]['total_quantity'] =  $sku->total_quantity;
 
                 $data['count'] += 1;
             }
             foreach($pos_sales as $pos_sale){
-
                 foreach ($pos_sale->items as $key => $sale_items) {
                     $sku = $sale_items->sku_code;
                     if(isset($report[$sku])) {
