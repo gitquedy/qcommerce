@@ -136,9 +136,9 @@ class Sku extends Model
         return response()->stream($callback, 200, $headers);
     }
 
-    public function computeSetQuantity() {
+    public function computeSetQuantity($warehouse_id) {
         if ($this->type == 'set') {
-            $set_items = SetItem::get_set_item_query()->where('sku_set_id', $this->id)->get();
+            $set_items = SetItem::get_set_item_query()->where('sku_set_id', $this->id)->where('warehouse_id', $warehouse_id)->get();
 
             $quantity_array = array();
             foreach ($set_items as $item) {

@@ -487,7 +487,7 @@ function addProducts(e) {
                       '</div>';
     $('#products_list').append(product_row);
     $("#ap_sku option:selected").attr('disabled','disabled');
-    $('#ap_sku').prop('selectedIndex',0);
+    $('#ap_sku').val(null).trigger('change');
     $('input[name=quantity]').val('');
   }
 }
@@ -499,6 +499,11 @@ function removeProduct(e) {
     $(this).parent().parent().remove();
   });
 }
+
+$(".select2").select2({
+  dropdownAutoWidth: true,
+  width: '100%'
+});
 
 
 </script>

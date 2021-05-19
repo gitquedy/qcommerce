@@ -19,8 +19,8 @@ class SetItem extends Model
 
     public static function get_set_item_query(){
         $query = DB::table('set_item')
-                    ->leftjoin('sku', 'set_item.sku_single_id', '=', 'sku.id')
-                    ->select('set_item.*', 'sku.quantity as single_quantity');
+                    ->leftjoin('warehouse_items', 'set_item.sku_single_id', '=', 'warehouse_items.sku_id')
+                    ->select('set_item.*', 'warehouse_items.warehouse_id', 'warehouse_items.quantity as single_quantity');
         return $query;
     }
 
