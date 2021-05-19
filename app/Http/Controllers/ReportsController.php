@@ -191,10 +191,10 @@ class ReportsController extends Controller
             $data = ['count' => 0];
             $report = [];
             foreach($Skus as $sku){
-                $report[$sku->id]['seller_sku'] = $sku->sku_code;
-                $report[$sku->id]['product_name'] = $sku->sku_name;
-                $report[$sku->id]['total_price'] =  $sku->total_price;
-                $report[$sku->id]['total_quantity'] =  $sku->total_quantity;
+                $report[$sku->sku_code]['seller_sku'] = $sku->sku_code;
+                $report[$sku->sku_code]['product_name'] = $sku->sku_name;
+                $report[$sku->sku_code]['total_price'] =  $sku->total_price;
+                $report[$sku->sku_code]['total_quantity'] =  $sku->total_quantity;
 
                 $data['count'] += 1;
             }
