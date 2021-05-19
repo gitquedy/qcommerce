@@ -277,14 +277,24 @@ class BarcodeController extends Controller
                                     // if($prod->site == 'lazada'){
                                     //     $response = $prod->product_price_quantity_update($xml);
                                     // }
-                                    $prod->updatePlatform();
+                                    $product->updatePlatform();
                                 }
                             }
                         }
                         
                         //sku parent
                         $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
-                        $sku->quantity = $sku->computeSetQuantity();
+                        // $sku->quantity = $sku->computeSetQuantity();
+                        $sku->quantity -= $qty;
+                        $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
+                        $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
+                        $new_quantity = $warehouse_qty - $qty;
+                        $warehouse_item = WarehouseItems::updateOrCreate(
+                            ['warehouse_id' => $warehouse_id,
+                            'sku_id' => $sku->id],
+                            ['quantity' => $new_quantity]
+                        );
+                        $prod->quantity = $warehouse_item->quantity;
                         $result = $sku->save();
 
                         $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
@@ -292,7 +302,7 @@ class BarcodeController extends Controller
                             $shop_id = $prod->shop_id;
                             $prod = Products::where('id', $prod->id)->first();
                             // $prod->quantity = $warehouse_item->quantity;
-                            $prod->quantity = $sku->computeSetQuantity();
+                            $prod->quantity = $sku->computeSetQuantity($prod->shop->warehouse_id);
                             $prod->save();
                                 $xml = '<?xml version="1.0" encoding="UTF-8" ?>
                                 <Request>
