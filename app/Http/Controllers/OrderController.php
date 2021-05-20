@@ -493,7 +493,7 @@ class OrderController extends Controller
 
         $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending']);
         $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP']);
-        $data['woocommerce_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereIn('status', ['pending', 'processing', 'on-hold']);
+        $data['woocommerce_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereIn('status', ['pending', 'processing']);
         if(count($daterange) == 2){
             if($daterange[0] == $daterange[1]){
                 $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);

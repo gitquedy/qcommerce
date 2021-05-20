@@ -49,10 +49,10 @@ class SkuController extends Controller
             
             $business_id = Auth::user()->business_id;
             
-               
-           $Sku = Sku::with('products')->where('business_id','=',$business_id)->orderBy('updated_at', 'desc');
-           
-           
+
+            $Sku = Sku::where('business_id','=',$business_id)->orderBy('updated_at', 'desc')
+                        ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')->select('sku.*', 'products.shop_id');
+
             return Datatables::eloquent($Sku)
             ->editColumn('link_shop', function(Sku $SKSU) {
                             $shop_list = array();
