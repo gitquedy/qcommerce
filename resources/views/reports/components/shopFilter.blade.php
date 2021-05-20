@@ -9,6 +9,9 @@
         @foreach($all_shops as $shop)
           <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="{{ $shop->id }}">{!! $shop->getImgSiteDisplayWithFullName() !!}</a>
         @endforeach
+          <a class="dropdown-item filter_btn" href="#" data-target="shop" data-type="multiple" data-value="0">
+            <img src="{{ asset('images/shop/icon/qcommerce.png') }}" class="m-0" alt="shopee" style="width:15px; height:15px"> <span style="padding-left: 5px;font-size:13px">Qcommerce (POS)</span>
+          </a>
       </div>
     </div>
   </div>

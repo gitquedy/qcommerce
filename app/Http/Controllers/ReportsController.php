@@ -157,15 +157,6 @@ class ReportsController extends Controller
                             ->orderBy('total_quantity', 'desc')
                             ->take($no_of_products);
 
-            // $Skus = OrderItem::join('products', 'products.id', '=', 'order_item.product_id')
-            //     ->join('order', 'order.id', '=', 'order_item.order_id')
-            //     ->rightJoin('sku', 'sku.id', '=', 'products.seller_sku_id')
-            //     ->select('order_item.product_id', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
-            //     ->whereIn('order.shop_id', $shop_ids)
-            //     ->whereNotIn('order.status', Order::statusNotIncludedInSales())
-            //     ->groupBy('products.seller_sku_id')
-            //     ->orderBy('total_quantity', 'desc')->take($no_of_products);
-
             $daterange = explode('/', $request->get('daterange'));
             if(count($daterange) == 2){
                 if($daterange[0] == $daterange[1]){
@@ -176,18 +167,7 @@ class ReportsController extends Controller
                 
             }
 
-            $pos_sales = Sales::where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled');
-            if(count($daterange) == 2){
-                if($daterange[0] == $daterange[1]){
-                    $pos_sales->where('date', [$daterange[0]]);
-                }else{
-                    $pos_sales->where('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
-                }
-                
-            }
-
-           $Skus = $Skus->get();
-           $pos_sales = $pos_sales->get();
+            $Skus = $Skus->get();
             $data = ['count' => 0];
             $report = [];
             foreach($Skus as $sku){
@@ -198,20 +178,34 @@ class ReportsController extends Controller
 
                 $data['count'] += 1;
             }
-            foreach($pos_sales as $pos_sale){
-                foreach ($pos_sale->items as $key => $sale_items) {
-                    $sku = $sale_items->sku_code;
-                    if(isset($report[$sku])) {
-                        $report[$sku]['total_price'] +=  $sale_items->subtotal;
-                        $report[$sku]['total_quantity'] +=  $sale_items->quantity;
+
+            if ($request->get('shop') == null || in_array('0', explode(',', $request->get('shop')))) {
+                $pos_sales = Sales::where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled');
+                if(count($daterange) == 2){
+                    if($daterange[0] == $daterange[1]){
+                        $pos_sales->where('date', [$daterange[0]]);
+                    }else{
+                        $pos_sales->where('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
                     }
-                    else {
-                        $report[$sku]['seller_sku'] = $sale_items->sku_code;
-                        $report[$sku]['product_name'] = $sale_items->sku_name;
-                        $report[$sku]['total_price'] =  $sale_items->subtotal;
-                        $report[$sku]['total_quantity'] =  $sale_items->quantity;
+                    
+                }
+
+                $pos_sales = $pos_sales->get();
+                foreach($pos_sales as $pos_sale){
+                    foreach ($pos_sale->items as $key => $sale_items) {
+                        $sku = $sale_items->sku_code;
+                        if(isset($report[$sku])) {
+                            $report[$sku]['total_price'] +=  $sale_items->subtotal;
+                            $report[$sku]['total_quantity'] +=  $sale_items->quantity;
+                        }
+                        else {
+                            $report[$sku]['seller_sku'] = $sale_items->sku_code;
+                            $report[$sku]['product_name'] = $sale_items->sku_name;
+                            $report[$sku]['total_price'] =  $sale_items->subtotal;
+                            $report[$sku]['total_quantity'] =  $sale_items->quantity;
+                        }
+                        $data['count'] += $sale_items->quantity;;
                     }
-                    $data['count'] += $sale_items->quantity;;
                 }
             }
             uasort($report, function ($a, $b) {
@@ -230,7 +224,7 @@ class ReportsController extends Controller
     public function dailySales(Request $request){
          $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Daily Sales"], ['name'=>"Daily Sales"]];
          $all_shops = $request->user()->business->shops;
-         if ( request()->ajax()) {
+            if ( request()->ajax()) {
                $shops = $request->user()->business->shops;
                if($request->get('shop') != ''){
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
@@ -273,7 +267,7 @@ class ReportsController extends Controller
                             return 'PHP ' . number_format($order->total_price + $sales->total, 2);
                         })
                     ->make(true);
-             }
+            }
              
             return view('reports.dailySales', [
                 'breadcrumbs' => $breadcrumbs,
