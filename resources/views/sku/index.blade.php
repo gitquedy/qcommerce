@@ -154,6 +154,7 @@
             },
             className: "btn-outline-primary margin-r-10"}
             ];
+  var order = [12, 'desc'];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
