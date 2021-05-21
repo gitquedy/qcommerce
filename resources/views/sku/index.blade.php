@@ -84,6 +84,7 @@
             <th>Product Type</th>
             <th>Actions</th>
             <th>Products Count</th>
+            <th>Updated At</th>
           </tr>
         </thead>
       </table>
@@ -137,7 +138,8 @@
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'type', name: 'type'},
             { data: 'action', name: 'action', orderable : false},
-            { data: 'products_count', name: 'products_count', searchable: false, visible: false }
+            { data: 'products_count', name: 'products_count', searchable: false, visible: false },
+            { data: 'updated_at', name: 'updated_at', searchable: false, visible: false }
         ];
   var table_route = {
           url: '{{ route('sku.index') }}',

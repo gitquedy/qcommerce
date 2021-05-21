@@ -9,7 +9,7 @@
 ==========================================================================================*/
 var table = '';
 if (typeof(order) === 'undefined') {
-  var order = [];
+  var order = [12, "desc"];
 }
 $(document).ready(function () {
   "use strict";

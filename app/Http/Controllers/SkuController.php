@@ -50,8 +50,9 @@ class SkuController extends Controller
             $business_id = Auth::user()->business_id;
             
 
-            $Sku = Sku::where('business_id','=',$business_id)->orderBy('updated_at', 'desc')
-                        ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')->select('sku.*', 'products.shop_id');
+            $Sku = Sku::where('business_id','=',$business_id)
+                        ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id)'))
+                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at');
 
             return Datatables::eloquent($Sku)
             ->editColumn('link_shop', function(Sku $SKSU) {
