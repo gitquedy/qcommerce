@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Daily Sales')
+@section('title', 'Monthly Sales')
 
 @section('vendor-style')
         {{-- vednor files --}}
@@ -22,7 +22,7 @@
   <div class="row">
     <div class="col-12">
       @include('reports.components.shopFilter')
-      @include('reports.components.dateFilter')
+      <!-- @include('reports.components.dateFilter') -->
       <div class="btn-group" id="chip_area_shop"></div>
       <div class="btn-group" id="chip_area_timings"></div>
     </div>
@@ -35,7 +35,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h4 class="card-title">Daily Sales</h4>
+          <h4 class="card-title">Monthly Sales</h4>
         </div>
         <div class="card-content">
           <div class="card-body">
@@ -55,7 +55,7 @@
                   <table class="table table-hover mb-0" id="report-table">
                       <thead>
                           <tr>
-                              <th>Date</th>
+                              <th>Month</th>
                               <th>No. of Order</th>
                               <th>No. of Units</th>
                               <th>Sales</th>
@@ -70,23 +70,6 @@
   </div>
 </div>
 </section>
-
-<!-- <section id="data-list-view" class="data-list-view-header">
-    {{-- DataTable starts --}}
-    <div class="table-responsive">
-      <table class="table data-list-view">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>No. of Order</th>
-            <th>No. of Units</th>
-            <th>Sale</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-    {{-- DataTable ends --}}
-  </section> -->
   {{-- Data list view end --}}  
 @endsection
 @section('vendor-script')
@@ -110,12 +93,12 @@
   <script src="{{ asset('js/scripts/reports/colors.js') }}"></script>
   <script type="text/javascript">
     function getParams(){
-      var $params = '?shop=' + $("#shop").val() + '&daterange=' + $("#daterange").val();
+      var $params = '?shop=' + $("#shop").val();
       return $params;
     }
-    var url = "{{ action('ReportsController@dailySales')  }}";
+    var url = "{{ action('ReportsController@monthlySales')  }}";
   </script>
-  <script src="{{ asset('js/scripts/reports/dailySales.js') }}"></script>
+  <script src="{{ asset('js/scripts/reports/monthlySales.js') }}"></script>
   <script src="{{ asset('js/scripts/reports/filter.js') }}"></script>
   <script type="text/javascript"></script>
   <script type="text/javascript">
@@ -127,30 +110,4 @@
       getChart();
     });     
   </script>
-
-  <!-- datatables -->
-  <!-- <script type="text/javascript">
-  var columnns = [
-            { data: 'dateFormat', name: 'dateFormat', orderable: true},
-            { data: 'total_orders', name: 'total_orders'},
-            { data: 'total_quantity', name: 'total_quantity'},
-            { data: 'total_sales', name: 'total_sales'},
-        ];
-  var table_route = {
-          url: '{{ action("ReportsController@dailySales") }}',
-          data: function (data) {
-                data.shop = $("#shop").val();
-                data.daterange = $("#daterange").val();
-            }
-        };
-  var buttons = [
-            ];
-  var BInfo = true;
-  var bFilter = true;
-  function created_row_function(row, data, dataIndex){
-  }
-  var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
-  var pageLength = 20;
-</script>
-<script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script> -->
 @endsection

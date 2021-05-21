@@ -129,6 +129,7 @@ class ReportsController extends Controller
             'breadcrumbs' => $breadcrumbs,
         ]);
     }
+
     public function topSellingProducts(Request $request){
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
         $all_shops = $request->user()->business->shops;
@@ -221,57 +222,115 @@ class ReportsController extends Controller
             'all_shops' => $all_shops,
         ]);
     }
+
     public function dailySales(Request $request){
-         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Daily Sales"], ['name'=>"Daily Sales"]];
-         $all_shops = $request->user()->business->shops;
-            if ( request()->ajax()) {
-               $shops = $request->user()->business->shops;
-               if($request->get('shop') != ''){
+        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Daily Sales"], ['name'=>"Daily Sales"]];
+        $all_shops = $request->user()->business->shops;
+
+        if ( request()->ajax()) {
+            $shops = $request->user()->business->shops;
+            if($request->get('shop') != ''){
                     $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
-               }
-               $shop_ids = $shops->pluck('id')->toArray();
-                $daterange = explode('/', $request->get('daterange'));
-                $order = Order::select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('sum(order.price) as total_price'), DB::raw('sum(order.items_count) as total_item_count'))
+            }
+            $shop_ids = $shops->pluck('id');
+
+            $order = Order::select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('sum(order.price) as total_price'), DB::raw('sum(order.items_count) as total_item_count'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
-                ->orderBy('date', 'desc')
+                ->orderBy('date', 'asc')
                 ->groupBy('date');
-                if(count($daterange) == 2){
-                    if($daterange[0] == $daterange[1]){
-                        $order->whereDate('order.created_at', [$daterange[0]]);
-                    }else{
-                        $order->whereDate('order.created_at', '>=', $daterange[0])->whereDate('order.created_at', '<=', $daterange[1]);
+
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $order->whereDate('order.created_at', [$daterange[0]]);
+                }else{
+                    $order->whereDate('order.created_at', '>=', $daterange[0])->whereDate('order.created_at', '<=', $daterange[1]);
+                }
+            }
+
+            $order = $order->get();
+            $data = ['count' => count($order)];
+            $report = [];
+            foreach($order as $order) {
+                $date = $order->date;
+                $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
+                
+                $report[$date]['total_orders'] = $order->total_orders + count($sales);
+
+                $count = 0;
+                foreach ($sales as $sale) {
+                    foreach ($sale->items as $item) {
+                        $count += $item->quantity;
                     }
                 }
+                $report[$date]['total_quantity'] = $order->total_item_count + $count;
+                $report[$date]['date'] = Utilities::format_date($order->date, 'M d, Y');
 
-                return Datatables::eloquent($order)
-                    ->editColumn('total_orders', function($order) {
-                            $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get()->count();
-                            return $order->total_orders + $sales;
-                        })
-                    ->editColumn('total_quantity', function($order) {
-                            $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
-                            $count = 0;
-                            foreach ($sales as $sale) {
-                                foreach ($sale->items as $item) {
-                                    $count += $item->quantity;
-                                }
-                            }
-                            return $order->total_item_count + $count;
-                        })
-                    ->addColumn('dateFormat', function(Order $order) {
-                            return Utilities::format_date($order->date, 'M d,Y');
-                        })
-                    ->addColumn('total_sales', function(Order $order) {
-                            $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
-                            return 'PHP ' . number_format($order->total_price + $sales->total, 2);
-                        })
-                    ->make(true);
+                $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
+                $report[$date]['total_sales'] =$order->total_price + $sales->total;
             }
-             
-            return view('reports.dailySales', [
-                'breadcrumbs' => $breadcrumbs,
-                'all_shops' => $all_shops,
-            ]);
+            $data['report'] = $report;
+            return $data;
+        }
+            
+        return view('reports.dailySales', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+        ]);
+    }
+
+    public function monthlySales(Request $request){
+        $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@monthlySales'), 'name'=>"Monthly Sales"], ['name'=>"Monthly Sales"]];
+        $all_shops = $request->user()->business->shops;
+
+        if ( request()->ajax()) {
+            $shops = $request->user()->business->shops;
+            if($request->get('shop') != ''){
+                    $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
+            }
+            $shop_ids = $shops->pluck('id');
+
+            $order = Order::select(DB::raw("DATE_FORMAT(order.created_at, '%Y-%m') as monthly"), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('SUM(order.price) as total_price'), DB::raw('SUM(order.items_count) as total_item_count'))
+                ->whereIn('order.shop_id', $shop_ids)
+                ->whereNotIn('order.status', Order::statusNotIncludedInSales())
+                ->orderBy('monthly', 'asc')
+                ->groupBy('monthly');
+
+            $order = $order->get();
+            $data = ['count' => count($order)];
+            $report = [];
+            foreach($order as $order) {
+                $date = $order->monthly;
+                $sales = Sales::where(DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m')"), $order->monthly)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
+                
+                $report[$date]['total_orders'] = $order->total_orders  + count($sales);
+
+                $count = 0;
+                foreach ($sales as $sale) {
+                    foreach ($sale->items as $item) {
+                        $count += $item->quantity;
+                    }
+                }
+                $report[$date]['total_quantity'] = $order->total_item_count + $count;
+                $report[$date]['date'] = Utilities::format_date($order->monthly, 'M Y');
+
+                $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where(DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m')"), $order->monthly)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
+                $report[$date]['total_sales'] =$order->total_price  + $sales->total;
+            }
+
+            $report_length = 12;
+            $report_offset = count($report)-$report_length;
+            if ($report_offset < 0) {
+                $report_offset = 0;
+            }
+            $data['report'] = array_slice($report, $report_offset, $report_length, true);
+            return $data;
+        }
+            
+        return view('reports.monthlySales', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+        ]);
     }
 }

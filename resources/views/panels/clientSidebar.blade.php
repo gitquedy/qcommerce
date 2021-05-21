@@ -340,6 +340,12 @@
                                 <span class="menu-title" data-i18n="">Daily Sales</span>
                             </a>
                         </li>
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'monthlySales' ? 'active' : '' }}">
+                            <a href="{{ action('ReportsController@monthlySales') }}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Monthly Sales</span>
+                            </a>
+                        </li>
                         <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'topSellingProducts' ? 'active' : '' }}">
                             <a href="{{ action('ReportsController@topSellingProducts') }}">
                                 <i class="feather icon-circle"></i>

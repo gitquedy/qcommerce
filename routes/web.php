@@ -295,6 +295,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/reports/productalert', 'ReportsController@productAlert')->name('reports.productAlert');
 		Route::get('/reports/topSellingProducts', 'ReportsController@topSellingProducts');
 		Route::get('/reports/dailySales', 'ReportsController@dailySales');
+		Route::get('/reports/monthlySales', 'ReportsController@monthlySales');
 	});
 	
 	Route::group(['middleware' => 'permission:order.manage'], function()
