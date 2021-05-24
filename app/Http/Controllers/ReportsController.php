@@ -268,7 +268,7 @@ class ReportsController extends Controller
                 $report[$date]['date'] = Utilities::format_date($order->date, 'M d, Y');
 
                 $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
-                $report[$date]['total_sales'] =$order->total_price + $sales->total;
+                $report[$date]['total_sales'] = $order->total_price + $sales->total;
             }
             $data['report'] = $report;
             return $data;
@@ -316,7 +316,7 @@ class ReportsController extends Controller
                 $report[$date]['date'] = Utilities::format_date($order->monthly, 'M Y');
 
                 $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where(DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m')"), $order->monthly)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
-                $report[$date]['total_sales'] =$order->total_price  + $sales->total;
+                $report[$date]['total_sales'] = $order->total_price  + $sales->total;
             }
 
             $report_length = 12;
