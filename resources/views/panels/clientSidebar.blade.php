@@ -134,6 +134,12 @@
                                 <span class="menu-title" data-i18n="">List of SKU</span>
                             </a>
                         </li>
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'unlink' ? 'active' : '' }}">
+                            <a href="{{route('sku.unlink')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Unlink SKU</span>
+                            </a>
+                        </li>
                         <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'create' ? 'active' : '' }}">
                             <a href="{{route('sku.create')}}">
                                 <i class="feather icon-circle"></i>

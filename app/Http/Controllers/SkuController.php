@@ -140,6 +140,109 @@ class SkuController extends Controller
             'statuses' => array(),
         ]);
     }
+
+
+    public function unlink() {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
+        ];
+        
+        if (request()->ajax()) {
+            
+            $business_id = Auth::user()->business_id;
+            
+            DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            $Sku = Sku::where('business_id','=',$business_id)
+                        ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')
+                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'))
+                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at')
+                        ->havingRaw('shop_id is null');
+
+            return Datatables::eloquent($Sku)
+            ->editColumn('link_shop', function(Sku $SKSU) {
+                            $shop_list = array();
+                            $SKSU->products->map( function($prod) use (&$shop_list) { $shop_list[] = '<span class="badge btn-outline-primary text-black font-weight-bold">'.$prod->shop->short_name.'</span>'; } );
+                            return implode(' ', $shop_list);
+                        })
+            ->editColumn('cost', function(Sku $SKSU) {
+                            return "<p>".$SKSU->cost.'</p><input type="number" min="0" class="form-control" data-defval="'.$SKSU->cost.'" data-name="cost" value="'.$SKSU->cost.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('price', function(Sku $SKSU) {
+                            return "<p>".$SKSU->price.'</p><input type="number" min="1" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('quantity', function(Sku $SKSU) {
+                            $warehouse = request()->warehouse;
+                            if($warehouse != "") {
+                                $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
+                                if($warehouse) {
+                                    return '<p>'.$warehouse->quantity.'</p>';
+                                }
+                                else {
+                                    return '<p>0</p>';
+                                }
+                            }
+                            else {
+                                return '<p>'.$SKSU->quantity.'</p>';
+                            }
+
+
+                        })
+            ->editColumn('alert_quantity', function(Sku $SKSU) {
+                            return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
+                        })
+            ->editColumn('type', function(Sku $SKSU) {
+                return '<p>'.ucfirst($SKSU->type).'</p>';
+            })
+            ->addColumn('category_name', function(Sku $SKSU) {
+                            $category = Category::find($SKSU->category);
+                            if($category){
+                               return  $category->name;
+                            }
+                        })
+            ->addColumn('supplier_company', function(Sku $SKSU) {
+                            $supplier = Supplier::find($SKSU->supplier);
+                            if($supplier){
+                               return  $supplier->company;
+                            }
+                        })
+            ->addColumn('image', function(Sku $SKSU) {
+                            return $SKSU->SkuImage();
+                        })
+            ->addColumn('products_count', function(Sku $SKSU) {
+                            return Products::where('seller_sku_id', $SKSU->id)->get()->count();
+                        })
+            ->addColumn('brand_name', function(Sku $SKSU) {
+                            $Brand = Brand::find($SKSU->brand);
+                            if($Brand){
+                               return  $Brand->name;
+                            }
+                            else {
+                                return "";
+                            }
+                        })
+            ->addColumn('action', function(Sku $SKSU) {
+                            return '<div class="btn-group dropup mr-1 mb-1">
+                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                            Action<span class="sr-only">Toggle Dropdown</span></button>
+                            <div class="dropdown-menu">
+                            <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',$SKSU->id).'" > Link SKU Products</a>
+                            <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
+                            <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
+                            </div>
+                            </div>';
+                        })
+            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
+            ->make(true);
+        }
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse;
+        return view('sku.unlink', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_warehouse' => $all_warehouse,
+            'all_shops' => array(),
+            'statuses' => array(),
+        ]);
+    }
     
     
     public function create(Request $request){

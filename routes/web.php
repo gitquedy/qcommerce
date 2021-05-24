@@ -115,6 +115,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sku/import/', 'SkuController@import')->name('sku.import');
 		Route::get('/sku/export/', 'SkuController@export')->name('sku.export');
 		Route::post('/sku/import/', 'SkuController@submitImport')->name('sku.submitImport');
+		Route::get('/sku/unlink/', 'SkuController@unlink')->name('sku.unlink');
 		Route::resource('/sku', 'SkuController');
 		Route::get('/sku/create/', 'SkuController@create')->name('sku.create');
 		Route::post('/sku/add/', 'SkuController@add')->name('sku.add');
