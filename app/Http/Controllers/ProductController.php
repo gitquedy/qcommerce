@@ -128,14 +128,126 @@ class ProductController extends Controller
                     })
                     ->rawColumns(['getImgAndIdDisplay', 'action', 'status_display'])
                     ->make(true);
-            }
-            return view('product.index', [
-                'breadcrumbs' => $breadcrumbs,
-                'all_shops' => $all_shops,
-                'statuses' => $statuses,
-                'selectedStatus' => $selectedStatus,
-            ]);
         }
+        return view('product.index', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+            'statuses' => $statuses,
+            'selectedStatus' => $selectedStatus,
+        ]);
+    }
+
+    public function unlink(Request $request) {
+        $all_shops =  $request->user()->business->shops;
+
+        $shop_ids = $all_shops->pluck('id');
+
+        if($request->get('site') == 'shopee'){
+           $all_shops = $all_shops->where('site', 'shopee');
+           $statuses = Products::$shopeeStatuses;
+        }else if ($request->get('site') == 'lazada'){
+           $statuses = Products::$lazadaStatuses;
+           $all_shops = $all_shops->where('site', 'lazada');
+        }else if ($request->get('site') == 'shopify'){
+           $statuses = Products::$shopifyStatuses;
+           $all_shops = $all_shops->where('site', 'shopify');
+        }else if ($request->get('site') == 'woocommerce'){
+            $statuses = Products::$woocommerceStatuses;
+            $all_shops = $all_shops->where('site', 'woocommerce');
+        }
+
+        if($request->get('status')){
+          $selectedStatus = $request->get('status');
+        }
+        else {
+          $selectedStatus = 'all';
+        }
+         $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->update(['seen' => true]);
+
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"Unlink Products"]
+        ];
+
+        if ( request()->ajax()) {
+               $Products = Products::orderBy('updated_at', 'desc')->whereNull('seller_sku_id'); ///with('shop')->
+               
+               if($request->get('shop') != ''){
+                    $Products->where('shop_id', $request->get('shop'));
+               }else{
+                   $Products->whereIn('shop_id', $shop_ids);
+               }
+               
+
+               $status = $request->get('status');
+               if($status != 'all') {
+                  if($status == 'sold-out'){
+                    $Products->where('quantity', 0);
+                  }else{
+                    $Products->where('status', $status);
+                  }
+                  
+               }
+                  
+               $Products->where('site', $request->get('site', 'lazada'));
+               
+                return Datatables::eloquent($Products)
+                ->addColumn('shop', function(Products $product) {
+                                return $product->shop ? $product->shop->short_name : '';
+                                    })
+                ->addColumn('image', function(Products $product) {
+                    $image_url = '';
+                    $imagres = explode("|",$product->Images);
+                    if(isset($imagres[0])){
+                        $image_url = $imagres[0];
+                    }
+                    return $image_url;
+                })
+                ->addColumn('getImgAndIdDisplay', function(Products $product) {
+                                return $product->getImgAndIdDisplay();
+                 })
+                ->addColumn('status_display', function(Products $product) {
+                                return ucfirst(strtolower($product->Status));
+                 })
+                ->addColumn('action', function(Products $product) {
+                    $actions = '';
+                    if($product->site == 'lazada'){
+                        $actions = '<div class="btn-group dropup mr-1 mb-1">
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        Action<span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                            <a class="dropdown-item" href="'. action('ProductController@edit', $product->id).'" ><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                            <a class="dropdown-item modal_button" href="#" data-href="'. action('ProductController@duplicateForm') .'?ids='. $product->id .'"><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>
+                        </div></div>';
+                    }else if($product->site == 'shopee'){
+                        $actions = '<div class="btn-group dropup mr-1 mb-1">
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        Action<span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                            <a class="dropdown-item modal_button" href="#" data-href="'. action('ProductController@duplicateForm') .'?ids='. $product->id .'"><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>';
+                        $actions .= '</div></div>';
+                    }else if($product->site == 'woocommerce'){
+                        $actions = '<div class="btn-group dropup mr-1 mb-1">
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        Action<span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
+                            <a class="dropdown-item modal_button" href="#" data-href="'. action('ProductController@duplicateForm') .'?ids='. $product->id .'"><i class="fa fa-copy aria-hidden="true""></i> Duplicate Product</a>';
+                        $actions .= '</div></div>';
+                    }
+                        return $actions;
+                    })
+                    ->rawColumns(['getImgAndIdDisplay', 'action', 'status_display'])
+                    ->make(true);
+        }
+        return view('product.unlink', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+            'statuses' => $statuses,
+            'selectedStatus' => $selectedStatus,
+        ]);
+    }
     
     
     public function edit(Products $product, Request $request){
@@ -364,6 +476,48 @@ class ProductController extends Controller
         $data['shopee_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->count();
         $data['shopify_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopify')->count();
         $data['woocommerce_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->count();
+        return response()->json(['data' => $data]); 
+    }
+
+    public function unlinkHeaders(Request $request){
+        $data = [];
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+
+        if($request->site == 'lazada'){
+            $lazada_statuses = Products::$lazadaStatuses;
+            foreach($lazada_statuses as $status){
+                $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereNull('seller_sku_id');
+                if($status == 'sold-out'){
+                    $data[$status] = $products->where('quantity', 0)->count();
+                }else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }else if($request->site == 'shopee'){
+            $shopee_statuses = Products::$shopeeStatuses;
+            foreach($shopee_statuses as $status){
+                $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereNull('seller_sku_id');
+                if($status == 'sold-out'){
+                    $data[$status] = $products->where('quantity', 0)->count();
+                }else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }else if($request->site == 'woocommerce'){
+            $woocommerce_statuses = Products::$woocommerceStatuses;
+            foreach($woocommerce_statuses as $status){
+                $products = Products::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereNull('seller_sku_id');
+                if($status == 'outofstock'){
+                    $data[$status] = $products->where('quantity', 0)->count();
+                }else{
+                    $data[$status] = $products->where('status', $status)->count();
+                }
+            }
+        }
+        $data['lazada_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereNull('seller_sku_id')->count();
+        $data['shopee_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereNull('seller_sku_id')->count();
+        $data['shopify_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'shopify')->whereNull('seller_sku_id')->count();
+        $data['woocommerce_total'] = Products::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereNull('seller_sku_id')->count();
         return response()->json(['data' => $data]); 
     }
 }

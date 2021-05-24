@@ -142,7 +142,7 @@ class SkuController extends Controller
     }
 
 
-    public function unlink() {
+    public function unlink(Request $request) {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Unlink SKU"]
         ];

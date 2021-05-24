@@ -108,6 +108,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/product/duplicateProudcts', 'ProductController@duplicateProudcts')->name('product.duplicateProudcts');
 		Route::get('/product/searchProduct', 'ProductController@searchProduct')->name('product.searchProduct');
 		Route::get('/product/headers', 'ProductController@headers')->name('product.headers');
+		Route::get('/product/unlink', 'ProductController@unlink')->name('product.unlink');
+		Route::get('/product/unlinkHeaders', 'ProductController@unlinkHeaders')->name('product.unlinkHeaders');
 	});
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
