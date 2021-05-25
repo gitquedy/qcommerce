@@ -109,6 +109,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/product/duplicateProudcts', 'ProductController@duplicateProudcts')->name('product.duplicateProudcts');
 		Route::get('/product/searchProduct', 'ProductController@searchProduct')->name('product.searchProduct');
 		Route::get('/product/headers', 'ProductController@headers')->name('product.headers');
+		Route::get('/product/unlink', 'ProductController@unlink')->name('product.unlink');
+		Route::get('/product/unlinkHeaders', 'ProductController@unlinkHeaders')->name('product.unlinkHeaders');
 	});
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
@@ -116,6 +118,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/sku/import/', 'SkuController@import')->name('sku.import');
 		Route::get('/sku/export/', 'SkuController@export')->name('sku.export');
 		Route::post('/sku/import/', 'SkuController@submitImport')->name('sku.submitImport');
+		Route::get('/sku/unlink/', 'SkuController@unlink')->name('sku.unlink');
 		Route::resource('/sku', 'SkuController');
 		Route::get('/sku/create/', 'SkuController@create')->name('sku.create');
 		Route::post('/sku/add/', 'SkuController@add')->name('sku.add');

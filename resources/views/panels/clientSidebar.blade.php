@@ -52,11 +52,31 @@
             @endcan
             
             @can('product.manage')
-                <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
+                <!-- <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
                     <a href="{{url('/product')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=active">
                         <i class="feather icon-package "></i>
                         <span class="menu-title" data-i18n="">Products</span>
                     </a>
+                </li> -->
+                <li class="nav-item ">
+                    <a href="#">
+                        <i class="feather icon-package"></i>
+                        <span class="menu-title" data-i18n="">Products</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="{{ $request->segment(1) == 'product' && $request->segment(2) == '' ? 'active' : '' }}">
+                            <a href="{{url('/product')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=active">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">List of Products</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'product' && $request->segment(2) == 'unlink' ? 'active' : '' }}">
+                            <a href="{{route('product.unlink')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=active">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Unlink Products</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             @endcan
             
@@ -132,6 +152,12 @@
                             <a href="{{url('/sku')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">List of SKU</span>
+                            </a>
+                        </li>
+                        <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'unlink' ? 'active' : '' }}">
+                            <a href="{{route('sku.unlink')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Unlink SKU</span>
                             </a>
                         </li>
                         <li class="{{ $request->segment(1) == 'sku' && $request->segment(2) == 'create' ? 'active' : '' }}">

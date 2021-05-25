@@ -33,6 +33,11 @@ class PayoutController extends Controller
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
              }
              $shop_ids = $shops->pluck('id')->toArray();
+             
+             $all_shops = Shop::whereIn('id', $shop_ids)->get();
+             foreach ($all_shops as $shop) {
+              $shop->syncLazadaPayout();
+             }
 
              $payout = LazadaPayout::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc');
 
