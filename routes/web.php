@@ -16,10 +16,11 @@
 
 Route::group(['middleware' => 'auth'], function()
 {
-	Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function(){
+	Route::group(['prefix' => 'admin'], function(){ //, 'middleware' => 'admin'
 		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
 		Route::resource('/manageuser', 'Admin\UserManagementController');
 		Route::get('/manageuser/delete/{user}', 'Admin\UserManagementController@delete');
+		Route::get('/manageuser/{user}/shops', 'Admin\UserManagementController@Shops')->name('user.shops');
 		Route::resource('/manageshop', 'Admin\ShopManagementController')->only(['index','edit','update','destroy']);
 		Route::resource('/promocode', 'Admin\PromocodeController');
 		Route::get('/promocode/delete/{promocode}', 'Admin\PromocodeController@delete');

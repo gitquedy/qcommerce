@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use DB;
-use Auth;
-use Validator;
-use App\User;
-use App\Package;
 use App\Business;
-use Illuminate\Http\Request;
-use App\Rules\MatchOldPassword;
-use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Package;
+use App\Products;
+use App\Rules\MatchOldPassword;
+use App\Shop;
+use App\User;
+use Auth;
+use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
+use Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserManagementController extends Controller
 {
@@ -44,7 +46,8 @@ class UserManagementController extends Controller
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                 Action<span class="sr-only">Toggle Dropdown</span></button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="'. action('Admin\UserManagementController@edit', $user->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                    <a class="dropdown-item" href="'. action('Admin\UserManagementController@edit', $user->id) .'"><i class="fa fa-edit" aria-hidden="true""></i> Edit</a>
+                    <a class="dropdown-item" href="'. route('user.shops', $user) .'"><i class="feather icon-shopping-bag" aria-hidden="true""></i> Shop List</a>
                     <a class="dropdown-item modal_button '.$disabled.'" href="#" data-href="'. action('Admin\UserManagementController@delete', $user->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
                 </div></div>';
                 return $actions;
@@ -248,5 +251,71 @@ class UserManagementController extends Controller
 
     public function settings(Request $request){
       return view('user.settings');
+    }
+
+    public function Shops(User $user)
+    {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\ShopManagementController@index'), 'name'=>"Shop List"], ['name'=>"Shops"]
+        ];
+        if ( request()->ajax()) {
+           $shop = Shop::where('business_id', $user->business->id)->orderBy('shop.updated_at', 'desc');
+            return Datatables::eloquent($shop)
+            ->editColumn('site', function(Shop $shop) {
+                            return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';
+                        })
+            ->addColumn('warehouse_name', function(Shop $shop) {
+                return isset($shop->warehouse->name)?$shop->warehouse->name:'[Deleted Warehouse]';
+            })
+            ->addColumn('statusChip', function(Shop $shop) {
+                            $html = '';
+                            if($shop->active == 1){
+                                $html = '<div class="chip chip-primary"><div class="chip-body"><div class="chip-text">Active</div></div></div>';
+                            }else if($shop->active == 2){
+                                $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">Syncing</div></div></div>';
+                            }
+                           return $html;
+                        })
+            ->addColumn('orders', function(Shop $shop) {
+                            $html = $shop->orders()->whereDate('created_at','=',date('Y-m-d'))->count();
+                            $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$html.'</div></div></div>';
+                           return $html;
+                        })
+            ->addColumn('pending_count', function(Shop $shop) {
+                           return '<div class="chip chip-danger"><div class="chip-body"><div class="chip-text">'.
+                        $shop->orders('pending')->count().'</div></div></div>';
+                        })
+            ->addColumn('ready_to_ship_count', function(Shop $shop) {
+                           return '<div class="chip chip-warning"><div class="chip-body"><div class="chip-text">'.
+                        $shop->orders('ready_to_ship')->count().'</div></div></div>';
+                        })
+            ->addColumn('shipped_count', function(Shop $shop) {
+                           return '<div class="chip chip-success"><div class="chip-body"><div class="chip-text">'.
+                        $shop->orders('shipped')->count().'</div></div></div>';
+                        })
+            ->addColumn('delivered_count', function(Shop $shop) {
+                           return '<div class="chip chip-success"><div class="chip-body"><div class="chip-text">'.
+                        $shop->orders('delivered')->count().'</div></div></div>';
+                        })
+            ->addColumn('products', function(Shop $shop) {
+                           $product_count =  Products::where('shop_id','=',$shop->id)->get()->count();
+                           return '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">'.$product_count.'</div></div></div>';
+                        })
+            ->addColumn('action', function(Shop $shop) {
+                    $actions = '<div class="btn-group dropup mr-1 mb-1">
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                    Action<span class="sr-only">Toggle Dropdown</span></button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item modal_button" href="#" data-href="'. action('Admin\ShopManagementController@edit', $shop->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                    </div></div>';
+                    return $actions;
+             })
+            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action'])
+            ->make(true);
+        }
+        return view('admin.user.shop', [
+            'user' => $user,
+            'breadcrumbs' => $breadcrumbs,
+        ]);
     }
 }
