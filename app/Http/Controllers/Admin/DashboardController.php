@@ -20,7 +20,7 @@ class DashboardController extends Controller
 
         $colour = Helper::get_colours();
         $total_users = User::count();
-        $users_date = User::select(DB::raw('DATE(created_at) as date'))->distinct()->orderBy('created_at', 'desc')->limit(10)->get();
+        $users_date = User::select(DB::raw('DATE(created_at) as date'))->distinct()->orderBy('date', 'desc')->limit(10)->get();
         
         $user_count = array();
         foreach ($users_date as $key => $value) {
@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
 
         $total_shops = Shop::count();
-        $shops_date = Shop::select(DB::raw('DATE(created_at) as date'))->distinct()->orderBy('created_at', 'desc')->limit(10)->get();
+        $shops_date = Shop::select(DB::raw('DATE(created_at) as date'))->distinct()->orderBy('date', 'desc')->limit(10)->get();
         
         $shops_count = array();
         foreach ($shops_date as $key => $value) {
