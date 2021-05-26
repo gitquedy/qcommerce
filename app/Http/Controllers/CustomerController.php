@@ -6,6 +6,9 @@ use Auth;
 use Validator;
 use App\Customer;
 use App\PriceGroup;
+use App\Shop;
+use App\WoocommerceCustomer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -298,5 +301,88 @@ class CustomerController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+    public function woocommerceCustomers() {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customer"], ['name'=>"WooCommerce Customers"]
+        ];
+
+        if ( request()->ajax()) {
+            $user = Auth::user();
+            $shops = Shop::where('business_id', $user->business_id)->where('site', 'woocommerce')->get();
+
+            foreach($shops as $shop) {
+                $client = $shop->woocommerceGetClient();
+
+                $page = 1;
+                $all_customers = [];
+                do{
+                    try {
+                        $customers = $client->get('customers', array('per_page' => 10, 'page' => $page));
+                    }catch(HttpClientException $e){
+                        die("Can't get customers: $e");
+                    }
+                    $all_customers = array_merge($all_customers, $customers);
+                    $page++;
+                } while (count($customers) > 0);
+
+                foreach($all_customers as $customer) {
+                    $orders = $shop->orders()->where('CustomerId', $customer->id)->get();
+    
+                    $orders_worth = 0;
+                    foreach($orders as $order) {
+                        $orders_worth += $order->price;
+                    }
+
+                    $customer_details = [
+                        'shop_id' => $shop->id,
+                        'woo_customer_id' => $customer->id,
+                        'first_name' => $customer->first_name,
+                        'last_name' => $customer->last_name,
+                        'address' => $customer->billing->address_1.', '.(($customer->billing->address_2)?$customer->billing->address_2.', ':'').$customer->billing->city,
+                        'email' => $customer->email,
+                        'mobile_num' => $customer->billing->phone,
+                        'orders_count' => $orders->count(),
+                        'orders_worth' => $orders_worth,
+                        'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_created) + 8 * 3600))->toDateTimeString(),
+                        'updated_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_modified) + 8 * 3600))->toDateTimeString(),
+                    ];
+    
+                    $record = WoocommerceCustomer::updateOrCreate(['woo_customer_id' => $customer_details['woo_customer_id']], $customer_details);
+                    foreach($orders as $order) {
+                        $order->update(['customer_id' => $record->id]);
+                    }
+                }
+            }
+
+            $customer = WoocommerceCustomer::with('shop');
+
+            return Datatables($customer)
+            ->addColumn('customer_name', function(WoocommerceCustomer $customer) {
+                return $customer->fullName();
+            })
+            ->addColumn('shop.short_name', function(WoocommerceCustomer $customer) {
+                return $customer->shop->short_name;
+            })
+            // ->addColumn('action', function(Customer $customer) {
+            //         $actions = '<div class="btn-group dropup mr-1 mb-1">
+            //         <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+            //         Action<span class="sr-only">Toggle Dropdown</span></button>
+            //         <div class="dropdown-menu">
+            //             <a class="dropdown-item" href="'. action('CustomerController@show', $customer->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
+            //             <a class="dropdown-item toggle_view_modal" href="" data-action="'.action('DepositController@viewDepositModal', $customer->id).'"><i class="fa fa-list" aria-hidden="true"></i> List Deposit</a>
+            //             <a class="dropdown-item toggle_view_modal" href="" data-action="'.action('DepositController@addDepositModal', $customer->id).'"><i class="fa fa-plus" aria-hidden="true"></i> Add Deposit</a>
+            //             <a class="dropdown-item" href="'. action('CustomerController@edit', $customer->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+            //             <a class="dropdown-item modal_button " href="#" data-href="'. action('CustomerController@delete', $customer->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
+            //         </div></div>';
+            //         return $actions;
+            //  })
+            // ->rawColumns(['action'])
+            ->make(true);
+        }
+        return view('customer.woocommerce', [
+            'breadcrumbs' => $breadcrumbs,
+        ]);
     }
 }

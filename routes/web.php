@@ -231,6 +231,7 @@ Route::group(['middleware' => 'auth'], function()
 
 	Route::group(['middleware' => 'permission:customer.manage'], function()
 	{
+		Route::get('/customer/woocommerce', 'CustomerController@woocommerceCustomers')->name('customer.woocommerce');
 		Route::resource('/customer', 'CustomerController');
 		Route::get('/customer/delete/{customer}', 'CustomerController@delete');
 		Route::post('/customer/addCustomerModal', 'CustomerController@addCustomerModal')->name('customer.addCustomerModal');

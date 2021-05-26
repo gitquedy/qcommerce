@@ -18,7 +18,7 @@ class Order extends Model
     protected $table = 'order';
 
     protected $fillable = [
-		    	'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name','shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout', 'order_no'
+		    	'tracking_no', 'customer_last_name', 'price','payment_method','customer_first_name', 'woocommerce_customer_id', 'CustomerId', 'shipping_fee','items_count','status','shop_id', 'created_at', 'updated_at', 'site', 'printed', 'packed', 'ordersn', 'shipping_fee_reconciled', 'returned', 'payout', 'order_no'
 			];
 
     public $timestamps = false;
@@ -57,6 +57,10 @@ class Order extends Model
     public function seller_payout_fees() {
         return $this->hasOne(ShippingFee::class, 'order_no', 'ordersn')->where('trans_type', 7);
     }
+
+    public function customer(){
+		return $this->belongsTo(WoocommerceCustomer::class, 'woocommerce_customer_id', 'id');
+	}
 
     public function getShippingFeeOverchargeAttribute(){
         
