@@ -212,9 +212,7 @@ class ReportsController extends Controller
             uasort($report, function ($a, $b) {
                 return $b['total_quantity'] <=> $a['total_quantity'];
             });
-            // print json_encode($report);die();
             $data['report'] = array_slice($report, 0, 10, true);
-            // $data['report'] = $report;
             return $data;
         }
         return view('reports.topSellingProducts', [
@@ -254,21 +252,40 @@ class ReportsController extends Controller
             $report = [];
             foreach($order as $order) {
                 $date = $order->date;
-                $sales = Sales::where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
-                
-                $report[$date]['total_orders'] = $order->total_orders + count($sales);
-
-                $count = 0;
-                foreach ($sales as $sale) {
-                    foreach ($sale->items as $item) {
-                        $count += $item->quantity;
-                    }
-                }
-                $report[$date]['total_quantity'] = $order->total_item_count + $count;
+                $report[$date]['total_orders'] = $order->total_orders;
+                $report[$date]['total_quantity'] = $order->total_item_count;
+                $report[$date]['total_sales'] = $order->total_price;
                 $report[$date]['date'] = Utilities::format_date($order->date, 'M d, Y');
+            }
+            if ($request->get('shop') == null || in_array('0', explode(',', $request->get('shop')))) {
+                $sales = $request->user()->business->sales()->select(DB::raw("DATE(sales.date) as date"), DB::raw('COUNT(DISTINCT sales.id) as total_sales'), DB::raw('COUNT(sale_items.id) as total_items'), DB::raw('SUM(sales.grand_total) as grand_total'))
+                    ->join('sale_items', 'sale_items.sales_id','=','sales.id')
+                    ->where('status', '!=', 'canceled')
+                    ->groupBy('date');
+                    if(count($daterange) == 2){
+                        if($daterange[0] == $daterange[1]){
+                            $sales->whereDate('sales.date', [$daterange[0]]);
+                        }else{
+                            $sales->whereDate('sales.date', '>=', $daterange[0])->whereDate('sales.date', '<=', $daterange[1]);
+                        }
+                    }
+                $sales = $sales->get();
 
-                $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where('date', $order->date)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
-                $report[$date]['total_sales'] = $order->total_price + $sales->total;
+                foreach ($sales as $sale) {
+                    $date = $sale->date;
+                    if (!isset($report[$date])) {
+                        $report[$date] = [
+                            'total_orders' => 0,
+                            'total_sales' => 0,
+                            'total_quantity' => 0,
+                        ];    
+                    }
+                    $report[$date]['total_orders'] += $sale->total_sales;
+                    $report[$date]['total_sales'] += $sale->grand_total;
+                    $report[$date]['total_quantity'] += $sale->total_items;
+                    $report[$date]['date'] = Utilities::format_date($sale->date, 'M d, Y');
+                }
+                $data['count'] += count($sales);
             }
             $data['report'] = $report;
             return $data;
@@ -302,23 +319,33 @@ class ReportsController extends Controller
             $report = [];
             foreach($order as $order) {
                 $date = $order->monthly;
-                $sales = Sales::where(DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m')"), $order->monthly)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->get();
-                
-                $report[$date]['total_orders'] = $order->total_orders  + count($sales);
-
-                $count = 0;
-                foreach ($sales as $sale) {
-                    foreach ($sale->items as $item) {
-                        $count += $item->quantity;
-                    }
-                }
-                $report[$date]['total_quantity'] = $order->total_item_count + $count;
+                $report[$date]['total_orders'] = $order->total_orders;
+                $report[$date]['total_quantity'] = $order->total_item_count;
+                $report[$date]['total_sales'] = $order->total_price;
                 $report[$date]['date'] = Utilities::format_date($order->monthly, 'M Y');
-
-                $sales = Sales::select(DB::raw('SUM(grand_total) as total'))->where(DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m')"), $order->monthly)->where('business_id', Auth::user()->business_id)->where('status', '!=', 'canceled')->first();
-                $report[$date]['total_sales'] = $order->total_price  + $sales->total;
             }
-
+            if ($request->get('shop') == null || in_array('0', explode(',', $request->get('shop')))) {
+                $sales = $request->user()->business->sales()->select(DB::raw("DATE_FORMAT(sales.date, '%Y-%m') as monthly"), DB::raw('COUNT(DISTINCT sales.id) as total_sales'), DB::raw('COUNT(sale_items.id) as total_items'), DB::raw('SUM(sales.grand_total) as grand_total'))
+                    ->join('sale_items', 'sale_items.sales_id','=','sales.id')
+                    ->where('status', '!=', 'canceled')
+                    ->groupBy('monthly')
+                    ->get();
+                foreach ($sales as $sale) {
+                    $date = $sale->monthly;
+                    if (!isset($report[$date])) {
+                        $report[$date] = [
+                            'total_orders' => 0,
+                            'total_sales' => 0,
+                            'total_quantity' => 0,
+                        ];    
+                    }
+                    $report[$date]['total_orders'] += $sale->total_sales;
+                    $report[$date]['total_sales'] += $sale->grand_total;
+                    $report[$date]['total_quantity'] += $sale->total_items;
+                    $report[$date]['date'] = Utilities::format_date($sale->monthly, 'M Y');
+                }
+                $data['count'] += count($sales);
+            }
             $report_length = 12;
             $report_offset = count($report)-$report_length;
             if ($report_offset < 0) {

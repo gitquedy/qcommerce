@@ -11,13 +11,7 @@
     </div>
 <div class="shadow-bottom"></div>
 <div class="main-menu-content">  
-    <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">    
-        
-        <li class="nav-item">
-            <a>
-                <span class="menu-title" data-i18n="nav.order">Admin Navigation</span>
-            </a>
-        </li>
+    <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
         <li class="nav-item {{ $request->segment(1) == '' ? 'active' : '' }}">
             <a href="{{route('admin.dashboard')}}">
