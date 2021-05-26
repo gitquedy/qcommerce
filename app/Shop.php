@@ -673,7 +673,12 @@ class Shop extends Model
             $all_products = array_merge($all_products, $products);
             $page++;
         } while (count($products) > 0);
+
+        $all_products_id = array();
+
         foreach($all_products as $product) {
+            $all_products_id[] = $product->id;
+
             $product_details = [
             'shop_id' => $this->id,
             'site' => 'woocommerce',
@@ -693,6 +698,11 @@ class Shop extends Model
             
             Products::updateOrCreate(['shop_id' => $product_details['shop_id'], 'item_id' => $product_details['item_id']], $product_details);
         }
+
+        $check_products = $this->products->pluck('item_id')->toArray();
+        $delete_ids = array_diff($check_products, $all_products_id);
+        $delete = $this->products()->whereIn('item_id', $delete_ids)->delete();
+        
         return;
     }
 
@@ -726,6 +736,7 @@ class Shop extends Model
                 'shipping_fee' => $order->shipping_total,
                 'printed' => ($order->status == 'completed') ? true : false,
                 'customer_first_name' => $order->billing->first_name . ' ' . $order->billing->last_name,
+                'sellerCustomer' => (int)$order->customer_id,
                 // 'created_at' => Carbon::parse($order->date_created)->toDateTimeString(),
                 // 'updated_at' => Carbon::parse($order->date_modified)->toDateTimeString(),
                 'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($order->date_created) + 8 * 3600))->toDateTimeString(),
