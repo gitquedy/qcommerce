@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-sm-12 shop_filter">
                     <label for="site1" class="btn btn-lg btn-outline-primary mb-1">
-                        <img class="shop_logo" src="{{asset('images/pages/no-img.jpg')}}" alt="">
+                        <img class="shop_logo" src="{{asset('images/shop/icon/qcommerce.png')}}" alt="">
                         Customers
                     </label>
                     <label for="site4" class="btn btn-lg btn-outline-primary mb-1 active">
