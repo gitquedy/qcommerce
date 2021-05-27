@@ -309,10 +309,10 @@ class CustomerController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customer"], ['name'=>"WooCommerce Customers"]
         ];
 
-        if ( request()->ajax()) {
-            $user = Auth::user();
-            $shops = Shop::where('business_id', $user->business_id)->where('site', 'woocommerce')->get();
+        $user = Auth::user();
+        $shops = Shop::where('business_id', $user->business_id)->where('site', 'woocommerce')->get();
 
+        if ( request()->ajax()) {
             $shop_ids = array();
             foreach($shops as $shop){
                 $shop_ids[] = $shop->id;
@@ -345,6 +345,7 @@ class CustomerController extends Controller
         }
         return view('customer.woocommerce', [
             'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $shops,
         ]);
     }
 }

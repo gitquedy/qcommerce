@@ -463,12 +463,12 @@
                                 <span class="menu-title" data-i18n="">Add Customer</span>
                             </a>
                         </li>
-                        <li class="{{ $request->segment(1) == 'customer' && $request->segment(2) == 'woocommerce' ? 'active' : '' }}">
+                        <!-- <li class="{{ $request->segment(1) == 'customer' && $request->segment(2) == 'woocommerce' ? 'active' : '' }}">
                             <a href="{{url('customer/woocommerce')}}">
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-title" data-i18n="">WooCommerce Customers</span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </li>
             @endcan

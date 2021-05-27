@@ -16,6 +16,34 @@
 @endsection
 
 @section('content')
+<section class="card">
+    <div class="card-content">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 shop_filter">
+                    <label for="site1" class="btn btn-lg btn-outline-primary mb-1">
+                        <img class="shop_logo" src="{{asset('images/pages/no-img.jpg')}}" alt="">
+                        Customers
+                    </label>
+                    <label for="site4" class="btn btn-lg btn-outline-primary mb-1 active">
+                        <img class="shop_logo" src="{{asset('images/shop/icon/woocommerce.png')}}" alt="">
+                        WooCommerce
+                    </label>
+                    <input type="radio" id="site1" name="site" value="customers">
+                    <input type="radio" id="site4" name="site" value="woocommerce">
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    @include('order.components.shopFilter')
+                    <div class="btn-group" id="chip_area_shop"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="data-list-view" class="data-list-view-header">
     {{-- DataTable starts --}}
     <div class="table-responsive">
@@ -80,11 +108,7 @@
             }
         };
     var buttons = [
-            { text: "<i class='feather icon-plus'></i> Add New",
-            action: function() {
-                // window.location = '{{ route('customer.create') }}';
-            },
-            className: "btn-outline-primary margin-r-10"}
+            
             ];
     var order = [8, 'desc'];
     var BInfo = true;
@@ -107,6 +131,10 @@ var pageLength = 20;
                 $('.view_modal').html(result).modal();
             }
         });
+    });
+
+    $('#site1').click(function() {
+      window.location = '{{ route('customer.index') }}';
     });
 </script> 
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
