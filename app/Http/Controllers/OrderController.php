@@ -31,6 +31,7 @@ class OrderController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
         ];
         $all_shops = $request->user()->business->shops;
+        $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));
         if($request->get('site') == 'shopee'){
            $statuses = Order::$shopee_statuses;
            $all_shops = $all_shops->where('site', 'shopee');
@@ -156,6 +157,7 @@ class OrderController extends Controller
         return view('order.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
+            'all_sites' => $all_sites,
             'statuses' => $statuses,
             'selectedStatus' => $selectedStatus,
         ]);

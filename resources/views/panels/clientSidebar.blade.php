@@ -52,12 +52,6 @@
             @endcan
             
             @can('product.manage')
-                <!-- <li class="nav-item {{ $request->segment(1) == 'product' ? 'active' : '' }}">
-                    <a href="{{url('/product')}}?site={{ $request->user()->checkFirstAllowedSite() }}&status=active">
-                        <i class="feather icon-package "></i>
-                        <span class="menu-title" data-i18n="">Products</span>
-                    </a>
-                </li> -->
                 <li class="nav-item ">
                     <a href="#">
                         <i class="feather icon-package"></i>
@@ -463,12 +457,6 @@
                                 <span class="menu-title" data-i18n="">Add Customer</span>
                             </a>
                         </li>
-                        <!-- <li class="{{ $request->segment(1) == 'customer' && $request->segment(2) == 'woocommerce' ? 'active' : '' }}">
-                            <a href="{{url('customer/woocommerce')}}">
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-title" data-i18n="">WooCommerce Customers</span>
-                            </a>
-                        </li> -->
                     </ul>
                 </li>
             @endcan

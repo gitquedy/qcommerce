@@ -33,30 +33,14 @@
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12 shop_filter">
-              <label for="site1" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'lazada' ?  'active' : ''}}">
-                <img class="shop_logo" src="{{asset('images/shop/icon/lazada.png')}}" alt="">
-                Lazada
-                <span id="badge_lazada_total" class="badge badge-secondary"></span>
+            @foreach($all_sites as $site)
+              <label for="{{ $site }}" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == $site ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/'.$site.'.png')}}" alt="">
+                {{ ucfirst($site) }}
+                <span id="badge_{{ $site }}_total" class="badge badge-secondary"></span>
               </label>
-              <label for="site2" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopee' ?  'active' : ''}}">
-                <img class="shop_logo" src="{{asset('images/shop/icon/shopee.png')}}" alt="">
-                Shopee
-                <span id="badge_shopee_total" class="badge badge-secondary"></span>
-              </label>
-              <label for="site3" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'shopify' ?  'active' : ''}}">
-                <img class="shop_logo" src="{{asset('images/shop/icon/shopify.png')}}" alt="">
-                Shopify
-                <span id="badge_shopify_total" class="badge badge-secondary"></span>
-              </label>
-              <label for="site4" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == 'woocommerce' ?  'active' : ''}}">
-                <img class="shop_logo" src="{{asset('images/shop/icon/woocommerce.png')}}" alt="">
-                WooCommerce
-                <span id="badge_woocommerce_total" class="badge badge-secondary"></span>
-              </label>
-              <input type="radio" id="site1" name="site" value="lazada"  {{ $request->get("site") == "lazada" ?  "checked" : ""}}>
-              <input type="radio" id="site2" name="site" value="shopee"  {{ $request->get('site') == 'shopee' ?  'checked' : ''}}>
-              <input type="radio" id="site3" name="site" value="shopify"  {{ $request->get('site') == 'shopify' ?  'checked' : ''}}>
-              <input type="radio" id="site4" name="site" value="woocommerce"  {{ $request->get('site') == 'woocommerce' ?  'checked' : ''}}>
+              <input type="radio" id="{{ $site }}" name="site" value="{{ $site }}"  {{ $request->get("site") == $site ?  "checked" : ""}}>
+            @endforeach
           </div>
         </div>
         {{-- <div class="row">

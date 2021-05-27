@@ -30,6 +30,8 @@ class ProductController extends Controller
 
         $shop_ids = $all_shops->pluck('id');
 
+        $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));
+
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
            $statuses = Products::$shopeeStatuses;
@@ -132,6 +134,7 @@ class ProductController extends Controller
         return view('product.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
+            'all_sites' => $all_sites,
             'statuses' => $statuses,
             'selectedStatus' => $selectedStatus,
         ]);
@@ -141,6 +144,8 @@ class ProductController extends Controller
         $all_shops =  $request->user()->business->shops;
 
         $shop_ids = $all_shops->pluck('id');
+
+        $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));
 
         if($request->get('site') == 'shopee'){
            $all_shops = $all_shops->where('site', 'shopee');
@@ -244,6 +249,7 @@ class ProductController extends Controller
         return view('product.unlink', [
             'breadcrumbs' => $breadcrumbs,
             'all_shops' => $all_shops,
+            'all_sites' => $all_sites,
             'statuses' => $statuses,
             'selectedStatus' => $selectedStatus,
         ]);
