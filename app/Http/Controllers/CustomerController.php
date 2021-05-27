@@ -70,8 +70,11 @@ class CustomerController extends Controller
             ->rawColumns(['action', 'price_group_data1'])
             ->make(true);
         }
+        $all_shops = $request->user()->business->shops;
+        $site = in_array('woocommerce', $all_shops->pluck('site')->toArray());
         return view('customer.index', [
             'breadcrumbs' => $breadcrumbs,
+            'site' => $site,
         ]);
     }
 

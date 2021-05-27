@@ -21,16 +21,16 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-12 shop_filter">
-                    <label for="site1" class="btn btn-lg btn-outline-primary mb-1">
+                    <label for="qcommerce" class="btn btn-lg btn-outline-primary mb-1">
                         <img class="shop_logo" src="{{asset('images/shop/icon/qcommerce.png')}}" alt="">
                         Customers
                     </label>
-                    <label for="site4" class="btn btn-lg btn-outline-primary mb-1 active">
+                    <input type="radio" id="qcommerce" name="site" value="customers">
+                    <label for="woocommerce" class="btn btn-lg btn-outline-primary mb-1 active">
                         <img class="shop_logo" src="{{asset('images/shop/icon/woocommerce.png')}}" alt="">
                         WooCommerce
                     </label>
-                    <input type="radio" id="site1" name="site" value="customers">
-                    <input type="radio" id="site4" name="site" value="woocommerce">
+                    <input type="radio" id="woocommerce" name="site" value="woocommerce">
                 </div>
             </div>
             <br>
@@ -133,7 +133,7 @@ var pageLength = 20;
         });
     });
 
-    $('#site1').click(function() {
+    $('#qcommerce').click(function() {
       window.location = '{{ route('customer.index') }}';
     });
 </script> 
