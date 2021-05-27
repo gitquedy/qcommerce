@@ -112,6 +112,7 @@ class Shop extends Model
                 $this->syncShopifyOrders($date);
             }else if($this->site == 'woocommerce'){
                 $this->syncWoocommerceOrders($date);
+                $this->syncWoocommerceCustomers($date);
             }
             $this->update(['active' => 1, 'is_first_time' => false]);
         } catch (\Exception $e) {
@@ -764,6 +765,52 @@ class Shop extends Model
             }
         }
         return;
+    }
+
+    public function syncWoocommerceCustomers($date) {
+        $woocommerce = $this->woocommerceGetClient();
+
+        $page = 1;
+        $all_customers = [];
+        $after = Carbon::parse($date)->format('c');
+        $before = Carbon::now()->addDays(2)->format('c');
+        do{
+            try {
+                $customers = $woocommerce->get('customers', array('per_page' => 10, 'page' => $page, 'after' => $after, 'before' => $before));
+            }catch(HttpClientException $e){
+                die("Can't get customers: $e");
+            }
+            $all_customers = array_merge($all_customers, $customers);
+            $page++;
+        } while (count($customers) > 0);
+
+        foreach($all_customers as $customer) {
+            $orders = $this->orders()->where('CustomerId', $customer->id)->get();
+
+            $orders_worth = 0;
+            foreach($orders as $order) {
+                $orders_worth += $order->price;
+            }
+
+            $customer_details = [
+                'shop_id' => $this->id,
+                'woo_customer_id' => $customer->id,
+                'first_name' => $customer->first_name,
+                'last_name' => $customer->last_name,
+                'address' => $customer->billing->address_1.', '.(($customer->billing->address_2)?$customer->billing->address_2.', ':'').$customer->billing->city,
+                'email' => $customer->email,
+                'mobile_num' => $customer->billing->phone,
+                'orders_count' => $orders->count(),
+                'orders_worth' => $orders_worth,
+                'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_created) + 8 * 3600))->toDateTimeString(),
+                'updated_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_modified) + 8 * 3600))->toDateTimeString(),
+            ];
+
+            $record = WoocommerceCustomer::updateOrCreate(['woo_customer_id' => $customer_details['woo_customer_id']], $customer_details);
+            foreach($orders as $order) {
+                $order->update(['woocommerce_customer_id' => $record->id]);
+            }
+        }
     }
 
     public function woocommerceGetClient() {

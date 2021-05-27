@@ -512,6 +512,7 @@ class ShopController extends Controller
                     $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }else if($shop->site == 'woocommerce'){
                     $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                    $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }    
                 //   $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                   $output = ['success' => 1,
@@ -544,6 +545,7 @@ class ShopController extends Controller
                 $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
               }else if($shop->site == 'woocommerce'){
                 $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
+                $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
               }
               $output = ['success' => 1,
                   'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',

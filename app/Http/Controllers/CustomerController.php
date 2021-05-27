@@ -313,50 +313,6 @@ class CustomerController extends Controller
             $user = Auth::user();
             $shops = Shop::where('business_id', $user->business_id)->where('site', 'woocommerce')->get();
 
-            // foreach($shops as $shop) {
-            //     $client = $shop->woocommerceGetClient();
-
-            //     $page = 1;
-            //     $all_customers = [];
-            //     do{
-            //         try {
-            //             $customers = $client->get('customers', array('per_page' => 10, 'page' => $page));
-            //         }catch(HttpClientException $e){
-            //             die("Can't get customers: $e");
-            //         }
-            //         $all_customers = array_merge($all_customers, $customers);
-            //         $page++;
-            //     } while (count($customers) > 0);
-
-            //     foreach($all_customers as $customer) {
-            //         $orders = $shop->orders()->where('CustomerId', $customer->id)->get();
-    
-            //         $orders_worth = 0;
-            //         foreach($orders as $order) {
-            //             $orders_worth += $order->price;
-            //         }
-
-            //         $customer_details = [
-            //             'shop_id' => $shop->id,
-            //             'woo_customer_id' => $customer->id,
-            //             'first_name' => $customer->first_name,
-            //             'last_name' => $customer->last_name,
-            //             'address' => $customer->billing->address_1.', '.(($customer->billing->address_2)?$customer->billing->address_2.', ':'').$customer->billing->city,
-            //             'email' => $customer->email,
-            //             'mobile_num' => $customer->billing->phone,
-            //             'orders_count' => $orders->count(),
-            //             'orders_worth' => $orders_worth,
-            //             'created_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_created) + 8 * 3600))->toDateTimeString(),
-            //             'updated_at' => Carbon::parse(date("Y-m-d H:i:s",strtotime($customer->date_modified) + 8 * 3600))->toDateTimeString(),
-            //         ];
-    
-            //         $record = WoocommerceCustomer::updateOrCreate(['woo_customer_id' => $customer_details['woo_customer_id']], $customer_details);
-            //         foreach($orders as $order) {
-            //             $order->update(['woocommerce_customer_id' => $record->id]);
-            //         }
-            //     }
-            // }
-
             $shop_ids = array();
             foreach($shops as $shop){
                 $shop_ids[] = $shop->id;
