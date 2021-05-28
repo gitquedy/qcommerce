@@ -130,6 +130,48 @@ class ReportsController extends Controller
         ]);
     }
 
+    public function itemsNotMoving(Request $request) {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@itemsNotMoving'), 'name'=>"Reports"], ['name'=>"Items Not Moving"]
+        ];
+        $all_shops = $request->user()->business->shops;
+
+        if($request->get('days')){
+            $selectedDays = $request->get('days');
+        }
+        else {
+            $selectedDays = 7;
+        }
+
+            if ( request()->ajax()) {
+                $business_id = Auth::user()->business_id;
+
+                $days = $request->get('days');
+
+                $Sku = Sku::where('business_id','=',$business_id)->where('updated_at', '<', Carbon::now()->subDays($days)->format('Y-m-d'));
+
+                return Datatables::eloquent($Sku)
+                ->addColumn('image', function(Sku $SKSU) {
+                                return $SKSU->SkuImage();
+                            })
+                ->addColumn('supplier_name', function(Sku $SKSU) {
+                                $Supplier = Supplier::find($SKSU->supplier);
+                                if($Supplier){
+                                   return  $Supplier->company;
+                                }
+                                else {
+                                    return "--";
+                                }
+                            })
+                ->make(true);
+            }
+        return view('reports.itemsNotMoving', [
+            'breadcrumbs' => $breadcrumbs,
+            'all_shops' => $all_shops,
+            'selectedDays' => $selectedDays,
+        ]);
+    }
+
     public function topSellingProducts(Request $request){
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
         $all_shops = $request->user()->business->shops;

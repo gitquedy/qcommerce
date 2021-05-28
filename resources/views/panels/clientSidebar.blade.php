@@ -354,6 +354,12 @@
                                 <span class="menu-title" data-i18n="">Product Alert</span>
                             </a>
                         </li>
+                        <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'itemsNotMoving' ? 'active' : '' }}">
+                            <a href="{{route('reports.itemsNotMoving')}}">
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-title" data-i18n="">Items Not Moving</span>
+                            </a>
+                        </li>
                         <li class="{{ $request->segment(1) == 'reports' && $request->segment(2) == 'dailySales' ? 'active' : '' }}">
                             <a href="{{ action('ReportsController@dailySales') }}">
                                 <i class="feather icon-circle"></i>
