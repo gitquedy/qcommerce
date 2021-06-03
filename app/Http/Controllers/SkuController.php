@@ -14,6 +14,7 @@ use App\Library\Lazada\lazop\LazopRequest;
 use App\Library\Lazada\lazop\UrlConstants;
 use App\PriceGroupItemPrice;
 use App\Products;
+use App\Plan;
 use App\Shop;
 use App\Sku;
 use App\SetItem;
@@ -131,8 +132,15 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse;
+        // $business_id = Auth::user()->business_id;
+        // $all_warehouse = Business::find($business_id)->warehouse;
+        $user = Auth::user();
+        if ($user->business->subscription() !== null) {
+            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+        }
+        else {
+            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+        }
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -234,8 +242,15 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse;
+        // $business_id = Auth::user()->business_id;
+        // $all_warehouse = Business::find($business_id)->warehouse;
+        $user = Auth::user();
+        if ($user->business->subscription() !== null) {
+            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+        }
+        else {
+            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+        }
         return view('sku.unlink', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -312,6 +327,8 @@ class SkuController extends Controller
 
         //code for adding products in set during sku creation
         if ($request->type == 'set') {
+            $quantity_array = array();
+            $sku_of_set = Sku::find($sku->id);
             for ($index = 0; $index < count($request->sku_id); $index++) {
                 $setitem = new SetItem();
                 $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
@@ -322,7 +339,13 @@ class SkuController extends Controller
                 $setitem->unit_price = $item->price;
                 $setitem->set_quantity = $request->set_quantity[$index];
                 $setitem->save();
+
+                $sku_of_setitem = Sku::find($request->sku_id[$index]);
+                $quantity_array[] = (int)($sku_of_setitem->quantity / $request->set_quantity[$index]);
             }
+            $quantity_of_set = min($quantity_array);
+            $sku_of_set->quantity = $quantity_of_set;
+            $sku_of_set->save();
         }
 
         return redirect('/sku/skuproducts/'.$sku->id);
@@ -404,6 +427,7 @@ class SkuController extends Controller
         $sku->type = $request->type;
 
         if ($request->type == 'set') {
+            $quantity_array = array();
             for ($index = 0; $index < count($request->sku_id); $index++) {
                 $item = Sku::where('business_id','=', $sku->business_id)->where('id','=',$request->sku_id[$index])->first();
                 $data = [
@@ -415,7 +439,12 @@ class SkuController extends Controller
                     'set_quantity' => $request->set_quantity[$index],
                 ];
                 SetItem::updateOrCreate(['sku_set_id' => $sku->id, 'sku_single_id' => $request->sku_id[$index]], $data);
+                
+                $sku_of_setitem = Sku::find($request->sku_id[$index]);
+                $quantity_array[] = (int)($sku_of_setitem->quantity / $request->set_quantity[$index]);
             }
+            $quantity_of_set = min($quantity_array);
+            $sku->quantity = $quantity_of_set;
             foreach ($sku->set_items as $item) {
                 if (!in_array($item->sku_single_id, $request->sku_id)) {
                     $item->delete();
@@ -557,7 +586,7 @@ class SkuController extends Controller
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to Unlink '. $product->name .' ?" data-text="This Product will no longer sync to this SKU." data-method="POST" data-href="'.route('sku.removeskuproduct',['id'=>$product->id]).'" > Unlink</a>
+                        <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to Unlink '. $product->name .' ?" data-text="This Product will no longer sync to this SKU." data-method="POST" data-href="'.route('sku.removeskuproduct',['id'=>$product->id, 'sku_id'=>$product->seller_sku_id]).'" > Unlink</a>
                         <a class="dropdown-item" href="'.$product->Url.'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
                     </div></div>';
                                 })
@@ -713,6 +742,17 @@ class SkuController extends Controller
         array_push($ids, $request->id);
         $update = Products::whereIn('id', $ids)->update(['seller_sku_id' => null]);
         if($update) {
+            // $sku_of_set = Sku::find($sku->id);
+            // if (!isset($sku_of_set->products)) {
+            //     $quantity_array = array();
+            //     foreach($sku_of_set->set_items as $item) {
+            //         $sku_of_setitem = Sku::find($item->sku_single_id);
+            //         $quantity_array[] = (int)($sku_of_setitem->quantity / $sku_of_set->quantity);
+            //     }
+            //     $quantity_of_set = min($quantity_array);
+            //     $sku_of_set->quantity = $quantity_of_set;
+            //     $sku_of_set->save();
+            // }
             $return = array('success' => true, 'msg' => "Product Unlink Successfully.");
         }
         print json_encode($return);
