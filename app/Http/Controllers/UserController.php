@@ -32,7 +32,8 @@ class UserController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('UserController@index'), 'name'=>"Users List"], ['name'=>"Users"]
         ];
         if ( request()->ajax()) {
-           $user = User::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc');
+            // $user = User::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc');
+            $user = User::getActiveUsers();
             return Datatables::eloquent($user)
             ->addColumn('nameAndImgDisplay', function(User $user) {
                 return $user->getNameAndImgDisplay();
@@ -119,6 +120,7 @@ class UserController extends Controller
      */
     public function create(Request $request)
     {
+        $this->authorize('create', User::class);
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('UserController@index'), 'name'=>"Users List"], ['name'=>"Add User"]
         ];
@@ -259,6 +261,7 @@ class UserController extends Controller
         if($user->business_id != $request->user()->business_id){
           abort(401, 'You don\'t have access to edit this user');
         }
+        $this->authorize('edit', $user);
 
         $shops = $request->user()->business->shops->chunk(3);
 

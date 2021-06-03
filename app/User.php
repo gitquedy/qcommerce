@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Utilities;
 use Spatie\Permission\Models\Permission;
 use App\ShopPermission;
+use Auth;
 
 class User extends Authenticatable
 {
@@ -116,6 +117,9 @@ use Notifiable, HasRoles;
         if($this->status == 1){
             $status ='<div class="chip chip-success"><div class="chip-body"><div class="chip-text">Active</div></div></div>';
         }
+        else if ($this->status == 0) {
+            $status ='<div class="chip chip-danger"><div class="chip-body"><div class="chip-text">Suspended</div></div></div>';
+        }
         return $status;
     }
 
@@ -188,5 +192,34 @@ use Notifiable, HasRoles;
 
     public function getNameAndImgDisplay(){
          return '<div class="text-primary font-medium-2 text-bold-600">'. $this->fullName() .' </div>' . '<img src="'. $this->imageUrl() .'" style="width:60px; height:60px">';
+    }
+
+    public static function getActiveUsers() {
+        $user = Auth::user();
+        if ($user->business->subscription() !== null) {
+            if ($user->business->subscription()->plan_id == 5 || $user->business->users()->count() <= $user->business->subscription()->plan->users) {
+                $user->business->users()->update(['status' => 1]);
+            }
+            else {
+                $active_count = $user->business->subscription()->plan->users;
+                $suspended_count = $user->business->users()->count() - $active_count;
+
+                $active_users = $user->business->users()->orderBy('created_at', 'asc')->take($active_count)->get();
+                foreach ($active_users as $active) {
+                    $active->status = 1;
+                    $active->save();
+                }
+
+                $suspended_users = $user->business->users()->orderBy('created_at', 'desc')->take($suspended_count)->get();
+                foreach ($suspended_users as $suspend) {
+                    $suspend->status = 0;
+                    $suspend->save();
+                }
+            }
+        }
+        else {
+            $user->business->users()->where('role', '!=', 'Owner')->update(['status' => 0]);
+        }
+        return $user->business->users()->orderBy('updated_at', 'desc');
     }
 }

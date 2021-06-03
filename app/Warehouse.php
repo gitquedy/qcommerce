@@ -24,10 +24,15 @@ class Warehouse extends Model
     public static function getAvailableWarehouses() {
         $user = Auth::user();
         if ($user->business->subscription() !== null) {
-            return $warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+            if ($user->business->subscription()->plan_id == 5) {
+                return $user->business->warehouse()->orderBy('created_at', 'asc');
+            }
+            else {
+                return $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+            }
         }
         else {
-            return $warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+            return $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
         }
     }
 }
