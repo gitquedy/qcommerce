@@ -95,7 +95,8 @@ class TransferController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Add Transfer"]
         ];
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         return view('transfer.create', compact('breadcrumbs','warehouses'));
     }
     
@@ -202,7 +203,8 @@ class TransferController extends Controller
         if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
         }
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         return view('transfer.edit', compact('transfer', 'warehouses'));
     }
 

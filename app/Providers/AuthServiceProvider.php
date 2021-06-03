@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Warehouse;
+use App\Models\User;
+use App\Policies\WarehousePolicy;
+use App\Policies\UserPolicy;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -15,6 +19,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         // 'App\Model' => 'App\Policies\ModelPolicy',
+        Warehouse::class => WarehousePolicy::class,
+
     ];
 
     /**

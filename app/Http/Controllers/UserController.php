@@ -125,7 +125,8 @@ class UserController extends Controller
 
         $shops = $request->user()->business->shops->chunk(3);
 
-        $warehouses = $request->user()->business->warehouse->chunk(3);
+        // $warehouses = $request->user()->business->warehouse->chunk(3);
+        $warehouses = Warehouse::getAvailableWarehouses()->chunk(3);
         return view('user.create', compact('breadcrumbs', 'shops', 'warehouses'));
     }
 
@@ -261,7 +262,8 @@ class UserController extends Controller
 
         $shops = $request->user()->business->shops->chunk(3);
 
-        $warehouses = $request->user()->business->warehouse->chunk(3);
+        // $warehouses = $request->user()->business->warehouse->chunk(3);
+        $warehouses = Warehouse::getAvailableWarehouses()->chunk(3);
 
         return view('user.edit', compact('user', 'shops', 'warehouses'));
     }

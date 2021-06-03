@@ -20,6 +20,7 @@ use App\Sku;
 use App\SetItem;
 use App\Supplier;
 use App\Utilities;
+use App\Warehouse;
 use App\WarehouseItems;
 use Auth;
 use Carbon\Carbon;
@@ -132,15 +133,9 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse;
-        // $user = Auth::user();
-        // if ($user->business->subscription() !== null) {
-        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
-        // }
-        // else {
-        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
-        // }
+        // $business_id = Auth::user()->business_id;
+        // $all_warehouse = Business::find($business_id)->warehouse;
+        $all_warehouse = Warehouse::getAvailableWarehouses();
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -242,15 +237,9 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse;
-        // $user = Auth::user();
-        // if ($user->business->subscription() !== null) {
-        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
-        // }
-        // else {
-        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
-        // }
+        // $business_id = Auth::user()->business_id;
+        // $all_warehouse = Business::find($business_id)->warehouse;
+        $all_warehouses = Warehouse::getAvailableWarehouses();
         return view('sku.unlink', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,

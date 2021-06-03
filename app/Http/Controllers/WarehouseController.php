@@ -21,8 +21,9 @@ class WarehouseController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouse"], ['name'=>"Warehouse List"]
         ];
         if ( request()->ajax()) {
-           $user = Auth::user();
-           $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
+            $user = Auth::user();
+            // $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
+            $warehouse = Warehouse::getAvailableWarehouses();
             return Datatables($warehouse)
             ->addColumn('action', function(Warehouse $warehouse) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">
@@ -50,6 +51,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Warehouse::class);
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouses List"], ['name'=>"Add Warehouse"]
         ];
@@ -107,6 +109,10 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse)
     {
+        if($warehouse->business_id != Auth::user()->business_id){
+            abort(401, 'You don\'t have access to edit this warehouse');
+        }
+        $this->authorize('show', $warehouse);
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouses List"], ['name'=>"View Warehouse"]
         ];
@@ -124,6 +130,7 @@ class WarehouseController extends Controller
         if($warehouse->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this warehouse');
         }
+        $this->authorize('edit', $warehouse);
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouses List"], ['name'=>"Edit Warehouse"]
         ];

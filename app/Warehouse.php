@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Plan;
+use Auth;
 
 class Warehouse extends Model
 {
@@ -17,5 +19,15 @@ class Warehouse extends Model
 
     public function Name() {
     	return isset($this->name)?ucwords($this->name):'[Deleted Warehouse]';
+    }
+
+    public static function getAvailableWarehouses() {
+        $user = Auth::user();
+        if ($user->business->subscription() !== null) {
+            return $warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+        }
+        else {
+            return $warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+        }
     }
 }

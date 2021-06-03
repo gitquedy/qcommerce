@@ -8,6 +8,7 @@ use App\Sku;
 use App\Shop;
 use Carbon\Carbon;
 use App\Utilities;
+use App\Warehouse;
 use Validator;
 use Helper;
 use Auth;
@@ -135,7 +136,8 @@ class ExpenseController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ExpenseCategoryController@index'), 'name'=>"Expenses"], ['name'=>"Expense Create"]
         ];
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         $categories = $request->user()->business->expense_categories;
         $suppliers = $request->user()->business->suppliers;
         return view('expense.create',compact('breadcrumbs', 'warehouses', 'categories', 'suppliers'));
@@ -273,7 +275,8 @@ class ExpenseController extends Controller
           abort(401, 'You don\'t have access to edit this expense');
         }
         $suppliers = $request->user()->business->suppliers;
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         $categories = $request->user()->business->expense_categories;
         return view('expense.edit', compact('categories', 'warehouses', 'expense', 'suppliers'));
     }

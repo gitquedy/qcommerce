@@ -119,7 +119,8 @@ class PurchasesController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases List"], ['name'=>"Add Purchase"]
         ];
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         $suppliers = $request->user()->business->suppliers;
         return view('purchases.create', compact('breadcrumbs','suppliers','warehouses'));
     }
@@ -288,7 +289,8 @@ class PurchasesController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases List"], ['name'=>"Edit Purchase"]
         ];
-        $warehouses = $request->user()->business->warehouse;
+        // $warehouses = $request->user()->business->warehouse;
+        $warehouses = Warehouse::getAvailableWarehouses();
         $suppliers = $request->user()->business->suppliers;
         return view('purchases.edit', compact('breadcrumbs','suppliers','warehouses', 'purchase'));
     }
