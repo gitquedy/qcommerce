@@ -14,7 +14,7 @@
       <div class="card-content">
         <div class="card-body text-center">
           <img src="{{ asset('images/pages/404.png') }}" class="img-fluid align-self-center" alt="branding logo">
-          <h1 class="font-large-2 my-1">{{ $exception->getStatusCode()  }}- {{ $exception->getMessage() }}</h1>
+          <h1 class="font-large-2 my-1">{{ $exception->getStatusCode()  }} - {{ $exception->getMessage() }}</h1>
           <p class="p-2">
             Sorry for the inconvenience caused. Please try again later
           </p>
