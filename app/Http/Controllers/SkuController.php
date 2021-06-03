@@ -132,15 +132,15 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        // $business_id = Auth::user()->business_id;
-        // $all_warehouse = Business::find($business_id)->warehouse;
-        $user = Auth::user();
-        if ($user->business->subscription() !== null) {
-            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
-        }
-        else {
-            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
-        }
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse;
+        // $user = Auth::user();
+        // if ($user->business->subscription() !== null) {
+        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+        // }
+        // else {
+        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+        // }
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -242,15 +242,15 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        // $business_id = Auth::user()->business_id;
-        // $all_warehouse = Business::find($business_id)->warehouse;
-        $user = Auth::user();
-        if ($user->business->subscription() !== null) {
-            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
-        }
-        else {
-            $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
-        }
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse;
+        // $user = Auth::user();
+        // if ($user->business->subscription() !== null) {
+        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->get();
+        // }
+        // else {
+        //     $all_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->get();
+        // }
         return view('sku.unlink', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -600,49 +600,6 @@ class SkuController extends Controller
             'statuses' => array(),
         ]);
     }
- 
-    // public function skuproductsset(Sku $sku,Request $request){
-        
-    //     $all_skus = Sku::where('business_id', $request->user()->business_id)->where('type', 'single')->orderBy('updated_at', 'desc')->get();
-        
-    //     $breadcrumbs = [
-    //         ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Link Set"]
-    //     ];
-
-    //     if ( request()->ajax()) {
-    //         $all_skus = Sku::where('business_id', $request->user()->business_id)->where('type', 'single')->orderBy('updated_at', 'desc')->get();
-    //         $Sku_array = array();
-    //         foreach($all_skus as $all_skusVAL){
-    //             $Sku_array[] = $all_skusVAL->id;
-    //         }
-           
-    //         $Sku_prod = SetItem::whereIn('sku_single_id', $Sku_array)->where('sku_set_id','=',$sku->id)->orderBy('updated_at', 'desc');
-
-           
-    //         return Datatables::eloquent($Sku_prod)
-    //                     ->addColumn('image', function(SetItem $setitem) {
-    //                         $sku_single = Sku::where('id', $setitem->sku_single_id)->first();
-    //                         return $sku_single->SkuImage();
-    //                     })
-    //                     ->addColumn('action', function(SetItem $setitem) {
-    //                         return '<div class="btn-group dropup mr-1 mb-1">
-    //                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
-    //                 Action<span class="sr-only">Toggle Dropdown</span></button>
-    //                 <div class="dropdown-menu">
-    //                     <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to Unlink '. $setitem->name .' ?" data-text="This SKU Product will no longer sync to this SKU Set." data-method="POST" data-href="'.route('sku.removeskuproductset',['id'=>$setitem->id, 'sku_id'=>$setitem->sku->id]).'" > Unlink</a>
-    //                     <a class="dropdown-item" href="'.route('sku.skuproducts',$setitem->sku->id).'"  target="_blank" ><i class="fa fa-folder-open aria-hidden="true""></i> View</a>
-    //                 </div></div>';
-    //                             })
-    //                     ->rawColumns(['action'])
-    //                     ->make(true);
-    //     }
-    //     return view('sku.listproductsset', [
-    //         'sku' => $sku,
-    //         'breadcrumbs' => $breadcrumbs,
-    //         'all_skus' => $all_skus,
-    //         'statuses' => array(),
-    //     ]);
-    // }
 
     public function addproductmodal(Request $request){
         $business_id = Auth::user()->business_id;
@@ -651,14 +608,6 @@ class SkuController extends Controller
         $title = "this SKU";
         return view('sku.modal.addskuproduct', compact('title', 'id', 'all_shops'));
     }
-
-    // public function addproductsetmodal(Request $request){
-    //     $business_id = Auth::user()->business_id;
-    //     $all_skus = Sku::where('business_id', $request->user()->business_id)->where('type', 'single')->orderBy('updated_at', 'desc')->get();
-    //     $id  = $request->id;
-    //     $title = "this SKU";
-    //     return view('sku.modal.addskuproductset', compact('title', 'id', 'all_skus'));
-    // }
 
     public function addproduct(Request $request){
         $business_id = Auth::user()->business_id;
@@ -702,38 +651,6 @@ class SkuController extends Controller
         print json_encode($result);
     }
 
-    // public function addproductset(Request $request){
-    //     $business_id = Auth::user()->business_id;
-    //     $sku_product = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku)->first(); //sku child, sku currently being link to parent
-    //     $sku_set = Sku::where('business_id','=', $business_id)->where('id','=',$request->sku_id)->first(); //sku parent
-    //     $quantity = $request->quantity; //sku child's quantity per set
-    //     // $products = Products::where('seller_sku_id', $sku_set->id)->get(); //linked sku set/parent products
-
-    //     $data = [
-    //         'sku_set_id' => $sku_set->id,
-    //         'sku_single_id' => $sku_product->id,
-    //         'code' => $sku_product->code,
-    //         'name' => $sku_product->name,
-    //         'unit_price' => $sku_product->price,
-    //         // 'SellerSku' => $sku->code,
-    //         'set_quantity' => $quantity
-    //     ];  
-
-    //     $result = SetItem::updateOrCreate(['sku_set_id' => $sku_set->id, 'sku_single_id' => $sku_product->id], $data);
-
-    //     $sku_set_quantity = $sku_set->computeSetQuantity($sku_set->products->shop->warehouse_id);
-    //     $sku_set->update(['quantity' => $sku_set_quantity]); //update sku parent's quantity based on the computation
-
-    //     if (isset($sku_set->products)) {
-    //         foreach($sku_set->products as $product) {
-    //             $result_prod = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
-    //             $response = $product->updatePlatform();
-    //         }
-    //     }
-  
-    //     print json_encode($result);
-    // }
-
     public function removeskuproduct(Request $request){
         $ids = array();
         if($request->ids){
@@ -757,30 +674,6 @@ class SkuController extends Controller
         }
         print json_encode($return);
     }
-
-    // public function removeskuproductset(Request $request){
-    //     $ids = array();
-    //     if($request->ids){
-    //         $ids = $request->ids;
-    //     }
-    //     array_push($ids, $request->id);
-    //     $update = SetItem::whereIn('id', $ids)->delete();
-    //     if($update) {
-    //         $return = array('success' => true, 'msg' => "SKU Unlink Successfully.");
-
-    //         $sku = Sku::where('id', $request->sku_id)->first();
-    //         $sku_set_quantity = $sku->computeSetQuantity();
-    //         $sku->update(['quantity' => $sku_set_quantity]);
-
-    //         if (isset($sku->products)) {
-    //             foreach($sku->products as $product) {
-    //                 $result = $product->update(['quantity' => $sku_set_quantity]); //update parent products' quantity
-    //                 $response = $product->updatePlatform();
-    //             }
-    //         }
-    //     }
-    //     print json_encode($return);
-    // }
 
     public function show() {
 
@@ -938,10 +831,5 @@ class SkuController extends Controller
         }
         return response()->json($output);
     }
-
-    // public function ajaxlistsku(Request $request) {
-    //     $output = Sku::where('shop_id',$request->shop_id)->get();
-    //     echo json_encode($output);
-    // }
 
 }
