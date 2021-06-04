@@ -61,12 +61,16 @@ class Warehouse extends Model
                 $suspended_count = $user->business->warehouse()->count() - $active_count;
 
                 $active_warehouse = $user->business->warehouse()->orderBy('created_at', 'asc')->take($active_count)->get();
-                $active_warehouse->status = 1;
-                $active_warehouse->save();
+                foreach ($active_warehouses as $active) {
+                    $active->status = 1;
+                    $active->save();
+                }
 
                 $suspended_warehouse = $user->business->warehouse()->orderBy('created_at', 'desc')->take($suspended_count)->get();
-                $suspended_warehouse->status = 0;
-                $suspended_warehouse->save();
+                foreach ($suspended_warehouses as $suspend) {
+                    $suspend->status = 0;
+                    $suspend->save();
+                }
             }
             else {
                 $user->business->warehouse()->update(['status' => 1]);
