@@ -9,7 +9,6 @@ use App\Shop;
 use App\Sales;
 use App\Products;
 use App\Sku;
-use App\Warehouse;
 use Helper;
 use Auth;
 use DB;
@@ -28,8 +27,7 @@ class DashboardController extends Controller
             return redirect(route('admin.dashboard'));
         }
         $Shop = $request->user()->business->shops;
-        // $Warehouses = $request->user()->business->warehouse;
-        $Warehouses = Warehouse::getAvailableWarehouses();
+        $Warehouses = $request->user()->business->warehouse->where('status', 1);
         foreach ($Shop as $shop) {
             $shop->shop_info_data_today = Order::get_dashboard_shop_performance($shop->id,'today');
             $shop->shop_info_data_yesterday = Order::get_dashboard_shop_performance($shop->id,'yesterday');

@@ -283,8 +283,7 @@ class ShopController extends Controller
         $breadcrumbs = [
                     ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Shopify Shop"]
                 ];
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         return view('shop.shopify_temp.create',compact('breadcrumbs', 'warehouses'));
     }
 
@@ -342,8 +341,7 @@ class ShopController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Woocommerce Shop"]
         ];
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         return view('shop.woocommerce_temp.create',compact('breadcrumbs', 'warehouses'));
     }
 

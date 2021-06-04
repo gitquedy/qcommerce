@@ -10,7 +10,6 @@ use App\Shop;
 use App\Products;
 use App\Transfer;
 use App\TransferItems;
-use App\Warehouse;
 use App\WarehouseItems;
 use App\OrderRef;
 use App\Settings;
@@ -95,8 +94,7 @@ class TransferController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Add Transfer"]
         ];
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         return view('transfer.create', compact('breadcrumbs','warehouses'));
     }
     
@@ -203,8 +201,7 @@ class TransferController extends Controller
         if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
         }
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         return view('transfer.edit', compact('transfer', 'warehouses'));
     }
 

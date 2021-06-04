@@ -14,13 +14,11 @@ use App\Library\Lazada\lazop\LazopRequest;
 use App\Library\Lazada\lazop\UrlConstants;
 use App\PriceGroupItemPrice;
 use App\Products;
-use App\Plan;
 use App\Shop;
 use App\Sku;
 use App\SetItem;
 use App\Supplier;
 use App\Utilities;
-use App\Warehouse;
 use App\WarehouseItems;
 use Auth;
 use Carbon\Carbon;
@@ -133,9 +131,8 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        // $business_id = Auth::user()->business_id;
-        // $all_warehouse = Business::find($business_id)->warehouse;
-        $all_warehouse = Warehouse::getAvailableWarehouses();
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -237,9 +234,8 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        // $business_id = Auth::user()->business_id;
-        // $all_warehouse = Business::find($business_id)->warehouse;
-        $all_warehouses = Warehouse::getAvailableWarehouses();
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
         return view('sku.unlink', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,

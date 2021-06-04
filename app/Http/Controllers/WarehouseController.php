@@ -23,8 +23,11 @@ class WarehouseController extends Controller
         if ( request()->ajax()) {
             $user = Auth::user();
             // $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
-            $warehouse = Warehouse::getAvailableWarehouses();
+            $warehouse = Warehouse::getActiveWarehouses();
             return Datatables($warehouse)
+            ->addColumn('statusDisplay', function(Warehouse $warehouse) {
+                return $warehouse->getStatusDisplay();
+            })
             ->addColumn('action', function(Warehouse $warehouse) {
                     $actions = '<div class="btn-group dropup mr-1 mb-1">
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
@@ -36,7 +39,7 @@ class WarehouseController extends Controller
                     </div></div>';
                     return $actions;
              })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'statusDisplay'])
             ->make(true);
         }
         return view('warehouse.index', [
@@ -110,7 +113,7 @@ class WarehouseController extends Controller
     public function show(Warehouse $warehouse)
     {
         if($warehouse->business_id != Auth::user()->business_id){
-            abort(401, 'You don\'t have access to edit this warehouse');
+            abort(401, 'You don\'t have access to view this warehouse');
         }
         $this->authorize('show', $warehouse);
         $breadcrumbs = [

@@ -11,7 +11,6 @@ use App\PurchaseItems;
 use App\Products;
 use App\Payment;
 use App\Supplier;
-use App\Warehouse;
 use App\OrderRef;
 use App\Settings;
 use Illuminate\Validation\Rule;
@@ -119,8 +118,7 @@ class PurchasesController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases List"], ['name'=>"Add Purchase"]
         ];
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         $suppliers = $request->user()->business->suppliers;
         return view('purchases.create', compact('breadcrumbs','suppliers','warehouses'));
     }
@@ -289,8 +287,7 @@ class PurchasesController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases List"], ['name'=>"Edit Purchase"]
         ];
-        // $warehouses = $request->user()->business->warehouse;
-        $warehouses = Warehouse::getAvailableWarehouses();
+        $warehouses = $request->user()->business->warehouse->where('status', 1);
         $suppliers = $request->user()->business->suppliers;
         return view('purchases.edit', compact('breadcrumbs','suppliers','warehouses', 'purchase'));
     }

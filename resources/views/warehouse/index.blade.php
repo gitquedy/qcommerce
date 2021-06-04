@@ -29,6 +29,7 @@
             <th>Address</th>
             <th>Phone</th>
             <th>Email</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -62,6 +63,7 @@
             { data: 'address', name: 'address' },
             { data: 'phone', name: 'phone' },
             { data: 'email', name: 'email' },
+            { data: 'statusDisplay', name: 'statusDisplay' },
             { data: 'action', name: 'action' }
         ];
   var table_route  = {
