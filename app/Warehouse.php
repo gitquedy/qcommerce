@@ -34,8 +34,6 @@ class Warehouse extends Model
 
     public static function getActiveWarehouses() {
         $user = Auth::user();
-        $active_count = $user->business->subscription()->plan->no_of_warehouse;
-        $suspended_count = $user->business->warehouse()->count() - $active_count; 
         if ($user->business->subscription() !== null) {
             if ($user->business->subscription()->plan_id == 5 || $user->business->warehouse()->count() <= $user->business->subscription()->plan->no_of_warehouse) {
                 $user->business->warehouse()->update(['status' => 1]);
