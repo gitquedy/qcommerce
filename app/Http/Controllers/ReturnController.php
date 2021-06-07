@@ -21,6 +21,7 @@ class ReturnController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('is_included_in_plan', 'return_recon');
       $breadcrumbs = [
           // ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
       ];

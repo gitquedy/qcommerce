@@ -14,6 +14,7 @@ class ShippingFeeController extends Controller
 {
     public function index(Request $request)
     {
+      $this->authorize('is_included_in_plan', 'shipping_overcharge_recon');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"], ['name'=>"Shipping Fee Reconciliation"]
         ];

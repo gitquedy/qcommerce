@@ -26,6 +26,7 @@ class SalesController extends Controller
      */
     public function index()
     {
+        $this->authorize('is_included_in_plan', 'add_sales');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales"], ['name'=>"Sales List"]
         ];
@@ -123,6 +124,7 @@ class SalesController extends Controller
      */
     public function create(Request $request)
     {
+        $this->authorize('is_included_in_plan', 'add_sales');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales List"], ['name'=>"Add Sales"]
         ];
@@ -289,6 +291,7 @@ class SalesController extends Controller
      */
     public function edit($id, Request $request)
     {
+        $this->authorize('is_included_in_plan', 'add_sales');
 
         $sales = Sales::findOrFail($id);
         $warehouses = $request->user()->business->warehouse->where('status', 1);

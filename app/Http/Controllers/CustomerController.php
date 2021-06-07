@@ -21,7 +21,8 @@ class CustomerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {   
+    {
+        $this->authorize('is_included_in_plan', 'customers_management');   
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customer"], ['name'=>"Customer List"]
         ];
@@ -85,6 +86,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
+        $this->authorize('is_included_in_plan', 'customers_management');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customers List"], ['name'=>"Add Customer"]
         ];
@@ -144,6 +146,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        $this->authorize('is_included_in_plan', 'customers_management');
        $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customers List"], ['name'=>"View Customer"]
         ];
@@ -158,6 +161,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer, Request $request)
     {
+        $this->authorize('is_included_in_plan', 'customers_management');
         if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
         }
@@ -245,6 +249,7 @@ class CustomerController extends Controller
     }
 
     public function delete(Customer $customer, Request $request){
+        $this->authorize('is_included_in_plan', 'customers_management');
       if($customer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this customer');
       }
@@ -308,6 +313,7 @@ class CustomerController extends Controller
     }
 
     public function woocommerceCustomers() {
+        $this->authorize('is_included_in_plan', 'customers_management');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('CustomerController@index'), 'name'=>"Customer"], ['name'=>"WooCommerce Customers"]
         ];

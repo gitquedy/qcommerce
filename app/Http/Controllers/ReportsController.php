@@ -45,6 +45,7 @@ class ReportsController extends Controller
 
 
     public function outOfStock(){
+        $this->authorize('is_included_in_plan', 'out_of_stock');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@outOfStock'), 'name'=>"Reports"], ['name'=>"Out of Stock"]
         ];
@@ -88,6 +89,7 @@ class ReportsController extends Controller
     }
 
     public function productAlert(){
+        $this->authorize('is_included_in_plan', 'stock_alert_monitoring');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@productAlert'), 'name'=>"Reports"], ['name'=>"Product Alert"]
         ];
@@ -131,6 +133,7 @@ class ReportsController extends Controller
     }
 
     public function itemsNotMoving(Request $request) {
+        $this->authorize('is_included_in_plan', 'items_not_moving');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@itemsNotMoving'), 'name'=>"Reports"], ['name'=>"Items Not Moving"]
         ];
@@ -173,6 +176,7 @@ class ReportsController extends Controller
     }
 
     public function topSellingProducts(Request $request){
+        $this->authorize('is_included_in_plan', 'top_selling_products');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
         $all_shops = $request->user()->business->shops;
 
@@ -264,6 +268,7 @@ class ReportsController extends Controller
     }
 
     public function dailySales(Request $request){
+        $this->authorize('is_included_in_plan', 'daily_sales');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Daily Sales"], ['name'=>"Daily Sales"]];
         $all_shops = $request->user()->business->shops;
 
@@ -343,6 +348,7 @@ class ReportsController extends Controller
     }
 
     public function monthlySales(Request $request){
+        $this->authorize('is_included_in_plan', 'monthly_sales');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@monthlySales'), 'name'=>"Monthly Sales"], ['name'=>"Monthly Sales"]];
         $all_shops = $request->user()->business->shops;
 

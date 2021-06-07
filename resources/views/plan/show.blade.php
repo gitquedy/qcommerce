@@ -114,7 +114,9 @@
               <li class="list-group-item"><b>REPORTS</b></li>
               <li class="list-group-item">Stock Alert Monitoring : <b>{!!boolean_to_text($plan->stock_alert_monitoring)!!}</b></li>
               <li class="list-group-item">Out of Stock : <b>{!!boolean_to_text($plan->out_of_stock)!!}</b></li>
+              <li class="list-group-item">Items Not Moving : <b>{!!boolean_to_text($plan->items_not_moving)!!}</b></li>
               <li class="list-group-item">Daily Sales : <b>{!!boolean_to_text($plan->daily_sales)!!}</b></li>
+              <li class="list-group-item">Monthly Sales : <b>{!!boolean_to_text($plan->monthly_sales)!!}</b></li>
               <li class="list-group-item">Top Selling Products : <b>{!!boolean_to_text($plan->top_selling_products)!!}</b></li>
             </ul>
           </div>
@@ -140,7 +142,7 @@
                 @elseif($business->subscription() !== NULL &&  $business->subscription()->plan->monthly_cost > $plan->monthly_cost)
                     <h3>You are currently subscribed to a higher plan.</h3>
                 @elseif($plan->id != 1)
-                    <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribed">
+                    <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Subscribe">
                 @endif
                 </form>
                <!--  <button type="reset" class="btn btn-outline-warning mr-1 mb-1">Reset --> 

@@ -344,10 +344,30 @@
                   @endforelse
                 </tr>
                 <tr>
+                  <td class="title_column">Items Not Moving</td>
+                  @forelse($plans as $plan)
+                    <td class=" border-bottom-0 border-top-0 text-center">
+                      <span>{!!boolean_to_text($plan->items_not_moving)!!}</span>
+                    </td>
+                  @empty
+                    <td class="border-bottom-0 border-top-0 ">--</td>
+                  @endforelse
+                </tr>
+                <tr>
                   <td class="title_column">Daily Sales</td>
                   @forelse($plans as $plan)
                     <td class=" border-bottom-0 border-top-0 text-center">
                       <span>{!!boolean_to_text($plan->daily_sales)!!}</span>
+                    </td>
+                  @empty
+                    <td class="border-bottom-0 border-top-0 ">--</td>
+                  @endforelse
+                </tr>
+                <tr>
+                  <td class="title_column">Monthly Sales</td>
+                  @forelse($plans as $plan)
+                    <td class=" border-bottom-0 border-top-0 text-center">
+                      <span>{!!boolean_to_text($plan->monthly_sales)!!}</span>
                     </td>
                   @empty
                     <td class="border-bottom-0 border-top-0 ">--</td>

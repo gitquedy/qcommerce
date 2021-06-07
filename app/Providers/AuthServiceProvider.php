@@ -2,13 +2,15 @@
 
 namespace App\Providers;
 
-use App\Models\Warehouse;
-use App\Models\User;
+use App\Warehouse;
+use App\User;
+use App\Plan;
 use App\Policies\WarehousePolicy;
 use App\Policies\UserPolicy;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Auth\Access\Response;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,23 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         // Passport::routes();
-        //
+        
+        Gate::define('is_included_in_plan', function (User $user, $feature) {
+            if ($user->business->subscription() !== null) {
+                if ($user->business->subscription()->plan_id == 5) {
+                    return true;
+                }
+                else {
+                    return $user->business->subscription()->plan->$feature
+                        ? Response::allow()
+                        : abort(403, 'This is not included in your subscription plan');
+                }
+            }
+            else {
+                return Plan::whereId(1)->value($feature)
+                    ? Response::allow()
+                    : abort(403, 'This is not included in your subscription plan');
+            }
+        });
     }
 }

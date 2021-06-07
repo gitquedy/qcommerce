@@ -26,6 +26,7 @@ class PurchasesController extends Controller
      */
     public function index()
     {
+        $this->authorize('is_included_in_plan', 'purchase_orders');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases"], ['name'=>"Purchases List"]
         ];
@@ -115,6 +116,7 @@ class PurchasesController extends Controller
      */
     public function create(Request $request)
     {
+        $this->authorize('is_included_in_plan', 'stock_transfer');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases List"], ['name'=>"Add Purchase"]
         ];
@@ -281,6 +283,7 @@ class PurchasesController extends Controller
      */
     public function edit(Purchases $purchase, Request $request)
     {
+        $this->authorize('is_included_in_plan', 'stock_transfer');
         if($purchase->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this purchase');
         }
@@ -451,6 +454,7 @@ class PurchasesController extends Controller
     }
 
     public function delete(Purchases $purchases, Request $request){
+        $this->authorize('is_included_in_plan', 'stock_transfer');
       if($purchases->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to delete this purchase');
       }

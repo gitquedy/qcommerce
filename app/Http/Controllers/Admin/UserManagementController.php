@@ -154,7 +154,9 @@ class UserManagementController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\UserManagementController@index'), 'name'=>"Users List"], ['name'=>"Edit User"]
         ];
         $user = User::findOrFail($id);
-        return view('admin.user.edit', compact('user','breadcrumbs'));
+        $shops = $user->business->shops->chunk(3);
+        $warehouses = $user->business->warehouse->chunk(3);
+        return view('admin.user.edit', compact('user', 'shops', 'warehouses', 'breadcrumbs'));
     }
 
     /**

@@ -68,7 +68,7 @@ use Notifiable, HasRoles;
     }
 
     public function checkFirstAllowedSite(){
-        $sites = ['lazada', 'shopee', 'shopify'];
+        $sites = ['lazada', 'shopee', 'shopify', 'woocommerce'];
         foreach($sites as $site){
             if($this->checkAllowedSite($site)){
                 return $site;

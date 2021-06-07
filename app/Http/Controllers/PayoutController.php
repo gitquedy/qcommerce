@@ -23,6 +23,7 @@ class PayoutController extends Controller
      */
     public function indexLaz(Request $request)
     {
+      $this->authorize('is_included_in_plan', 'payment_recon');
       $breadcrumbs = [];
       $shops = $request->user()->business->shops->where('site', 'lazada');
       $shops_id = $shops->pluck('id')->toArray();
@@ -97,6 +98,7 @@ class PayoutController extends Controller
 
     public function indexShopee(Request $request)
     {
+      $this->authorize('is_included_in_plan', 'return_recon');
       $breadcrumbs = [];
       $shops = $request->user()->business->shops->where('site', 'shopee');
       $shops_id = $shops->pluck('id')->toArray();

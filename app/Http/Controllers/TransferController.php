@@ -25,6 +25,7 @@ class TransferController extends Controller
      */
     public function index()
     {
+        $this->authorize('is_included_in_plan', 'stock_transfer');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer"], ['name'=>"Transfer List"]
         ];
@@ -91,6 +92,7 @@ class TransferController extends Controller
      */
     public function create(Request $request)
     {
+        $this->authorize('is_included_in_plan', 'stock_transfer');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Add Transfer"]
         ];
@@ -198,6 +200,7 @@ class TransferController extends Controller
      */
     public function edit(Transfer $transfer, Request $request)
     {
+        $this->authorize('is_included_in_plan', 'stock_transfer');
         if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
         }
@@ -345,6 +348,7 @@ class TransferController extends Controller
     }
 
     public function delete(Transfer $transfer, Request $request){
+        $this->authorize('is_included_in_plan', 'stock_transfer');
       if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
       }
