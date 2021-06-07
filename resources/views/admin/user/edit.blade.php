@@ -64,6 +64,25 @@
                                 </div>
                             </div>
                           </div>
+                          @if($user->role == "Owner")
+                            <div class="row">
+                              <div class="col-md-4">
+                                  <div class="form-group">
+                                      <label>Subscription Plan</label>
+                                      <div class="position-relative has-icon-left">
+                                        <select name="plan" id="plan" class="select2 form-control">
+                                          @foreach($plans as $plan)
+                                            <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                          @endforeach
+                                        </select>
+                                        <div class="form-control-position"> 
+                                          <i class="feather icon-credit-card"></i>
+                                        </div>
+                                      </div>
+                                  </div>
+                              </div>
+                            </div>
+                          @endif
                           <div class="row">
                             <div class="card-header">
                               <h4 class="card-title">Change Password:</h4>
@@ -117,4 +136,8 @@
 @section('vendor-script')
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
-
+@section('myscript')
+<script>
+$("#plan option[value={{$billing == null ? 1 : $billing->plan_id}}]").attr('selected', 'selected');
+</script>
+@endsection

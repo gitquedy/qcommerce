@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Business;
+use App\Billing;
 use App\Http\Controllers\Controller;
 use App\Package;
 use App\Products;
+use App\Plan;
 use App\Rules\MatchOldPassword;
 use App\Shop;
 use App\User;
@@ -156,7 +158,9 @@ class UserManagementController extends Controller
         $user = User::findOrFail($id);
         $shops = $user->business->shops->chunk(3);
         $warehouses = $user->business->warehouse->chunk(3);
-        return view('admin.user.edit', compact('user', 'shops', 'warehouses', 'breadcrumbs'));
+        $plans = Plan::all();
+        $billing = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->first();
+        return view('admin.user.edit', compact('user', 'shops', 'warehouses', 'plans', 'billing', 'breadcrumbs'));
     }
 
     /**
@@ -199,6 +203,21 @@ class UserManagementController extends Controller
                  if($request->has('permissions')){
                     $permissions = Permission::whereIn('name', $request->permissions)->get();
                     $user->givePermissionTo($permissions);
+                }
+            }
+
+            if($user->role == "Owner") {
+                $current_plan = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->first();
+                if($request->plan != ($current_plan == null ? 1 : $current_plan->plan_id)) {
+                    $override = [
+                        'invoice_no' => 'OVERRIDE - '.$user->business->name,
+                        'business_id' => $user->business_id,
+                        'plan_id' => $request->plan,
+                        'billing_period' => 'Month',
+                        'amount' => Plan::find($request->plan)->monthly_cost,
+                        'paid_status' => 1,
+                    ];
+                    Billing::create($override);
                 }
             }
             $user = $user->update($data);
