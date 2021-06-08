@@ -261,7 +261,7 @@ class Order extends Model
         
         foreach($result as $r) {
             if ($r->site == 'lazada') {
-                $total += (float) str_replace(",","",$r->price);
+                $total += (float) str_replace(",","",$r->price + $r->shipping_fee);
             }
             elseif ($r->site == 'shopee') {
                 // $items = OrderItem::select(DB::raw('ROUND(SUM(order_item.price)) as total_price'))->where('order_id', $r->id)->first();

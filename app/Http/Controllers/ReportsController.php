@@ -192,7 +192,7 @@ class ReportsController extends Controller
                 $no_of_products = $request->get('no_of_products');
             }
 
-            $Skus = Products::select('products.seller_sku_id', 'sku.code as sku_code', 'sku.name as sku_name', DB::raw('ROUND(SUM(order_item.price)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
+            $Skus = Products::select('products.seller_sku_id', 'sku.code as sku_code', 'sku.name as sku_name', DB::raw('ROUND(SUM(order_item.price + order.shipping_fee)) as total_price'), DB::raw('SUM(order_item.quantity) as total_quantity'))
                             ->join('order_item', 'order_item.product_id','=','products.id')
                             ->join('order', 'order.id','=','order_item.order_id')
                             ->join('sku', 'sku.id','=','products.seller_sku_id')
@@ -279,7 +279,7 @@ class ReportsController extends Controller
             }
             $shop_ids = $shops->pluck('id');
 
-            $order = Order::select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('SUM(order.price) as total_price'), DB::raw('SUM(order.items_count) as total_item_count'))
+            $order = Order::select(DB::raw('DATE(order.created_at) as date'), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('SUM(order.price + order.shipping_fee) as total_price'), DB::raw('SUM(order.items_count) as total_item_count'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->orderBy('date', 'asc')
@@ -359,7 +359,7 @@ class ReportsController extends Controller
             }
             $shop_ids = $shops->pluck('id');
 
-            $order = Order::select(DB::raw("DATE_FORMAT(order.created_at, '%Y-%m') as monthly"), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('SUM(order.price) as total_price'), DB::raw('SUM(order.items_count) as total_item_count'))
+            $order = Order::select(DB::raw("DATE_FORMAT(order.created_at, '%Y-%m') as monthly"), DB::raw('COUNT(DISTINCT order.id) as total_orders'), DB::raw('SUM(order.price + order.shipping_fee) as total_price'), DB::raw('SUM(order.items_count) as total_item_count'))
                 ->whereIn('order.shop_id', $shop_ids)
                 ->whereNotIn('order.status', Order::statusNotIncludedInSales())
                 ->orderBy('monthly', 'asc')
