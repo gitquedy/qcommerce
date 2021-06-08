@@ -767,7 +767,7 @@ class Shop extends Model
             }
         }
 
-        $check_orders = $this->orders->pluck('ordersn')->toArray();
+        $check_orders = $this->orders()->where('created_at', '>', $date)->pluck('ordersn')->toArray();
         $delete_ids = array_diff($check_orders, $all_orders_id);
         $delete = $this->orders()->whereIn('ordersn', $delete_ids)->delete();
 
