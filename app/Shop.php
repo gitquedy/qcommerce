@@ -729,6 +729,8 @@ class Shop extends Model
         } while (count($orders) > 0);
 
         foreach($all_orders as $order) {
+            $all_orders_id[] = $order->id;
+
             $order_details = [
                 'ordersn' => $order->id,
                 'order_no' => $order->order_key,
@@ -764,6 +766,11 @@ class Shop extends Model
                 }
             }
         }
+
+        $check_orders = $this->orders->pluck('ordersn')->toArray();
+        $delete_ids = array_diff($check_orders, $all_orders_id);
+        $delete = $this->orders()->whereIn('ordersn', $delete_ids)->delete();
+
         return;
     }
 
