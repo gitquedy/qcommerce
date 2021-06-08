@@ -60,7 +60,7 @@ class Business extends Model
 	}
 
     public function subscription() {
-    	return Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->first();
+    	return Billing::where('business_id', Auth::user()->business_id)->where('paid_status', 1)->orderBy('created_at', 'desc')->first();
     }
 
     public function expense_categories(){

@@ -159,7 +159,7 @@ class UserManagementController extends Controller
         $shops = $user->business->shops->chunk(3);
         $warehouses = $user->business->warehouse->chunk(3);
         $plans = Plan::all();
-        $billing = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->first();
+        $billing = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->orderBy('created_at', 'desc')->first();
         return view('admin.user.edit', compact('user', 'shops', 'warehouses', 'plans', 'billing', 'breadcrumbs'));
     }
 
@@ -207,7 +207,7 @@ class UserManagementController extends Controller
             }
 
             if($user->role == "Owner") {
-                $current_plan = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->first();
+                $current_plan = Billing::where('business_id', $user->business_id)->where('paid_status', 1)->orderBy('created_at', 'desc')->first();
                 if($request->plan != ($current_plan == null ? 1 : $current_plan->plan_id)) {
                     $override = [
                         'invoice_no' => 'OVERRIDE - '.$user->business->name,
@@ -218,6 +218,7 @@ class UserManagementController extends Controller
                         'paid_status' => 1,
                     ];
                     Billing::create($override);
+                    $current_plan->update(['paid_status' => 4]);
                 }
             }
             $user = $user->update($data);
