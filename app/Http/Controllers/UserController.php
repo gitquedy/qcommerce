@@ -32,8 +32,7 @@ class UserController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('UserController@index'), 'name'=>"Users List"], ['name'=>"Users"]
         ];
         if ( request()->ajax()) {
-            // $user = User::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc');
-            $user = User::getActiveUsers();
+            $user = User::where('business_id', $request->user()->business_id)->orderBy('updated_at', 'desc');
             return Datatables::eloquent($user)
             ->addColumn('nameAndImgDisplay', function(User $user) {
                 return $user->getNameAndImgDisplay();

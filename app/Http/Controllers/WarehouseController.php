@@ -22,8 +22,7 @@ class WarehouseController extends Controller
         ];
         if ( request()->ajax()) {
             $user = Auth::user();
-            // $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
-            $warehouse = Warehouse::getActiveWarehouses();
+            $warehouse = $request->user()->business->warehouse()->orderBy('updated_at', 'desc');
             return Datatables($warehouse)
             ->addColumn('statusDisplay', function(Warehouse $warehouse) {
                 return $warehouse->getStatusDisplay();

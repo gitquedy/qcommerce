@@ -13,6 +13,10 @@ class Warehouse extends Model
     ];
 
 
+    public function business() {
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
+
     public function items(){
         return $this->hasMany(WarehouseItems::class, 'warehouse_id', 'id');
     }
@@ -32,8 +36,8 @@ class Warehouse extends Model
         return $status;
     }
 
-    public static function getActiveWarehouses() {
-        $user = Auth::user();
+    public function updateWarehouseStatus() {
+        $user = $this->business->users()->where('role', 'Owner')->first();
         if ($user->business->subscription() !== null) {
             if ($user->business->subscription()->plan_id == 5 || $user->business->warehouse()->count() <= $user->business->subscription()->plan->no_of_warehouse) {
                 $user->business->warehouse()->update(['status' => 1]);

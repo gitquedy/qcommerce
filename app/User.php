@@ -194,8 +194,8 @@ use Notifiable, HasRoles;
          return '<div class="text-primary font-medium-2 text-bold-600">'. $this->fullName() .' </div>' . '<img src="'. $this->imageUrl() .'" style="width:60px; height:60px">';
     }
 
-    public static function getActiveUsers() {
-        $user = Auth::user();
+    public function updateUserStatus() {
+        $user = $this;
         if ($user->business->subscription() !== null) {
             if ($user->business->subscription()->plan_id == 5 || $user->business->users()->count() <= $user->business->subscription()->plan->users) {
                 $user->business->users()->update(['status' => 1]);
@@ -220,6 +220,5 @@ use Notifiable, HasRoles;
         else {
             $user->business->users()->where('role', '!=', 'Owner')->update(['status' => 0]);
         }
-        return $user->business->users()->orderBy('updated_at', 'desc');
     }
 }

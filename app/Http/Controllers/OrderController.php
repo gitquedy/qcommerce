@@ -391,7 +391,7 @@ class OrderController extends Controller
                         'phone'         => ($woo_order->billing->phone) ? $woo_order->billing->phone : '',
                         'custom_fields' => [
                             'order number' => $order->ordersn,
-                            'date' => date('m/d/Y', strtotime(Carbon::parse(date("Y-m-d H:i:s",strtotime($woo_order->date_created) + 8 * 3600))->toDateTimeString())),
+                            'date' => Carbon::parse(date("m/d/Y",strtotime($woo_order->date_created) + 8 * 3600))->toDateTimeString(),
                         ],
                     ]);
                 }
