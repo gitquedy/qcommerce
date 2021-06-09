@@ -17,6 +17,10 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Products;
 use App\Business;
+use LaravelDaily\Invoices\Invoice;
+use LaravelDaily\Invoices\Classes\Party;
+use LaravelDaily\Invoices\Classes\InvoiceItem;
+use Auth;
 
 class OrderController extends Controller
 {
@@ -358,7 +362,7 @@ class OrderController extends Controller
                   $request->session()->flash('flash_error',$Result);
                   return redirect('/order?site=lazada');
               }
-            }else{
+            }else if ($order->site == 'shopee'){
               $client =$order->shop->shopeeGetClient();
               $order->update(['printed' => true]);
               $result = $client->logistics->getAirwayBill(['ordersn_list' => [$order->ordersn]])->getData();
@@ -368,6 +372,37 @@ class OrderController extends Controller
                   $request->session()->flash('flash_error',$result['result']['errors'][0]['error_description']);
                   return redirect('/order?site=shopee');
               }
+            }
+            else if ($order->site == 'woocommerce') {
+                $order->update(['printed' => true]);
+                $client = new Party([
+                    'name'          => $order->shop->name,
+                    'address'       => Auth::user()->business->location,
+                ]);
+        
+                $customer = new Party([
+                    'name'          => ($order->customer_first_name) ? $order->customer_first_name : '',
+                    'address'       => ($order->customer->address) ? $order->customer->address : '',
+                    'email'         => ($order->customer->email) ? $order->customer->email : '',
+                    'phone'         => ($order->customer->mobile_num) ? $order->customer->mobile_num : '',
+                    'custom_fields' => [
+                        'order number' => $order->ordersn,
+                        'date' => date('m/d/Y', strtotime($order->created_at)),
+                    ],
+                ]);
+                $order_items = array();
+                foreach ($order->products as $item) {
+                    $order_items[] = (new InvoiceItem())
+                        ->title((($item->product->SellerSku) ? '['.$item->product->SellerSku.'] - ' : '').$item->product->name)
+                        ->pricePerUnit($item->price)
+                        ->qty($item->quantity);
+                }
+                $invoice = Invoice::make()
+                ->seller($client)
+                ->buyer($customer)
+                ->addItems($order_items);
+
+            return $invoice->stream();
             }
     }
     

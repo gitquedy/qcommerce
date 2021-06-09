@@ -115,7 +115,7 @@ class Order extends Model
                     $disabled['ready_to_ship'] = '';
                     $disabled['cancel'] = '';
                 }
-            }else if($status == 'SHIPPED'){
+            }else if($status == 'SHIPPED' || $status == 'processing' || $status == 'shipped'){
                 $disabled['print_shipping_label'] = '';
             }
             $dropdown = '<div class="btn-group dropup mr-1 mb-1">
