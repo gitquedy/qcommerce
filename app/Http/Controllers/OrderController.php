@@ -379,17 +379,35 @@ class OrderController extends Controller
                     'name'          => $order->shop->name,
                     'address'       => Auth::user()->business->location,
                 ]);
-        
-                $customer = new Party([
-                    'name'          => ($order->customer_first_name) ? $order->customer_first_name : '',
-                    'address'       => ($order->customer->address) ? $order->customer->address : '',
-                    'email'         => ($order->customer->email) ? $order->customer->email : '',
-                    'phone'         => ($order->customer->mobile_num) ? $order->customer->mobile_num : '',
-                    'custom_fields' => [
-                        'order number' => $order->ordersn,
-                        'date' => date('m/d/Y', strtotime($order->created_at)),
-                    ],
-                ]);
+
+                if ($order->CustomerId == 0) {
+                    $woocommerce = $order->shop->woocommerceGetClient();
+                    $woo_order = $woocommerce->get('orders/'.$order->ordersn);
+
+                    $customer = new Party([
+                        'name'          => $woo_order->billing->first_name . ' ' . $woo_order->billing->last_name,
+                        'address'       => $woo_order->billing->address_1.', '.(($woo_order->billing->address_2)?$woo_order->billing->address_2.', ':'').$woo_order->billing->city,
+                        'email'         => ($woo_order->billing->email) ? $woo_order->billing->email : '',
+                        'phone'         => ($woo_order->billing->phone) ? $woo_order->billing->phone : '',
+                        'custom_fields' => [
+                            'order number' => $order->ordersn,
+                            'date' => date('m/d/Y', strtotime(Carbon::parse(date("Y-m-d H:i:s",strtotime($woo_order->date_created) + 8 * 3600))->toDateTimeString())),
+                        ],
+                    ]);
+                }
+                else {
+                    $customer = new Party([
+                        'name'          => ($order->customer_first_name) ? $order->customer_first_name : '',
+                        'address'       => ($order->customer->address) ? $order->customer->address : '',
+                        'email'         => ($order->customer->email) ? $order->customer->email : '',
+                        'phone'         => ($order->customer->mobile_num) ? $order->customer->mobile_num : '',
+                        'custom_fields' => [
+                            'order number' => $order->ordersn,
+                            'date' => date('m/d/Y', strtotime($order->created_at)),
+                        ],
+                    ]);
+                }
+
                 $order_items = array();
                 foreach ($order->products as $item) {
                     $order_items[] = (new InvoiceItem())
