@@ -27,7 +27,7 @@
 
 <section class="card">
     <div class="card-header">
-        <h4 class="card-title">Plan Name</h4>
+        <h4 class="card-title">{!!$subs->name!!}</h4>
     </div>
     <div class="card-content">
         <div class="card-body">
