@@ -260,9 +260,9 @@ class SkuController extends Controller
             'breadcrumbs' => $breadcrumbs,
             // 'Category'=> $Category,
             // 'Brand'=> $Brand,
-            'Supplier' => $Supplier
-            ],
-            compact ('all_skus')
+            'Supplier' => $Supplier,
+            'all_skus' => $all_skus
+            ]
         );
         
     }
@@ -366,9 +366,9 @@ class SkuController extends Controller
             'Sku'=> $Sku,
             // 'Category'=> $Category,
             // 'Brand'=> $Brand,
-            'Supplier' => $Supplier
-            ],
-            compact ('all_skus')
+            'Supplier' => $Supplier,
+            'all_skus' => $all_skus
+            ]
         );
         
     }

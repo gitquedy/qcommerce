@@ -40,6 +40,13 @@
                 <span class="menu-title" data-i18n="">Promocode</span>
             </a>
         </li>
+
+        <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'subscription' ? 'active' : '' }}">
+            <a href="{{url('/admin/subscription')}}">
+                <i class="feather icon-command"></i>
+                <span class="menu-title" data-i18n="">Subscription</span>
+            </a>
+        </li>
         
     </ul>
 </div>

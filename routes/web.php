@@ -25,6 +25,9 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/promocode', 'Admin\PromocodeController');
 		Route::get('/promocode/delete/{promocode}', 'Admin\PromocodeController@delete');
 		Route::post('/promocode/checkPromocode', 'Admin\PromocodeController@checkPromocode')->name('promocode.checkPromocode');
+		Route::resource('/subscription', 'Admin\SubscriptionController')->only(['index']);
+		Route::get('/subscription/edit/{id}', 'Admin\SubscriptionController@edit')->name('subscription.edit');
+		Route::post('/subscription/update', 'Admin\SubscriptionController@update')->name('subscription.update');
 	});
 
 
