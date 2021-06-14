@@ -182,6 +182,20 @@
               $(this).val('').trigger('change');
             } 
         });
+
+        var shops = {!!json_encode($allowed_shops)!!}.split("/");
+        if (!shops.includes("Lazada") && !shops.includes("All")) {
+          $("#channel option[value=lazada]").remove();
+        }
+        if (!shops.includes("Shopee") && !shops.includes("All")) {
+          $("#channel option[value=shopee]").remove();
+        }
+        if (!shops.includes("Shopify") && !shops.includes("All")) {
+          $("#channel option[value=shopify]").remove();
+        }
+        if (!shops.includes("Woocommerce") && !shops.includes("All")) {
+          $("#channel option[value=woocommerce]").remove();
+        }
     });
 
 

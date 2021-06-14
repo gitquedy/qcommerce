@@ -39,7 +39,8 @@ class syncLazadaPayout extends Command
      */
     public function handle()
     {
-        $shops = Shop::where('site', 'lazada')->get();
+        // $shops = Shop::where('site', 'lazada')->get();
+        $shops = Shop::where('site', 'lazada')->where('active', '!=', 0)->get();
         foreach($shops as $shop){
             $shop->syncLazadaPayout(Carbon::now()->subDays(30)->format('Y-m-d'));
             $shop->touch();

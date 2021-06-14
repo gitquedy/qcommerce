@@ -39,7 +39,8 @@ class syncShopeePayout extends Command
      */
     public function handle()
     {
-        $shops = Shop::where('site', 'shopee')->get();
+        // $shops = Shop::where('site', 'shopee')->get();
+        $shops = Shop::where('site', 'shopee')->where('active', '!=', 0)->get();
         foreach($shops as $shop){
             $shop->syncShopeePayout(Carbon::now()->subDays(30)->format('Y-m-d'));
             $shop->touch();

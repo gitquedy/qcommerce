@@ -80,6 +80,5 @@ class Warehouse extends Model
                 $user->business->warehouse()->update(['status' => 1]);
             }
         }
-        return $user->business->warehouse()->orderBy('updated_at', 'desc');
     }
 }

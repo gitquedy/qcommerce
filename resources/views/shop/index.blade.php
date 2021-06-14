@@ -85,16 +85,7 @@
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
-            { data: 'id',
-            name: 'id' , 
-            orderable : false,
-
-            "render": function (){
-                    return '<input type="checkbox" class="dt-checkboxes">';
-                },
-                className:'dt-checkboxes-cell'
-                
-            },
+            { data: 'id_checkbox', name: 'id', orderable: false, className:'dt-checkboxes-cell'},
             { data: 'id', name: 'id'},
             { data: 'site', name: 'site', orderable : false, className: 'shop_logo'},
             { data: 'name', name: 'name' },

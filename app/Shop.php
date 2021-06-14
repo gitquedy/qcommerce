@@ -100,6 +100,52 @@ class Shop extends Model
         return $data;
     }
 
+    public function updateShopStatus() {
+        $user = $this->business->users()->where('role', 'Owner')->first();
+        if ($user->business->subscription() !== null) {
+            if ($user->business->subscription()->plan_id == 5 || $user->business->shops()->count() <= $user->business->subscription()->plan->accounts_marketplace) {
+                $user->business->shops()->update(['active' => 1]);
+            }
+            else {
+                $active_count = $user->business->subscription()->plan->accounts_marketplace;
+                $suspended_count = $user->business->shops()->count() - $active_count;
+
+                $active_shops = $user->business->shops()->orderBy('created_at', 'asc')->take($active_count)->get();
+                foreach ($active_shops as $active) {
+                    $active->active = 1;
+                    $active->save();
+                }
+
+                $suspended_shops = $user->business->shops()->orderBy('created_at', 'desc')->take($suspended_count)->get();
+                foreach ($suspended_shops as $suspend) {
+                    $suspend->active = 0;
+                    $suspend->save();
+                }
+            }
+        }
+        else {
+            if ($user->business->shops()->count() > Plan::whereId(1)->value('accounts_marketplace')) {
+                $active_count = Plan::whereId(1)->value('accounts_marketplace');
+                $suspended_count = $user->business->shops()->count() - $active_count;
+
+                $active_shop = $user->business->shops()->orderBy('created_at', 'asc')->take($active_count)->get();
+                foreach ($active_shop as $active) {
+                    $active->active = 1;
+                    $active->save();
+                }
+
+                $suspended_shop = $user->business->shops()->orderBy('created_at', 'desc')->take($suspended_count)->get();
+                foreach ($suspended_shop as $suspend) {
+                    $suspend->active = 0;
+                    $suspend->save();
+                }
+            }
+            else {
+                $user->business->shops()->update(['status' => 1]);
+            }
+        }
+    }
+
     
     public function syncOrders($date = '2018-01-01', $step = '+1 day'){
         try {

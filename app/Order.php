@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Shop;
 use App\Lazop;
+use App\Plan;
 use App\Utilities;
 use Carbon\Carbon;
 use App\Library\Lazada\lazop\LazopRequest;
@@ -510,4 +511,14 @@ class Order extends Model
     public function OrderID(){
         return $this->site == 'lazada' ? $this->id : $this->ordersn;
     }    
+
+    public static function getMaxOrders() {
+        $subscription = Auth::user()->business->subscription();
+        if ($subscription !== null) {
+            return $subscription->plan->order_processing;
+        }
+        else {
+            return Plan::whereId(1)->value('order_processing');
+        }
+    }
 }

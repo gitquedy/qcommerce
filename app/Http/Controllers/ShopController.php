@@ -35,7 +35,11 @@ class ShopController extends Controller
         ];
         if ( request()->ajax()) {
            $shop = $request->user()->business->shops()->orderBy('shop.updated_at', 'desc');
+           $shop->first()->updateShopStatus();
             return Datatables::eloquent($shop)
+            ->addColumn('id_checkbox', function(Shop $shop) {
+                return '<input type="checkbox" class="dt-checkboxes" '.($shop->active == 0 ? 'disabled' : '').'>';
+            })
             ->editColumn('site', function(Shop $shop) {
                             return '<img src="'.asset('images/shop/icon/'.$shop->site.'.png').'" style="display:block; width:100%; height:auto;">';
                         })
@@ -58,6 +62,8 @@ class ShopController extends Controller
                                 $html = '<div class="chip chip-primary"><div class="chip-body"><div class="chip-text">Active</div></div></div>';
                             }else if($shop->active == 2){
                                 $html = '<div class="chip chip-info"><div class="chip-body"><div class="chip-text">Syncing</div></div></div>';
+                            }else if($shop->active == 0){
+                                $html = '<div class="chip chip-danger"><div class="chip-body"><div class="chip-text">Suspended</div></div></div>';
                             }
                            return $html;
                         })
@@ -91,11 +97,11 @@ class ShopController extends Controller
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item modal_button" href="#" data-href="'. action('ShopController@edit', $shop->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
+                        <a class="dropdown-item modal_button '.($shop->active == 0 ? 'disabled' : '').'" href="#" data-href="'. action('ShopController@edit', $shop->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                     </div></div>';
                     return $actions;
              })
-            ->rawColumns(['site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action', 'reSync'])
+            ->rawColumns(['id_checkbox', 'site', 'shipped_count', 'pending_count', 'ready_to_ship_count', 'delivered_count', 'statusChip','orders','products', 'action', 'reSync'])
             ->make(true);
         }
         return view('shop.index', [
@@ -119,10 +125,17 @@ class ShopController extends Controller
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
         $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
+        $plan = Auth::user()->business->subscription()->plan;
+        if (!$plan) {
+            $plan = Plan::whereId(1);
+        }
+        $allowed_shops = $plan->sales_channels;
+        error_log($allowed_shops);
         // die(var_dump(request()->session()));
         return view('shop.create', [
           'breadcrumbs' => $breadcrumbs,
-          'warehouses' => $warehouses
+          'warehouses' => $warehouses,
+          'allowed_shops' => $allowed_shops,
         ]);
     }
 
@@ -280,6 +293,7 @@ class ShopController extends Controller
     }
 
     public function createShopifyTemp(Request $request){
+        $this->authorize('createShopify', Shop::class);
         $breadcrumbs = [
                     ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Shopify Shop"]
                 ];
@@ -338,6 +352,7 @@ class ShopController extends Controller
 
     // Woocommerce Temp
     public function createWoocommerceTemp(Request $request){
+        $this->authorize('createWoocommerce', Shop::class);
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ShopController@index'), 'name'=>"Shop"], ['name'=>"Create Woocommerce Shop"]
         ];
@@ -394,6 +409,7 @@ class ShopController extends Controller
     }
 
     public function edit(Shop $shop){
+        $this->authorize('edit', $shop);
         $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         return view('shop.edit', compact('shop', 'warehouses'));
     }
@@ -512,7 +528,7 @@ class ShopController extends Controller
                     $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }else if($shop->site == 'woocommerce'){
                     $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
-                    $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
+                    // $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
                 }    
                 //   $shop->syncOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
                   $output = ['success' => 1,
@@ -545,7 +561,7 @@ class ShopController extends Controller
                 $shop->syncShopifyOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
               }else if($shop->site == 'woocommerce'){
                 $shop->syncWoocommerceOrders(Carbon::now()->subDays(30)->format('Y-m-d'));
-                $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
+                // $shop->syncWoocommerceCustomers(Carbon::now()->subDays(30)->format('Y-m-d'));
               }
               $output = ['success' => 1,
                   'msg' => 'Orders '. $shop->name .'['. $shop->short_name . '] successfully synced',

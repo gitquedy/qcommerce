@@ -39,7 +39,8 @@ class syncShippingDetails extends Command
      */
     public function handle()
     {
-        $shops = Shop::get();
+        // $shops = Shop::get();
+        $shops = Shop::where('site', 'lazada')->where('active', '!=', 0)->get();
         foreach($shops as $shop){
             $shop->syncShippingDetails(Carbon::now()->subDays(8)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
             echo 'Sync Shipping Details Successfully ' .  date('d-m-Y H:i:s') . PHP_EOL;

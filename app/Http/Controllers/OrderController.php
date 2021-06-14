@@ -65,6 +65,18 @@ class OrderController extends Controller
 
      if ( request()->ajax()) {
            $shops = $request->user()->business->shops;
+           $max_orders = Order::getMaxOrders();
+           error_log('max'.$max_orders);
+           if ($max_orders == 0) {
+                $shops_id = $shops->pluck('id')->toArray();
+                $allshops_orders = Order::whereIn('shop_id', $shops_id)->pluck('id')->toArray();    //get max orders_processing from all shops before filtering
+                error_log('count'.count($allshops_orders));
+           }
+           else {
+                $shops_id = $shops->pluck('id')->toArray();
+                $allshops_orders = Order::whereIn('shop_id', $shops_id)->orderBy('created_at', 'desc')->limit($max_orders)->pluck('id')->toArray();     //get max orders_processing from all shops before filtering
+                error_log('take'.count($allshops_orders));
+           }
 
            if($request->get('shop') != ''){
                 $shops = $shops->whereIn('id', explode(",", $request->get('shop')));
@@ -72,10 +84,14 @@ class OrderController extends Controller
            $shops_id = $shops->pluck('id')->toArray();
            $status = $request->get('status');
            if($status == 'all') {
-              $orders = Order::whereIn('shop_id', $shops_id); //with('shop')->
+            //   $orders = Order::whereIn('shop_id', $shops_id); //with('shop')->
+              $orders = Order::whereIn('shop_id', $shops_id)->whereIn('id', $allshops_orders);
+              error_log($orders->count());
            }
            else {
-              $orders = Order::whereIn('shop_id', $shops_id)->where('status', $status); //with('shop')->
+            //   $orders = Order::whereIn('shop_id', $shops_id)->where('status', $status); //with('shop')->
+              $orders = Order::whereIn('shop_id', $shops_id)->whereIn('id', $allshops_orders)->where('status', $status);
+              error_log($orders->count());
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
@@ -501,11 +517,22 @@ class OrderController extends Controller
         $data = [];
         $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
         $daterange = explode('/', $request->get('daterange'));
+
+        $max_orders = Order::getMaxOrders();
+        error_log('max'.$max_orders);
+        if ($max_orders == 0) {
+            $allshops_orders = Order::whereIn('shop_id', $shop_ids)->pluck('id')->toArray();    //get max orders_processing from all shops before filtering
+            error_log('count'.count($allshops_orders));
+        }
+        else {
+            $allshops_orders = Order::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc')->limit($max_orders)->pluck('id')->toArray();     //get max orders_processing from all shops before filtering
+            error_log('take'.count($allshops_orders));
+        }
         
         if($request->site == 'lazada'){
             $lazada_statuses = Order::$statuses;
             foreach($lazada_statuses as $status){
-                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada');
+                $orders = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'lazada');
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
                         $orders = $orders->whereDate('created_at', [$daterange[0]]);
@@ -519,7 +546,7 @@ class OrderController extends Controller
         }else if ($request->site == 'shopee') {
             $shopee_statuses = Order::$shopee_statuses;
             foreach($shopee_statuses as $status){
-                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee');
+                $orders = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'shopee');
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
                         $orders = $orders->whereDate('created_at', [$daterange[0]]);
@@ -533,7 +560,7 @@ class OrderController extends Controller
         else if($request->site == 'woocommerce') {
             $woocommerce_statuses = Order::$woocommerce_statuses;
             foreach($woocommerce_statuses as $status){
-                $orders = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce');
+                $orders = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'woocommerce');
                 if(count($daterange) == 2){
                     if($daterange[0] == $daterange[1]){
                         $orders = $orders->whereDate('created_at', [$daterange[0]]);
@@ -546,9 +573,9 @@ class OrderController extends Controller
             }
         }
 
-        $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'lazada')->whereIn('status', ['pending']);
-        $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP']);
-        $data['woocommerce_total'] = Order::whereIn('shop_id', $shop_ids)->where('site', 'woocommerce')->whereIn('status', ['pending', 'processing']);
+        $data['lazada_total'] = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'lazada')->whereIn('status', ['pending']);
+        $data['shopee_total'] = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'shopee')->whereIn('status', ['RETRY_SHIP', 'READY_TO_SHIP']);
+        $data['woocommerce_total'] = Order::whereIn('shop_id', $shop_ids)->whereIn('id', $allshops_orders)->where('site', 'woocommerce')->whereIn('status', ['pending', 'processing']);
         if(count($daterange) == 2){
             if($daterange[0] == $daterange[1]){
                 $data['lazada_total'] = $data['lazada_total']->whereDate('created_at', [$daterange[0]]);

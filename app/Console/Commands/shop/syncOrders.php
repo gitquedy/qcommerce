@@ -41,7 +41,8 @@ class syncOrders extends Command
      */
     public function handle()
     {
-        $shops = Shop::all();
+        // $shops = Shop::all();
+        $shops = Shop::where('active', '!=', 0)->get();
         $total = count($shops);
         foreach($shops as $index => $shop){
             echo $shop->id.'-'.$shop->name.'('.$shop->site.') ('.($index + 1).'/'.$total.')  --  ';

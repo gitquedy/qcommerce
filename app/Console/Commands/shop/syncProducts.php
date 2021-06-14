@@ -41,7 +41,8 @@ class syncProducts extends Command
      */
     public function handle()
     {
-        $shops = Shop::all();
+        // $shops = Shop::all();
+        $shops = Shop::where('active', '!=', 0)->get();
         // $shops = Shop::where('business_id', 5)->get();
         $sku_ids = [];
         foreach($shops as $shop){
