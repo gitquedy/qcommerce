@@ -60,6 +60,7 @@ class PlanController extends Controller
         $billing->save();
         $request->user->updateUserStatus();
         $request->user->business->warehouse()->first()->updateWarehouseStatus();
+        $request->user->business->shops()->first()->updateShopStatus();
         return view('plan.confirm', compact('breadcrumbs', 'response', 'billing'));
     }
 

@@ -210,7 +210,7 @@ class UserManagementController extends Controller
                 $current_plan = $user->business->subscription();
                 if($request->plan != ($current_plan == null ? 1 : $current_plan->plan_id)) {
                     $override = [
-                        'invoice_no' => 'OVERRIDE - '.$user->business->name,
+                        'invoice_no' => Billing::getNextInvoiceNumber(),
                         'business_id' => $user->business_id,
                         'plan_id' => $request->plan,
                         'billing_period' => 'Month',
@@ -221,6 +221,7 @@ class UserManagementController extends Controller
                     $current_plan->update(['paid_status' => 3]);
                     $user->updateUserStatus();
                     $user->business->warehouse()->first()->updateWarehouseStatus();
+                    $user->business->shops()->first()->updateShopStatus();
                 }
             }
             $user = $user->update($data);
