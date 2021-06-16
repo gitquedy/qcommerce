@@ -28,6 +28,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/subscription', 'Admin\SubscriptionController')->only(['index']);
 		Route::get('/subscription/edit/{id}', 'Admin\SubscriptionController@edit')->name('subscription.edit');
 		Route::post('/subscription/update', 'Admin\SubscriptionController@update')->name('subscription.update');
+		Route::resource('/billing', 'Admin\BillingController')->only(['index']);
+		Route::post('/billing/quickupdate/', 'Admin\BillingController@quickUpdate')->name('billing.quickUpdate');
 	});
 
 

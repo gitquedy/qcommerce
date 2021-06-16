@@ -47,6 +47,13 @@
                 <span class="menu-title" data-i18n="">Subscription</span>
             </a>
         </li>
+
+        <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'Billing' ? 'active' : '' }}">
+            <a href="{{url('/admin/billing')}}">
+                <i class="feather icon-credit-card"></i>
+                <span class="menu-title" data-i18n="">Billing</span>
+            </a>
+        </li>
         
     </ul>
 </div>

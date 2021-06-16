@@ -393,53 +393,6 @@
       });
     });
 
-    $('#cancel_subscription').on('click', function() {
-      const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-          confirmButton: 'btn btn-lg btn-block btn-outline-danger disabled confirm_cancal_subscription_button',
-          cancelButton: 'btn btn-lg btn-block btn-primary'
-        },
-        buttonsStyling: false,
-        onOpen: (swalWithBootstrapButtons) => {
-          setTimeout(function() {
-            $('.confirm_cancal_subscription_button').removeClass('disabled');
-          }, 2000);
-        }
-      })
-
-      swalWithBootstrapButtons.fire({
-        title: 'Are you sure you want to cancel your subscription?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        reverseButtons: true,
-        showCancelButton: true,
-        focusConfirm: false,
-        focusCancel: true,
-        confirmButtonText: 'Yes, Cancel my subscription!',
-        cancelButtonText: 'No, Keep my subscription!'
-      }).then((result) => {
-        if (result.value) {
-          $.ajax({
-              url: $(this).data('href'),
-              method: "POST",
-              data: {id:$(this).data('id')},
-              success:function(result)
-              {
-                Swal.fire(
-                  'Done!',
-                  'Your subscription has been canceled.',
-                  'success'
-                );
-                $("#current_plan").html("FREE");
-                $("#billing_cycle").html("N\\A");
-                $("#promocode").html("None");
-                $("#start_date").html("--");
-              }
-          });
-        }
-      })
-    });
-
   });
 </script>
 @endsection
