@@ -48,11 +48,25 @@
             </a>
         </li>
 
-        <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'Billing' ? 'active' : '' }}">
-            <a href="{{url('/admin/billing')}}">
-                <i class="feather icon-credit-card"></i>
+        <li class="nav-item">
+            <a href="#">
+                <i class="fa fa-credit-card"></i>
                 <span class="menu-title" data-i18n="">Billing</span>
             </a>
+            <ul class="menu-content">
+                <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'billing' && $request->segment(3) == '' ? 'active' : '' }}">
+                    <a href="{{url('/admin/billing')}}">
+                        <i class="feather icon-circle"></i>
+                        <span class="menu-title" data-i18n="">List of Invoices</span>
+                    </a>
+                </li>
+                <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'billing' && $request->segment(3) == 'overdue' ? 'active' : '' }}">
+                    <a href="{{route('billing.overdue')}}">
+                        <i class="feather icon-circle"></i>
+                        <span class="menu-title" data-i18n="">Over Due Invoices</span>
+                    </a>
+                </li>
+            </ul>
         </li>
         
     </ul>

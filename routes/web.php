@@ -29,7 +29,8 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/subscription/edit/{id}', 'Admin\SubscriptionController@edit')->name('subscription.edit');
 		Route::post('/subscription/update', 'Admin\SubscriptionController@update')->name('subscription.update');
 		Route::resource('/billing', 'Admin\BillingController')->only(['index']);
-		Route::post('/billing/quickupdate/', 'Admin\BillingController@quickUpdate')->name('billing.quickUpdate');
+		Route::post('/billing/quickupdate', 'Admin\BillingController@quickUpdate')->name('billing.quickUpdate');
+		Route::get('/billing/overdue', 'Admin\BillingController@overdue')->name('billing.overdue');
 	});
 
 

@@ -56,7 +56,7 @@
       </table>
     </div>
     {{-- DataTable ends --}}
-    
+
 </section>
 {{-- Data list view end --}}
 @endsection
@@ -89,13 +89,13 @@
             { data: 'promocode', name: 'promocode'},
             { data: 'billing_period', name: 'billing_period'},
             { data: 'amount', name: 'amount'},
-            { data: 'paid_status', name: 'paid_status', className: 'quick_update_box'},
+            { data: 'paid_status', name: 'paid_status'},
             { data: 'payment_date', name: 'payment_date'},
             { data: 'next_payment_date', name: 'next_payment_date'},
             { data: 'created_at', name: 'created_at', searchable: false, visible: false }
         ];
     var table_route = {
-            url: '{{ route('billing.index') }}'
+            url: '{{ route('billing.overdue') }}'
             };
     var buttons = [];
     var order = [10, 'desc'];
@@ -130,90 +130,6 @@
             cancelButton: 'btn btn-danger'
             },
             buttonsStyling: false
-        })
-
-
-        $(document).on('click', '.quick_update_box', function() {
-            var td = $(this);
-            td.find("p").hide();
-            td.find('input').show().focus().on('keypress',function(e) {
-                if(e.which == 13) {
-                    $(this).trigger('focusout');
-                }
-            });
-            td.find('input').show().focus().on('focusout', function() {
-                if($(this).val() != $(this).data('defval')) {
-                    var name = $(this).data('name');
-                    var defval = $(this).data('defval');
-                    var status = $(this).val();
-                    var billing_id = $(this).data('billing_id');
-                    Swal.fire({
-                        title: 'Update '+name+' ?',
-                        text: "Change value from "+defval+" to "+$(this).val()+" ?",
-                        type: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, Change it!'
-                    }).then((result) => {
-                        if (result.value) {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('billing.quickUpdate') }}',
-                                data: {'billing_id': billing_id, 'name': name, 'status': td.find("input").val()},
-                                dataType: "JSON",
-                                cache: false,
-                                success: function (res) {
-                                    if (res) {
-                                        td.find('input').attr('data-defval', status).data('defval', status).hide();
-                                        td.find("p").html(function () {
-                                            if (td.find("input").val() == 0) {
-                                                return 'unpaid';
-                                            }
-                                            else if (td.find("input").val() == 1) {
-                                                return 'paid';
-                                            }
-                                            else if (td.find("input").val() == 2) {
-                                                return 'failed';
-                                            }
-                                            else if (td.find("input").val() == 3) {
-                                                return 'cancelled';
-                                            }
-                                            else if (td.find("input").val() == 4) {
-                                                return 'suspended';
-                                            }
-                                        }).show();
-                                        $('#errors').html('');
-                                    }
-                                    else {
-                                        swal2.fire(
-                                        'Warning',
-                                        'Something went wrong :(',
-                                        'error'
-                                        );
-                                        td.find('input').val(defval).hide();
-                                        td.find("p").show();
-                                    }
-                                },
-                                error: function(jqXhr, json, errorThrown){
-                                    td.find('input').val(defval).hide();
-                                    td.find("p").show();
-                                    $('#errors').html('');
-                                    $.each(jqXhr.responseJSON.errors, function(key, value) {
-                                        $('#errors').append('<div class="alert alert-danger">'+value+'</div');
-                                    }); 
-                                }
-                            });
-                        }
-                        else {
-                        td.find('input').val(defval).hide();
-                        td.find("p").show();
-                        }
-                    })
-                }
-                else {
-                td.find('input').hide();
-                td.find("p").show();
-                }
-            });
         });
     }); 
 </script>
