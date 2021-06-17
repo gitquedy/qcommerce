@@ -436,23 +436,28 @@ class UserController extends Controller
                         return $billing->plan->name;
                     })
         ->editColumn('paid_status', function(Billing $billing) {
-                        if ($billing->paid_status == 0) {
-                            $status = 'unpaid';
+                        switch ($billing->paid_status) {
+                          case 0:
+                              return '<span class="badge badge-pill badge-primary">Unpaid</span>';
+                              break;
+                          case 1:
+                              return '<span class="badge badge-pill badge-success">Paid</span>';
+                              break;
+                          case 2:
+                              return '<span class="badge badge-pill badge-danger">Failed</span>';
+                              break;
+                          case 3:
+                              return '<span class="badge badge-pill badge-warning">Canceled</span>';
+                              break;
+                          case 4:
+                              return '<span class="badge badge-pill badge-dark">Suspended</span>';
+                              break;
+                          default:
+                              return '<span class="badge badge-pill badge-secondary">Unknown</span>';
+                              break;
                         }
-                        else if ($billing->paid_status == 1) {
-                            $status = 'paid';
-                        }
-                        else if ($billing->paid_status == 2) {
-                            $status = 'failed';
-                        }
-                        else if ($billing->paid_status == 3) {
-                            $status = 'cancelled';
-                        }
-                        else if ($billing->paid_status == 4) {
-                            $status = 'suspended';
-                        }
-                        return $status;
                     })
+        ->rawColumns(['paid_status'])
         ->make(true);
       }
       return view('user.settings');

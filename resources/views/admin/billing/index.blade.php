@@ -143,19 +143,22 @@
                                         td.find('input').attr('data-defval', status).data('defval', status).hide();
                                         td.find("p").html(function () {
                                             if (td.find("input").val() == 0) {
-                                                return 'unpaid';
+                                                return '<span class="badge-pill badge-primary">Unpaid</span>';
                                             }
                                             else if (td.find("input").val() == 1) {
-                                                return 'paid';
+                                                return '<span class="badge badge-pill badge-success">Paid</span>';
                                             }
                                             else if (td.find("input").val() == 2) {
-                                                return 'failed';
+                                                return '<span class="badge badge-pill badge-danger">Failed</span>';
                                             }
                                             else if (td.find("input").val() == 3) {
-                                                return 'cancelled';
+                                                return '<span class="badge badge-pill badge-warning">Canceled</span>';
                                             }
                                             else if (td.find("input").val() == 4) {
-                                                return 'suspended';
+                                                return '<span class="badge badge-pill badge-dark">Suspended</span>';
+                                            }
+                                            else {
+                                                return '<span class="badge badge-pill badge-secondary">Unknown</span>';
                                             }
                                         }).show();
                                         $('#errors').html('');
