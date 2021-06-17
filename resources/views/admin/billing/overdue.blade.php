@@ -17,16 +17,6 @@
 
 @section('content')
 {{-- Data list view starts --}}
-<style>
-    .product_image{
-        width:100px;
-        height:auto;
-    }
-    
-    option[disabled]{
-        background-color:#F8F8F8;
-    }
-</style>
 
 <section id="data-list-view" class="data-list-view-header">
 
@@ -49,7 +39,7 @@
             <th>Amount</th>
             <th>Status</th>
             <th>Payment Date</th>
-            <th>Due Date</th>
+            <th>Next Payment Date</th>
             <th>Created At</th>
           </tr>
         </thead>
@@ -65,7 +55,7 @@
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
-  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
+  <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>
   <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
@@ -103,34 +93,9 @@
     var bFilter = true;
     function created_row_function(row, data, dataIndex){
         $(row).attr('data-id', JSON.parse(data.id));
-        if(data['products_count'] < 1){
-            $(row).addClass('text-danger bold font-weight-bold');
-        }
     }
-
     var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
     var pageLength = 20;
 </script>
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
-<script type="text/javascript">
-    $(document).ready(function(){
-        var additional_custom_filter = $(".additional_custom_filter").html();
-        $(".action-filters").prepend(additional_custom_filter);
-        $(".additional_custom_filter").html('');
-
-
-        $(".select2").select2({
-            dropdownAutoWidth: true,
-            width: '100%'
-        });
-
-        const swal2 = Swal.mixin({
-            customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-        });
-    }); 
-</script>
 @endsection

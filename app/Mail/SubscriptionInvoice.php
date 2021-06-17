@@ -48,9 +48,19 @@ class SubscriptionInvoice extends Mailable
     {
         $name = $this->business->name;
         $date = $this->business->subscription()->next_payment_date;
-        $subject = 'Invoice#'.Billing::getNextInvoiceNumber().' for '.$this->business->subscription()->plan->name.' Plan of Qcommerce, due '.$this->business->subscription()->next_payment_date;
-        $pdf = PDF::loadview('email.subscriptionInvoice', ['business' => $this->business])->output();
-        return $this->view('email.subscriptionInvoice')
+        
+        $invoice = new Billing;
+        $invoice->invoice_no = Billing::getNextInvoiceNumber();
+        $invoice->business_id = $this->business->id;
+        $invoice->plan_id = $this->business->subscription()->plan_id;
+        $invoice->billing_period = $this->business->subscription()->billing_period;
+        $invoice->amount = $this->business->subscription()->amount;
+        $invoice->paid_status = 0;
+        $invoice->save();
+
+        $subject = 'Invoice#'.$invoice->invoice_no.' for '.$this->business->subscription()->plan->name.' Plan of Qcommerce, due '.$date;
+        $pdf = PDF::loadview('email.subscriptionInvoice', ['business' => $this->business, 'invoice' => $invoice])->output();
+        return $this->view('email.subscriptionInvoice', ['invoice' => $invoice])
                     ->subject($subject)
                     ->attachData($pdf, $subject.'.pdf', [
                         'mime' => 'application/pdf',

@@ -18,6 +18,7 @@ use App\Shop;
 use App\ShopPermission;
 use App\WarehousePermission;
 use App\Warehouse;
+use App\Billing;
 
 class UserController extends Controller
 {
@@ -427,6 +428,33 @@ class UserController extends Controller
     }
 
     public function settings(Request $request){
+      if (request()->ajax()) {
+        $billing = Billing::where('business_id', $request->user()->business_id);
+
+        return Datatables::eloquent($billing)
+        ->editColumn('plan_id', function(Billing $billing) {
+                        return $billing->plan->name;
+                    })
+        ->editColumn('paid_status', function(Billing $billing) {
+                        if ($billing->paid_status == 0) {
+                            $status = 'unpaid';
+                        }
+                        else if ($billing->paid_status == 1) {
+                            $status = 'paid';
+                        }
+                        else if ($billing->paid_status == 2) {
+                            $status = 'failed';
+                        }
+                        else if ($billing->paid_status == 3) {
+                            $status = 'cancelled';
+                        }
+                        else if ($billing->paid_status == 4) {
+                            $status = 'suspended';
+                        }
+                        return $status;
+                    })
+        ->make(true);
+      }
       return view('user.settings');
     }
 }

@@ -467,7 +467,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-              <strong>Amount Due:</strong> {{$business->subscription()->plan->monthly_cost}}Php
+              <strong>Amount Due:</strong> {{$business->subscription()->amount}}Php
             </span>
                                   </td>
                                 </tr>
@@ -501,7 +501,7 @@
                         <table class="purchase" width="100%" cellpadding="0" cellspacing="0">
                           <tr>
                             <td>
-                              <h3>Invoice No: {{$business->subscription()->getNextInvoiceNumber()}}</h3>
+                              <h3>Invoice No: {{$invoice->invoice_no}}</h3>
                             </td>
                             <td>
                               <h3 class="align-right">Date: {{Carbon\Carbon::now()->toDateString()}}</h3>
@@ -520,14 +520,14 @@
                                 </tr>
                                 <tr>
                                   <td width="80%" class="purchase_item"><span class="f-fallback">{{$business->subscription()->plan->name}} Subscription Plan</span></td>
-                                  <td class="align-right" width="20%" class="purchase_item"><span class="f-fallback">{{$business->subscription()->plan->monthly_cost}}Php</span></td>
+                                  <td class="align-right" width="20%" class="purchase_item"><span class="f-fallback">{{$business->subscription()->amount}}Php</span></td>
                                 </tr>
                                 <tr>
                                   <td width="80%" class="purchase_footer" valign="middle">
                                     <p class="f-fallback purchase_total purchase_total--label">Total</p>
                                   </td>
                                   <td width="20%" class="purchase_footer" valign="middle">
-                                    <p class="f-fallback purchase_total">{{$business->subscription()->plan->monthly_cost}}Php</p>
+                                    <p class="f-fallback purchase_total">{{$business->subscription()->amount}}Php</p>
                                   </td>
                                 </tr>
                               </table>
