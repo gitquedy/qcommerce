@@ -437,7 +437,7 @@ class OrderController extends Controller
                 ->addItems($order_items)
                 ->totalAmount($total);
 
-                return PDF::loadview('vendor.invoices.templates.default', ['invoice' => $invoice])->stream();
+                return PDF::loadview('vendor.invoices.templates.default', ['invoices' => $invoice])->stream();
             }
     }
     
@@ -515,7 +515,7 @@ class OrderController extends Controller
             };
         }
         if ($order->site == 'woocommerce') {
-            return PDF::loadview('vendor.invoices.templates.default', ['invoice' => $invoice])->stream();
+            return PDF::loadview('vendor.invoices.templates.default', ['invoices' => $invoice])->stream();
         }
     }
 
