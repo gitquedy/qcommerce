@@ -421,16 +421,21 @@ class OrderController extends Controller
                 }
 
                 $order_items = array();
+                $total = 0;
                 foreach ($order->products as $item) {
                     $order_items[] = (new InvoiceItem())
                         ->title((($item->product->SellerSku) ? '['.$item->product->SellerSku.'] - ' : '').$item->product->name)
                         ->pricePerUnit($item->price)
-                        ->qty($item->quantity);
+                        ->qty($item->quantity)
+                        ->subTotalPrice($item->price*$item->quantity);
+
+                    $total += $item->price*$item->quantity;
                 }
                 $invoice[$order->ordersn] = Invoice::make()
                 ->seller($client)
                 ->buyer($customer)
-                ->addItems($order_items);
+                ->addItems($order_items)
+                ->totalAmount($total);
 
                 return PDF::loadview('vendor.invoices.templates.default', ['invoice' => $invoice])->stream();
             }
@@ -492,16 +497,21 @@ class OrderController extends Controller
                 }
 
                 $order_items = array();
+                $total = 0;
                 foreach ($order->products as $item) {
                     $order_items[] = (new InvoiceItem())
                         ->title((($item->product->SellerSku) ? '['.$item->product->SellerSku.'] - ' : '').$item->product->name)
                         ->pricePerUnit($item->price)
-                        ->qty($item->quantity);
+                        ->qty($item->quantity)
+                        ->subTotalPrice($item->price*$item->quantity);
+
+                        $total += $item->price*$item->quantity;
                 }
                 $invoice[$order->ordersn] = Invoice::make()
                 ->seller($client)
                 ->buyer($customer)
-                ->addItems($order_items);
+                ->addItems($order_items)
+                ->totalAmount($total);
             };
         }
         if ($order->site == 'woocommerce') {
