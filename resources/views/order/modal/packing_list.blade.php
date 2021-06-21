@@ -119,6 +119,63 @@
     </section>
     <hr style="display: block; color:black !important; background-color:black !important;" />
     @endforeach
+
+    @foreach($orders['woocommerce'] as $order)
+      <section class="card">
+        <div class="card-content">
+          <div class="card-body">
+            <h4 class="card-title">Order Details</h4>
+            <div class="row">
+              <div class="col-12">
+                <table class="table text-center">
+                  <thead>
+                    <tr>
+                      <th>{{ $order->shop_name }}</th>
+                      <th>{{ Carbon\Carbon::parse(date("Y-m-d H:i:s",strtotime($order->date_created) + 8 * 3600))->toDateTimeString() }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ $order->id }}</td>
+                      <td>{{ $order->shipping->first_name }} {{ $order->shipping->last_name }}</td>
+                      <td>Platform: Woocommerce</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="card-content">
+        <div class="card-body">
+          <h4 class="card-title">Items</h4>
+          <div class="row">
+            <div class="col-12">
+              <table class="table text-center">
+                <thead>
+                  <tr>
+                    <th>Check</th>
+                    <th>Quantity</th>
+                    <th >Name</th>
+                  </tr>
+                </thead>
+                <tbody id="items_list">
+                  @foreach($order->line_items as $item)
+                    <tr>
+                      <td><i class="fa fa-circle-o"></i></td>
+                      <td>{{ $item->quantity }}</td>
+                      <td>{{ $item->name }}({{ $item->sku }})</td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <hr style="display: block; color:black !important; background-color:black !important;" />
+    @endforeach
 	</div>
     <div class="modal-footer">
       <button type="button" class="btn btn-primary no-print" aria-label="Print" 

@@ -21,6 +21,7 @@ use LaravelDaily\Invoices\Invoice;
 use LaravelDaily\Invoices\Classes\Party;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
 use Auth;
+use PDF;
 
 class OrderController extends Controller
 {
@@ -66,16 +67,13 @@ class OrderController extends Controller
      if ( request()->ajax()) {
            $shops = $request->user()->business->shops;
            $max_orders = Order::getMaxOrders();
-           error_log('max'.$max_orders);
            if ($max_orders == 0) {
                 $shops_id = $shops->pluck('id')->toArray();
                 $allshops_orders = Order::whereIn('shop_id', $shops_id)->pluck('id')->toArray();    //get max orders_processing from all shops before filtering
-                error_log('count'.count($allshops_orders));
            }
            else {
                 $shops_id = $shops->pluck('id')->toArray();
                 $allshops_orders = Order::whereIn('shop_id', $shops_id)->orderBy('created_at', 'desc')->limit($max_orders)->pluck('id')->toArray();     //get max orders_processing from all shops before filtering
-                error_log('take'.count($allshops_orders));
            }
 
            if($request->get('shop') != ''){
@@ -86,12 +84,10 @@ class OrderController extends Controller
            if($status == 'all') {
             //   $orders = Order::whereIn('shop_id', $shops_id); //with('shop')->
               $orders = Order::whereIn('shop_id', $shops_id)->whereIn('id', $allshops_orders);
-              error_log($orders->count());
            }
            else {
             //   $orders = Order::whereIn('shop_id', $shops_id)->where('status', $status); //with('shop')->
               $orders = Order::whereIn('shop_id', $shops_id)->whereIn('id', $allshops_orders)->where('status', $status);
-              error_log($orders->count());
            }
 
            $orders->where('site', $request->get('site', 'lazada'));
@@ -431,12 +427,12 @@ class OrderController extends Controller
                         ->pricePerUnit($item->price)
                         ->qty($item->quantity);
                 }
-                $invoice = Invoice::make()
+                $invoice[$order->ordersn] = Invoice::make()
                 ->seller($client)
                 ->buyer($customer)
                 ->addItems($order_items);
 
-            return $invoice->stream();
+                return PDF::loadview('vendor.invoices.templates.default', ['invoice' => $invoice])->stream();
             }
     }
     
@@ -447,26 +443,76 @@ class OrderController extends Controller
             $order->printed = true;
             $order->save();
 
-            $Result =    Order::get_shipping_level($order->ordersn);
-            $jsOBJ = json_decode($Result);
-            
-            if($jsOBJ->code==0){
-                if(isset($jsOBJ->data->document->file)){
-                    $document = base64_decode($jsOBJ->data->document->file);
-                    echo $document."<hr/>";
+            if ($order->site == 'lazada') {
+                $Result =    Order::get_shipping_level($order->ordersn);
+                $jsOBJ = json_decode($Result);
+                
+                if($jsOBJ->code==0){
+                    if(isset($jsOBJ->data->document->file)){
+                        $document = base64_decode($jsOBJ->data->document->file);
+                        echo $document."<hr/>";
+                    }
+                
+                }else{
+                    echo "For order# ".$orderVAL." Error - ".$Result."<hr/>";
                 }
-            
-            }else{
-                echo "For order# ".$orderVAL." Error - ".$Result."<hr/>";
             }
-            
+            else if ($order->site == 'woocommerce') {
+                $client = new Party([
+                    'name'          => $order->shop->name,
+                    'address'       => Auth::user()->business->location,
+                ]);
+
+                if ($order->CustomerId == 0) {
+                    $woocommerce = $order->shop->woocommerceGetClient();
+                    $woo_order = $woocommerce->get('orders/'.$order->ordersn);
+
+                    $customer = new Party([
+                        'name'          => $woo_order->billing->first_name . ' ' . $woo_order->billing->last_name,
+                        'address'       => $woo_order->billing->address_1.', '.(($woo_order->billing->address_2)?$woo_order->billing->address_2.', ':'').$woo_order->billing->city,
+                        'email'         => ($woo_order->billing->email) ? $woo_order->billing->email : '',
+                        'phone'         => ($woo_order->billing->phone) ? $woo_order->billing->phone : '',
+                        'custom_fields' => [
+                            'order number' => $order->ordersn,
+                            'date' => Carbon::parse(date("m/d/Y",strtotime($woo_order->date_created) + 8 * 3600))->toDateTimeString(),
+                        ],
+                    ]);
+                }
+                else {
+                    $customer = new Party([
+                        'name'          => ($order->customer_first_name) ? $order->customer_first_name : '',
+                        'address'       => ($order->customer->address) ? $order->customer->address : '',
+                        'email'         => ($order->customer->email) ? $order->customer->email : '',
+                        'phone'         => ($order->customer->mobile_num) ? $order->customer->mobile_num : '',
+                        'custom_fields' => [
+                            'order number' => $order->ordersn,
+                            'date' => date('m/d/Y', strtotime($order->created_at)),
+                        ],
+                    ]);
+                }
+
+                $order_items = array();
+                foreach ($order->products as $item) {
+                    $order_items[] = (new InvoiceItem())
+                        ->title((($item->product->SellerSku) ? '['.$item->product->SellerSku.'] - ' : '').$item->product->name)
+                        ->pricePerUnit($item->price)
+                        ->qty($item->quantity);
+                }
+                $invoice[$order->ordersn] = Invoice::make()
+                ->seller($client)
+                ->buyer($customer)
+                ->addItems($order_items);
+            };
+        }
+        if ($order->site == 'woocommerce') {
+            return PDF::loadview('vendor.invoices.templates.default', ['invoice' => $invoice])->stream();
         }
     }
 
     public function printPackingList(Request $request){
       $ids = explode(',',$request->get('ids'));
       $products = Order::whereIn('id', $ids)->get();
-      $orders = ['shopee' => [], 'lazada' => []];
+      $orders = ['shopee' => [], 'lazada' => [], 'woocommerce' => []];
       $counter = 0;
       foreach($products as $product){
         if($product->site == 'lazada'){
@@ -499,12 +545,17 @@ class OrderController extends Controller
           }
 
         }else if($product->site == 'shopee'){
-          $client = $product->shop->shopeeGetClient();
-          $order_details = $client->order->getOrderDetails(['ordersn_list' => array_values([$product->ordersn])])->getData();
-          if(isset($order_details['orders'][0])){
-            $orders['shopee'][$counter] = $order_details['orders'][0];
-            $orders['shopee'][$counter]['shop_name'] = $product->shop->name;
-          }
+            $client = $product->shop->shopeeGetClient();
+            $order_details = $client->order->getOrderDetails(['ordersn_list' => array_values([$product->ordersn])])->getData();
+            if(isset($order_details['orders'][0])){
+                $orders['shopee'][$counter] = $order_details['orders'][0];
+                $orders['shopee'][$counter]['shop_name'] = $product->shop->name;
+            }
+        }else if($product->site == 'woocommerce') {
+            $client = $product->shop->woocommerceGetClient();
+            $order_details = $client->get('orders/'.$product->ordersn);
+            $orders['woocommerce'][$counter] = $order_details;
+            $orders['woocommerce'][$counter]->shop_name = $product->shop->name;
         }
          $counter += 1;
       }
@@ -519,14 +570,11 @@ class OrderController extends Controller
         $daterange = explode('/', $request->get('daterange'));
 
         $max_orders = Order::getMaxOrders();
-        error_log('max'.$max_orders);
         if ($max_orders == 0) {
             $allshops_orders = Order::whereIn('shop_id', $shop_ids)->pluck('id')->toArray();    //get max orders_processing from all shops before filtering
-            error_log('count'.count($allshops_orders));
         }
         else {
             $allshops_orders = Order::whereIn('shop_id', $shop_ids)->orderBy('created_at', 'desc')->limit($max_orders)->pluck('id')->toArray();     //get max orders_processing from all shops before filtering
-            error_log('take'.count($allshops_orders));
         }
         
         if($request->site == 'lazada'){

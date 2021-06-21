@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{ $invoice->name }}</title>
+    <title>Print Shipping Label</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
     <style type="text/css" media="screen">
@@ -133,21 +133,8 @@
 
     <body>
         {{-- Header --}}
-        <!-- <table class="table mt-5">
-            <tbody>
-                <tr>
-                    <td class="border-0 pl-0" width="70%">
-                        <h4 class="text-uppercase">
-                            <strong>{{ $invoice->name }}</strong>
-                        </h4>
-                    </td>
-                    <td class="border-0 pl-0">
-                        <p>{{ __('invoices::invoice.serial') }} <strong>{{ $invoice->getSerialNumber() }}</strong></p>
-                        <p>{{ __('invoices::invoice.date') }}: <strong>{{ $invoice->getDate() }}</strong></p>
-                    </td>
-                </tr>
-            </tbody>
-        </table> -->
+        
+        @foreach($invoice as $invoice)
         <div class="container">
             <div class="row">
                 <div class="col">
@@ -342,6 +329,8 @@
                     </tr>
             </tbody>
         </table>
+        <hr>
+        @endforeach
 
         
 

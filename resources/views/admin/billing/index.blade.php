@@ -178,7 +178,7 @@
                                     td.find("p").show();
                                     $('#errors').html('');
                                     $.each(jqXhr.responseJSON.errors, function(key, value) {
-                                        $('#errors').append('<div class="alert alert-danger">'+value+'</div');
+                                        $('#errors').append('<div class="alert alert-danger">'+value+'</div>');
                                     }); 
                                 }
                             });
