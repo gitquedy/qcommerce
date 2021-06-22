@@ -6,6 +6,7 @@ use App\User;
 use App\Shop;
 use App\Plan;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class ShopPolicy
 {
@@ -84,13 +85,7 @@ class ShopPolicy
     }
 
     public function edit(User $user, Shop $shop) {
-        if ($user->business->subscription() !== null) {
-            $shop_avail = $user->business->shops()->where('active', '!=', 0)->pluck('id')->toArray();
-        }
-        else {
-            $shop_avail = $user->business->shops()->where('active', '!=', 0)->pluck('id')->toArray();
-        }
-        return in_array($shop->id, $shop_avail)
+        return ($user->business->shops()->whereId($shop->id)->value('active') != 0)
             ? Response::allow()
             : abort(403, 'Please upgrade your subscription plan to edit this shop');
     }

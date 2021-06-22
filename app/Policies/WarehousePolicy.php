@@ -41,25 +41,13 @@ class WarehousePolicy
     }
 
     public function show(User $user, Warehouse $warehouse) {
-        if ($user->business->subscription() !== null) {
-            $warehouse_avail = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->pluck('id')->toArray();
-        }
-        else {
-            $warehouse_avail = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->pluck('id')->toArray();
-        }
-        return in_array($warehouse->id, $warehouse_avail)
+        return ($user->business->warehouse()->whereId($warehouse->id)->value('status') == 1)
             ? Response::allow()
             : abort(403, 'Please upgrade your subscription plan to view this warehouse again');
     }
 
     public function edit(User $user, Warehouse $warehouse) {
-        if ($user->business->subscription() !== null) {
-            $warehouse_avail = $user->business->warehouse()->orderBy('created_at', 'asc')->take($user->business->subscription()->plan->no_of_warehouse)->pluck('id')->toArray();
-        }
-        else {
-            $warehouse_avail = $user->business->warehouse()->orderBy('created_at', 'asc')->take(Plan::whereId(1)->value('no_of_warehouse'))->pluck('id')->toArray();
-        }
-        return in_array($warehouse->id, $warehouse_avail)
+        return ($user->business->warehouse()->whereId($warehouse->id)->value('status') == 1)
             ? Response::allow()
             : abort(403, 'Please upgrade your subscription plan to edit this warehouse');
     }

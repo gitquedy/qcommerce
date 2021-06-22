@@ -40,13 +40,7 @@ class UserPolicy
     }
 
     public function edit(User $user, User $model) {
-        if ($user->business->subscription() !== null) {
-            $user_avail = $user->business->users()->where('status', 1)->pluck('id')->toArray();
-        }
-        else {
-            $user_avail = $user->business->users()->where('status', 1)->pluck('id')->toArray();
-        }
-        return in_array($model->id, $user_avail)
+        return ($user->business->users()->whereId($model->id)->value('status') == 1)
             ? Response::allow()
             : abort(403, 'Please upgrade your subscription plan to edit this user');
     }
