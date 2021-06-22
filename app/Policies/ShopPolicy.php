@@ -46,15 +46,10 @@ class ShopPolicy
 
     public function createShopify(User $user) {
         if ($user->business->subscription() !== null) {
-            if ($user->business->subscription()->plan_id == 5) {
-                return true;
-            }
-            else {
-                $allowed_sites = explode('/', $user->business->subscription()->plan->sales_channels);
-                return (in_array('Shopify', $allowed_sites) ||  in_array('All', $allowed_sites))
-                    ? Response::allow()
-                    : abort(403, 'This site is not included in your subscription plan');
-            }
+            $allowed_sites = explode('/', $user->business->subscription()->plan->sales_channels);
+            return (in_array('Shopify', $allowed_sites) ||  in_array('All', $allowed_sites))
+                ? Response::allow()
+                : abort(403, 'This site is not included in your subscription plan');
         }
         else {
             $allowed_sites = explode('/', Plan::whereId(1)->value('sales_channels'));
@@ -66,15 +61,10 @@ class ShopPolicy
 
     public function createWoocommerce(User $user) {
         if ($user->business->subscription() !== null) {
-            if ($user->business->subscription()->plan_id == 5) {
-                return true;
-            }
-            else {
-                $allowed_sites = explode('/', $user->business->subscription()->plan->sales_channels);
-                return (in_array('Woocommerce', $allowed_sites) ||  in_array('All', $allowed_sites))
-                    ? Response::allow()
-                    : abort(403, 'This site is not included in your subscription plan');
-            }
+            $allowed_sites = explode('/', $user->business->subscription()->plan->sales_channels);
+            return (in_array('Woocommerce', $allowed_sites) ||  in_array('All', $allowed_sites))
+                ? Response::allow()
+                : abort(403, 'This site is not included in your subscription plan');
         }
         else {
             $allowed_sites = explode('/', Plan::whereId(1)->value('sales_channels'));

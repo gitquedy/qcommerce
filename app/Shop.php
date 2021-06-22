@@ -102,6 +102,8 @@ class Shop extends Model
 
     public function updateShopStatus() {
         $user = $this->business->users()->where('role', 'Owner')->first();
+
+        //based on allowed number of shops
         if ($user->business->subscription() !== null) {
             if ($user->business->subscription()->plan_id == 5 || $user->business->shops()->count() <= $user->business->subscription()->plan->accounts_marketplace) {
                 $user->business->shops()->update(['active' => 1]);
@@ -142,6 +144,34 @@ class Shop extends Model
             }
             else {
                 $user->business->shops()->update(['status' => 1]);
+            }
+        }
+
+        //based on allowed shop sites
+        if ($user->business->subscription() !== null) {
+            $allowed_sites = explode('/', $user->business->subscription()->plan->sales_channels);
+            foreach($user->business->shops() as $shop) {
+                if (in_array(ucfirst(strtolower($shop->site)), $allowed_sites) ||  in_array('All', $allowed_sites)) {
+                    $shop->active = 1;
+                    $shop->save();
+                }
+                else {
+                    $shop->active = 0;
+                    $shop->save();
+                }
+            }
+        }
+        else {
+            $allowed_sites = explode('/', Plan::whereId(1)->value('sales_channels'));
+            foreach($user->business->shops() as $shop) {
+                if (in_array(ucfirst(strtolower($shop->site)), $allowed_sites) ||  in_array('All', $allowed_sites)) {
+                    $shop->active = 1;
+                    $shop->save();
+                }
+                else {
+                    $shop->active = 0;
+                    $shop->save();
+                }
             }
         }
     }
