@@ -154,6 +154,14 @@ class OrderController extends Controller
                 ->addColumn('statusDisplay', function(Order $order) {
                             return ucwords(str_replace('_', ' ', $order->status));
                                 })
+                ->addColumn('printedDisplay', function(Order $order) {
+                                if ($order->printed) {
+                                    return '<h1><span style="color:green">&#10003;</span><h1>';
+                                }
+                                else {
+                                    return '<h4><span style="color:red">&#10060;</span><h4>';
+                                }
+                            })
                 ->addColumn('actions', function(Order $order) {
                             return $order->getActionsDropdown();
                                 })
@@ -166,7 +174,7 @@ class OrderController extends Controller
                 ->addColumn('updated_at_at_human_read', function(Order $order) {
                             return Carbon::parse($order->updated_at)->diffForHumans();
                                 })
-                ->rawColumns(['actions', 'item_list', 'idDisplay'])
+                ->rawColumns(['actions', 'item_list', 'idDisplay', 'printedDisplay'])
                 ->make(true);
          }
         

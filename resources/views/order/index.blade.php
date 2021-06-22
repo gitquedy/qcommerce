@@ -114,6 +114,7 @@
             <th>Price</th>
             <th>Item Count</th>
             <th>Status</th>
+            <th>Printed</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -188,6 +189,7 @@
             { data: 'price', name: 'price' },
             { data: 'items_count', name: 'items_count' },
             { data: 'statusDisplay', name: 'status' },
+            { data: 'printedDisplay', name: 'printed' },
             { data: 'actions', name: 'actions', orderable : false },
         ];
   var table_route = {
