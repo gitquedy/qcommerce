@@ -397,7 +397,7 @@ class OrderController extends Controller
                 $order->update(['printed' => true]);
                 $client = new Party([
                     'name'          => $order->shop->name,
-                    'address'       => Auth::user()->business->location,
+                    'address'       => $order->shop->warehouse->address,
                 ]);
 
                 if ($order->CustomerId == 0) {
@@ -473,7 +473,7 @@ class OrderController extends Controller
             else if ($order->site == 'woocommerce') {
                 $client = new Party([
                     'name'          => $order->shop->name,
-                    'address'       => Auth::user()->business->location,
+                    'address'       => $order->shop->warehouse->address,
                 ]);
 
                 if ($order->CustomerId == 0) {
