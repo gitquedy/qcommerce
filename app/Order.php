@@ -107,7 +107,26 @@ class Order extends Model
                             <a class="dropdown-item '. $disabled['print_shipping_label'] .'" href="'.route('order.print_shipping',array('id'=>$this->id)).'"><i class="fa fa-print aria-hidden="true""></i> Print Shipping Label</a>
                             <a class="dropdown-item confirm '. $disabled['cancel'] .'" href="#" data-href="'. action('OrderController@cancel', [$order_id]) .'" data-text="Are you sure to mark '. $this->ordersn .' as canceled?" data-text="This Action is irreversible." data-input="textarea" data-placeholder="Type your reason here..."><i class="fa fa-window-close-o aria-hidden="true""></i> Cancel Order</a>
                         </div></div>';
-        }else{
+        }
+        else if ($this->site == 'woocommerce') {
+            $disabled = ['print_shipping_label' => 'disabled', 'cancel' => 'disabled', 'mark_as_shipped' => 'disabled'];
+            if($status == 'pending' || $status == 'processing') {
+                $disabled['print_shipping_label'] = '';
+                $disabled['mark_as_shipped'] = '';
+                $disabled['cancel'] = '';
+            } else if($status == 'shipped') {
+                $disabled['print_shipping_label'] = '';
+            }
+            $dropdown = '<div class="btn-group dropup mr-1 mb-1">
+                        '. $nextAction .'
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Toggle Dropdown</span></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item confirm '. $disabled['mark_as_shipped'] .'" href="#" data-href="'. route('order.markAsShipped', [$order_id]) .'" data-text="Are you sure to mark Order'. $this->ordersn .' as shipped?" data-text="This Action is irreversible.><i class="fa fa-truck aria-hidden="true""></i> Mark as Shipped</a>
+                            <a class="dropdown-item '. $disabled['print_shipping_label'] .'" href="'.route('order.print_shipping',array('id'=>$order_id)).'"><i class="fa fa-print aria-hidden="true""></i> Print Shipping Label</a>
+                            <a class="dropdown-item modal_button '. $disabled['cancel'] .'" href="#" data-href="'. action('OrderController@cancelModal', [$order_id]) .'"><i class="fa fa-window-close-o aria-hidden="true""></i> Cancel Order</a>
+                        </div></div>';
+        } else {
             $disabled = ['print_shipping_label' => 'disabled', 'cancel' => 'disabled', 'ready_to_ship' => 'disabled'];
             if($status == 'READY_TO_SHIP'){
                 if($this->tracking_no != ''){

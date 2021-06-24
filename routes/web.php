@@ -309,6 +309,7 @@ Route::group(['middleware' => 'auth'], function()
 	{
 		Route::get('/order/readyToShip/{order}', 'OrderController@readyToShip')->name('order.readyToShip');
 		Route::post('/order/readyToShipMultiple/', 'OrderController@readyToShipMultiple')->name('order.readyToShipMultiple');
+		Route::get('/order/markAsShipped/{order}', 'OrderController@markAsShipped')->name('order.markAsShipped');
 		Route::get('/order/cancelModal/{order}', 'OrderController@cancelModal');
 		Route::post('/order/cancelSubmit/{order}', 'OrderController@cancelSubmit');
 		Route::get('/order/cancel/{order}', 'OrderController@cancel')->name('order.cancel');

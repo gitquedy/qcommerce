@@ -242,7 +242,23 @@ class OrderController extends Controller
         return response()->json($output);
     }    
 
-    
+    public function markAsShipped(Order $order, Request $request) {
+        try {
+            $client = $order->shop->woocommerceGetClient();
+            $client->put('orders/'.$order->ordersn, ['status' => 'shipped']);
+            $order->update(['status' => 'shipped']);
+            $output = ['success' => 1,
+                    'msg' => 'Order ' . $order->ordersn . ' marked as Shipped',
+                ];
+        } catch (\Exception $e) {
+            \Log::emergency("File:" . $e->getFile(). " Line:" . $e->getLine(). " Message:" . $e->getMessage());
+            $output = ['success' => 0,
+                        'msg' => env('APP_DEBUG') ? $e->getMessage() : 'Sorry something went wrong, please try again later.'
+                    ];
+            DB::rollBack();
+        }
+        return response()->json($output);
+    }
 
    public function readyToShipShopee(Order $order,Request $request){
        return view ('order.ready_to_ship', compact('order'));
