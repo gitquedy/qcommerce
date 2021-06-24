@@ -225,11 +225,7 @@ $(document).ready(function () {
   actionDropdown.insertBefore($(".top .actions .dt-buttons"))
   var columnFilter = $(".column-filter")
   columnFilter.insertAfter($(".top .actions .dt-buttons"))
-
-  //To append filter checkbox after add new button
-  var filterCheckbox = $(".filter-checkbox");
-  filterCheckbox.insertAfter($(".top .actions .dt-buttons"));
-
+  
   // to check and uncheck checkboxes on click of <td> tag
   // $(".data-list-view, .data-thumb-view").on("click", "tbody td", function () {
   //   var dtCheckbox = $(this).parent("tr").find(".dt-checkboxes-cell .dt-checkboxes")

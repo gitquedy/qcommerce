@@ -179,6 +179,8 @@
       $(".action-filters").prepend(additional_custom_filter);
       $(".additional_custom_filter").html('');
 
+      var filterCheckbox = $(".filter-checkbox");
+      filterCheckbox.insertAfter($(".top .actions .dt-buttons"));
 
       $(".select2").select2({
         dropdownAutoWidth: true,
