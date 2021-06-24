@@ -55,6 +55,10 @@ class SkuController extends Controller
                         ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id)'))
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at');
 
+            if ($request->get('stocks') == 'with_stocks_only') {
+                $Sku = $Sku->where('sku.quantity', '>', 0);
+            }
+
             return Datatables::eloquent($Sku)
             ->editColumn('link_shop', function(Sku $SKSU) {
                             $shop_list = array();
@@ -157,6 +161,10 @@ class SkuController extends Controller
                         ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'))
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at')
                         ->havingRaw('shop_id is null');
+
+            if ($request->get('stocks') == 'with_stocks_only') {
+                $Sku = $Sku->where('sku.quantity', '>', 0);
+            }
 
             return Datatables::eloquent($Sku)
             ->editColumn('link_shop', function(Sku $SKSU) {

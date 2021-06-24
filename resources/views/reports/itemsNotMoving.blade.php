@@ -30,7 +30,7 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="btn-group-toggle" data-toggle="buttons">
+        <div class="btn-group-toggle actions-dropodown" data-toggle="buttons">
             <label class="btn px-1 btn-outline-primary {{ (7 == $selectedDays) ? 'active' : '' }}">
                 <input type="radio" name="days" id="7days"  class="selectFilter" value=7 autocomplete="off" checked>
                 <i class='feather icon-calendar'></i> 7 Days

@@ -45,6 +45,10 @@
           </div>
         </div>
       </div>
+      <div class="form-check form-check-inline filter-checkbox">
+        <input class="form-check-input" type="checkbox" name="stocks" id="stocks" value="stocks">
+        <label class="form-check-label" for="stocks">Show only items with stocks</label>
+      </div>
     </div>
 
 
@@ -145,6 +149,7 @@
           url: '{{ route('sku.index') }}',
           data: function (data) {
                 data.warehouse = $("#warehouse").val();
+                data.stocks = $('input[name=stocks][value=stocks]').is(":checked") ? 'with_stocks_only' : 'all';
             }
         };
   var buttons = [
@@ -248,7 +253,9 @@
 
       });
       
-
+      $(document).on('change', $('input[name=stocks][value=stocks]'), function() {
+        table.ajax.reload();
+      });
 
 
 
