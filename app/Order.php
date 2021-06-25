@@ -122,7 +122,7 @@ class Order extends Model
                         <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                         <span class="sr-only">Toggle Dropdown</span></button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item confirm '. $disabled['mark_as_shipped'] .'" href="#" data-href="'. route('order.markAsShipped', [$order_id]) .'" data-text="Are you sure to mark Order'. $this->ordersn .' as shipped?" data-text="This Action is irreversible.><i class="fa fa-truck aria-hidden="true""></i> Mark as Shipped</a>
+                            <a class="dropdown-item confirm '. $disabled['mark_as_shipped'] .'" href="#" data-href="'. route('order.markAsShipped', [$order_id]) .'" data-text="Are you sure to mark Order'. $this->ordersn .' as shipped?" data-text="This Action is irreversible."><i class="fa fa-truck aria-hidden="true""></i> Mark as Shipped</a>
                             <a class="dropdown-item '. $disabled['print_shipping_label'] .'" href="'.route('order.print_shipping',array('id'=>$order_id)).'"><i class="fa fa-print aria-hidden="true""></i> Print Shipping Label</a>
                             <a class="dropdown-item modal_button '. $disabled['cancel'] .'" href="#" data-href="'. action('OrderController@cancelModal', [$order_id]) .'"><i class="fa fa-window-close-o aria-hidden="true""></i> Cancel Order</a>
                         </div></div>';

@@ -44,6 +44,8 @@ class SkuController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
         ];
+        $all_shops = $request->user()->business->shops;
+        $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));
         
         if (request()->ajax()) {
             
@@ -52,11 +54,28 @@ class SkuController extends Controller
             DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
             $Sku = Sku::where('business_id','=',$business_id)
                         ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')
-                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id)'))
+                        ->leftjoin('warehouse_items', 'sku.id', '=', 'warehouse_items.sku_id')
+                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at');
 
             if ($request->get('stocks') == 'with_stocks_only') {
-                $Sku = $Sku->where('sku.quantity', '>', 0);
+                $warehouse = $request->get('warehouse');
+                if ($warehouse != "") {
+                    $sku_ids = array();
+                    foreach($Sku->get() as $row) {
+                        $warehouse_ids = explode(',', $row->warehouse_id);
+                        $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                        $items = array_combine($warehouse_ids, $warehouse_quantities);
+
+                        if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
+                            $sku_ids[] = $row->id;
+                        }
+                    }
+                    $Sku = $Sku->whereIn('sku.id', $sku_ids);
+                }
+                else {
+                    $Sku = $Sku->where('sku.quantity', '>', 0);
+                }
             }
 
             return Datatables::eloquent($Sku)
@@ -76,14 +95,14 @@ class SkuController extends Controller
                             if($warehouse != "") {
                                 $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
                                 if($warehouse) {
-                                    return '<p>'.$warehouse->quantity.'</p>';
+                                    return $warehouse->quantity;
                                 }
                                 else {
-                                    return '<p>0</p>';
+                                    return 0;
                                 }
                             }
                             else {
-                                return '<p>'.$SKSU->quantity.'</p>';
+                                return $SKSU->quantity;
                             }
 
 
@@ -132,7 +151,7 @@ class SkuController extends Controller
                             </div>
                             </div>';
                         })
-            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
+            ->rawColumns(['link_shop','cost','price','alert_quantity','type','action'])
             ->make(true);
         }
         $business_id = Auth::user()->business_id;
@@ -140,8 +159,8 @@ class SkuController extends Controller
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
-            'all_shops' => array(),
-            'statuses' => array(),
+            'all_shops' => $all_shops,
+            'all_sites' => $all_sites,
         ]);
     }
 
@@ -158,12 +177,29 @@ class SkuController extends Controller
             DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
             $Sku = Sku::where('business_id','=',$business_id)
                         ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')
-                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'))
+                        ->leftjoin('warehouse_items', 'sku.id', '=', 'warehouse_items.sku_id')
+                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at')
                         ->havingRaw('shop_id is null');
 
             if ($request->get('stocks') == 'with_stocks_only') {
-                $Sku = $Sku->where('sku.quantity', '>', 0);
+                $warehouse = $request->get('warehouse');
+                if ($warehouse != "") {
+                    $sku_ids = array();
+                    foreach($Sku->get() as $row) {
+                        $warehouse_ids = explode(',', $row->warehouse_id);
+                        $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                        $items = array_combine($warehouse_ids, $warehouse_quantities);
+
+                        if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
+                            $sku_ids[] = $row->id;
+                        }
+                    }
+                    $Sku = $Sku->whereIn('sku.id', $sku_ids);
+                }
+                else {
+                    $Sku = $Sku->where('sku.quantity', '>', 0);
+                }
             }
 
             return Datatables::eloquent($Sku)
@@ -183,14 +219,14 @@ class SkuController extends Controller
                             if($warehouse != "") {
                                 $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
                                 if($warehouse) {
-                                    return '<p>'.$warehouse->quantity.'</p>';
+                                    return $warehouse->quantity;
                                 }
                                 else {
-                                    return '<p>0</p>';
+                                    return 0;
                                 }
                             }
                             else {
-                                return '<p>'.$SKSU->quantity.'</p>';
+                                return $SKSU->quantity;
                             }
 
 
@@ -239,7 +275,7 @@ class SkuController extends Controller
                             </div>
                             </div>';
                         })
-            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
+            ->rawColumns(['link_shop','cost','price','alert_quantity','type','action'])
             ->make(true);
         }
         $business_id = Auth::user()->business_id;

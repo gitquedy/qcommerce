@@ -28,6 +28,34 @@
     }
 </style>
 
+<section class="card">
+  <div class="card-header">
+    <h4 class="card-title">Filter </h4>
+  </div>
+    <div class="card-content">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-12 shop_filter">
+            @foreach($all_sites as $site)
+              <label for="{{ $site }}" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == $site ?  'active' : ''}}">
+                <img class="shop_logo" src="{{asset('images/shop/icon/'.$site.'.png')}}" alt="">
+                {{ ucfirst($site) }}
+                <span id="badge_{{ $site }}_total" class="badge badge-secondary"></span>
+              </label>
+              <input type="radio" id="{{ $site }}" name="site" value="{{ $site }}"  {{ $request->get("site") == $site ?  "checked" : ""}}>
+            @endforeach
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-12">
+            @include('order.components.shopFilter')
+            <div class="btn-group" id="chip_area_shop"></div>
+          </div>
+      </div>
+    </div>
+  </section>
+
 <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
@@ -138,7 +166,7 @@
             { data: 'link_shop', name: 'products.shop_id'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
-            { data: 'quantity', name: 'quantity'},
+            { data: 'quantity', name: 'warehouse_quantity'},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'type', name: 'type'},
             { data: 'action', name: 'action', orderable : false},
