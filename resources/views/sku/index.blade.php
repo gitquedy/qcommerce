@@ -166,7 +166,7 @@
             { data: 'link_shop', name: 'products.shop_id'},
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
-            { data: 'quantity', name: 'warehouse_quantity'},
+            { data: 'quantity', name: 'quantity'},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'type', name: 'type'},
             { data: 'action', name: 'action', orderable : false},
@@ -195,6 +195,7 @@
     if(data['products_count'] < 1){
         $(row).addClass('text-danger bold font-weight-bold');
     }
+    $(row).find('td:eq(7)').attr('data-order', data['quantity']);
   }
 
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];

@@ -58,24 +58,36 @@ class SkuController extends Controller
                         ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at');
 
-            if ($request->get('stocks') == 'with_stocks_only') {
+            if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') == "") {
+                $Sku = $Sku->where('sku.quantity', '>', 0);
+            }
+            else if ($request->get('stocks') == 'all' && $request->get('warehouse') != "") {
                 $warehouse = $request->get('warehouse');
-                if ($warehouse != "") {
-                    $sku_ids = array();
-                    foreach($Sku->get() as $row) {
-                        $warehouse_ids = explode(',', $row->warehouse_id);
-                        $warehouse_quantities = explode(',', $row->warehouse_quantity);
-                        $items = array_combine($warehouse_ids, $warehouse_quantities);
+                $sku_ids = array();
+                foreach($Sku->get() as $row) {
+                    $warehouse_ids = explode(',', $row->warehouse_id);
+                    $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                    $items = array_combine($warehouse_ids, $warehouse_quantities);
 
-                        if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
-                            $sku_ids[] = $row->id;
-                        }
+                    if (in_array($warehouse, $warehouse_ids)) {
+                        $sku_ids[] = $row->id;
                     }
-                    $Sku = $Sku->whereIn('sku.id', $sku_ids);
                 }
-                else {
-                    $Sku = $Sku->where('sku.quantity', '>', 0);
+                $Sku = $Sku->whereIn('sku.id', $sku_ids);
+            }
+            else if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') != "") {
+                $warehouse = $request->get('warehouse');
+                $sku_ids = array();
+                foreach($Sku->get() as $row) {
+                    $warehouse_ids = explode(',', $row->warehouse_id);
+                    $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                    $items = array_combine($warehouse_ids, $warehouse_quantities);
+
+                    if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
+                        $sku_ids[] = $row->id;
+                    }
                 }
+                $Sku = $Sku->whereIn('sku.id', $sku_ids);
             }
 
             return Datatables::eloquent($Sku)
@@ -104,8 +116,6 @@ class SkuController extends Controller
                             else {
                                 return $SKSU->quantity;
                             }
-
-
                         })
             ->editColumn('alert_quantity', function(Sku $SKSU) {
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
@@ -182,24 +192,36 @@ class SkuController extends Controller
                         ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at')
                         ->havingRaw('shop_id is null');
 
-            if ($request->get('stocks') == 'with_stocks_only') {
+            if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') == "") {
+                $Sku = $Sku->where('sku.quantity', '>', 0);
+            }
+            else if ($request->get('stocks') == 'all' && $request->get('warehouse') != "") {
                 $warehouse = $request->get('warehouse');
-                if ($warehouse != "") {
-                    $sku_ids = array();
-                    foreach($Sku->get() as $row) {
-                        $warehouse_ids = explode(',', $row->warehouse_id);
-                        $warehouse_quantities = explode(',', $row->warehouse_quantity);
-                        $items = array_combine($warehouse_ids, $warehouse_quantities);
+                $sku_ids = array();
+                foreach($Sku->get() as $row) {
+                    $warehouse_ids = explode(',', $row->warehouse_id);
+                    $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                    $items = array_combine($warehouse_ids, $warehouse_quantities);
 
-                        if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
-                            $sku_ids[] = $row->id;
-                        }
+                    if (in_array($warehouse, $warehouse_ids)) {
+                        $sku_ids[] = $row->id;
                     }
-                    $Sku = $Sku->whereIn('sku.id', $sku_ids);
                 }
-                else {
-                    $Sku = $Sku->where('sku.quantity', '>', 0);
+                $Sku = $Sku->whereIn('sku.id', $sku_ids);
+            }
+            else if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') != "") {
+                $warehouse = $request->get('warehouse');
+                $sku_ids = array();
+                foreach($Sku->get() as $row) {
+                    $warehouse_ids = explode(',', $row->warehouse_id);
+                    $warehouse_quantities = explode(',', $row->warehouse_quantity);
+                    $items = array_combine($warehouse_ids, $warehouse_quantities);
+
+                    if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
+                        $sku_ids[] = $row->id;
+                    }
                 }
+                $Sku = $Sku->whereIn('sku.id', $sku_ids);
             }
 
             return Datatables::eloquent($Sku)
@@ -228,8 +250,6 @@ class SkuController extends Controller
                             else {
                                 return $SKSU->quantity;
                             }
-
-
                         })
             ->editColumn('alert_quantity', function(Sku $SKSU) {
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
