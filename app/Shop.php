@@ -880,7 +880,7 @@ class Shop extends Model
                 'woo_customer_id' => $customer->id,
                 'first_name' => $customer->first_name,
                 'last_name' => $customer->last_name,
-                'address' => $customer->billing->address_1.', '.(($customer->billing->address_2)?$customer->billing->address_2.', ':'').$customer->billing->city,
+                'address' => $customer->billing->address_1.', '.(($customer->billing->address_2)?$customer->billing->address_2.', ':'').$customer->billing->city.', '.$woo_order->billing->state.', '.$woo_order->billing->postcode,
                 'email' => $customer->email,
                 'mobile_num' => $customer->billing->phone,
                 'orders_count' => $orders->count(),

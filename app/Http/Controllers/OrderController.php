@@ -422,7 +422,7 @@ class OrderController extends Controller
 
                     $customer = new Party([
                         'name'          => $woo_order->billing->first_name . ' ' . $woo_order->billing->last_name,
-                        'address'       => $woo_order->billing->address_1.', '.(($woo_order->billing->address_2)?$woo_order->billing->address_2.', ':'').$woo_order->billing->city,
+                        'address'       => $woo_order->billing->address_1.', '.(($woo_order->billing->address_2)?$woo_order->billing->address_2.', ':'').$woo_order->billing->city.', '.$woo_order->billing->state.', '.$woo_order->billing->postcode,
                         'email'         => ($woo_order->billing->email) ? $woo_order->billing->email : '',
                         'phone'         => ($woo_order->billing->phone) ? $woo_order->billing->phone : '',
                         'custom_fields' => [
