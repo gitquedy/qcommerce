@@ -178,6 +178,7 @@
           data: function (data) {
                 data.warehouse = $("#warehouse").val();
                 data.stocks = $('input[name=stocks][value=stocks]').is(":checked") ? 'with_stocks_only' : 'all';
+                data.site = $('input[name="site"]:checked').val();
             }
         };
   var buttons = [
@@ -288,7 +289,17 @@
         table.ajax.reload();
       });
 
-
+      $(document).on('change', $('input[name=site]'), function() {
+        $('input[name=site]').map(function() {
+          if($(this).is(":checked")) {
+            $("label[for=" + $(this).val() + "]").addClass("active");
+          } else {
+            $("label[for=" + $(this).val() + "]").removeClass("active");
+          }
+        });
+        // url = "{{ action('SkuController@index')}}?site=" + $('input[name="site"]:checked').val();
+        // window.location.href = url;
+      });
 
 
   }); 
