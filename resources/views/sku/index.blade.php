@@ -112,6 +112,7 @@
             <th>Cost</th>
             <th>Price</th>
             <th>Quantity</th>
+            <th>Warehouse Quantity</th>
             <th>Alert Quantity</th>
             <th>Product Type</th>
             <th>Actions</th>
@@ -167,6 +168,7 @@
             { data: 'cost', name: 'cost', className: 'quick_update_box'},
             { data: 'price', name: 'price', className: 'quick_update_box'},
             { data: 'quantity', name: 'quantity'},
+            { data: 'warehouse_quantity', name: 'temp_wquantity_sort', visible: false},
             { data: 'alert_quantity', name: 'alert_quantity', className: 'quick_update_box'},
             { data: 'type', name: 'type'},
             { data: 'action', name: 'action', orderable : false},
@@ -188,7 +190,7 @@
             },
             className: "btn-outline-primary margin-r-10"}
             ];
-  var order = [12, 'desc'];
+  var order = [13, 'desc'];
   var BInfo = true;
   var bFilter = true;
   function created_row_function(row, data, dataIndex){
@@ -196,7 +198,6 @@
     if(data['products_count'] < 1){
         $(row).addClass('text-danger bold font-weight-bold');
     }
-    $(row).find('td:eq(7)').attr('data-order', data['quantity']);
   }
 
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
@@ -287,6 +288,17 @@
       
       $(document).on('change', $('input[name=stocks][value=stocks]'), function() {
         table.ajax.reload();
+      });
+
+      $(document).on('change', $("#warehouse"), function() {
+        if ($("#warehouse").val() != "") {
+          table.column(7).visible(false);
+          table.column(8).visible(true);
+        }
+        else {
+          table.column(8).visible(false);
+          table.column(7).visible(true);
+        }
       });
 
       $(document).on('change', $('input[name=site]'), function() {

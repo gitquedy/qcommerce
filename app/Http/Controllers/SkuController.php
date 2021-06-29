@@ -55,8 +55,8 @@ class SkuController extends Controller
             $Sku = Sku::where('business_id','=',$business_id)
                         ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')
                         ->leftjoin('warehouse_items', 'sku.id', '=', 'warehouse_items.sku_id')
-                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
-                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at');
+                        ->select(DB::raw('sku.id AS id'), 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', 'sku.temp_wquantity_sort', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
+                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', 'sku.temp_wquantity_sort');
 
             if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') == "") {
                 $Sku = $Sku->where('sku.quantity', '>', 0);
@@ -71,6 +71,8 @@ class SkuController extends Controller
 
                     if (in_array($warehouse, $warehouse_ids)) {
                         $sku_ids[] = $row->id;
+                        $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->save();
                     }
                 }
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
@@ -85,6 +87,8 @@ class SkuController extends Controller
 
                     if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
                         $sku_ids[] = $row->id;
+                        $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->save();
                     }
                 }
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
@@ -116,6 +120,9 @@ class SkuController extends Controller
                             return "<p>".$SKSU->price.'</p><input type="number" min="1" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('quantity', function(Sku $SKSU) {
+                            return '<p>'.$SKSU->quantity.'</p>';
+                        })
+            ->editColumn('warehouse_quantity', function(Sku $SKSU) {
                             $warehouse = request()->warehouse;
                             if($warehouse != "") {
                                 $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
@@ -134,8 +141,8 @@ class SkuController extends Controller
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('type', function(Sku $SKSU) {
-                return '<p>'.ucfirst($SKSU->type).'</p>';
-            })
+                            return '<p>'.ucfirst($SKSU->type).'</p>';
+                        })
             ->addColumn('category_name', function(Sku $SKSU) {
                             $category = Category::find($SKSU->category);
                             if($category){
@@ -174,7 +181,7 @@ class SkuController extends Controller
                             </div>
                             </div>';
                         })
-            ->rawColumns(['link_shop','cost','price','alert_quantity','type','action'])
+            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
         $business_id = Auth::user()->business_id;
@@ -201,8 +208,8 @@ class SkuController extends Controller
             $Sku = Sku::where('business_id','=',$business_id)
                         ->leftjoin('products', 'sku.id', '=', 'products.seller_sku_id')
                         ->leftjoin('warehouse_items', 'sku.id', '=', 'warehouse_items.sku_id')
-                        ->select('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
-                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at')
+                        ->select(DB::raw('sku.id AS id'), 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price', 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', 'sku.temp_wquantity_sort', DB::raw('GROUP_CONCAT(products.shop_id) as shop_id'), DB::raw('GROUP_CONCAT(warehouse_items.warehouse_id) as warehouse_id'), DB::raw('GROUP_CONCAT(warehouse_items.quantity) as warehouse_quantity'))
+                        ->groupBy('sku.id', 'sku.business_id','sku.code', 'sku.name', 'sku.brand', 'sku.category', 'sku.supplier', 'sku.cost', 'sku.price' , 'sku.quantity', 'sku.alert_quantity', 'sku.type', 'sku.created_at', 'sku.updated_at', 'sku.temp_wquantity_sort')
                         ->havingRaw('shop_id is null');
 
             if ($request->get('stocks') == 'with_stocks_only' && $request->get('warehouse') == "") {
@@ -218,6 +225,8 @@ class SkuController extends Controller
 
                     if (in_array($warehouse, $warehouse_ids)) {
                         $sku_ids[] = $row->id;
+                        $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->save();
                     }
                 }
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
@@ -232,6 +241,8 @@ class SkuController extends Controller
 
                     if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
                         $sku_ids[] = $row->id;
+                        $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->save();
                     }
                 }
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
@@ -250,6 +261,9 @@ class SkuController extends Controller
                             return "<p>".$SKSU->price.'</p><input type="number" min="1" class="form-control" data-defval="'.$SKSU->price.'" data-name="price" value="'.$SKSU->price.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('quantity', function(Sku $SKSU) {
+                            return '<p>'.$SKSU->quantity.'</p>';
+                        })
+            ->editColumn('warehouse_quantity', function(Sku $SKSU) {
                             $warehouse = request()->warehouse;
                             if($warehouse != "") {
                                 $warehouse = $SKSU->warehouse_items()->where('warehouse_id', $warehouse)->first();
@@ -268,8 +282,8 @@ class SkuController extends Controller
                             return "<p>".$SKSU->alert_quantity.'</p><input type="number" class="form-control" data-defval="'.$SKSU->alert_quantity.'" data-name="alert_quantity" value="'.$SKSU->alert_quantity.'" data-sku_id="'.$SKSU->id.'" style="display:none;">';
                         })
             ->editColumn('type', function(Sku $SKSU) {
-                return '<p>'.ucfirst($SKSU->type).'</p>';
-            })
+                            return '<p>'.ucfirst($SKSU->type).'</p>';
+                        })
             ->addColumn('category_name', function(Sku $SKSU) {
                             $category = Category::find($SKSU->category);
                             if($category){
@@ -308,7 +322,7 @@ class SkuController extends Controller
                             </div>
                             </div>';
                         })
-            ->rawColumns(['link_shop','cost','price','alert_quantity','type','action'])
+            ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
         $business_id = Auth::user()->business_id;
