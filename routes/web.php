@@ -117,6 +117,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/product/headers', 'ProductController@headers')->name('product.headers');
 		Route::get('/product/unlink', 'ProductController@unlink')->name('product.unlink');
 		Route::get('/product/unlinkHeaders', 'ProductController@unlinkHeaders')->name('product.unlinkHeaders');
+		Route::get('/sku/headers', 'SkuController@headers')->name('sku.headers');
 	});
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
@@ -140,7 +141,6 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
 		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
 		Route::get('/sku/searchPurchase/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@searchPurchase')->name('sku.searchPurchase');
-
 	});
 
 	Route::group(['middleware' => 'permission:warehouse.manage'], function()

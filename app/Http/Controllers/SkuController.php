@@ -107,6 +107,19 @@ class SkuController extends Controller
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
             }
 
+            if ($request->get('shop') != "") {
+                $sku_ids = array();
+                foreach ($Sku->get() as $sku) {
+                    foreach ($sku->products as $product) {
+                        if ($product->shop_id == $request->get('shop')) {
+                            $sku_ids[] = $sku->id;
+                            break;
+                        }
+                    }
+                }
+                $Sku = $Sku->whereIn('sku.id', $sku_ids);
+            }
+
             return Datatables::eloquent($Sku)
             ->editColumn('link_shop', function(Sku $SKSU) {
                             $shop_list = array();
@@ -186,6 +199,7 @@ class SkuController extends Controller
         }
         $business_id = Auth::user()->business_id;
         $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
+        $all_shops = ($request->get('site') != "") ? $all_shops->where('site', $request->get('site')) : $all_shops;
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -906,6 +920,26 @@ class SkuController extends Controller
                     ];
         }
         return response()->json($output);
+    }
+
+    public function headers(Request $request){
+        $data = [];
+        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+
+        $Sku = Sku::where('business_id', $request->user()->business_id)->get();
+
+        $data['lazada_total'] = 0;
+        $data['shopee_total'] = 0;
+        $data['shopify_total'] = 0;
+        $data['woocommerce_total'] = 0;
+        foreach ($Sku as $sku) {
+            $data['lazada_total'] += $sku->products()->where('site', 'lazada')->count();
+            $data['shopee_total'] += $sku->products()->where('site', 'shopee')->count();
+            $data['shopify_total'] += $sku->products()->where('site', 'shopify')->count();
+            $data['woocommerce_total'] += $sku->products()->where('site', 'woocommerce')->count();
+        }
+
+        return response()->json(['data' => $data]);
     }
 
 }

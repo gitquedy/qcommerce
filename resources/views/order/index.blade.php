@@ -29,59 +29,60 @@
   <div class="card-header">
     <h4 class="card-title">Filter </h4>
   </div>
-    <div class="card-content">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-sm-12 shop_filter">
-            @foreach($all_sites as $site)
-              <label for="{{ $site }}" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == $site ?  'active' : ''}}">
-                <img class="shop_logo" src="{{asset('images/shop/icon/'.$site.'.png')}}" alt="">
-                {{ ucfirst($site) }}
-                <span id="badge_{{ $site }}_total" class="badge badge-secondary"></span>
+  <div class="card-content">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-12 shop_filter">
+          @foreach($all_sites as $site)
+            <label for="{{ $site }}" class="btn btn-lg btn-outline-primary mb-1 {{ $request->get('site') == $site ?  'active' : ''}}">
+              <img class="shop_logo" src="{{asset('images/shop/icon/'.$site.'.png')}}" alt="">
+              {{ ucfirst($site) }}
+              <span id="badge_{{ $site }}_total" class="badge badge-secondary"></span>
+            </label>
+            <input type="radio" id="{{ $site }}" name="site" value="{{ $site }}"  {{ $request->get("site") == $site ?  "checked" : ""}}>
+          @endforeach
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="btn-group-toggle" data-toggle="buttons">
+            <label class="btn px-1 btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
+              <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
+            </label>
+            @foreach($statuses as $status)
+              <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
+                <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucfirst(strtolower(str_replace("_"," ", $status))) }}
+                <span id="badge_{{ $status }}" class="badge badge-secondary"></span>
               </label>
-              <input type="radio" id="{{ $site }}" name="site" value="{{ $site }}"  {{ $request->get("site") == $site ?  "checked" : ""}}>
             @endforeach
           </div>
         </div>
-        <br>
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="btn-group-toggle" data-toggle="buttons">
-              <label class="btn px-1 btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
-                <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
-              </label>
-              @foreach($statuses as $status)
-                <label class="btn px-1 btn-outline-primary {{ ($status == $selectedStatus) ? 'active' : '' }}">
-                  <input type="radio" name="status" id="status_{{ $status }}"  class="selectFilter" value="{{ $status }}"  {{ ($status == $selectedStatus) ? 'checked' : '' }} autocomplete="off"> {{ ucfirst(strtolower(str_replace("_"," ", $status))) }}
-                  <span id="badge_{{ $status }}" class="badge badge-secondary"></span>
-                </label>
-              @endforeach
-            </div>
-          </div>
-        </div>
-        <br>
-        <div class="row">
-          <div class="col-12">
-            @include('order.components.shopFilter')
-            @include('reports.components.dateFilter')
-            <div class="btn-group mb-1 shipping_status">
-              <div class="dropdown ">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Shipping Status
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="All">All</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="to_process">To Process</a>
-                  <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="processed">Processed</a>
-                </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-12">
+          @include('order.components.shopFilter')
+          @include('reports.components.dateFilter')
+          <div class="btn-group mb-1 shipping_status">
+            <div class="dropdown ">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Shipping Status
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="All">All</a>
+                <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="to_process">To Process</a>
+                <a class="dropdown-item filter_btn" href="#" data-target="shipping_status" data-type="single" data-value="processed">Processed</a>
               </div>
             </div>
-            <div class="btn-group" id="chip_area_shop"></div>
-            <div class="btn-group" id="chip_area_timings"></div>
           </div>
+          <div class="btn-group" id="chip_area_shop"></div>
+          <div class="btn-group" id="chip_area_timings"></div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">

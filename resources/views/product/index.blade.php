@@ -75,8 +75,8 @@
         </div> --}}
         <br>
         <div class="row">
-        <div class="col-sm-12">
-          <div class="btn-group-toggle" data-toggle="buttons">
+          <div class="col-sm-12">
+            <div class="btn-group-toggle" data-toggle="buttons">
               <label class="btn px-1 btn-outline-primary {{ ('all' == $selectedStatus) ? 'active' : '' }}">
                 <input type="radio" name="status" id="status_all" class="selectFilter" autocomplete="off" value="all" checked> All
               </label>

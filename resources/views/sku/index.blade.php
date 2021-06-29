@@ -48,10 +48,11 @@
         </div>
         <br>
         <div class="row">
-          <div class="col-12">
+          <div class="col-sm-12">
             @include('order.components.shopFilter')
             <div class="btn-group" id="chip_area_shop"></div>
           </div>
+        </div>
       </div>
     </div>
   </section>
@@ -142,6 +143,20 @@
 @endsection
 @section('myscript')
   {{-- Page js files --}}
+  <script type="text/javascript">
+    function getHeaders(){
+        $.ajax({
+        method: "GET",
+        url: "{{ action('SkuController@headers')  }}?site={{ $request->get('site') }}&shops=" + $("#shop").val(),
+        success: function success(result) {
+          console.log(result.data);
+            $.each(result.data, function (i, item) {
+              $('#badge_' + i).html(item);
+            });
+          },
+        });     
+      }
+  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
@@ -181,6 +196,7 @@
                 data.warehouse = $("#warehouse").val();
                 data.stocks = $('input[name=stocks][value=stocks]').is(":checked") ? 'with_stocks_only' : 'all';
                 data.site = $('input[name="site"]:checked').val();
+                data.shop = $("#shop").val();
             }
         };
   var buttons = [
@@ -199,7 +215,9 @@
         $(row).addClass('text-danger bold font-weight-bold');
     }
   }
-
+  function draw_callback_function(settings){
+    getHeaders();
+  }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
@@ -301,16 +319,10 @@
         }
       });
 
-      $(document).on('change', $('input[name=site]'), function() {
-        $('input[name=site]').map(function() {
-          if($(this).is(":checked")) {
-            $("label[for=" + $(this).val() + "]").addClass("active");
-          } else {
-            $("label[for=" + $(this).val() + "]").removeClass("active");
-          }
-        });
-        // url = "{{ action('SkuController@index')}}?site=" + $('input[name="site"]:checked').val();
-        // window.location.href = url;
+      $('input[name="site"]').change(function(){
+        var site = $('input[name="site"]:checked').val();
+        url = "{{ action('SkuController@index')}}?site=" + site;
+        window.location.href = url;
       });
 
 
