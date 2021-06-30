@@ -72,6 +72,7 @@ class SkuController extends Controller
                     if (in_array($warehouse, $warehouse_ids)) {
                         $sku_ids[] = $row->id;
                         $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->timestamps = false;
                         $row->save();
                     }
                 }
@@ -88,6 +89,7 @@ class SkuController extends Controller
                     if (in_array($warehouse, $warehouse_ids) && $items[$warehouse] > 0) {
                         $sku_ids[] = $row->id;
                         $row->temp_wquantity_sort = $items[$warehouse];
+                        $row->timestamps = false;
                         $row->save();
                     }
                 }
