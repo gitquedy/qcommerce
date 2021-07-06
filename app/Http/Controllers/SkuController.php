@@ -24,6 +24,7 @@ use App\WarehouseItems;
 use App\Adjustment;
 use App\Sales;
 use App\Transfer;
+use App\Purchases;
 use App\Order;
 use Auth;
 use Carbon\Carbon;
@@ -966,6 +967,7 @@ class SkuController extends Controller
                             DB::raw('adjustment_items.adjustment_id AS adjustment_id'),
                             DB::raw('null AS sales_id'),
                             DB::raw('null AS transfer_id'),
+                            DB::raw('null AS purchase_id'),
                             DB::raw('null AS order_id'),
                             DB::raw('adjustment_items.warehouse_id AS warehouse_id'),
                             DB::raw('adjustment_items.created_at as date'),
@@ -980,6 +982,7 @@ class SkuController extends Controller
                             DB::raw('null AS adjustment_id'),
                             DB::raw('sale_items.sales_id AS sales_id'),
                             DB::raw('null AS transfer_id'),
+                            DB::raw('null AS purchase_id'),
                             DB::raw('null AS order_id'),
                             DB::raw('sale_items.warehouse_id AS warehouse_id'),
                             DB::raw('sale_items.created_at as date'),
@@ -994,6 +997,7 @@ class SkuController extends Controller
                             DB::raw('null AS adjustment_id'),
                             DB::raw('null AS sales_id'),
                             DB::raw('transfer_items.transfer_id AS transfer_id'),
+                            DB::raw('null AS purchase_id'),
                             DB::raw('null AS order_id'),
                             DB::raw('transfer_items.to_warehouse_id AS warehouse_id'),
                             DB::raw('transfer_items.created_at as date'),
@@ -1008,11 +1012,27 @@ class SkuController extends Controller
                             DB::raw('null AS adjustment_id'),
                             DB::raw('null AS sales_id'),
                             DB::raw('transfer_items.transfer_id AS transfer_id'),
+                            DB::raw('null AS purchase_id'),
                             DB::raw('null AS order_id'),
                             DB::raw('transfer_items.from_warehouse_id AS warehouse_id'),
                             DB::raw('transfer_items.created_at as date'),
                             DB::raw('transfer_items.quantity as quantity'),
                             DB::raw('transfer_items.new_quantity_from as new_quantity'),
+                            DB::raw('null as type')
+                        ]);
+
+            $purchases = Sku::join('purchase_items', 'sku.id', '=', 'purchase_items.sku_id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('null AS adjustment_id'),
+                            DB::raw('null AS sales_id'),
+                            DB::raw('null AS transfer_id'),
+                            DB::raw('purchase_items.purchases_id AS purchase_id'),
+                            DB::raw('null AS order_id'),
+                            DB::raw('purchase_items.warehouse_id AS warehouse_id'),
+                            DB::raw('purchase_items.created_at as date'),
+                            DB::raw('purchase_items.quantity as quantity'),
+                            DB::raw('purchase_items.new_quantity as new_quantity'),
                             DB::raw('null as type')
                         ]);
 
@@ -1024,6 +1044,7 @@ class SkuController extends Controller
                             DB::raw('null AS adjustment_id'),
                             DB::raw('null AS sales_id'),
                             DB::raw('null AS transfer_id'),
+                            DB::raw('null AS purchase_id'),
                             DB::raw('order_item.order_id AS order_id'),
                             DB::raw('shop.warehouse_id AS warehouse_id'),
                             DB::raw('order_item.created_at as date'),
@@ -1031,10 +1052,10 @@ class SkuController extends Controller
                             DB::raw('order_item.new_quantity as new_quantity'),
                             DB::raw('null as type')
                         ])
-                        ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from);
+                        ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from)->union($purchases);
 
             $SKU = DB::table(DB::raw("({$barcode->toSql()}) as x"))
-                        ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
+                        ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'purchase_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
                         ->where('id', $sku->id)
                         ->orderBy('date', 'desc');
                         
@@ -1052,6 +1073,9 @@ class SkuController extends Controller
                             else if (isset($SKU->transfer_id)) {
                                 return Transfer::find($SKU->transfer_id)->reference_no;
                             }
+                            else if (isset($SKU->purchase_id)) {
+                                return Purchases::find($SKU->purchase_id)->reference_no;
+                            }
                             else if (isset($SKU->order_id)) {
                                 return Order::find($SKU->order_id)->ordersn;
                             }
@@ -1065,6 +1089,9 @@ class SkuController extends Controller
                             }
                             else if (isset($SKU->transfer_id)) {
                                 return 'Transfer';
+                            }
+                            else if (isset($SKU->purchase_id)) {
+                                return 'Purchase';
                             }
                             else if (isset($SKU->order_id)) {
                                 return 'Barcode';
@@ -1091,6 +1118,9 @@ class SkuController extends Controller
                                 else if ($transfer->to_warehouse_id == $warehouse->id) {
                                     return '+ '.$SKU->quantity;
                                 }
+                            }
+                            else if (isset($SKU->purchase_id)) {
+                                return '+ '.$SKU->quantity;
                             }
                             else {
                                 return '- '.$SKU->quantity;

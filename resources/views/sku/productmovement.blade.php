@@ -89,6 +89,7 @@
                             <th>Adjustment ID</th>
                             <th>Sales ID</th>
                             <th>Transfer ID</th>
+                            <th>Purchase ID</th>
                             <th>Order ID</th>
                             <th>Type</th>
                             <th>Warehouse</th>
@@ -135,6 +136,7 @@
             { data: 'adjustment_id', name: 'adjustment_id', visible: false},
             { data: 'sales_id', name: 'sales_id', visible: false},
             { data: 'transfer_id', name: 'transfer_id', visible: false},
+            { data: 'purchase_id', name: 'purchase_id', visible: false},
             { data: 'order_id', name: 'order_id', visible: false},
             { data: 'type', name: 'type' },
             { data: 'warehouse', name: 'warehouse_id' },

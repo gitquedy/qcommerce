@@ -65,6 +65,10 @@ class Sku extends Model
     public function transfer_items() {
 		return $this->hasMany(TransferItems::class, 'sku_id', 'id');
 	}
+
+    public function purchase_items() {
+		return $this->hasMany(PurchaseItems::class, 'sku_id', 'id');
+	}
     
     public static function syncStocks($warehouse_id, $items) {
         foreach ($items as $item) {

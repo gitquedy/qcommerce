@@ -13,9 +13,11 @@ use App\Payment;
 use App\Supplier;
 use App\OrderRef;
 use App\Settings;
+use App\WarehouseItems;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PurchasesController extends Controller
 {
@@ -208,6 +210,7 @@ class PurchasesController extends Controller
             foreach ($request->purchases_items_array as $item) {
                 $purchase_item = [];
                 $purchase_item['purchases_id'] = $purchase->id;
+                $purchase_item['warehouse_id'] = $purchase->warehouse_id;
                 $purchase_item['sku_id'] = $item['sku_id'];
                 $purchase_item['sku_code'] = $item['code'];
                 $purchase_item['sku_name'] = $item['name'];
@@ -217,11 +220,16 @@ class PurchasesController extends Controller
                 $purchase_item['discount'] = 0;
                 $purchase_item['subtotal'] = $item['price'] * $item['quantity'];
                 $purchase_item['real_unit_price'] = $item['real_unit_price'];
+                $purchase_item['created_at'] = Carbon::now();
                 $purchase_items[] = $purchase_item;
             }
             $sales_items_query = PurchaseItems::insert($purchase_items);
             if($request->status == 'received') {
-                Sku::returnStocks($request->warehouse_id , $purchase->items);   
+                Sku::returnStocks($request->warehouse_id , $purchase->items);
+                foreach($purchase->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['po' => DB::raw('po + 1')]);
@@ -381,6 +389,7 @@ class PurchasesController extends Controller
             foreach ($request->purchases_items_array as $item) {
                 $purchase_item = [];
                 $purchase_item['purchases_id'] = $purchase->id;
+                $purchase_item['warehouse_id'] = $purchase->warehouse_id;
                 $purchase_item['sku_id'] = $item['sku_id'];
                 $purchase_item['sku_code'] = $item['code'];
                 $purchase_item['sku_name'] = $item['name'];
@@ -390,11 +399,16 @@ class PurchasesController extends Controller
                 $purchase_item['discount'] = 0;
                 $purchase_item['subtotal'] = $item['price'] * $item['quantity'];
                 $purchase_item['real_unit_price'] = $item['real_unit_price'];
+                $purchase_item['created_at'] = Carbon::now();
                 $purchase_items[] = $purchase_item;
             }
             $sales_items_query = PurchaseItems::insert($purchase_items);
             if($request->status == 'received' && $old_status != 'received') {
                 Sku::returnStocks($request->warehouse_id , $purchase->items);   
+                foreach($purchase->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['po' => DB::raw('po + 1')]);
@@ -430,6 +444,10 @@ class PurchasesController extends Controller
             DB::beginTransaction();
             if ($purchases->status == 'received') {
                 Sku::syncStocks($purchases->warehouse_id, $purchases->items->toArray());
+                foreach($purchase->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             $purchases->payments()->delete();
             $purchases->delete();
