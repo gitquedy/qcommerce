@@ -141,6 +141,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
 		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
 		Route::get('/sku/searchPurchase/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@searchPurchase')->name('sku.searchPurchase');
+		Route::get('/sku/productmovement/{sku}', 'SkuController@productMovement')->name('sku.productmovement');
 	});
 
 	Route::group(['middleware' => 'permission:warehouse.manage'], function()

@@ -47,7 +47,7 @@ class Sales extends Model
     }
 
 	public function items(){
-		return $this->hasMany('App\SaleItems', 'sales_id');
+		return $this->hasMany(SaleItems::class, 'sales_id', 'id');
 	}
 
     public static function get_dashboard_sales($status="",$type="",$current_user=true){

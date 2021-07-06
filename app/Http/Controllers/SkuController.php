@@ -19,7 +19,12 @@ use App\Sku;
 use App\SetItem;
 use App\Supplier;
 use App\Utilities;
+use App\Warehouse;
 use App\WarehouseItems;
+use App\Adjustment;
+use App\Sales;
+use App\Transfer;
+use App\Order;
 use Auth;
 use Carbon\Carbon;
 use Helper;
@@ -192,6 +197,7 @@ class SkuController extends Controller
                             <div class="dropdown-menu">
                             <a class="dropdown-item fa fa-link" href="'.route('sku.skuproducts',$SKSU->id).'" > Link SKU Products</a>
                             <a class="dropdown-item fa fa-edit" href="'.route('sku.edit',['id'=>$SKSU->id]).'" > Edit</a>
+                            <a class="dropdown-item fa fa-product-hunt" href="'.route('sku.productmovement', $SKSU->id).'" > Product Movement</a>
                             <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $SKSU->name .' ?" data-text="This Action is irreversible." data-href="'.route('sku.delete',['id'=>$SKSU->id]).'" > Delete</a>
                             </div>
                             </div>';
@@ -944,6 +950,167 @@ class SkuController extends Controller
         }
 
         return response()->json(['data' => $data]);
+    }
+
+    public function productMovement(Sku $sku, Request $request) {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"Product Movement"]
+        ];
+
+        if (request()->ajax()) {
+            $business_id = Auth::user()->business_id;
+
+            $adjustments = Sku::join('adjustment_items', 'sku.id', '=', 'adjustment_items.sku_id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('adjustment_items.adjustment_id AS adjustment_id'),
+                            DB::raw('null AS sales_id'),
+                            DB::raw('null AS transfer_id'),
+                            DB::raw('null AS order_id'),
+                            DB::raw('adjustment_items.warehouse_id AS warehouse_id'),
+                            DB::raw('adjustment_items.created_at as date'),
+                            DB::raw('adjustment_items.quantity as quantity'),
+                            DB::raw('adjustment_items.new_quantity as new_quantity'),
+                            DB::raw('adjustment_items.type as type')
+                        ]);
+
+            $sales = Sku::join('sale_items', 'sku.id', '=', 'sale_items.sku_id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('null AS adjustment_id'),
+                            DB::raw('sale_items.sales_id AS sales_id'),
+                            DB::raw('null AS transfer_id'),
+                            DB::raw('null AS order_id'),
+                            DB::raw('sale_items.warehouse_id AS warehouse_id'),
+                            DB::raw('sale_items.created_at as date'),
+                            DB::raw('sale_items.quantity as quantity'),
+                            DB::raw('sale_items.new_quantity as new_quantity'),
+                            DB::raw('null as type')
+                        ]);
+                        
+            $transfer_to = Sku::join('transfer_items', 'sku.id', '=', 'transfer_items.sku_id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('null AS adjustment_id'),
+                            DB::raw('null AS sales_id'),
+                            DB::raw('transfer_items.transfer_id AS transfer_id'),
+                            DB::raw('null AS order_id'),
+                            DB::raw('transfer_items.to_warehouse_id AS warehouse_id'),
+                            DB::raw('transfer_items.created_at as date'),
+                            DB::raw('transfer_items.quantity as quantity'),
+                            DB::raw('transfer_items.new_quantity_to as new_quantity'),
+                            DB::raw('null as type')
+                        ]);
+
+            $transfer_from = Sku::join('transfer_items', 'sku.id', '=', 'transfer_items.sku_id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('null AS adjustment_id'),
+                            DB::raw('null AS sales_id'),
+                            DB::raw('transfer_items.transfer_id AS transfer_id'),
+                            DB::raw('null AS order_id'),
+                            DB::raw('transfer_items.from_warehouse_id AS warehouse_id'),
+                            DB::raw('transfer_items.created_at as date'),
+                            DB::raw('transfer_items.quantity as quantity'),
+                            DB::raw('transfer_items.new_quantity_from as new_quantity'),
+                            DB::raw('null as type')
+                        ]);
+
+            $barcode = Products::join('order_item', 'products.id' , '=', 'order_item.product_id')
+                        ->join('sku', 'products.seller_sku_id', '=', 'sku.id')
+                        ->join('shop', 'products.shop_id', '=', 'shop.id')
+                        ->select([
+                            DB::raw('sku.id AS id'),
+                            DB::raw('null AS adjustment_id'),
+                            DB::raw('null AS sales_id'),
+                            DB::raw('null AS transfer_id'),
+                            DB::raw('order_item.order_id AS order_id'),
+                            DB::raw('shop.warehouse_id AS warehouse_id'),
+                            DB::raw('order_item.created_at as date'),
+                            DB::raw('order_item.quantity as quantity'),
+                            DB::raw('order_item.new_quantity as new_quantity'),
+                            DB::raw('null as type')
+                        ])
+                        ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from);
+
+            $SKU = DB::table(DB::raw("({$barcode->toSql()}) as x"))
+                        ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
+                        ->where('id', $sku->id)
+                        ->orderBy('date', 'desc');
+                        
+            return Datatables::of($SKU)
+            ->editColumn('date', function($SKU) {
+                            return Carbon::parse($SKU->date)->toDateString();
+                        })
+            ->addColumn('ref_order_no', function($SKU) {
+                            if (isset($SKU->adjustment_id)) {
+                                return Adjustment::find($SKU->adjustment_id)->reference_no;
+                            }
+                            else if (isset($SKU->sales_id)) {
+                                return Sales::find($SKU->sales_id)->reference_no;
+                            }
+                            else if (isset($SKU->transfer_id)) {
+                                return Transfer::find($SKU->transfer_id)->reference_no;
+                            }
+                            else if (isset($SKU->order_id)) {
+                                return Order::find($SKU->order_id)->ordersn;
+                            }
+                        })
+            ->addColumn('type', function($SKU) {
+                            if (isset($SKU->adjustment_id)) {
+                                return 'Adjustment';
+                            }
+                            else if (isset($SKU->sales_id)) {
+                                return 'Sales';
+                            }
+                            else if (isset($SKU->transfer_id)) {
+                                return 'Transfer';
+                            }
+                            else if (isset($SKU->order_id)) {
+                                return 'Barcode';
+                            }
+                        })
+            ->editColumn('warehouse', function($SKU) {
+                            return Warehouse::find($SKU->warehouse_id)->name;
+                        })
+            ->editColumn('quantity', function($SKU) {
+                            if (isset($SKU->type)) {
+                                if ($SKU->type == 'addition') {
+                                    return '+ '.$SKU->quantity;
+                                }
+                                else if ($SKU->type == 'subtraction') {
+                                    return '- '.$SKU->quantity;
+                                }
+                            }
+                            else if (isset($SKU->transfer_id)) {
+                                $transfer = Transfer::find($SKU->transfer_id);
+                                $warehouse = Warehouse::find($SKU->warehouse_id);
+                                if ($transfer->from_warehouse_id == $warehouse->id) {
+                                    return '- '.$SKU->quantity;
+                                }
+                                else if ($transfer->to_warehouse_id == $warehouse->id) {
+                                    return '+ '.$SKU->quantity;
+                                }
+                            }
+                            else {
+                                return '- '.$SKU->quantity;
+                            }
+                        })
+            ->editColumn('items_remaining', function($SKU) {
+                            if (isset($SKU->new_quantity)) {
+                                return $SKU->new_quantity;
+                            }
+                            else {
+                                return 'Cannot determine. Product Movement feature has not yet implemented during this movement';
+                            }
+                        })
+            ->make(true);
+        }
+
+        return view('sku.productmovement', [
+            'breadcrumbs' => $breadcrumbs,
+            'sku' => $sku,
+        ]);
     }
 
 }

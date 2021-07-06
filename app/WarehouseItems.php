@@ -15,6 +15,6 @@ class WarehouseItems extends Model
 	}
 
     public function sku(){
-        return $this->hasOne(Sku::class, 'id', 'sku_id');
+        return $this->belongsTo(Sku::class, 'sku_id', 'id');
 	}
 }

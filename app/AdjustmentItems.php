@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AdjustmentItems extends Model
 {
+    protected $table = 'adjustment_items';
+
     protected $fillable = [
         'adjustment_id', 'sku_id', 'sku_code', 'sku_name', 'image', 'quantity', 'warehouse_id', 'type'
     ];
@@ -19,7 +21,7 @@ class AdjustmentItems extends Model
 	}
 
     public function sku(){
-        return $this->hasOne(Sku::class, 'id', 'sku_id');
+        return $this->belongsTo(Sku::class, 'sku_id', 'id');
 	}
 
     public function warehouse_item(){

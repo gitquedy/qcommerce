@@ -14,6 +14,7 @@ use App\Shop;
 use App\Sku;
 use App\Utilities;
 use App\WarehouseItems;
+use App\OrderItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -323,6 +324,9 @@ class BarcodeController extends Controller
                             }
                         }
                     }
+                    $orderitem = OrderItem::where('order_id', $order->id)->where('product_id', $prod->id)->first();
+                    $orderitem->new_quantity = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first()->quantity;
+                    $orderitem->save();
                 }
             }
         }

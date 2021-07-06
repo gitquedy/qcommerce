@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Validator;
+use Carbon\Carbon;
 use App\Business;
 use App\Sku;
 use App\Shop;
@@ -148,6 +149,7 @@ class TransferController extends Controller
                 $transfer_item['quantity'] = $item['quantity'];
                 $transfer_item['from_warehouse_id'] = $transfer->from_warehouse_id;
                 $transfer_item['to_warehouse_id'] = $transfer->to_warehouse_id;
+                $transfer_item['created_at'] = Carbon::now();
                 $transfer_items[] = $transfer_item;
             }
 
@@ -160,6 +162,11 @@ class TransferController extends Controller
                     Transfer::addItemsOnWarehouse($transfer->id);
                 }
                 Sku::reSyncStocks($transfer->items()->pluck('sku_id'));
+                foreach($transfer->items as $item) {
+                    $item->new_quantity_from = WarehouseItems::where('warehouse_id', $item->from_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
 
             if (!$request->reference_no) {
@@ -270,6 +277,7 @@ class TransferController extends Controller
                 $transfer_item['quantity'] = $item['quantity'];
                 $transfer_item['from_warehouse_id'] = $transfer->from_warehouse_id;
                 $transfer_item['to_warehouse_id'] = $transfer->to_warehouse_id;
+                $transfer_item['created_at'] = Carbon::now();
                 $transfer_items[] = $transfer_item;
                 if(in_array($transfer->status, ['completed', 'sent'])) {
                     $warehouse_item = WarehouseItems::where('warehouse_id', $transfer->from_warehouse_id)->where('sku_id', $id)->first();
@@ -287,6 +295,11 @@ class TransferController extends Controller
                     Transfer::addItemsOnWarehouse($transfer->id);
                 }
                 Sku::reSyncStocks($transfer->items()->pluck('sku_id'));
+                foreach($transfer->items as $item) {
+                    $item->new_quantity_from = WarehouseItems::where('warehouse_id', $item->from_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
 
             $output = ['success' => 1,

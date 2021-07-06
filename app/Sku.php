@@ -53,6 +53,18 @@ class Sku extends Model
     public function set_items() {
         return $this->hasMany(SetItem::class, 'sku_set_id', 'id');
     }
+
+    public function adjustment_items() {
+		return $this->hasMany(AdjustmentItems::class, 'sku_id', 'id');
+	}
+
+    public function sale_items() {
+		return $this->hasMany(SaleItems::class, 'sku_id', 'id');
+	}
+
+    public function transfer_items() {
+		return $this->hasMany(TransferItems::class, 'sku_id', 'id');
+	}
     
     public static function syncStocks($warehouse_id, $items) {
         foreach ($items as $item) {

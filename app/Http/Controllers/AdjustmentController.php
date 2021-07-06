@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Validator;
+use Carbon\Carbon;
 
 class AdjustmentController extends Controller
 {
@@ -130,6 +131,7 @@ class AdjustmentController extends Controller
                 $adjustment_item['quantity'] = $item['quantity'];
                 $adjustment_item['warehouse_id'] = $adjustment->warehouse_id;
                 $adjustment_item['type'] = $item['type'];
+                $adjustment_item['created_at'] = Carbon::now();
                 $adjustment_items[] = $adjustment_item;
                 $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item['sku_id'])->first();
                 $warehouse_qty = (isset($warehouse_item->quantity))?$warehouse_item->quantity:0;
@@ -140,6 +142,10 @@ class AdjustmentController extends Controller
             $adjustment_items_query = AdjustmentItems::insert($adjustment_items);
             Adjustment::applyItemsOnWarehouse($adjustment->id);
             Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
+            foreach($adjustment->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
 
             if (! $request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['adj' => DB::raw('adj + 1')]);
@@ -240,6 +246,7 @@ class AdjustmentController extends Controller
                 $adjustment_item['quantity'] = $item['quantity'];
                 $adjustment_item['warehouse_id'] = $adjustment->warehouse_id;
                 $adjustment_item['type'] = $item['type'];
+                $adjustment_item['created_at'] = Carbon::now();
                 $adjustment_items[] = $adjustment_item;
                 $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $item['sku_id'])->first();
                 $warehouse_qty = (isset($warehouse_item->quantity))?$warehouse_item->quantity:0;
@@ -252,6 +259,10 @@ class AdjustmentController extends Controller
             $adjustment_items_query = AdjustmentItems::insert($adjustment_items);
             Adjustment::applyItemsOnWarehouse($adjustment->id);
             Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
+            foreach($adjustment->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
 
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['adj' => DB::raw('adj + 1')]);
@@ -383,6 +394,7 @@ class AdjustmentController extends Controller
                 $adjustment_item['quantity'] = $import['quantity'];
                 $adjustment_item['warehouse_id'] = $adjustment->warehouse_id;
                 $adjustment_item['type'] = $import['type'];
+                $adjustment_item['created_at'] = Carbon::now();
                 $adjustment_items[] = $adjustment_item;
                 $warehouse_item = WarehouseItems::where('warehouse_id', $adjustment->warehouse_id)->where('sku_id', $Sku->id)->first();
                 $warehouse_qty = (isset($warehouse_item->quantity))?$warehouse_item->quantity:0;
@@ -409,6 +421,10 @@ class AdjustmentController extends Controller
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['adj' => DB::raw('adj + 1')]);
             }
             Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
+            foreach($adjustment->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
             $output = ['success' => 1,
                 'msg' => 'Adjustment Imported successfully!',
                 'redirect' => action('AdjustmentController@index')

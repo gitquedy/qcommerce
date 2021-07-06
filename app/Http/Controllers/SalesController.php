@@ -13,9 +13,11 @@ use App\Payment;
 use App\Customer;
 use App\OrderRef;
 use App\Settings;
+use App\WarehouseItems;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SalesController extends Controller
 {
@@ -214,6 +216,7 @@ class SalesController extends Controller
             foreach ($request->sales_item_array as $item) {
                 $sales_item = [];
                 $sales_item['sales_id'] = $sales->id;
+                $sales_item['warehouse_id'] = $sales->warehouse_id;
                 $sales_item['sku_id'] = $item['sku_id'];
                 $sales_item['sku_code'] = $item['code'];
                 $sales_item['sku_name'] = $item['name'];
@@ -223,12 +226,17 @@ class SalesController extends Controller
                 $sales_item['discount'] = 0;
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
+                $sales_item['created_at'] = Carbon::now();
                 $sales_items[] = $sales_item;
             }
             if($request->status == 'completed') {
                 Sku::syncStocks($request->warehouse_id ,$request->sales_item_array);   
             }
             $sales_items_query = SaleItems::insert($sales_items);
+            foreach($sales->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
             }
@@ -379,6 +387,7 @@ class SalesController extends Controller
             foreach ($request->sales_item_array as $item) {
                 $sales_item = [];
                 $sales_item['sales_id'] = $sales->id;
+                $sales_item['warehouse_id'] = $sales->warehouse_id;
                 $sales_item['sku_id'] = $item['sku_id'];
                 $sales_item['sku_code'] = $item['code'];
                 $sales_item['sku_name'] = $item['name'];
@@ -388,6 +397,7 @@ class SalesController extends Controller
                 $sales_item['discount'] = 0;
                 $sales_item['subtotal'] = $item['price'] * $item['quantity'];
                 $sales_item['real_unit_price'] = $item['real_unit_price'];
+                $sales_item['created_at'] = Carbon::now();
                 $sales_items[] = $sales_item;
 
             }
@@ -402,6 +412,10 @@ class SalesController extends Controller
                  Sku::returnStocks($old_warehouse, $sales->items);
             }
             SaleItems::insert($sales_items);
+            foreach($sales->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
             $output = ['success' => 1,
                 'msg' => 'Sale updated successfully!',
                 'redirect' => action('SalesController@index')
@@ -432,6 +446,10 @@ class SalesController extends Controller
         }
         if ($sales->status == 'completed') {
             Sku::returnStocks($sales->warehouse_id, $sales->items);
+            foreach($sales->items as $item) {
+                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                $item->save();
+            }
         }
         try {
             DB::beginTransaction();

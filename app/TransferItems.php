@@ -9,7 +9,7 @@ class TransferItems extends Model
     protected $fillable = ['adjustment_id', 'sku_id', 'sku_code', 'sku_name', 'image', 'quantity', 'from_warehouse_id', 'to_warehouse_id'];
 
     public function transfer(){
-        return $this->belongsTo(Adjustment::class, 'transfer_id', 'id');
+        return $this->belongsTo(Transfer::class, 'transfer_id', 'id');
 	}
 
     public function from_warehouse(){
@@ -21,7 +21,7 @@ class TransferItems extends Model
 	}
 
     public function sku(){
-        return $this->hasOne(Sku::class, 'id', 'sku_id');
+        return $this->belongsTo(Sku::class, 'sku_id', 'id');
 	}
 
     public function from_warehouse_item(){
