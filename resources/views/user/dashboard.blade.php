@@ -913,11 +913,11 @@ function number_format (number, decimals, dec_point, thousands_sep) {
               }
               var percentage_increase_today = ((value.shop_info_data_today - value.shop_info_data_yesterday) / value.shop_info_data_yesterday) * 100;
               if (percentage_increase_today > 0) {
-                $('.shop_info_data_today'+ value.id).append('<span style="color:green"> &#8593;'+percentage_increase_today+'%</span>');
+                $('.shop_info_data_today'+ value.id).append('<span style="color:green"> &#8593;'+number_format(percentage_increase_today, 0)+'%</span>');
               }
               else if (percentage_increase_today < 0) {
                 percentage_increase_today = percentage_increase_today * -1;
-                $('.shop_info_data_today'+ value.id).append('<span style="color:red"> &#8595;'+percentage_increase_today+'%</span>');
+                $('.shop_info_data_today'+ value.id).append('<span style="color:red"> &#8595;'+number_format(percentage_increase_today, 0)+'%</span>');
               }
 
               if (value.shop_info_data_last_month == 0) {
@@ -926,11 +926,11 @@ function number_format (number, decimals, dec_point, thousands_sep) {
               }
               var percentage_increase_month = ((value.shop_info_data_month - value.shop_info_data_last_month) / value.shop_info_data_last_month) * 100;
               if (percentage_increase_month > 0) {
-                $('.shop_info_data_month'+ value.id).append('<span style="color:green"> &#8593;'+percentage_increase_month+'%</span>');
+                $('.shop_info_data_month'+ value.id).append('<span style="color:green"> &#8593;'+number_format(percentage_increase_month, 0)+'%</span>');
               }
               else if (percentage_increase_month < 0) {
                 percentage_increase_month = percentage_increase_month * -1;
-                $('.shop_info_data_month'+ value.id).append('<span style="color:red"> &#8595;'+percentage_increase_month+'%</span>');
+                $('.shop_info_data_month'+ value.id).append('<span style="color:red"> &#8595;'+number_format(percentage_increase_month, 0)+'%</span>');
               }
               $.each(result.monthly, function( i, monthly ) {
                 if(value.id==monthly.shop_id){
