@@ -78,7 +78,7 @@ class BarcodeController extends Controller
                 $response = $client->execute($r, $accessToken);
                 $data = json_decode($response, true);
                 foreach ($data['data'] as $item) {
-                    if($item['cancel_return_initiator'] == ""){
+                    if($item['cancel_return_initiator'] == "null-null"){
                         $sku = $item['sku'];
                         if(!in_array($sku, $items_sku)) {
                             array_push($items_sku, $sku);
