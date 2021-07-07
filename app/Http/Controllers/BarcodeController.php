@@ -106,9 +106,10 @@ class BarcodeController extends Controller
                     // die(var_dump($item));
                     if(!in_array($sku, $items_sku)) {
                         array_push($items_sku, $sku);
+                        $pic = OrderItem::join('products', 'order_item.product_id', '=', 'products.id')->where('order_item.order_id', $order->id)->where('products.item_id', $sku)->first()->Images;
                         $items[$sku] = array(
                             'sku' => $sku,
-                            'pic' => '',
+                            'pic' => explode('|', $pic)[0],
                             'name' => $item['item_name'],
                             'qty' => $item['variation_quantity_purchased'],
                             'unit_price' => (int)  $item['variation_original_price'],
@@ -141,14 +142,16 @@ class BarcodeController extends Controller
                 // $count = count($order_items->$line_items);
                 $count = 0;
                 foreach ($order_items->line_items as $item) {
+                    $pic = OrderItem::join('products', 'order_item.product_id', '=', 'products.id')->where('order_item.order_id', $order->id)->where('products.item_id', $item->product_id)->first()->Images;
                     $sku = $item->sku;
+                    error_log($pic);
                     if ($sku == '') {
                         $count++;
                         $sku = 'item' . $count;
                     }
                     $items[$sku] = [
                         'sku' => $sku,
-                        'pic' => '',
+                        'pic' => $pic,
                         'name' => $item->name,
                         'qty' => $item->quantity,
                         'unit_price' => $item->price,
