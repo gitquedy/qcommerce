@@ -117,11 +117,18 @@
                                       <span class="text-success currentMonthlySale">0</span>
                                   </h2>
                               </div>
-                              <div>
+                              <div class="mr-2">
                                   <p class="mb-50 text-bold-600">Last Month</p>
                                   <h2 class="text-bold-400">
                                       <sup class="font-medium-1">₱</sup>
                                       <span class="preMonthSale">0</span>
+                                  </h2>
+                              </div>
+                              <div class="ml-auto">
+                                  <p class="mb-50 text-bold-600"></p>
+                                  <h2 class="text-bold-400">
+                                      <sup class="font-medium-5 arrow"></sup>
+                                      <span class="percentageIncrease">0%</span>
                                   </h2>
                               </div>
 
@@ -146,6 +153,7 @@
                                     <th class="text-right">Yesterday</th>
                                     <th class="text-right">This Week</th>
                                     <th class="text-right">This Month</th>
+                                    <th class="text-right">Last Month</th>
                                   </tr>
                                 </thead>
                                 <tbody class="shopInfoTableTbody">
@@ -157,6 +165,7 @@
                                         <td class="text-right pr-1 shop_info_data_yesterday{{ $s->id }}">{{$s->shop_info_data_yesterday}}</td>
                                         <td class="text-right pr-1 shop_info_data_week{{ $s->id }}">{{$s->shop_info_data_week}}</td>
                                         <td class="text-right pr-1 shop_info_data_month{{ $s->id }}">{{$s->shop_info_data_month}}</td>
+                                        <td class="text-right pr-1 shop_info_data_last_month{{ $s->id }}">{{$s->shop_info_data_last_month}}</td>
                                       </tr>
                                     @endforeach          
                                 </tbody>
@@ -896,6 +905,33 @@ function number_format (number, decimals, dec_point, thousands_sep) {
               $('.shop_info_data_yesterday'+ value.id).html(value.shop_info_data_yesterday);
               $('.shop_info_data_week'+ value.id).html(value.shop_info_data_week);
               $('.shop_info_data_month'+ value.id).html(value.shop_info_data_month);
+              $('.shop_info_data_last_month'+ value.id).html(value.shop_info_data_last_month);
+
+              if (value.shop_info_data_yesterday == 0) {
+                value.shop_info_data_yesterday++;
+                value.shop_info_data_today++;
+              }
+              var percentage_increase_today = ((value.shop_info_data_today - value.shop_info_data_yesterday) / value.shop_info_data_yesterday) * 100;
+              if (percentage_increase_today > 0) {
+                $('.shop_info_data_today'+ value.id).append('<span style="color:green"> &#8593;'+percentage_increase_today+'%</span>');
+              }
+              else if (percentage_increase_today < 0) {
+                percentage_increase_today = percentage_increase_today * -1;
+                $('.shop_info_data_today'+ value.id).append('<span style="color:red"> &#8595;'+percentage_increase_today+'%</span>');
+              }
+
+              if (value.shop_info_data_last_month == 0) {
+                value.shop_info_data_last_month++;
+                value.shop_info_data_month++;
+              }
+              var percentage_increase_month = ((value.shop_info_data_month - value.shop_info_data_last_month) / value.shop_info_data_last_month) * 100;
+              if (percentage_increase_month > 0) {
+                $('.shop_info_data_month'+ value.id).append('<span style="color:green"> &#8593;'+percentage_increase_month+'%</span>');
+              }
+              else if (percentage_increase_month < 0) {
+                percentage_increase_month = percentage_increase_month * -1;
+                $('.shop_info_data_month'+ value.id).append('<span style="color:red"> &#8595;'+percentage_increase_month+'%</span>');
+              }
               $.each(result.monthly, function( i, monthly ) {
                 if(value.id==monthly.shop_id){
                   pie_chart_labels.push(value.short_name);
@@ -930,6 +966,21 @@ function number_format (number, decimals, dec_point, thousands_sep) {
             }
             $('.currentMonthlySale').html(number_format(currentMonthlySale, 2));
             $('.preMonthSale').html(number_format(pre_month_sale, 2));
+            if (pre_month_sale == 0) {
+              pre_month_sale++;
+              currentMonthlySale++;
+            }
+            var percentage_increase = ((currentMonthlySale - pre_month_sale) / pre_month_sale) * 100;
+            if (percentage_increase > 0) {
+              $('.arrow').css('color', 'green');
+              $('.arrow').html('&#8593;');
+            }
+            else if (percentage_increase < 0) {
+              $('.arrow').css('color', 'red');
+              $('.arrow').html('&#8595;');
+              percentage_increase = percentage_increase * -1;
+            }
+            $('.percentageIncrease').html(number_format(percentage_increase, 2) + '%');
       
               
               var system_colours = [];

@@ -159,6 +159,16 @@ class Sales extends Model
             
         }
 
+        if($type=='last_month'){
+            $start = date('Y-m-d', strtotime("first day of previous month"));
+            
+            $end = date('Y-m-d', strtotime("last day of previous month"));
+            
+            $query->where('date', '>=', $start);
+            $query->where('date', '<=', $end);
+            
+        }
+
         $result = $query->get();
         $total = 0;
         

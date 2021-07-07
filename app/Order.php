@@ -275,6 +275,10 @@ class Order extends Model
               $query->where('created_at', '>=', Carbon::now()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->endOfMonth()->toDateTimeString());
         }
 
+        if($type=='last_month'){
+            $query->where('created_at', '>=', Carbon::now()->subMonth()->firstOfMonth()->toDateTimeString())->where('created_at', '<=', Carbon::now()->subMonth()->endOfMonth()->toDateTimeString());
+        }
+
         $result = $query->get();
         $total = 0;
 

@@ -33,6 +33,7 @@ class DashboardController extends Controller
             $shop->shop_info_data_yesterday = Order::get_dashboard_shop_performance($shop->id,'yesterday');
             $shop->shop_info_data_week = Order::get_dashboard_shop_performance($shop->id,'week');
             $shop->shop_info_data_month = Order::get_dashboard_shop_performance($shop->id,'month');
+            $shop->shop_info_data_last_month = Order::get_dashboard_shop_performance($shop->id,'last_month');
         }
 
         $Shop_Index = count($Shop);
@@ -46,6 +47,7 @@ class DashboardController extends Controller
         $Shop[$Shop_Index]->shop_info_data_yesterday = Sales::get_dashboard_performance('yesterday');
         $Shop[$Shop_Index]->shop_info_data_week = Sales::get_dashboard_performance('week');
         $Shop[$Shop_Index]->shop_info_data_month = Sales::get_dashboard_performance('month');
+        $Shop[$Shop_Index]->shop_info_data_last_month = Sales::get_dashboard_performance('last_month');
         $colour = Helper::get_colours();
 
         if ( request()->ajax()) {
