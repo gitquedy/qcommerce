@@ -907,11 +907,13 @@ function number_format (number, decimals, dec_point, thousands_sep) {
               $('.shop_info_data_month'+ value.id).html(value.shop_info_data_month);
               $('.shop_info_data_last_month'+ value.id).html(value.shop_info_data_last_month);
 
-              if (value.shop_info_data_yesterday == 0) {
-                value.shop_info_data_yesterday++;
-                value.shop_info_data_today++;
+              var today = parseFloat(value.shop_info_data_today);
+              var yesterday = parseFloat(value.shop_info_data_yesterday);
+              if (yesterday == 0) {
+                yesterday++;
+                today++;
               }
-              var percentage_increase_today = ((value.shop_info_data_today - value.shop_info_data_yesterday) / value.shop_info_data_yesterday) * 100;
+              var percentage_increase_today = ((today - yesterday) / yesterday) * 100;
               if (percentage_increase_today > 0) {
                 $('.shop_info_data_today'+ value.id).append('<span style="color:green"> &#8593;'+number_format(percentage_increase_today, 0)+'%</span>');
               }
@@ -919,12 +921,14 @@ function number_format (number, decimals, dec_point, thousands_sep) {
                 percentage_increase_today = percentage_increase_today * -1;
                 $('.shop_info_data_today'+ value.id).append('<span style="color:red"> &#8595;'+number_format(percentage_increase_today, 0)+'%</span>');
               }
-
-              if (value.shop_info_data_last_month == 0) {
-                value.shop_info_data_last_month++;
-                value.shop_info_data_month++;
+              
+              var month = parseFloat(value.shop_info_data_month);
+              var last_month = parseFloat(value.shop_info_data_last_month);
+              if (last_month == 0) {
+                last_month++;
+                month++;
               }
-              var percentage_increase_month = ((value.shop_info_data_month - value.shop_info_data_last_month) / value.shop_info_data_last_month) * 100;
+              var percentage_increase_month = ((month - last_month) / last_month) * 100;
               if (percentage_increase_month > 0) {
                 $('.shop_info_data_month'+ value.id).append('<span style="color:green"> &#8593;'+number_format(percentage_increase_month, 0)+'%</span>');
               }
