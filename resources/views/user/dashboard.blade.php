@@ -962,7 +962,7 @@ function number_format (number, decimals, dec_point, thousands_sep) {
                       line1.push(current_sale);
                   }
                   if(parseInt(index) == "{{ date('d') }}") {
-                    current = value;
+                    current = current_sale;
                   }
                 });
             }
@@ -973,7 +973,7 @@ function number_format (number, decimals, dec_point, thousands_sep) {
                   chart_days.push(index);
                   line2.push(pre_month_sale);
                   if(parseInt(index) == "{{ date('d') }}") {
-                    previous = value;
+                    previous = pre_month_sale;
                   }
                 });
             }
