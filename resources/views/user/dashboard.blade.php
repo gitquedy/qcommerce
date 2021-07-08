@@ -951,12 +951,18 @@ function number_format (number, decimals, dec_point, thousands_sep) {
             var line2 = [];
             var current_sale = 0;
 
+            var current = 0;
+            var previous = 0;
+
             if (typeof result.combine_chart.current !== 'undefined') {
                 $.each(result.combine_chart.current, function( index, value ) {
                   currentMonthlySale += value;
                   if(parseInt(index) <= "{{ date('d') }}"){
                       current_sale += value;
                       line1.push(current_sale);
+                  }
+                  if(parseInt(index) == "{{ date('d') }}") {
+                    current = value;
                   }
                 });
             }
@@ -966,15 +972,18 @@ function number_format (number, decimals, dec_point, thousands_sep) {
                   pre_month_sale += value;
                   chart_days.push(index);
                   line2.push(pre_month_sale);
+                  if(parseInt(index) == "{{ date('d') }}") {
+                    previous = value;
+                  }
                 });
             }
             $('.currentMonthlySale').html(number_format(currentMonthlySale, 2));
             $('.preMonthSale').html(number_format(pre_month_sale, 2));
-            if (pre_month_sale == 0) {
-              pre_month_sale++;
-              currentMonthlySale++;
+            if (previous == 0) {
+              previous++;
+              current++;
             }
-            var percentage_increase = ((currentMonthlySale - pre_month_sale) / pre_month_sale) * 100;
+            var percentage_increase = ((current - previous) / previous) * 100;
             if (percentage_increase > 0) {
               $('.arrow').css('color', 'green');
               $('.arrow').html('&#8593;');
