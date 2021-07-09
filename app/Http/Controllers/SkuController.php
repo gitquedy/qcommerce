@@ -1051,13 +1051,12 @@ class SkuController extends Controller
                             DB::raw('order_item.quantity as quantity'),
                             DB::raw('order_item.new_quantity as new_quantity'),
                             DB::raw('null as type')
-                        ])
+                        ])->whereNotNull('new_quantity')
                         ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from)->union($purchases);
 
             $SKU = DB::table(DB::raw("({$barcode->toSql()}) as x"))
                         ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'purchase_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
                         ->where('id', $sku->id)
-                        ->whereNotNull('date')
                         ->orderBy('date', 'desc');
                         
             return Datatables::of($SKU)
