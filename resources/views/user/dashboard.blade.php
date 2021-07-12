@@ -907,8 +907,8 @@ function number_format (number, decimals, dec_point, thousands_sep) {
               $('.shop_info_data_month'+ value.id).html(value.shop_info_data_month);
               $('.shop_info_data_last_month'+ value.id).html(value.shop_info_data_last_month);
 
-              var today = parseFloat(value.shop_info_data_today);
-              var yesterday = parseFloat(value.shop_info_data_yesterday);
+              var today = parseFloat(value.shop_info_data_today.replace(/,/g, ''));
+              var yesterday = parseFloat(value.shop_info_data_yesterday.replace(/,/g, ''));
               if (yesterday == 0) {
                 yesterday++;
                 today++;
@@ -922,8 +922,8 @@ function number_format (number, decimals, dec_point, thousands_sep) {
                 $('.shop_info_data_today'+ value.id).append('<span style="color:red"> &#8595;'+number_format(percentage_increase_today, 0)+'%</span>');
               }
               
-              var month = parseFloat(value.shop_info_data_month);
-              var last_month = parseFloat(value.shop_info_data_last_month);
+              var month = parseFloat(value.shop_info_data_month.replace(/,/g, ''));
+              var last_month = parseFloat(value.shop_info_data_last_month.replace(/,/g, ''));
               if (last_month == 0) {
                 last_month++;
                 month++;
