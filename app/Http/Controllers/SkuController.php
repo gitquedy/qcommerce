@@ -1054,12 +1054,13 @@ class SkuController extends Controller
                         ])->whereNotNull('new_quantity')
                         ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from)->union($purchases);
 
-            $SKU = DB::table(DB::raw("({$barcode->toSql()}) as x"))
+            $SKUs = DB::table(DB::raw("({$barcode->toSql()}) as x"))
                         ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'purchase_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
                         ->where('id', $sku->id)
+                        ->where('warehouse_id', $request->get('warehouse'))
                         ->orderBy('date', 'desc');
                         
-            return Datatables::of($SKU)
+            return Datatables::of($SKUs)
             ->editColumn('date', function($SKU) {
                             return Carbon::parse($SKU->date)->toDateString();
                         })
@@ -1137,9 +1138,22 @@ class SkuController extends Controller
             ->make(true);
         }
 
+        // $warehouse_ids = array_values(array_unique($SKUs->pluck('warehouse_id')->toArray()));
+        // if (Auth::user()->role == 'Staff') {
+        //     $all_warehouse_ids = array_intersect($warehouse_ids, Auth::user()->warehousePermissions->pluck('warehouse_id'));
+        //     $all_warehouse = Warehouse::whereIn('id', $all_warehouse_ids)->select('id', 'name');
+        // }
+        // else {
+        //     $all_warehouse = Warehouse::whereIn('id', $warehouse_ids)->select('id', 'name');
+        // }
+
+        $business_id = Auth::user()->business_id;
+        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
+
         return view('sku.productmovement', [
             'breadcrumbs' => $breadcrumbs,
             'sku' => $sku,
+            'all_warehouse' => $all_warehouse
         ]);
     }
 

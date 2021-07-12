@@ -74,6 +74,16 @@
                 </div>
             </div>
         </div>
+        <div class="filter-checkbox shop_filter row">
+            @foreach($all_warehouse as $warehouse)
+                <div class="col">
+                    <label for="{{ $warehouse->id }}" class="btn btn-outline-primary">
+                        {{ ucfirst($warehouse->name) }}
+                    </label>
+                    <input type="radio" id="{{ $warehouse->id }}" name="warehouse" value="{{ $warehouse->id }}">
+                </div>
+            @endforeach
+        </div>
         {{-- Data list view starts --}}
         <div id="data-list-view" class="col-xl-9 col-md-6 col-sm-12 data-list-view-header">
             {{-- DataTable starts --}}
@@ -145,7 +155,9 @@
         ];
         var table_route = {
           url: '{{ route('sku.productmovement', $sku->id) }}',
-          data: function (data) {}
+          data: function (data) {
+            data.warehouse = $('input[name=warehouse]:checked').val();
+          }
         };
         var buttons = [];
         var BInfo = true;
@@ -161,7 +173,29 @@
     
     <script type="text/javascript">
         $(document).ready(function(){
+            var filterCheckbox = $(".filter-checkbox");
+            filterCheckbox.insertAfter($(".top .actions .dt-buttons"));
+
+            $(".top").addClass("row align-items-center");
+            $(".action-btns").addClass("col");
+            $(".action-filters").addClass("col-md-auto");
             
+            $("input[name=warehouse]:first").attr('checked', true);
+            var warehouse = $('input[name=warehouse]:checked').val();
+            $('label[for="'+warehouse+'"]').addClass('active');
+            table.ajax.reload();
+            
+            $('input[name=warehouse]').change(function() {
+                $('input[name=warehouse]').map(function () {
+                    if ($(this).val() == $('input[name=warehouse]:checked').val()) {
+                        $('label[for="'+$(this).val()+'"]').addClass('active');
+                    }
+                    else {
+                        $('label[for="'+$(this).val()+'"]').removeClass('active');
+                    }
+                });
+                table.ajax.reload();
+            });
         });
     </script>
 @endsection
