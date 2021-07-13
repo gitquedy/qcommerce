@@ -197,16 +197,16 @@ class BarcodeController extends Controller
             foreach ($request->items as $sku => $qty) {
                 
                 $shop_id = $request->shop_id;
-                $shop = Shop::find($shop_id);
+                $shop = DB::table('shop')->select('warehouse_id')->find($shop_id);
                 $warehouse_id = $shop->warehouse_id;
-                $prod = Products::where('SellerSku', $sku)->orWhere('item_id', $sku)->where('shop_id', $shop_id)->first();
+                $prod = Products::with('sku')->where('SellerSku', $sku)->orWhere('item_id', $sku)->where('shop_id', $shop_id)->first();
                 if(isset($prod->seller_sku_id)) {
-                    $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
+                    $sku = $prod->sku;
 
                     //single products
-                    if ($prod->sku->type == 'single') {
+                    if ($sku->type == 'single') {
                         $sku->quantity -= $qty;
-                        $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
+                        $witem = DB::table('warehouse_items')->where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
                         $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
                         $new_quantity = $warehouse_qty - $qty;
                         $warehouse_item = WarehouseItems::updateOrCreate(
@@ -214,42 +214,46 @@ class BarcodeController extends Controller
                             'sku_id' => $sku->id],
                             ['quantity' => $new_quantity]
                         );
-                        $prod->quantity = $warehouse_item->quantity;
                         $result = $sku->save();
-                        $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
+                        $Sku_prod = $sku->products;
                         foreach ($Sku_prod as $prod) {
-                            $shop_id = $prod->shop_id;
-                            $prod = Products::where('id', $prod->id)->first();
                             $prod->quantity = $warehouse_item->quantity;
                             $prod->save();
-                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                                <Request>
-                                    <Product>
-                                        <Skus>
-                                            <Sku>
-                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                                <quantity>'.$prod->quantity.'</quantity>
-                                            </Sku>
-                                        </Skus>
-                                    </Product>
-                                </Request>';
                             if(env('lazada_sku_sync', true)){
-                                // if($prod->site == 'lazada'){
-                                //     $response = $prod->product_price_quantity_update($xml);
-                                // }
                                 $prod->updatePlatform();
                             }
                         }
                     }
                     //set products
-                    else if ($prod->sku->type == 'set') {
+                    else if ($sku->type == 'set') {
+
+                        //sku parent
+                        $sku->quantity -= $qty;
+                        $witem = DB::table('warehouse_items')->where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
+                        $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
+                        $new_quantity = $warehouse_qty - $qty;
+                        $warehouse_item = WarehouseItems::updateOrCreate(
+                            ['warehouse_id' => $warehouse_id,
+                            'sku_id' => $sku->id],
+                            ['quantity' => $new_quantity]
+                        );
+                        $result = $sku->save();
+                        $Sku_prod = $sku->products;
+                        foreach ($Sku_prod as $prod) {
+                            $prod->quantity = $warehouse_item->quantity;
+                            $prod->save();
+                            if(env('lazada_sku_sync', true)){
+                                $prod->updatePlatform();
+                            }
+                        }
+
                         //sku child
                         foreach ($sku->set_items as $set_item) {
-                            $sku = Sku::whereId($set_item->sku_single_id)->where('business_id', Auth::user()->business_id)->first();
+                            $sku = Sku::where('id', $set_item->sku_single_id)->where('business_id', Auth::user()->business_id)->first();
                             $set_quantity = $set_item->set_quantity;
-                            $sku->quantity -= $qty*$set_quantity;
+                            $sku->quantity -= ($qty*$set_quantity);
 
-                            $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $set_item->sku_single_id)->first();
+                            $witem = DB::table('warehouse_items')->where('warehouse_id', $warehouse_id)->where('sku_id', $set_item->sku_single_id)->first();
                             $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
                             $new_quantity = $warehouse_qty - $qty*$set_quantity;
                             $warehouse_item = WarehouseItems::updateOrCreate(
@@ -257,78 +261,20 @@ class BarcodeController extends Controller
                                  'sku_id' => $sku->id],
                                 ['quantity' => $new_quantity]
                             );
-                            $prod->quantity = $warehouse_item->quantity;
                             $result = $sku->save();
 
-                            $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
+                            $Sku_prod = $sku->products;
                             foreach ($Sku_prod as $product) {
-                                $shop_id = $product->shop_id;
-                                $product = Products::where('id', $product->id)->first();
                                 $product->quantity = $warehouse_item->quantity;
                                 $product->save();
-                                    $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                                    <Request>
-                                        <Product>
-                                            <Skus>
-                                                <Sku>
-                                                    <SellerSku>'.$product->SellerSku.'</SellerSku>
-                                                    <quantity>'.$product->quantity.'</quantity>
-                                                </Sku>
-                                            </Skus>
-                                        </Product>
-                                    </Request>';
                                 if(env('lazada_sku_sync', true)){
-                                    // if($prod->site == 'lazada'){
-                                    //     $response = $prod->product_price_quantity_update($xml);
-                                    // }
                                     $product->updatePlatform();
                                 }
                             }
                         }
-                        
-                        //sku parent
-                        $sku = Sku::whereId($prod->seller_sku_id)->where('business_id', Auth::user()->business_id)->first();
-                        // $sku->quantity = $sku->computeSetQuantity();
-                        $sku->quantity -= $qty;
-                        $witem = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first();
-                        $warehouse_qty = isset($witem->quantity)?$witem->quantity:0;
-                        $new_quantity = $warehouse_qty - $qty;
-                        $warehouse_item = WarehouseItems::updateOrCreate(
-                            ['warehouse_id' => $warehouse_id,
-                            'sku_id' => $sku->id],
-                            ['quantity' => $new_quantity]
-                        );
-                        $prod->quantity = $warehouse_item->quantity;
-                        $result = $sku->save();
-
-                        $Sku_prod = Products::with('shop')->where('seller_sku_id','=',$sku->id)->orderBy('updated_at', 'desc')->get();
-                        foreach ($Sku_prod as $prod) {
-                            $shop_id = $prod->shop_id;
-                            $prod = Products::where('id', $prod->id)->first();
-                            // $prod->quantity = $warehouse_item->quantity;
-                            $prod->quantity = $sku->computeSetQuantity($prod->shop->warehouse_id);
-                            $prod->save();
-                                $xml = '<?xml version="1.0" encoding="UTF-8" ?>
-                                <Request>
-                                    <Product>
-                                        <Skus>
-                                            <Sku>
-                                                <SellerSku>'.$prod->SellerSku.'</SellerSku>
-                                                <quantity>'.$prod->quantity.'</quantity>
-                                            </Sku>
-                                        </Skus>
-                                    </Product>
-                                </Request>';
-                            if(env('lazada_sku_sync', true)){
-                                // if($prod->site == 'lazada'){
-                                //     $response = $prod->product_price_quantity_update($xml);
-                                // }
-                                $prod->updatePlatform();
-                            }
-                        }
                     }
                     $orderitem = OrderItem::where('order_id', $order->id)->where('product_id', $prod->id)->first();
-                    $orderitem->new_quantity = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first()->quantity;
+                    $orderitem->new_quantity = DB::table('warehouse_items')->where('warehouse_id', $warehouse_id)->where('sku_id', $prod->seller_sku_id)->first()->quantity;
                     $orderitem->save();
                 }
             }
