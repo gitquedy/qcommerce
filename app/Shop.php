@@ -562,6 +562,12 @@ class Shop extends Model
                 }
                 $product_update_or_create_result = [];
                 foreach($products as $product_details){
+                    if ($product_details['skus'][0]['Images']) {
+                        $image = implode('|', array_filter($product_details['skus'][0]['Images']));
+                    }
+                    else {
+                        $image = implode('|', array_filter($product_details['images']));
+                    }
                     $product_details = [
                     'shop_id' => $this->id,
                     'site' => 'lazada',
@@ -569,7 +575,7 @@ class Shop extends Model
                     'SellerSku' => $product_details['skus'][0]['SellerSku'],
                     'item_id' => $product_details['item_id'],
                     'price' =>  $product_details['skus'][0]['price'],
-                    'Images' => implode('|', array_filter($product_details['skus'][0]['Images'])),
+                    'Images' => $image,
                     'name' => $product_details['attributes']['name'],
                     'Status' => $product_details['skus'][0]['Status'],
                     'Url' => $product_details['skus'][0]['Url'],
