@@ -22,6 +22,7 @@ use Validator;
 use Auth;
 use Yajra\DataTables\Facades\DataTables;
 use Oseintow\Shopify\Facades\Shopify;
+use App\Jobs\BarcodePackItems;
 
 class BarcodeController extends Controller
 {
@@ -139,15 +140,11 @@ class BarcodeController extends Controller
             } else if ($order->site == 'woocommerce') {
                 $client = $shop->woocommerceGetClient();
                 $order_items = $client->get('orders/' . $order->ordersn);
-                // $count = count($order_items->$line_items);
-                $count = 0;
                 foreach ($order_items->line_items as $item) {
                     $pic = OrderItem::join('products', 'order_item.product_id', '=', 'products.id')->where('order_item.order_id', $order->id)->where('products.item_id', $item->product_id)->first()->Images;
                     $sku = $item->sku;
-                    error_log($pic);
                     if ($sku == '') {
-                        $count++;
-                        $sku = 'item' . $count;
+                        $sku = $item->product_id;
                     }
                     $items[$sku] = [
                         'sku' => $sku,
