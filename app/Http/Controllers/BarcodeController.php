@@ -196,7 +196,10 @@ class BarcodeController extends Controller
                 $shop_id = $request->shop_id;
                 $shop = DB::table('shop')->select('warehouse_id')->find($shop_id);
                 $warehouse_id = $shop->warehouse_id;
-                $prod = Products::with('sku')->where('SellerSku', $sku)->orWhere('item_id', $sku)->where('shop_id', $shop_id)->first();
+                $prod = Products::with('sku')->where('shop_id', $shop_id)
+                                ->where(function ($query) use ($sku){
+                                    $query->where('SellerSku', $sku)->orWhere('item_id', $sku);
+                                })->first();
                 if(isset($prod->seller_sku_id)) {
                     $sku = $prod->sku;
 
@@ -213,11 +216,11 @@ class BarcodeController extends Controller
                         );
                         $result = $sku->save();
                         $Sku_prod = $sku->products;
-                        foreach ($Sku_prod as $prod) {
-                            $prod->quantity = $warehouse_item->quantity;
-                            $prod->save();
+                        foreach ($Sku_prod as $product) {
+                            $product->quantity = $warehouse_item->quantity;
+                            $product->save();
                             if(env('lazada_sku_sync', true)){
-                                $prod->updatePlatform();
+                                $product->updatePlatform();
                             }
                         }
                     }
@@ -236,11 +239,11 @@ class BarcodeController extends Controller
                         );
                         $result = $sku->save();
                         $Sku_prod = $sku->products;
-                        foreach ($Sku_prod as $prod) {
-                            $prod->quantity = $warehouse_item->quantity;
-                            $prod->save();
+                        foreach ($Sku_prod as $product_parent) {
+                            $product_parent->quantity = $warehouse_item->quantity;
+                            $product_parent->save();
                             if(env('lazada_sku_sync', true)){
-                                $prod->updatePlatform();
+                                $product_parent->updatePlatform();
                             }
                         }
 
@@ -261,11 +264,11 @@ class BarcodeController extends Controller
                             $result = $sku->save();
 
                             $Sku_prod = $sku->products;
-                            foreach ($Sku_prod as $product) {
-                                $product->quantity = $warehouse_item->quantity;
-                                $product->save();
+                            foreach ($Sku_prod as $product_child) {
+                                $product_child->quantity = $warehouse_item->quantity;
+                                $product_child->save();
                                 if(env('lazada_sku_sync', true)){
-                                    $product->updatePlatform();
+                                    $product_child->updatePlatform();
                                 }
                             }
                         }
