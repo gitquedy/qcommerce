@@ -164,8 +164,8 @@
             success: function (result) {
                 $("#packed_div").hide();
                 packed_alert.fire(
-                  'Packed!',
-                  'Items are now packed.',
+                  'Items are being packed.',
+                  'Check back in a few seconds',
                   'success'
                 )
             },
