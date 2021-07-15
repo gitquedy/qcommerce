@@ -52,7 +52,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:restart')
                  ->everyFiveMinutes()
                  ->appendOutputTo('storage/logs/cron_queueRestart.log');
-        $schedule->command('queue:work --daemon')
+        $schedule->command('queue:work')
                  ->everyMinute()
                  ->withoutOverlapping()
                  ->appendOutputTo('storage/logs/cron_queueWork.log');
