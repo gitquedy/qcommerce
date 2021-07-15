@@ -49,6 +49,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:sendInvoice')
                  ->daily()
                  ->appendOutputTo('storage/logs/cron_sendInvoice.log');
+        $schedule->command('queue:restart')
+                 ->everyFiveMinutes()
+                 ->appendOutputTo('storage/logs/cron_queueRestart.log');
+        $schedule->command('queue:work --daemon')
+                 ->everyMinute()
+                 ->withoutOverlapping()
+                 ->appendOutputTo('storage/logs/cron_queueWork.log');
     }
 
     /**
