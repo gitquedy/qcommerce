@@ -795,6 +795,8 @@ class SkuController extends Controller
             }
             else {
                 $sku->leftjoin('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+                $sku->groupBy('sku.id');
             }
             $result = $sku->get();
             foreach ($result as &$r) {
