@@ -33,7 +33,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index'), 'name'=>"Orders List"], ['name'=>"Orders All"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('OrderController@index', ['site='.$request->user()->checkFirstAllowedSite(), 'status=pending']), 'name'=>"Orders List"], ['name'=>"Orders All"]
         ];
         $all_shops = $request->user()->business->shops;
         $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));

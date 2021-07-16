@@ -55,7 +55,7 @@ class ProductController extends Controller
          $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->update(['seen' => true]);
 
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"List of Products"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index', ['site='.$request->user()->checkFirstAllowedSite(), 'status=active']), 'name'=>"Products"], ['name'=>"List of Products"]
         ];
 
         if ( request()->ajax()) {
@@ -170,7 +170,7 @@ class ProductController extends Controller
          $Products_unseen =  Products::whereIn('shop_id',$shop_ids)->update(['seen' => true]);
 
         $breadcrumbs = [
-            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@index'), 'name'=>"Products"], ['name'=>"Unlink Products"]
+            ['link'=>"/",'name'=>"Home"],['link'=> action('ProductController@unlink', ['site='.$request->user()->checkFirstAllowedSite(), 'status=active']), 'name'=>"Products"], ['name'=>"Unlink Products"]
         ];
 
         if ( request()->ajax()) {
