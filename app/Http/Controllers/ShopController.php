@@ -6,6 +6,7 @@ use Auth;
 use App\Shop;
 use App\Products;
 use App\Warehouse;
+use App\Plan;
 use Illuminate\Http\Request;
 use App\Lazop;
 use Carbon\Carbon;
@@ -125,12 +126,14 @@ class ShopController extends Controller
           ['link'=>"/",'name'=>"Home"], ['link'=> route('shop.create'),'name'=>"Add Shop"], ['name'=>"Shop"]
         ];
         $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
-        $plan = Auth::user()->business->subscription()->plan;
-        if (!$plan) {
+        $plan = Auth::user()->business->subscription();
+        if (!isset($plan)) {
             $plan = Plan::whereId(1);
         }
-        $allowed_shops = $plan->sales_channels;
-        error_log($allowed_shops);
+        else {
+            $plan = $plan->plan;
+        }
+        $allowed_shops = $plan->value('sales_channels');
         // die(var_dump(request()->session()));
         return view('shop.create', [
           'breadcrumbs' => $breadcrumbs,
