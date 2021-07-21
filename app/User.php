@@ -13,6 +13,7 @@ use App\Utilities;
 use Spatie\Permission\Models\Permission;
 use App\ShopPermission;
 use Auth;
+use App\Notifications\MailResetPassword;
 
 class User extends Authenticatable
 {
@@ -220,5 +221,9 @@ use Notifiable, HasRoles;
         else {
             $user->business->users()->where('role', '!=', 'Owner')->update(['status' => 0]);
         }
+    }
+
+    public function sendPasswordResetNotification($token) {
+        $this->notify(new MailResetPassword($token));
     }
 }
