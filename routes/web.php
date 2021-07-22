@@ -31,6 +31,12 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/billing', 'Admin\BillingController')->only(['index']);
 		Route::post('/billing/quickupdate', 'Admin\BillingController@quickUpdate')->name('billing.quickUpdate');
 		Route::get('/billing/overdue', 'Admin\BillingController@overdue')->name('billing.overdue');
+		Route::get('/billing/details', 'Admin\BillingController@details')->name('billing.details');
+		Route::get('/billing/details/create', 'Admin\BillingController@create')->name('billing.details.create');
+		Route::post('/billing/details/add', 'Admin\BillingController@add')->name('billing.details.add');
+		Route::get('/billing/details/edit/{id}', 'Admin\BillingController@edit')->name('billing.details.edit');
+		Route::post('/billing/details/update', 'Admin\BillingController@update')->name('billing.details.update');
+		Route::get('/billing/details/delete/{id}', 'Admin\BillingController@delete')->name('billing.details.delete');
 	});
 
 

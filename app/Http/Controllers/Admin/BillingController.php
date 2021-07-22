@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Billing;
 use App\Business;
+use App\Bank;
 use Validator;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
@@ -114,5 +115,109 @@ class BillingController extends Controller {
         return view('admin.billing.overdue', [
             'breadcrumbs' => $breadcrumbs,
         ]);
+    }
+
+    public function details() {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\BillingController@details'), 'name'=>"Billing"], ['name'=>"Bank Details"]
+        ];
+
+        if (request()->ajax()) {
+            $bank = Bank::all();
+
+            return DataTables::of($bank)
+            ->addColumn('action', function(Bank $b) {
+                return '<div class="btn-group dropup mr-1 mb-1">
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
+                Action<span class="sr-only">Toggle Dropdown</span></button>
+                <div class="dropdown-menu">
+                <a class="dropdown-item fa fa-edit" href="'.route('billing.details.edit',['id'=>$b->id]).'" > Edit</a>
+                <a class="dropdown-item fa fa-trash confirm" href="#"  data-text="Are you sure to delete '. $b->account_name .' ?" data-text="This Action is irreversible." data-href="'.route('billing.details.delete',['id'=>$b->id]).'" > Delete</a>
+                </div>
+                </div>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+        }
+
+        return view('admin.billing.details', [
+            'breadcrumbs' => $breadcrumbs,
+        ]);
+    }
+
+    public function create(Request $request) {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\BillingController@details'), 'name'=>"Bank Details"], ['name'=>"Add Bank"]
+        ];
+
+        return view('admin.billing.details.create', [
+            'breadcrumbs' => $breadcrumbs
+        ]);
+    }
+
+    public function add(Request $request) {
+        $request->validate([
+            'bank' => 'required',
+            'account_name' => 'required',
+            'account_number' => 'required|numeric'
+        ]);
+
+        $bank = new Bank;
+        $bank->bank = $request->bank;
+        $bank->account_name = $request->account_name;
+        $bank->account_number = $request->account_number;
+
+        if ($bank->save()){
+            $request->session()->flash('flash_success', 'Successfully added bank.');
+        } else {
+            $request->session()->flash('flash_error', 'Something went wrong!');
+        }
+
+        return redirect('admin/billing/details');
+    }
+
+    public function edit($id="", Request $request) {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\BillingController@details'), 'name'=>"Bank Details"], ['name'=>"Edit Bank"]
+        ];
+
+        $bank = Bank::find($id);
+
+        return view('admin.billing.details.edit', [
+            'breadcrumbs' => $breadcrumbs,
+            'bank' => $bank
+        ]);
+    }
+
+    public function update(Request $request) {
+        $request->validate([
+            'bank' => 'required',
+            'account_name' => 'required',
+            'account_number' => 'required|numeric'
+        ]);
+
+        $bank = Bank::find($request->id);
+        $bank->bank = $request->bank;
+        $bank->account_name = $request->account_name;
+        $bank->account_number = $request->account_number;
+
+        if ($bank->save()){
+            $request->session()->flash('flash_success', 'Successfully updated bank.');
+        } else {
+            $request->session()->flash('flash_error', 'Something went wrong!');
+        }
+
+        return redirect('admin/billing/details');
+    }
+
+    public function delete($id, Request $request) {
+        $bank = Bank::find($id);
+        
+        if ($bank->delete()) {
+            $output = ['success' => 1, 'msg' => 'Success'];
+        } else {
+            $output = ['success' => 0, 'msg' => "Error!"];  
+        }
+        return response()->json($output);
     }
 }

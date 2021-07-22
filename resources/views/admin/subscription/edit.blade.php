@@ -5,26 +5,15 @@
 
 @section('vendor-style')
         {{-- vednor files --}}
-        <link rel="stylesheet" href="{{ asset(mix('vendors/css/tables/datatable/extensions/dataTables.checkboxes.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/forms/select/select2.min.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/animate/animate.css')) }}">
         <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
 @endsection
 @section('mystyle')
         {{-- Page css files --}}
-        <link rel="stylesheet" href="{{ asset(mix('css/pages/data-list-view.css')) }}">
 @endsection
 
 @section('content')
-{{-- Data list view starts --}}
-
-<style>
-    .product_image{
-        width:100px;
-        height:auto;
-    }
-</style>
-
 <section class="card">
     <div class="card-header">
         <h4 class="card-title">{!!$subs->name!!}</h4>
@@ -305,15 +294,10 @@
 
 @section('vendor-script')
 {{-- vendor js files --}}
-    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
-    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
-    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>
-    <script src="{{ asset(mix('vendors/js/tables/datatable/buttons.bootstrap.min.js')) }}"></script>-
-    <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.checkboxes.min.js')) }}"></script>
     <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
     <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
     <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
-<script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+    <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
 @endsection
 @section('myscript')
 <script type="text/javascript">

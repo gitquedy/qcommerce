@@ -66,6 +66,12 @@
                         <span class="menu-title" data-i18n="">Over Due Invoices</span>
                     </a>
                 </li>
+                <li class="{{ $request->segment(1) == 'admin' && $request->segment(2) == 'billing' && $request->segment(3) == 'details' ? 'active' : '' }}">
+                    <a href="{{route('billing.details')}}">
+                        <i class="feather icon-circle"></i>
+                        <span class="menu-title" data-i18n="">Bank Details</span>
+                    </a>
+                </li>
             </ul>
         </li>
         

@@ -51,7 +51,7 @@
 {{-- Data list view end --}}
 @endsection
 @section('vendor-script')
-{{-- vednor js files --}}
+{{-- vendor js files --}}
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.buttons.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/tables/datatable/datatables.bootstrap4.min.js')) }}"></script>

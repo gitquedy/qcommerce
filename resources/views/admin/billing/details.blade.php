@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Billing')
+@section('title', 'Bank Details')
 
 @section('vendor-style')
         {{-- vendor files --}}
@@ -31,16 +31,10 @@
             <th class="dt-checkboxes-cell dt-checkboxes-select-all sorting_disabled">
                 <input type="checkbox">
             </th>
-            <th>Invoice No.</th>
-            <th>Business</th>
-            <th>Plan</th>
-            <th>Promo Code</th>
-            <th>Billing Period</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Payment Date</th>
-            <th>Next Payment Date</th>
-            <th>Created At</th>
+            <th>Bank</th>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Action</th>
           </tr>
         </thead>
       </table>
@@ -73,22 +67,22 @@
                 },
                 className:'dt-checkboxes-cell'
             },
-            { data: 'invoice_no', name: 'invoice_no'},
-            { data: 'business_id', name: 'business_id'},
-            { data: 'plan_id', name: 'plan_id'},
-            { data: 'promocode', name: 'promocode'},
-            { data: 'billing_period', name: 'billing_period'},
-            { data: 'amount', name: 'amount'},
-            { data: 'paid_status', name: 'paid_status'},
-            { data: 'payment_date', name: 'payment_date'},
-            { data: 'next_payment_date', name: 'next_payment_date'},
-            { data: 'created_at', name: 'created_at', searchable: false, visible: false }
+            { data: 'bank', name: 'bank'},
+            { data: 'account_name', name: 'account_name'},
+            { data: 'account_number', name: 'account_number'},
+            { data: 'action', name: 'action', orderable : false}
         ];
     var table_route = {
-            url: '{{ route('billing.overdue') }}'
+            url: '{{ route('billing.details') }}'
             };
-    var buttons = [];
-    var order = [10, 'desc'];
+    var buttons = [
+            { text: "<i class='feather icon-plus'></i> Add New",
+                action: function() {
+                    window.location = '{{ route('billing.details.create') }}';
+                },
+            className: "btn-outline-primary margin-r-10" }
+        ];
+    var order = [];
     var BInfo = true;
     var bFilter = true;
     function created_row_function(row, data, dataIndex){
