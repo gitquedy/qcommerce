@@ -74,7 +74,7 @@
                 </div>
             </div>
         </div>
-        <div class="filter-checkbox shop_filter row">
+        <!-- <div class="filter-checkbox shop_filter row">
             @foreach($all_warehouse as $warehouse)
                 <div class="col">
                     <label for="{{ $warehouse->id }}" class="btn btn-outline-primary">
@@ -83,6 +83,17 @@
                     <input type="radio" id="{{ $warehouse->id }}" name="warehouse" value="{{ $warehouse->id }}">
                 </div>
             @endforeach
+        </div> -->
+        <div class="additional_custom_filter">
+            <div class="dataTables_length" id="DataTables_Table_0_warehouse">
+                <label>
+                    <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm" id="warehouse">
+                        @foreach($all_warehouse as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
         </div>
         {{-- Data list view starts --}}
         <div id="data-list-view" class="col-xl-9 col-md-6 col-sm-12 data-list-view-header">
@@ -156,7 +167,8 @@
         var table_route = {
           url: '{{ route('sku.productmovement', $sku->id) }}',
           data: function (data) {
-            data.warehouse = $('input[name=warehouse]:checked').val();
+            // data.warehouse = $('input[name=warehouse]:checked').val();
+            data.warehouse = $("#warehouse").val();
           }
         };
         var buttons = [];
@@ -173,29 +185,33 @@
     
     <script type="text/javascript">
         $(document).ready(function(){
-            var filterCheckbox = $(".filter-checkbox");
-            filterCheckbox.insertAfter($(".top .actions .dt-buttons"));
+            var additional_custom_filter = $(".additional_custom_filter").html();
+            $(".action-filters").prepend(additional_custom_filter);
+            $(".additional_custom_filter").html('');
 
-            $(".top").addClass("row align-items-center");
-            $(".action-btns").addClass("col");
-            $(".action-filters").addClass("col-md-auto");
+            // var filterCheckbox = $(".filter-checkbox");
+            // filterCheckbox.insertAfter($(".top .actions .dt-buttons"));
+
+            // $(".top").addClass("row align-items-center");
+            // $(".action-btns").addClass("col");
+            // $(".action-filters").addClass("col-md-auto");
             
-            $("input[name=warehouse]:first").attr('checked', true);
-            var warehouse = $('input[name=warehouse]:checked').val();
-            $('label[for="'+warehouse+'"]').addClass('active');
-            table.ajax.reload();
+            // $("input[name=warehouse]:first").attr('checked', true);
+            // var warehouse = $('input[name=warehouse]:checked').val();
+            // $('label[for="'+warehouse+'"]').addClass('active');
+            // table.ajax.reload();
             
-            $('input[name=warehouse]').change(function() {
-                $('input[name=warehouse]').map(function () {
-                    if ($(this).val() == $('input[name=warehouse]:checked').val()) {
-                        $('label[for="'+$(this).val()+'"]').addClass('active');
-                    }
-                    else {
-                        $('label[for="'+$(this).val()+'"]').removeClass('active');
-                    }
-                });
-                table.ajax.reload();
-            });
+            // $('input[name=warehouse]').change(function() {
+            //     $('input[name=warehouse]').map(function () {
+            //         if ($(this).val() == $('input[name=warehouse]:checked').val()) {
+            //             $('label[for="'+$(this).val()+'"]').addClass('active');
+            //         }
+            //         else {
+            //             $('label[for="'+$(this).val()+'"]').removeClass('active');
+            //         }
+            //     });
+            //     table.ajax.reload();
+            // });
         });
     </script>
 @endsection
