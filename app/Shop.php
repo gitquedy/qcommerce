@@ -442,11 +442,12 @@ class Shop extends Model
     public function shopeeSaveOrdersPerSN($orders, $date){
         $client = $this->shopeeGetClient();
         $orders = array_chunk($orders,50);
-        $ordersn_list = [];
+        $all_ordersn = [];
         foreach($orders as $order){
             $ordersn_list = [];
             foreach($order as $o){
                 $ordersn_list[] = $o['ordersn'];
+                $all_ordersn[] = $o['ordersn'];
             }
             $order_details = $client->order->getOrderDetails(['ordersn_list' => array_values($ordersn_list)])->getData();
             if(isset($order_details['orders'])){
@@ -489,7 +490,7 @@ class Shop extends Model
             }
         }
         $check_orders = $this->orders()->where('updated_at', '>', $date)->pluck('ordersn')->toArray();
-        $delete_orders = array_diff($check_orders, $ordersn_list);
+        $delete_orders = array_diff($check_orders, $all_ordersn);
         $delete = $this->orders()->whereIn('ordersn', $delete_orders)->delete();
     }
 
