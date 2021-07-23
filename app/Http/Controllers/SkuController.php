@@ -1049,7 +1049,7 @@ class SkuController extends Controller
                             DB::raw('null AS purchase_id'),
                             DB::raw('order_item.order_id AS order_id'),
                             DB::raw('shop.warehouse_id AS warehouse_id'),
-                            DB::raw('order_item.updated_at as date'),
+                            DB::raw('order_item.created_at as date'),
                             DB::raw('order_item.quantity as quantity'),
                             DB::raw('order_item.new_quantity as new_quantity'),
                             DB::raw('null as type')
@@ -1139,15 +1139,6 @@ class SkuController extends Controller
                         })
             ->make(true);
         }
-
-        // $warehouse_ids = array_values(array_unique($SKUs->pluck('warehouse_id')->toArray()));
-        // if (Auth::user()->role == 'Staff') {
-        //     $all_warehouse_ids = array_intersect($warehouse_ids, Auth::user()->warehousePermissions->pluck('warehouse_id'));
-        //     $all_warehouse = Warehouse::whereIn('id', $all_warehouse_ids)->select('id', 'name');
-        // }
-        // else {
-        //     $all_warehouse = Warehouse::whereIn('id', $warehouse_ids)->select('id', 'name');
-        // }
 
         $business_id = Auth::user()->business_id;
         $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
