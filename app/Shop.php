@@ -223,7 +223,7 @@ class Shop extends Model
 
     public function syncShopeeOrders($date){
         $orders = $this->shopeeGetOrdersPerDate($date);
-        $this->shopeeSaveOrdersPerSN($orders);
+        $this->shopeeSaveOrdersPerSN($orders, $date);
     }
 
     public function syncLazadaOrders($date = "2018-01-01"){
@@ -439,7 +439,7 @@ class Shop extends Model
         return $orders;
     }
 
-    public function shopeeSaveOrdersPerSN($orders){
+    public function shopeeSaveOrdersPerSN($orders, $date){
         $client = $this->shopeeGetClient();
         $orders = array_chunk($orders,50);
         $ordersn_list = [];
@@ -488,6 +488,9 @@ class Shop extends Model
                 } // orders
             }
         }
+        $check_orders = $this->orders()->where('updated_at', '>', $date)->pluck('ordersn')->toArray();
+        $delete_orders = array_diff($check_orders, $ordersn_list);
+        $delete = $this->orders()->whereIn('ordersn', $delete_orders)->delete();
     }
 
     public function refreshToken(){
