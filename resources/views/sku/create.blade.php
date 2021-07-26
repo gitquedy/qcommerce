@@ -116,7 +116,6 @@
                 <div class="form-group">
                   <div class="input-group">
                     <select class="form-control s280" name="type" id="type">
-                      <option value="" disabled selected></option>
                       <option  value="single">Single</option>
                       <option  value="set">Set</option>
                     </select>
@@ -466,6 +465,8 @@ function process_add_supplier(e){
        }
     });
 }
+
+$("#type option[value=single]").attr('selected', 'selected');
 
 $("#type").change(function () {
   if ($("#type option:selected").val() == 'set') {

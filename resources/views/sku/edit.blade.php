@@ -109,7 +109,6 @@
                 <div class="form-group">
                   <div class="input-group">
                     <select class="form-control s280" name="type" id="type">
-                      <option value="" disabled selected></option>
                       <option  value="single">Single</option>
                       <option  value="set">Set</option>
                     </select>
@@ -450,7 +449,6 @@ $("#type").change(function () {
 });
 
 var set_items = {!! json_encode($Sku->set_items->toArray()) !!};
-console.log(set_items);
 
 set_items.map(function(item) {
   var product_row = '<div class="row product_row">'+

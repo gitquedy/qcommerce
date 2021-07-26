@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Brand;
-use App\Business;
 use App\Category;
 use App\Customer;
 use App\Http\Controllers\Controller;
@@ -50,7 +49,7 @@ class SkuController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SkuController@index'), 'name'=>"SKU"], ['name'=>"List of SKU"]
         ];
-        $all_shops = $request->user()->business->shops;
+        $all_shops = $request->user()->business->shops->where('active', '!=', 0);
         $all_sites = array_values(array_unique($all_shops->pluck('site')->toArray()));
         
         if (request()->ajax()) {
@@ -206,9 +205,8 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
-        $all_shops = ($request->get('site') != "") ? $all_shops->where('site', $request->get('site')) : $all_shops;
+        $all_warehouse = $request->user()->business->warehouse->where('status', 1);
+        // $all_shops = ($request->get('site') != "") ? $all_shops->where('site', $request->get('site')) : $all_shops;
         return view('sku.index', [
             'breadcrumbs' => $breadcrumbs,
             'all_warehouse' => $all_warehouse,
@@ -350,13 +348,10 @@ class SkuController extends Controller
             ->rawColumns(['link_shop','cost','price','quantity','alert_quantity','type','action'])
             ->make(true);
         }
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
+        $all_warehouse = $request->user()->business->warehouse->where('status', 1);
         return view('sku.unlink', [
             'breadcrumbs' => $breadcrumbs,
-            'all_warehouse' => $all_warehouse,
-            'all_shops' => array(),
-            'statuses' => array(),
+            'all_warehouse' => $all_warehouse
         ]);
     }
     
@@ -961,8 +956,6 @@ class SkuController extends Controller
         ];
 
         if (request()->ajax()) {
-            $business_id = Auth::user()->business_id;
-
             $adjustments = Sku::join('adjustment_items', 'sku.id', '=', 'adjustment_items.sku_id')
                         ->select([
                             DB::raw('sku.id AS id'),
@@ -1053,13 +1046,14 @@ class SkuController extends Controller
                             DB::raw('order_item.quantity as quantity'),
                             DB::raw('order_item.new_quantity as new_quantity'),
                             DB::raw('null as type')
-                        ])->whereNotNull('new_quantity')
+                        ])
                         ->union($adjustments)->union($sales)->union($transfer_to)->union($transfer_from)->union($purchases);
 
             $SKUs = DB::table(DB::raw("({$barcode->toSql()}) as x"))
                         ->select(['id', 'adjustment_id', 'sales_id', 'transfer_id', 'purchase_id', 'order_id', 'warehouse_id', 'date', 'quantity', 'new_quantity', 'type'])
                         ->where('id', $sku->id)
                         ->where('warehouse_id', $request->get('warehouse'))
+                        ->whereNotNull('new_quantity')
                         ->orderBy('date', 'desc');
                         
             return Datatables::of($SKUs)
@@ -1130,18 +1124,12 @@ class SkuController extends Controller
                             }
                         })
             ->editColumn('items_remaining', function($SKU) {
-                            if (isset($SKU->new_quantity)) {
-                                return $SKU->new_quantity;
-                            }
-                            else {
-                                return 'Cannot determine. Product Movement feature has not yet implemented during this movement';
-                            }
+                            return $SKU->new_quantity;
                         })
             ->make(true);
         }
-
-        $business_id = Auth::user()->business_id;
-        $all_warehouse = Business::find($business_id)->warehouse->where('status', 1);
+        
+        $all_warehouse = $request->user()->business->warehouse->where('status', 1);
 
         return view('sku.productmovement', [
             'breadcrumbs' => $breadcrumbs,

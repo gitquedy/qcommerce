@@ -36,7 +36,7 @@ class ShopController extends Controller
         ];
         if ( request()->ajax()) {
            $shop = $request->user()->business->shops()->orderBy('shop.updated_at', 'desc');
-           $shop->first()->updateShopStatus();
+           
             return Datatables::eloquent($shop)
             ->addColumn('id_checkbox', function(Shop $shop) {
                 return '<input type="checkbox" class="dt-checkboxes" '.($shop->active == 0 ? 'disabled' : '').'>';

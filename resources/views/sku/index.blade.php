@@ -28,7 +28,7 @@
     }
 </style>
 
-<section class="card">
+<!-- <section class="card">
   <div class="card-header">
     <h4 class="card-title">Filter </h4>
   </div>
@@ -55,9 +55,10 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section> -->
 
-<section id="data-list-view" class="data-list-view-header">
+  <section id="data-list-view" class="data-list-view-header">
     <div class="action-btns d-none">
       <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
@@ -82,13 +83,23 @@
 
 
     <div class="additional_custom_filter">
+    <div class="dataTables_length" id="DataTables_Table_0_shop">
+        <label>
+          <select name="shop" class="selectFilter custom-select custom-select-sm form-control form-control-sm w-100" id="shop">
+            <option value="">All Shop</option>
+              @foreach($all_shops as $shop)
+                <option value="{{ $shop->id }}">{{ $shop->short_name }} - {{ $shop->name }}</option>
+              @endforeach
+          </select>
+        </label>
+      </div>
       <div class="dataTables_length" id="DataTables_Table_0_warehouse">
         <label>
-          <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm" id="warehouse">
+          <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm w-100" id="warehouse">
             <option value="">All Warehouse</option>
-            @foreach($all_warehouse as $warehouse)
-              <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-            @endforeach
+              @foreach($all_warehouse as $warehouse)
+                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+              @endforeach
           </select>
         </label>
       </div>
@@ -319,11 +330,11 @@
         }
       });
 
-      $('input[name="site"]').change(function(){
-        var site = $('input[name="site"]:checked').val();
-        url = "{{ action('SkuController@index')}}?site=" + site;
-        window.location.href = url;
-      });
+      // $('input[name="site"]').change(function(){
+      //   var site = $('input[name="site"]:checked').val();
+      //   url = "{{ action('SkuController@index')}}?site=" + site;
+      //   window.location.href = url;
+      // });
 
 
   }); 

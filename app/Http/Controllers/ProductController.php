@@ -26,7 +26,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     { 
-        $all_shops =  $request->user()->business->shops;
+        $all_shops =  $request->user()->business->shops->where('active', '!=', 0);
 
         $shop_ids = $all_shops->pluck('id');
 
@@ -141,7 +141,7 @@ class ProductController extends Controller
     }
 
     public function unlink(Request $request) {
-        $all_shops =  $request->user()->business->shops;
+        $all_shops =  $request->user()->business->shops->where('active', '!=', 0);
 
         $shop_ids = $all_shops->pluck('id');
 

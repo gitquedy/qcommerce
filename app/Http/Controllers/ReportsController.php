@@ -137,7 +137,6 @@ class ReportsController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@itemsNotMoving'), 'name'=>"Reports"], ['name'=>"Items Not Moving"]
         ];
-        $all_shops = $request->user()->business->shops;
 
         if($request->get('days')){
             $selectedDays = $request->get('days');
@@ -170,7 +169,6 @@ class ReportsController extends Controller
             }
         return view('reports.itemsNotMoving', [
             'breadcrumbs' => $breadcrumbs,
-            'all_shops' => $all_shops,
             'selectedDays' => $selectedDays,
         ]);
     }
@@ -178,7 +176,7 @@ class ReportsController extends Controller
     public function topSellingProducts(Request $request){
         $this->authorize('is_included_in_plan', 'top_selling_products');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@topSellingProducts'), 'name'=>"Reports"], ['name'=>"Top Selling Products"]];
-        $all_shops = $request->user()->business->shops;
+        $all_shops = $request->user()->business->shops->where('active', '!=', 0);
 
         if (request()->ajax()) {
             $shops = $request->user()->business->shops();
@@ -270,7 +268,7 @@ class ReportsController extends Controller
     public function dailySales(Request $request){
         $this->authorize('is_included_in_plan', 'daily_sales');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@dailySales'), 'name'=>"Daily Sales"], ['name'=>"Daily Sales"]];
-        $all_shops = $request->user()->business->shops;
+        $all_shops = $request->user()->business->shops->where('active', '!=', 0);
 
         if ( request()->ajax()) {
             $shops = $request->user()->business->shops;
@@ -350,7 +348,7 @@ class ReportsController extends Controller
     public function monthlySales(Request $request){
         $this->authorize('is_included_in_plan', 'monthly_sales');
         $breadcrumbs = [['link'=>"/",'name'=>"Home"],['link'=> action('ReportsController@monthlySales'), 'name'=>"Monthly Sales"], ['name'=>"Monthly Sales"]];
-        $all_shops = $request->user()->business->shops;
+        $all_shops = $request->user()->business->shops->where('active', '!=', 0);
 
         if ( request()->ajax()) {
             $shops = $request->user()->business->shops;

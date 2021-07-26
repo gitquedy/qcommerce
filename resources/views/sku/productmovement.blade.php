@@ -87,7 +87,7 @@
         <div class="additional_custom_filter">
             <div class="dataTables_length" id="DataTables_Table_0_warehouse">
                 <label>
-                    <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm" id="warehouse">
+                    <select name="warehouse" class="selectFilter custom-select custom-select-sm form-control form-control-sm w-100" id="warehouse">
                         @foreach($all_warehouse as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
