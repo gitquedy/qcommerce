@@ -101,18 +101,18 @@ class SkuController extends Controller
                 $Sku = $Sku->whereIn('sku.id', $sku_ids);
             }
 
-            if ($request->get('site') != "") {
-                $sku_ids = array();
-                foreach ($Sku->get() as $sku) {
-                    foreach ($sku->products as $product) {
-                        if ($product->site == $request->get('site')) {
-                            $sku_ids[] = $sku->id;
-                            break;
-                        }
-                    }
-                }
-                $Sku = $Sku->whereIn('sku.id', $sku_ids);
-            }
+            // if ($request->get('site') != "") {
+            //     $sku_ids = array();
+            //     foreach ($Sku->get() as $sku) {
+            //         foreach ($sku->products as $product) {
+            //             if ($product->site == $request->get('site')) {
+            //                 $sku_ids[] = $sku->id;
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     $Sku = $Sku->whereIn('sku.id', $sku_ids);
+            // }
 
             if ($request->get('shop') != "") {
                 $sku_ids = array();

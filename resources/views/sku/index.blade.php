@@ -206,7 +206,7 @@
           data: function (data) {
                 data.warehouse = $("#warehouse").val();
                 data.stocks = $('input[name=stocks][value=stocks]').is(":checked") ? 'with_stocks_only' : 'all';
-                data.site = $('input[name="site"]:checked').val();
+                // data.site = $('input[name="site"]:checked').val();
                 data.shop = $("#shop").val();
             }
         };
