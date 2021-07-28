@@ -157,16 +157,19 @@ class TransferController extends Controller
             if(in_array($transfer->status, ['completed', 'sent'])) {
                 //remove items from_warehouse
                 Transfer::subtractItemsOnWarehouse($transfer->id);
+                foreach($transfer->items as $item) {
+                    $item->new_quantity_from = WarehouseItems::where('warehouse_id', $item->from_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
                 if(in_array($transfer->status, ['completed'])) {
                     //add items to_warehouse
                     Transfer::addItemsOnWarehouse($transfer->id);
+                    foreach($transfer->items as $item) {
+                        $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                        $item->save();
+                    }
                 }
                 Sku::reSyncStocks($transfer->items()->pluck('sku_id'));
-                foreach($transfer->items as $item) {
-                    $item->new_quantity_from = WarehouseItems::where('warehouse_id', $item->from_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                    $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                    $item->save();
-                }
             }
 
             if (!$request->reference_no) {
@@ -291,15 +294,18 @@ class TransferController extends Controller
             $transfer_items_query = TransferItems::insert($transfer_items);
             if(in_array($transfer->status, ['completed', 'sent'])) {
                 Transfer::subtractItemsOnWarehouse($transfer->id);
-                if(in_array($transfer->status, ['completed'])) {
-                    Transfer::addItemsOnWarehouse($transfer->id);
-                }
-                Sku::reSyncStocks($transfer->items()->pluck('sku_id'));
                 foreach($transfer->items as $item) {
                     $item->new_quantity_from = WarehouseItems::where('warehouse_id', $item->from_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                    $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
                     $item->save();
                 }
+                if(in_array($transfer->status, ['completed'])) {
+                    Transfer::addItemsOnWarehouse($transfer->id);
+                    foreach($transfer->items as $item) {
+                        $item->new_quantity_to = WarehouseItems::where('warehouse_id', $item->to_warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                        $item->save();
+                    }
+                }
+                Sku::reSyncStocks($transfer->items()->pluck('sku_id'));
             }
 
             $output = ['success' => 1,
