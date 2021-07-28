@@ -212,9 +212,6 @@
         $(row).addClass('text-danger bold font-weight-bold');
     }
   }
-  function draw_callback_function(settings){
-    getHeaders();
-  }
   var aLengthMenu = [[20, 50, 100, 500],[20, 50, 100, 500]];
   var pageLength = 20;
 </script>
