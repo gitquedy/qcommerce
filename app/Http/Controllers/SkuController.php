@@ -642,6 +642,11 @@ class SkuController extends Controller
 
                 $response = $product->updatePlatform();
             }
+            $sku_quantity = 0;
+            foreach ($sku->warehouse_items as $item) {
+                $sku_quantity += $item->quantity;
+            }
+            $sku->update(['quantity' => $sku_quantity]);
         }
         $result = array('success' => true, 'msg' => 'Product Syncs Successfully.');
         return $result;
