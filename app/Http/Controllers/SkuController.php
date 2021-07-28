@@ -930,25 +930,25 @@ class SkuController extends Controller
         return response()->json($output);
     }
 
-    public function headers(Request $request){
-        $data = [];
-        $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
+    // public function headers(Request $request){
+    //     $data = [];
+    //     $shop_ids =  $request->user()->business->shops->pluck('id')->toArray();
 
-        $Sku = Sku::where('business_id', $request->user()->business_id)->get();
+    //     $Sku = Sku::where('business_id', $request->user()->business_id)->get();
 
-        $data['lazada_total'] = 0;
-        $data['shopee_total'] = 0;
-        $data['shopify_total'] = 0;
-        $data['woocommerce_total'] = 0;
-        foreach ($Sku as $sku) {
-            $data['lazada_total'] += $sku->products()->where('site', 'lazada')->count();
-            $data['shopee_total'] += $sku->products()->where('site', 'shopee')->count();
-            $data['shopify_total'] += $sku->products()->where('site', 'shopify')->count();
-            $data['woocommerce_total'] += $sku->products()->where('site', 'woocommerce')->count();
-        }
+    //     $data['lazada_total'] = 0;
+    //     $data['shopee_total'] = 0;
+    //     $data['shopify_total'] = 0;
+    //     $data['woocommerce_total'] = 0;
+    //     foreach ($Sku as $sku) {
+    //         $data['lazada_total'] += $sku->products()->where('site', 'lazada')->count();
+    //         $data['shopee_total'] += $sku->products()->where('site', 'shopee')->count();
+    //         $data['shopify_total'] += $sku->products()->where('site', 'shopify')->count();
+    //         $data['woocommerce_total'] += $sku->products()->where('site', 'woocommerce')->count();
+    //     }
 
-        return response()->json(['data' => $data]);
-    }
+    //     return response()->json(['data' => $data]);
+    // }
 
     public function productMovement(Sku $sku, Request $request) {
         $breadcrumbs = [
