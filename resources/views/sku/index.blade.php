@@ -154,20 +154,6 @@
 @endsection
 @section('myscript')
   {{-- Page js files --}}
-  <script type="text/javascript">
-    function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('SkuController@headers')  }}?site={{ $request->get('site') }}&shops=" + $("#shop").val(),
-        success: function success(result) {
-          console.log(result.data);
-            $.each(result.data, function (i, item) {
-              $('#badge_' + i).html(item);
-            });
-          },
-        });     
-      }
-  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var columnns = [
