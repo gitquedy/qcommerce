@@ -290,8 +290,8 @@ class Shop extends Model
                                     'product_id' => $product->id,
                                     'quantity' => 1,
                                     'price' => $item['paid_price'],
-                                    'created_at' => Carbon::parse($record->created_at)->format('Y-m-d H:i:s'),
-                                    'updated_at' => Carbon::parse($record->updated_at)->format('Y-m-d H:i:s'),
+                                    // 'created_at' => Carbon::parse($record->created_at)->format('Y-m-d H:i:s'),
+                                    // 'updated_at' => Carbon::parse($record->updated_at)->format('Y-m-d H:i:s'),
                                 );
                             }
                             else {
@@ -478,8 +478,8 @@ class Shop extends Model
                                 'product_id' => $product->id,
                                 'quantity' => $item['variation_quantity_purchased'],
                                 'price' => $item['variation_discounted_price'],
-                                'created_at' => $record->created_at,
-                                'updated_at' => $record->updated_at
+                                // 'created_at' => $record->created_at,
+                                // 'updated_at' => $record->updated_at
                             ];
                             OrderItem::updateOrCreate(
                                 ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
@@ -654,8 +654,8 @@ class Shop extends Model
                                 'product_details' => $product->id,
                                 'quantity' => $item->quantity,
                                 'price' => $item->price,
-                                'created_at' => $record->created_at,
-                                'updated_at' => $record->updated_at
+                                // 'created_at' => $record->created_at,
+                                // 'updated_at' => $record->updated_at
                             ];
                             OrderItem::updateOrCreate(
                                 ['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail
@@ -845,8 +845,8 @@ class Shop extends Model
                         'order_id' => $record->id,
                         'quantity' => $item->quantity,
                         'price' => $item->price,
-                        'created_at' => $record->created_at,
-                        'updated_at' => $record->updated_at
+                        // 'created_at' => $record->created_at,
+                        // 'updated_at' => $record->updated_at
                     ];
                     OrderItem::updateOrCreate(['order_id' => $item_detail['order_id'], 'product_id' => $item_detail['product_id']], $item_detail);
                 }

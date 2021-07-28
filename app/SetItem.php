@@ -9,9 +9,7 @@ class SetItem extends Model
 {
 	protected $table = 'set_item';
 
-    protected $fillable = ['sku_set_id', 'sku_single_id', 'code', 'name', 'set_quantity', 'unit_price', 'created_at' , 'updated_at'];
-
-    // public $timestamps = false;
+    protected $fillable = ['sku_set_id', 'sku_single_id', 'code', 'name', 'set_quantity', 'unit_price'];
 
     public function sku(){
     	return $this->belongsTo(Sku::class, 'sku_set_id', 'id');
@@ -23,12 +21,4 @@ class SetItem extends Model
                     ->select('set_item.*', 'warehouse_items.warehouse_id', 'warehouse_items.quantity as single_quantity');
         return $query;
     }
-
-    // public function toArray(){
-    // 	$data = parent::toArray();
-    // 	if($this->sku){
-    // 		$data['item_details'] = $this->sku;
-    // 	}
-    // 	return $data;
-    // }
 }
