@@ -128,12 +128,12 @@ class ShopController extends Controller
         $warehouses = Warehouse::where('business_id', Auth::user()->business_id)->get();
         $plan = Auth::user()->business->subscription();
         if (!isset($plan)) {
-            $plan = Plan::whereId(1);
+            $plan = Plan::find(1);
         }
         else {
             $plan = $plan->plan;
         }
-        $allowed_shops = $plan->value('sales_channels');
+        $allowed_shops = $plan->sales_channels;
         // die(var_dump(request()->session()));
         return view('shop.create', [
           'breadcrumbs' => $breadcrumbs,
