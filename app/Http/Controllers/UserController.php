@@ -125,7 +125,7 @@ class UserController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('UserController@index'), 'name'=>"Users List"], ['name'=>"Add User"]
         ];
 
-        $shops = $request->user()->business->shops->chunk(3);
+        $shops = $request->user()->business->shops->where('active', '!=', 0)->chunk(3);
 
         $warehouses = $request->user()->business->warehouse->where('status', 1)->chunk(3);
         return view('user.create', compact('breadcrumbs', 'shops', 'warehouses'));
@@ -262,7 +262,7 @@ class UserController extends Controller
         }
         $this->authorize('edit', $user);
 
-        $shops = $request->user()->business->shops->chunk(3);
+        $shops = $request->user()->business->shops->where('active', '!=', 0)->chunk(3);
 
         $warehouses = $request->user()->business->warehouse->where('status', 1)->chunk(3);
 

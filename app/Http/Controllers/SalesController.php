@@ -229,13 +229,13 @@ class SalesController extends Controller
                 $sales_item['created_at'] = Carbon::now();
                 $sales_items[] = $sales_item;
             }
-            if($request->status == 'completed') {
-                Sku::syncStocks($request->warehouse_id ,$request->sales_item_array);   
-            }
             $sales_items_query = SaleItems::insert($sales_items);
-            foreach($sales->items as $item) {
-                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                $item->save();
+            if($request->status == 'completed') {
+                Sku::syncStocks($request->warehouse_id ,$request->sales_item_array);
+                foreach($sales->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             if (!$request->reference_no) {
                 $increment = OrderRef::where('settings_id', $genref->id)->update(['so' => DB::raw('so + 1')]);
@@ -401,20 +401,24 @@ class SalesController extends Controller
                 $sales_items[] = $sales_item;
 
             }
+            SaleItems::insert($sales_items);
             if($old_status != 'completed' && $request->status == 'completed') {
                 Sku::syncStocks($request->warehouse_id, $request->sales_item_array);
+                foreach($sales->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             else if($old_status == 'completed' && $request->status == 'completed') {
                 Sku::returnStocks($old_warehouse, $sales->items);
                 Sku::syncStocks($request->warehouse_id, $request->sales_item_array);
+                foreach($sales->items as $item) {
+                    $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
+                    $item->save();
+                }
             }
             else if($old_status == 'completed' && $request->status != 'completed') {
-                 Sku::returnStocks($old_warehouse, $sales->items);
-            }
-            SaleItems::insert($sales_items);
-            foreach($sales->items as $item) {
-                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                $item->save();
+                Sku::returnStocks($old_warehouse, $sales->items);
             }
             $output = ['success' => 1,
                 'msg' => 'Sale updated successfully!',
@@ -446,14 +450,11 @@ class SalesController extends Controller
         }
         if ($sales->status == 'completed') {
             Sku::returnStocks($sales->warehouse_id, $sales->items);
-            foreach($sales->items as $item) {
-                $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
-                $item->save();
-            }
         }
         try {
             DB::beginTransaction();
             $sales->payments()->delete();
+            $sales->items()->delete();
             $sales->delete();
             DB::commit();
             $output = ['success' => 1,

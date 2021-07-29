@@ -298,7 +298,7 @@
 
       });
       
-      $(document).on('change', $('input[name=stocks][value=stocks]'), function() {
+      $('#stocks').on('change', function() {
         table.ajax.reload();
       });
 

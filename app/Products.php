@@ -44,12 +44,17 @@ class Products extends Model
     }
 
     public function getWarehouseQuantity() {
-        $warehouse = $this->sku->warehouse_items()->where('warehouse_id', $this->shop->warehouse_id)->first();
-        if ($warehouse) {
-            return $warehouse->quantity;
+        if ($this->sku->type == 'single') {
+            $warehouse = $this->sku->warehouse_items()->where('warehouse_id', $this->shop->warehouse_id)->first();
+            if ($warehouse) {
+                return $warehouse->quantity;
+            }
+            else {
+                return 0;
+            }
         }
-        else {
-            return 0;
+        else if ($this->sku->type == 'set') {
+            return $this->sku->computeSetWarehouseQuantity($this->shop->warehouse_id);
         }
     }
     

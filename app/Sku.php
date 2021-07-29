@@ -88,6 +88,21 @@ class Sku extends Model
                 $warehouse_item->save();
                 $sku->save();
                 $sku->updateProductsandPlatforms();
+
+                $set_of_item = SetItem::where('sku_single_id', $item['sku_id'])->get();
+                if ($set_of_item) {
+                    foreach ($set_of_item as $set) {
+                        $sku = Sku::find($set->sku_set_id);
+                        $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($warehouse_id);
+                        $warehouse_item = $sku->warehouse_items()->updateOrCreate(
+                            ['warehouse_id' => $warehouse_id,
+                            'sku_id' => $sku->id],
+                            ['quantity' => $warehouse_set_quantity]
+                        );
+                        $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
+                        $sku->updateProductsandPlatforms();
+                    }
+                }
             }
         }
     }
@@ -110,6 +125,21 @@ class Sku extends Model
                 $warehouse_item->save();
                 $sku->save();
                 $sku->updateProductsandPlatforms();
+
+                $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
+                if ($set_of_item) {
+                    foreach ($set_of_item as $set) {
+                        $sku = Sku::find($set->sku_set_id);
+                        $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($warehouse_id);
+                        $warehouse_item = $sku->warehouse_items()->updateOrCreate(
+                            ['warehouse_id' => $warehouse_id,
+                            'sku_id' => $sku->id],
+                            ['quantity' => $warehouse_set_quantity]
+                        );
+                        $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
+                        $sku->updateProductsandPlatforms();
+                    }
+                } 
             }
         }
     }
@@ -152,18 +182,34 @@ class Sku extends Model
         return response()->stream($callback, 200, $headers);
     }
 
-    public function computeSetQuantity($warehouse_id) {
+    public function computeSetWarehouseQuantity($warehouse_id) {
         if ($this->type == 'set') {
+            $items_count = $this->set_items()->count();
             $set_items = SetItem::get_set_item_query()->where('sku_set_id', $this->id)->where('warehouse_id', $warehouse_id)->get();
 
-            $quantity_array = array();
-            foreach ($set_items as $item) {
-                $quantity_array[] = (int)($item->single_quantity / $item->set_quantity); //computation for available sku parent quantity based on sku child's quantity per set
+            if ($set_items->count() == $items_count) {
+                $quantity_array = array();
+                foreach ($set_items as $item) {
+                    $quantity_array[] = (int)($item->single_quantity / $item->set_quantity); //computation for available sku parent quantity based on sku child's quantity per set
+                }
+                
+                $set_quantity = min($quantity_array); //computation for available sku parent quantity based on sku child's quantity per set
             }
-
-            $set_quantity = min($quantity_array); //computation for available sku parent quantity based on sku child's quantity per set
-
+            else {
+                $set_quantity = 0;
+            }
+            
             return $set_quantity;
+        }
+    }
+
+    public function computeSetSkuQuantity() {
+        if ($this->type == 'set') {
+            $sku_quantity = 0;
+            foreach ($this->warehouse_items as $item) {
+                $sku_quantity += $item->quantity;
+            }
+            return $sku_quantity;
         }
     }
 }

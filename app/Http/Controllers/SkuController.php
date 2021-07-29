@@ -550,30 +550,14 @@ class SkuController extends Controller
         
         if($sku->save()){
             foreach ($sku->products as $product) {
-                if ($sku->type == 'single') {
-                    $data = [
-                        'seller_sku_id' => $sku->id,
-                        'price' => $sku->price,
-                        // 'SellerSku' => $sku->code,
-                        'quantity' => $sku->quantity
-                    ];
-    
-                    $result = $product->update($data);
-                    $product->update(['quantity' => $product->getWarehouseQuantity()]);
-                }
-                else if ($sku->type == 'set') {
-                    $sku_set_quantity = $sku->computeSetQuantity($product->shop->warehouse_id);
+                $data = [
+                    'seller_sku_id' => $sku->id,
+                    'price' => $sku->price,
+                    // 'SellerSku' => $sku->code,
+                    'quantity' => $product->getWarehouseQuantity()
+                ];
 
-                    $data = [
-                        'seller_sku_id' => $sku->id,
-                        'price' => $sku->price,
-                        // 'SellerSku' => $sku->code,
-                        // 'quantity' => $product->getWarehouseQuantity()
-                        'quantity' => $sku_set_quantity
-                    ];
-
-                    $result = $product->update($data);
-                }
+                $result = $product->update($data);
 
                 $response = $product->updatePlatform();
             }
@@ -723,30 +707,7 @@ class SkuController extends Controller
         ];  
 
         $result = $product->update($data);
-
-        if ($sku->type == 'single') {
-            $product->update(['quantity' => $product->getWarehouseQuantity()]);
-        }
-        else if ($sku->type == 'set') {
-            $sku_set_quantity = $sku->computeSetQuantity($product->shop->warehouse_id);
-            $product->update(['quantity' => $sku_set_quantity]);
-            
-            $data = [
-                'warehouse_id' => $product->shop->warehouse_id,
-                'sku_id' => $sku->id,
-                'quantity' => $sku_set_quantity
-            ];
-
-            $witem = WarehouseItems::updateOrCreate(['warehouse_id' => $product->shop->warehouse_id, 'sku_id' => $sku->id], $data);
-
-            $sku_total_quantity = 0;
-            foreach($sku->warehouse_items as $item) {
-                $sku_total_quantity += $item->quantity;
-            }
-
-            $sku->update(['quantity' => $sku_total_quantity]);
-        }
-
+        
         $response = $product->updatePlatform();
   
         print json_encode($result);
@@ -760,17 +721,6 @@ class SkuController extends Controller
         array_push($ids, $request->id);
         $update = Products::whereIn('id', $ids)->update(['seller_sku_id' => null]);
         if($update) {
-            // $sku_of_set = Sku::find($sku->id);
-            // if (!isset($sku_of_set->products)) {
-            //     $quantity_array = array();
-            //     foreach($sku_of_set->set_items as $item) {
-            //         $sku_of_setitem = Sku::find($item->sku_single_id);
-            //         $quantity_array[] = (int)($sku_of_setitem->quantity / $sku_of_set->quantity);
-            //     }
-            //     $quantity_of_set = min($quantity_array);
-            //     $sku_of_set->quantity = $quantity_of_set;
-            //     $sku_of_set->save();
-            // }
             $return = array('success' => true, 'msg' => "Product Unlink Successfully.");
         }
         print json_encode($return);

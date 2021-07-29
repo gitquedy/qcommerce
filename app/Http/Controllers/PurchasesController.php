@@ -450,6 +450,7 @@ class PurchasesController extends Controller
                 }
             }
             $purchases->payments()->delete();
+            $purchases->items()->delete();
             $purchases->delete();
             DB::commit();
             $output = ['success' => 1,

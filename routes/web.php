@@ -123,7 +123,6 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/product/headers', 'ProductController@headers')->name('product.headers');
 		Route::get('/product/unlink', 'ProductController@unlink')->name('product.unlink');
 		Route::get('/product/unlinkHeaders', 'ProductController@unlinkHeaders')->name('product.unlinkHeaders');
-		Route::get('/sku/headers', 'SkuController@headers')->name('sku.headers');
 	});
 	
 	Route::group(['middleware' => 'permission:sku.manage'], function()
