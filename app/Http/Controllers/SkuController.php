@@ -733,10 +733,55 @@ class SkuController extends Controller
     public function search($warehouse = 'none', $search, $customer_id = 'none', $withQTY = false)
     {
         if($warehouse != 'none') {
-            $sku = Sku::where(function($query) use ($search){
+            $sku = Sku::where('warehouse_id', $warehouse)->where(function($query) use ($search){
                 $query->where('name', 'LIKE', '%'. $search. '%');
                 $query->orWhere('code', 'LIKE', '%'. $search. '%');
             });
+            $sku->select('sku.*','warehouse_items.quantity');
+            if ($withQTY === true) {
+                $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                $sku->where('warehouse_items.warehouse_id', $warehouse);
+                $sku->where('warehouse_items.quantity', '>=', 1);
+            }
+            else {
+                $sku->leftjoin('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');
+                DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+                $sku->groupBy('sku.id');
+            }
+            $result = $sku->get();
+            foreach ($result as &$r) {
+                if($withQTY !== true) {
+                    $qty = $r->warehouse_items()->where('warehouse_id', $warehouse)->first();
+                    $r->quantity = ($qty)?$qty->quantity:0;
+                }
+
+                $r->image = $r->SkuImage();
+                if ($customer_id != 'none') {
+                    $customer = Customer::where('business_id', Auth::user()->business_id)->where('id', $customer_id)->first();
+                    $price_group_item = PriceGroupItemPrice::where('price_group_id', $customer->price_group)->where('sku_id', $r->id)->first();
+                    $r->price_group_item = $customer->price_group;
+                    if($price_group_item) {
+                        $r->price = $price_group_item->price;
+                        $r->customer = $customer;
+                    }
+                }
+            }
+        }
+        else {
+            $result = [];
+        }
+        return response()->json($result);
+            
+    }
+
+    public function search_single($warehouse = 'none', $search, $customer_id = 'none', $withQTY = false)
+    {
+        if($warehouse != 'none') {
+            $sku = Sku::where('type', 'single')->where('warehouse_id', $warehouse)
+                ->where(function($query) use ($search){
+                    $query->where('name', 'LIKE', '%'. $search. '%');
+                    $query->orWhere('code', 'LIKE', '%'. $search. '%');
+                });
             $sku->select('sku.*','warehouse_items.quantity');
             if ($withQTY === true) {
                 $sku->join('warehouse_items', 'warehouse_items.sku_id', '=', 'sku.id');

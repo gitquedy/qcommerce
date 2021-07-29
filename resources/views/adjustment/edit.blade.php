@@ -422,7 +422,7 @@
         // Set the Options for "Bloodhound" suggestion engine
         var engine = new Bloodhound({
             remote: {
-                url: '{{ route('sku.search') }}/%WAREHOUSE%/%QUERY%',
+                url: '{{ route('sku.search_single') }}/%WAREHOUSE%/%QUERY%',
                 replace: function(url, query) {
                     var wid = ($('#select_warehouse').val())?$('#select_warehouse').val():'none';
                     return url.replace('%WAREHOUSE%', wid).replace('%QUERY%', query);

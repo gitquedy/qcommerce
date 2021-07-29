@@ -58,6 +58,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::post('/user/update_profile/', 'UserController@updateProfile')->name('user.updateProfile');
 	// Route::get('/user/change_password/', 'UserController@changePassword')->name('user.changePassword');
 	Route::post('/user/update_password/', 'UserController@updatePassword')->name('user.updatePassword');
+	Route::get('/billing/index', 'BillingController@index')->name('billing.index');
 
 	
 
@@ -66,6 +67,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/lazop/receive', 'LazopController@receive')->name('lazop.receive');
 	Route::get('/shop/shopeeGetLogistics/{shop}', 'ShopController@shopeeGetLogistics');
 	Route::post('/barcode/view_barcode', 'BarcodeController@viewBarcode')->name('barcode.viewBarcode');
+	Route::post('/billing/view_invoice', 'BillingController@viewInvoice')->name('billing.viewInvoice');
 
 
 	//application
@@ -145,6 +147,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/sku/quickupdate/', 'SkuController@quickUpdate')->name('sku.quickUpdate');
 		Route::post('/sku/syncskuproducts/', 'SkuController@syncSkuProducts')->name('sku.syncSkuProducts');
 		Route::get('/sku/search/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search')->name('sku.search');
+		Route::get('/sku/search_single/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@search_single')->name('sku.search_single');
 		Route::get('/sku/searchPurchase/{warehouse?}/{search?}/{customer?}/{withQTY?}', 'SkuController@searchPurchase')->name('sku.searchPurchase');
 		Route::get('/sku/productmovement/{sku}', 'SkuController@productMovement')->name('sku.productmovement');
 	});
