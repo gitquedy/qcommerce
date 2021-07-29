@@ -733,7 +733,7 @@ class SkuController extends Controller
     public function search($warehouse = 'none', $search, $customer_id = 'none', $withQTY = false)
     {
         if($warehouse != 'none') {
-            $sku = Sku::where('warehouse_id', $warehouse)->where(function($query) use ($search){
+            $sku = Sku::where(function($query) use ($search){
                 $query->where('name', 'LIKE', '%'. $search. '%');
                 $query->orWhere('code', 'LIKE', '%'. $search. '%');
             });
@@ -777,8 +777,7 @@ class SkuController extends Controller
     public function search_single($warehouse = 'none', $search, $customer_id = 'none', $withQTY = false)
     {
         if($warehouse != 'none') {
-            $sku = Sku::where('type', 'single')->where('warehouse_id', $warehouse)
-                ->where(function($query) use ($search){
+            $sku = Sku::where('type', 'single')->where(function($query) use ($search){
                     $query->where('name', 'LIKE', '%'. $search. '%');
                     $query->orWhere('code', 'LIKE', '%'. $search. '%');
                 });
