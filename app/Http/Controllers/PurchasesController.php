@@ -404,8 +404,9 @@ class PurchasesController extends Controller
             }
             $sales_items_query = PurchaseItems::insert($purchase_items);
             if($request->status == 'received' && $old_status != 'received') {
-                Sku::returnStocks($request->warehouse_id , $purchase->items);   
-                foreach($purchase->items as $item) {
+                Sku::returnStocks($request->warehouse_id , $purchase->items);
+                $pur = Purchases::find($purchase->id);   
+                foreach($pur->items as $item) {
                     $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
                     $item->save();
                 }

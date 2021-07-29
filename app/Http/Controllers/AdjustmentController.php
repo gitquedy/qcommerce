@@ -259,9 +259,11 @@ class AdjustmentController extends Controller
             $adjustment_items_query = AdjustmentItems::insert($adjustment_items);
             Adjustment::applyItemsOnWarehouse($adjustment->id);
             Sku::reSyncStocks($adjustment->items()->pluck('sku_id'));
-            foreach($adjustment->items as $item) {
+            $adj = Adjustment::find($adjustment->id);
+            foreach($adj->items as $item) {
                 $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
                 $item->save();
+                error_log($item->new_quantity);
             }
 
             if (!$request->reference_no) {
