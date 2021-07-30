@@ -59,6 +59,8 @@ Route::group(['middleware' => 'auth'], function()
 	// Route::get('/user/change_password/', 'UserController@changePassword')->name('user.changePassword');
 	Route::post('/user/update_password/', 'UserController@updatePassword')->name('user.updatePassword');
 	Route::get('/billing/index', 'BillingController@index')->name('billing.index');
+	Route::post('/user/update_company/', 'UserController@updateCompany')->name('user.updateCompany');
+	Route::post('/user/create_company/', 'UserController@createCompany')->name('user.createCompany');
 
 	
 

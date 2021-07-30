@@ -19,6 +19,7 @@ use App\ShopPermission;
 use App\WarehousePermission;
 use App\Warehouse;
 use App\Billing;
+use App\Company;
 
 class UserController extends Controller
 {
@@ -111,6 +112,71 @@ class UserController extends Controller
                         'msg' => 'User updated successfully',
                   ];
         return response()->json($output);
+    }
+    
+    public function updateCompany(Request $request) {
+      $user = $request->user();
+      $request->validate([
+            'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'required',
+            'address' => 'required',
+            'vat_tin_no' => 'required',
+            'phone' => '',
+          ]);
+
+        $company = $user->business->company;
+        $company->name = $request->name;
+        $company->address = $request->address;
+        $company->vat_tin_no = $request->vat_tin_no;
+        $company->phone_no = $request->phone_no;
+
+        if ($request->hasFile('logo')) {
+          if(file_exists(public_path('images/profile/company-logo/'.$company->logo))){
+            unlink(public_path('images/profile/company-logo/'.$company->logo));
+          }
+
+          $logoName = 'business_'.$company->business_id.'.'.request()->logo->getClientOriginalExtension();
+          $request->logo->move(public_path('images/profile/company-logo'), $logoName);
+          $company->logo = $logoName;
+        }
+
+        $company->save();
+        $output = ['success' => 1,
+                        'msg' => 'Company details updated successfully',
+                        'redirect' => action('UserController@settings')
+                  ];
+        return redirect()->action('UserController@settings')->with('status', $output['msg']);
+    }
+
+    public function createCompany(Request $request) {
+      $user = $request->user();
+      $request->validate([
+            'logo' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'required',
+            'address' => 'required',
+            'vat_tin_no' => 'required',
+            'phone' => '',
+          ]);
+
+        $company = new Company;
+        $company->business_id = $user->business_id;
+        $company->name = $request->name;
+        $company->address = $request->address;
+        $company->vat_tin_no = $request->vat_tin_no;
+        $company->phone_no = $request->phone_no;
+
+        if ($request->hasFile('logo')) {
+          $logoName = 'business_'.$company->business_id.'.'.request()->logo->getClientOriginalExtension();
+          $request->logo->move(public_path('images/profile/company-logo'), $logoName);
+          $company->logo = $logoName;
+        }
+
+        $company->save();
+        $output = ['success' => 1,
+                        'msg' => 'Company details saved successfully',
+                        'redirect' => action('UserController@settings')
+                  ];
+        return redirect()->action('UserController@settings')->with('status', $output['msg']);
     }
 
     /**
