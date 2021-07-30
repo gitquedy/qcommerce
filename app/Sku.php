@@ -241,8 +241,6 @@ class Sku extends Model
                 $set_quantity = 0;
             }
 
-            $this->warehouse_items()->where('warehouse_id', $warehouse_id)->update(['quantity' => $set_quantity]);
-
             return $set_quantity;
         }
     }
