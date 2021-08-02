@@ -654,7 +654,7 @@
                },
               error: function(jqXhr, json, errorThrown){
                 Swal.close();
-                toastr.error('error');
+                toastr.error(json+': 'errorThrown);
                 console.log(jqXhr);
                 console.log(json);
                 console.log(errorThrown);
