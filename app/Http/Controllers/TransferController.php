@@ -124,8 +124,8 @@ class TransferController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $user = Auth::user();
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
             $transfer = new Transfer;
@@ -242,8 +242,8 @@ class TransferController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             if(in_array($transfer->status, ['completed', 'sent'])) {
                 Transfer::addItemsOnWarehouse($transfer->id, true);
                 if(in_array($transfer->status, ['completed'])) {
@@ -336,8 +336,8 @@ class TransferController extends Controller
         if($transfer->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this transfer');
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             foreach ($transfer->items as $item) {
                 $warehouse_qty = (isset($item->to_warehouse_item->quantity))?$item->to_warehouse_item->quantity:0;
                 if ($item->quantity > $warehouse_qty) {
