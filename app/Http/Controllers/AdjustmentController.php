@@ -107,8 +107,8 @@ class AdjustmentController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $user = Auth::user();
             $warehouse = Warehouse::where('business_id', $user->business_id)->where('id', $request->warehouse_id)->first();
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
@@ -214,8 +214,8 @@ class AdjustmentController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             foreach ($adjustment->items as $item) {
                 $warehouse_qty = (isset($item->warehouse_item->quantity))?$item->warehouse_item->quantity:0;
                 if ($item->type == "addition" && $item->quantity > $warehouse_qty) {
@@ -296,8 +296,8 @@ class AdjustmentController extends Controller
         if($adjustment->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to edit this adjustment');
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             foreach ($adjustment->items as $item) {
                 $warehouse_qty = (isset($item->warehouse_item->quantity))?$item->warehouse_item->quantity:0;
                 if ($item->type == "addition" && $item->quantity > $warehouse_qty) {
