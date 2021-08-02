@@ -3,6 +3,11 @@
 
 @section('title', 'Edit Sale')
 
+@section('vendor-style')
+        {{-- vendor files --}}
+        <link rel="stylesheet" href="{{ asset(mix('vendors/css/extensions/sweetalert2.min.css')) }}">
+@endsection
+
 @section('mystyle')
 <style>
     .product_image{
@@ -249,6 +254,11 @@
   </div>
 </section>
 <!-- // Basic Floating Label Form section end -->
+@endsection
+@section('vendor-script')
+{{-- vednor js files --}}
+<!-- vendor files -->
+  <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
 @endsection
 @section('myscript')
 <script type="text/javascript">
@@ -676,7 +686,18 @@
             data: new FormData(this),
             processData: false,
             contentType: false,
+            beforeSend:  function() {
+              Swal.fire({
+                title: 'Please Wait !',
+                html: 'Updating Sales',
+                allowOutsideClick: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                },
+              });
+            },
             success: function(result){  
+              Swal.close();
               console.log(result);
               if(result.success == true){
                 toastr.success(result.msg);
@@ -707,6 +728,8 @@
               $('.btn_save').prop('disabled', false);
                },
               error: function(jqXhr, json, errorThrown){
+                Swal.close();
+                toastr.error(json+': '+errorThrown);
                 console.log(jqXhr);
                 console.log(json);
                 console.log(errorThrown);

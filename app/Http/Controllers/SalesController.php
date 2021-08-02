@@ -174,8 +174,8 @@ class SalesController extends Controller
         elseif ($request->payment_type == 'deposit' && $request->paid > $customer->available_deposit()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => ['paid' => ['Insufficient Deposit balance']]]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $user = Auth::user();
             $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
             $genref = Settings::where('business_id', Auth::user()->business_id)->first();
@@ -342,8 +342,8 @@ class SalesController extends Controller
         if ($validator->fails()) {
             return response()->json(['msg' => 'Please check for errors' ,'error' => $validator->errors()]);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $user = Auth::user();
             // $customer = Customer::where('business_id', $user->business_id)->where('id', $request->customer_id)->first();
             $total = 0;
@@ -451,8 +451,8 @@ class SalesController extends Controller
         if ($sales->status == 'completed') {
             Sku::returnStocks($sales->warehouse_id, $sales->items);
         }
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $sales->payments()->delete();
             $sales->items()->delete();
             $sales->delete();

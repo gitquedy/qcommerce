@@ -536,7 +536,7 @@
             beforeSend:  function() {
               Swal.fire({
                 title: 'Please Wait !',
-                html: 'Transfering Items',
+                html: 'Adjusting Items',
                 allowOutsideClick: false,
                 onBeforeOpen: () => {
                     Swal.showLoading()
