@@ -536,7 +536,7 @@
             beforeSend:  function() {
               Swal.fire({
                 title: 'Please Wait !',
-                html: 'Transfering Items',// add html attribute if you want or remove
+                html: 'Transfering Items',
                 allowOutsideClick: false,
                 onBeforeOpen: () => {
                     Swal.showLoading()
@@ -576,7 +576,7 @@
                },
               error: function(jqXhr, json, errorThrown){
                 Swal.close();
-                toastr.error(json+': 'errorThrown);
+                toastr.error(json+': '+errorThrown);
                 console.log(jqXhr);
                 console.log(json);
                 console.log(errorThrown);
