@@ -178,6 +178,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/transfer', 'TransferController');
 		Route::post('/transfer/viewTransferModal/{transfer}', 'TransferController@viewTransferModal')->name('transfer.viewTransferModal');
 		Route::get('/transfer/delete/{transfer}', 'TransferController@delete');
+		Route::get('/transfer/printDeliveryReceipt/{id}', 'TransferController@printDeliveryReceipt')->name('transfer.printDeliveryReceipt');
 
 	});
 

@@ -16,6 +16,7 @@ use App\OrderRef;
 use App\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class TransferController extends Controller
 {
@@ -75,7 +76,9 @@ class TransferController extends Controller
 
                     $delete = '<a class="dropdown-item modal_button" href="#" data-href="'. action('TransferController@delete', $transfer->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
 
-                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$edit.$delete.'</div></div>';
+                    $print = '<a class="dropdown-item" href="'. action('TransferController@printDeliveryReceipt', $transfer->id) .'"><i class="fa fa-print aria-hidden="true""></i> Print Delivery Receipt</a>';
+
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$edit.$delete.$print.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action', 'status'])
@@ -380,5 +383,18 @@ class TransferController extends Controller
     public function viewTransferModal(Transfer $transfer, Request $request) {
         $business_id = Auth::user()->business_id;
         return view('transfer.modal.viewTransfer', compact('transfer'));
+    }
+
+    public function printDeliveryReceipt($transfer_id, Request $request) {
+        $transfer = Transfer::findOrFail($transfer_id);
+        $warehouse = $transfer->to_warehouse;
+        $company = $request->user()->business->company;
+        $owner = $request->user()->business->users()->where('role', 'Owner')->first()->fullName();
+        return PDF::loadview('transfer.deliveryreceipt', [
+            'transfer' => $transfer,
+            'warehouse' => $warehouse,
+            'company' => $company,
+            'owner' => $owner
+        ])->stream();
     }
 }
