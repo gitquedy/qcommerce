@@ -97,7 +97,7 @@
                 <td>{{$item->quantity}}</td>
                 <td>pc</td>
                 <td>{{$item->sku_name}}</td>
-                <td>{{(isset($pricegroup_items) && isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price)) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
+                <td>{{isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
                 <td>{{App\Sku::find($item->sku_id)->price}}</td>
             </tr>
             @endforeach

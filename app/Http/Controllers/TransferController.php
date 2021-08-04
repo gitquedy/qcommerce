@@ -401,7 +401,7 @@ class TransferController extends Controller
 
     public function printDeliveryReceipt($transfer_id, Request $request) {
         $transfer = Transfer::findOrFail($transfer_id);
-        $pricegroup_items = isset($transfer->price_group->items)?$transfer->price_group->items:null;
+        $pricegroup_items = $transfer->price_group->items;
         $warehouse = $transfer->to_warehouse;
         $company = $request->user()->business->company;
         return PDF::loadview('transfer.deliveryreceipt', [
