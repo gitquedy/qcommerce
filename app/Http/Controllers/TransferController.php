@@ -9,6 +9,7 @@ use App\Business;
 use App\Sku;
 use App\Shop;
 use App\Products;
+use App\PriceGroup;
 use App\Transfer;
 use App\TransferItems;
 use App\WarehouseItems;
@@ -101,7 +102,8 @@ class TransferController extends Controller
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Add Transfer"]
         ];
         $warehouses = $request->user()->business->warehouse->where('status', 1);
-        return view('transfer.create', compact('breadcrumbs','warehouses'));
+        $price_groups = PriceGroup::where('business_id', $request->user()->business_id)->get();
+        return view('transfer.create', compact('breadcrumbs','warehouses', 'price_groups'));
     }
     
     /**
@@ -119,6 +121,8 @@ class TransferController extends Controller
             'to_warehouse_id' => 'required|different:from_warehouse_id|exists:warehouses,id',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
+            'terms' => 'required',
+            'pricegroup' => 'required',
             'transfer_item_array' => 'required|array',
         ],
         [
@@ -137,8 +141,10 @@ class TransferController extends Controller
             $transfer->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_tr();
             $transfer->from_warehouse_id = $request->from_warehouse_id;
             $transfer->to_warehouse_id = $request->to_warehouse_id;
+            $transfer->pricegroup_id = $request->pricegroup;
             $transfer->status = $request->status;
             $transfer->note = $request->note;
+            $transfer->terms = $request->terms;
             $transfer->created_by = $user->id;
             $transfer->save();
             $transfer_items = [];
@@ -217,8 +223,12 @@ class TransferController extends Controller
         if($transfer->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this transfer');
         }
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer List"], ['name'=>"Edit Transfer"]
+        ];
         $warehouses = $request->user()->business->warehouse->where('status', 1);
-        return view('transfer.edit', compact('transfer', 'warehouses'));
+        $price_groups = PriceGroup::where('business_id', $request->user()->business_id)->get();
+        return view('transfer.edit', compact('breadcrumbs', 'transfer', 'warehouses', 'price_groups'));
     }
 
     /**
@@ -237,6 +247,8 @@ class TransferController extends Controller
             'to_warehouse_id' => 'required|different:from_warehouse_id|exists:warehouses,id',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
+            'terms' => 'required',
+            'pricegroup' => 'required',
             'transfer_item_array' => 'required|array',
         ],
         [
@@ -268,8 +280,10 @@ class TransferController extends Controller
             }
             $transfer->from_warehouse_id = $request->from_warehouse_id;
             $transfer->to_warehouse_id = $request->to_warehouse_id;
+            $transfer->pricegroup_id = $request->pricegroup;
             $transfer->status = $request->status;
             $transfer->note = $request->note;
+            $transfer->terms = $request->terms;
             $transfer->updated_by = $user->id;
             $transfer->save();
             $transfer_items = [];
@@ -387,14 +401,14 @@ class TransferController extends Controller
 
     public function printDeliveryReceipt($transfer_id, Request $request) {
         $transfer = Transfer::findOrFail($transfer_id);
+        $pricegroup_items = isset($transfer->price_group->items)?$transfer->price_group->items:null;
         $warehouse = $transfer->to_warehouse;
         $company = $request->user()->business->company;
-        $owner = $request->user()->business->users()->where('role', 'Owner')->first()->fullName();
         return PDF::loadview('transfer.deliveryreceipt', [
             'transfer' => $transfer,
+            'pricegroup_items' => $pricegroup_items,
             'warehouse' => $warehouse,
-            'company' => $company,
-            'owner' => $owner
+            'company' => $company
         ])->stream();
     }
 }

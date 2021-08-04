@@ -9,7 +9,7 @@ use App\SetItem;
 class Transfer extends Model
 {
      protected $fillable = [
-        'business_id', 'date', 'reference_no', 'from_warehouse_id', 'to_warehouse_id', 'status', 'note', 'created_by', 'updated_by'
+        'business_id', 'date', 'reference_no', 'from_warehouse_id', 'to_warehouse_id', 'pricegroup_id', 'status', 'note', 'terms', 'created_by', 'updated_by'
     ];
 
     public function items(){
@@ -22,6 +22,10 @@ class Transfer extends Model
 
     public function to_warehouse() {
         return $this->hasOne(Warehouse::class, 'id', 'to_warehouse_id');
+    }
+
+    public function price_group() {
+        return $this->hasOne(PriceGroup::class, 'id', 'pricegroup_id');
     }
 
     public function created_by_name(){

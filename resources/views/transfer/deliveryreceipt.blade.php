@@ -34,7 +34,11 @@
             table, th, td {
                 border: 1px solid black;
             }
-            .rep {
+            img {
+                vertical-align: middle;
+                padding-right: 10px;
+            }
+            .rep, .company {
                 display: inline-block;
                 vertical-align: middle;
             }
@@ -58,11 +62,13 @@
     </head>
     <body>
         <div>
-            <div>{{$company->name}}</div>
-            <div>{{$company->address}}</div>
-            <div>VAT Reg TIN: {{$company->vat_tin_no}}</div>
-            <div>{{$owner}}</div>
-            <div>Mobile # {{$company->phone_no}}</div>
+            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}" height="80px">
+            <div class="company">
+                <div>{{$company->name}}</div>
+                <div>{{$company->address}}</div>
+                <div>VAT Reg TIN: {{$company->vat_tin_no}}</div>
+                <div>Mobile # {{$company->phone_no}}</div>
+            </div>
         </div>
         <br><br>
         <div><strong>DELIVERY RECEIPT</strong></div>
@@ -76,7 +82,7 @@
             <div class="grid-item col-1">ADDRESS</div>
             <div class="grid-item col-2"><strong>{{$warehouse->address}}</strong></div>
             <div class="grid-item col-3">TERMS</div>
-            <div class="grid-item col-3"><strong>: Consignment</strong></div>
+            <div class="grid-item col-3"><strong>: {{ucfirst($transfer->terms)}}</strong></div>
         </div>
         <table>
             <tr>
@@ -91,7 +97,7 @@
                 <td>{{$item->quantity}}</td>
                 <td>pc</td>
                 <td>{{$item->sku_name}}</td>
-                <td>{{App\Sku::find($item->sku_id)->cost}}</td>
+                <td>{{(isset($pricegroup_items) && isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price)) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
                 <td>{{App\Sku::find($item->sku_id)->price}}</td>
             </tr>
             @endforeach

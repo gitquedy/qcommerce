@@ -101,7 +101,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="offset-md-4 col-md-4">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Terms</label>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="terms" id="terms" class="form-control select2 update_select" placeholder="Terms">
+                                        <option value="consignment">Consignment</option>
+                                        <option value="outright">Outright</option>
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-activity"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>From Warehouse</label>
                                     <div class="position-relative has-icon-left">
@@ -135,6 +149,21 @@
                                       </select>
                                       <div class="form-control-position"> 
                                         <i class="feather icon-box"></i>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Price Group</label>
+                                    <div class="position-relative has-icon-left">
+                                      <select name="pricegroup" id="pricegroup" class="form-control select2 update_select" placeholder="Price Group">
+                                        @foreach($price_groups as $pricegroup)
+                                        <option value="{{$pricegroup->id}}">{{ucfirst($pricegroup->name)}}</option>
+                                        @endforeach
+                                      </select>
+                                      <div class="form-control-position"> 
+                                        <i class="feather icon-activity"></i>
                                       </div>
                                     </div>
                                 </div>
