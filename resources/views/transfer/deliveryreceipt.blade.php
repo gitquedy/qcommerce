@@ -62,7 +62,7 @@
     </head>
     <body>
         <div>
-            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}" height="80px">
+            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}" height="100px">
             <div class="company">
                 <div>{{$company->name}}</div>
                 <div>{{$company->address}}</div>
