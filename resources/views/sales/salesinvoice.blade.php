@@ -89,7 +89,9 @@
                 <th>QTY</th>
                 <th>UNIT</th>
                 <th>PARTICULARS</th>
+                @if(isset($pricegroup_items))
                 <th>UNIT COST</th>
+                @endif
                 <th>SELLING PRICE</th>
             </tr>
             @foreach($sales->items as $item)
@@ -97,7 +99,9 @@
                 <td>{{$item->quantity}}</td>
                 <td>pc</td>
                 <td>{{$item->sku_name}}</td>
+                @if(isset($pricegroup_items))
                 <td>{{isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
+                @endif
                 <td>{{App\Sku::find($item->sku_id)->price}}</td>
             </tr>
             @endforeach

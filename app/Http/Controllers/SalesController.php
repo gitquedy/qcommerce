@@ -156,7 +156,7 @@ class SalesController extends Controller
             'note' => 'nullable|string|max:255',
             'paid' => 'nullable',
             'terms' => 'required',
-            'pricegroup' => 'required',
+            'pricegroup' => 'nullable',
             'sales_item_array' => 'required|array',
             'payment_reference_no' => 'nullable',
             'payment_type' => Rule::requiredIf($request->paid > 0),
@@ -347,7 +347,7 @@ class SalesController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'terms' => 'required',
-            'pricegroup' => 'required',
+            'pricegroup' => 'nullable',
             'sales_item_array' => 'required|array',
         ],
         [
@@ -504,7 +504,7 @@ class SalesController extends Controller
 
     public function printSalesInvoice($sales_id, Request $request) {
         $sales = Sales::findOrFail($sales_id);
-        $pricegroup_items = $sales->price_group->items;
+        $pricegroup_items = isset($sales->pricegroup_id)?$sales->price_group->items:null;
         $warehouse = $sales->warehouse;
         $company = $request->user()->business->company;
         return PDF::loadview('sales.salesinvoice', [

@@ -122,7 +122,7 @@ class TransferController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'terms' => 'required',
-            'pricegroup' => 'required',
+            'pricegroup' => 'nullable',
             'transfer_item_array' => 'required|array',
         ],
         [
@@ -248,7 +248,7 @@ class TransferController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'terms' => 'required',
-            'pricegroup' => 'required',
+            'pricegroup' => 'nullable',
             'transfer_item_array' => 'required|array',
         ],
         [
@@ -401,7 +401,7 @@ class TransferController extends Controller
 
     public function printDeliveryReceipt($transfer_id, Request $request) {
         $transfer = Transfer::findOrFail($transfer_id);
-        $pricegroup_items = $transfer->price_group->items;
+        $pricegroup_items = isset($transfer->pricegroup_id)?$transfer->price_group->items:null;
         $warehouse = $transfer->to_warehouse;
         $company = $request->user()->business->company;
         return PDF::loadview('transfer.deliveryreceipt', [

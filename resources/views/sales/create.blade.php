@@ -143,6 +143,7 @@
                                     <label>Price Group</label>
                                     <div class="position-relative has-icon-left">
                                       <select name="pricegroup" id="pricegroup" class="form-control select2 update_select" placeholder="Price Group">
+                                        <option value="">None</option>
                                         @foreach($price_groups as $pricegroup)
                                         <option value="{{$pricegroup->id}}">{{ucfirst($pricegroup->name)}}</option>
                                         @endforeach
