@@ -156,7 +156,6 @@ class SalesController extends Controller
             'note' => 'nullable|string|max:255',
             'paid' => 'nullable',
             'terms' => 'required',
-            'pricegroup' => 'nullable',
             'sales_item_array' => 'required|array',
             'payment_reference_no' => 'nullable',
             'payment_type' => Rule::requiredIf($request->paid > 0),
@@ -191,7 +190,6 @@ class SalesController extends Controller
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
             $sales->warehouse_id = $request->warehouse_id;
-            $sales->pricegroup_id = $request->pricegroup;
             $sales->customer_first_name = $customer->first_name;
             $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
@@ -347,7 +345,6 @@ class SalesController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'terms' => 'required',
-            'pricegroup' => 'nullable',
             'sales_item_array' => 'required|array',
         ],
         [
@@ -365,7 +362,6 @@ class SalesController extends Controller
             $sales->business_id = $user->business_id;
             // $sales->customer_id = $request->customer_id;
             $sales->warehouse_id = $request->warehouse_id;
-            $sales->pricegroup_id = $request->pricegroup;
             // $sales->customer_first_name = $customer->first_name;
             // $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
@@ -504,7 +500,8 @@ class SalesController extends Controller
 
     public function printSalesInvoice($sales_id, Request $request) {
         $sales = Sales::findOrFail($sales_id);
-        $pricegroup_items = isset($sales->pricegroup_id)?$sales->price_group->items:null;
+        $customer = $sales->customer;
+        $pricegroup_items = ($customer->price_group != 0)?$customer->price_group_data->items:null;
         $warehouse = $sales->warehouse;
         $company = $request->user()->business->company;
         return PDF::loadview('sales.salesinvoice', [
