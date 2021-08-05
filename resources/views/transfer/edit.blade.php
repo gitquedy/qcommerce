@@ -156,7 +156,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Status</label>
+                                    <label>Price Group</label>
                                     <div class="position-relative has-icon-left">
                                       <select name="pricegroup" id="pricegroup" class="form-control select2 update_select" placeholder="Price Group">
                                         @foreach($price_groups as $pricegroup)

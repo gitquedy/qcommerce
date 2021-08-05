@@ -10,6 +10,7 @@ use App\Sales;
 use App\SaleItems;
 use App\Products;
 use App\Payment;
+use App\PriceGroup;
 use App\Customer;
 use App\OrderRef;
 use App\Settings;
@@ -18,6 +19,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use PDF;
 
 class SalesController extends Controller
 {
@@ -108,7 +110,9 @@ class SalesController extends Controller
 
                     $delete = '<a class="dropdown-item modal_button " href="#" data-href="'. action('SalesController@delete', $sales->id).'" ><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>';
 
-                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_payments.$edit.$delete.'</div></div>';
+                    $print = '<a class="dropdown-item" href="'. action('SalesController@printSalesInvoice', $sales->id) .'"><i class="fa fa-print aria-hidden="true""></i> Print Sales Invoice</a>';
+
+                    $actions = '<div class="btn-group dropup mr-1 mb-1"><button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">Action<span class="sr-only">Toggle Dropdown</span></button><div class="dropdown-menu">'.$view.$add_payment.$view_payments.$edit.$delete.$print.'</div></div>';
                     return $actions;
              })
             ->rawColumns(['action','status','payment_status'])
@@ -132,7 +136,8 @@ class SalesController extends Controller
         ];
         $warehouses = $request->user()->business->warehouse->where('status', 1);
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
-        return view('sales.create', compact('breadcrumbs','customers','warehouses'));
+        $price_groups = PriceGroup::where('business_id', $request->user()->business_id)->get();
+        return view('sales.create', compact('breadcrumbs','customers','warehouses', 'price_groups'));
     }
 
     /**
@@ -150,6 +155,8 @@ class SalesController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'paid' => 'nullable',
+            'terms' => 'required',
+            'pricegroup' => 'required',
             'sales_item_array' => 'required|array',
             'payment_reference_no' => 'nullable',
             'payment_type' => Rule::requiredIf($request->paid > 0),
@@ -184,12 +191,14 @@ class SalesController extends Controller
             $sales->business_id = $user->business_id;
             $sales->customer_id = $request->customer_id;
             $sales->warehouse_id = $request->warehouse_id;
+            $sales->pricegroup_id = $request->pricegroup;
             $sales->customer_first_name = $customer->first_name;
             $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
             $sales->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_so();
             $sales->note = $request->note;
             $sales->status = $request->status;
+            $sales->terms = $request->terms;
             $sales->discount = ($request->discount)?$request->discount:0;
             $sales->paid = $request->paid;
             $sales->created_by = $user->id;
@@ -301,14 +310,18 @@ class SalesController extends Controller
     {
         $this->authorize('is_included_in_plan', 'add_sales');
 
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales List"], ['name'=>"Edit Sales"]
+        ];
         $sales = Sales::findOrFail($id);
         $warehouses = $request->user()->business->warehouse->where('status', 1);
         $customers = Customer::where('business_id', Auth::user()->business_id)->get();
+        $price_groups = PriceGroup::where('business_id', $request->user()->business_id)->get();
         if($sales->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this sales');
         }
         // print json_encode($sales->items);die();
-        return view('sales.edit', compact('sales', 'customers', 'warehouses'));
+        return view('sales.edit', compact('breadcrumbs', 'sales', 'customers', 'warehouses', 'price_groups'));
     }
 
     /**
@@ -333,6 +346,8 @@ class SalesController extends Controller
             // 'customer_id' => 'required',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
+            'terms' => 'required',
+            'pricegroup' => 'required',
             'sales_item_array' => 'required|array',
         ],
         [
@@ -350,6 +365,7 @@ class SalesController extends Controller
             $sales->business_id = $user->business_id;
             // $sales->customer_id = $request->customer_id;
             $sales->warehouse_id = $request->warehouse_id;
+            $sales->pricegroup_id = $request->pricegroup;
             // $sales->customer_first_name = $customer->first_name;
             // $sales->customer_last_name = $customer->last_name;
             $sales->date = date("Y-m-d H:i:s", strtotime($request->date));
@@ -358,6 +374,7 @@ class SalesController extends Controller
             }
             $sales->note = $request->note;
             $sales->status = $request->status;
+            $sales->terms = $request->terms;
             $sales->discount = ($request->discount)?$request->discount:0;
             $sales->updated_by = $user->id;
 
@@ -483,6 +500,19 @@ class SalesController extends Controller
         $business_id = Auth::user()->business_id;
         $payments = $sales->payments;
         return view('sales.modal.viewSales', compact('sales','payments'));
+    }
+
+    public function printSalesInvoice($sales_id, Request $request) {
+        $sales = Sales::findOrFail($sales_id);
+        $pricegroup_items = $sales->price_group->items;
+        $warehouse = $sales->warehouse;
+        $company = $request->user()->business->company;
+        return PDF::loadview('sales.salesinvoice', [
+            'sales' => $sales,
+            'pricegroup_items' => $pricegroup_items,
+            'warehouse' => $warehouse,
+            'company' => $company
+        ])->stream();
     }
 }
 

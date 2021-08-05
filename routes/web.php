@@ -265,6 +265,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::resource('/sales', 'SalesController');
 		Route::get('/sales/delete/{sales}', 'SalesController@delete');
 		Route::post('/sales/viewSalesModal/{sales}', 'SalesController@viewSalesModal')->name('sales.viewSalesModal');
+		Route::get('/sales/printSalesInvoice/{id}', 'SalesController@printSalesInvoice')->name('sales.printSalesInvoice');
 	});
 
 	Route::group(['middleware' => 'permission:purchase.manage'], function()
