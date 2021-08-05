@@ -125,20 +125,6 @@
                                     </div>
                                 </div> -->
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Terms</label>
-                                    <div class="position-relative has-icon-left">
-                                      <select name="terms" id="terms" class="form-control select2 update_select" placeholder="Terms">
-                                        <option value="consignment" @if($sales->terms == 'consignment') selected @endif>Consignment</option>
-                                        <option value="outright" @if($sales->terms == 'outright') selected @endif>Outright</option>
-                                      </select>
-                                      <div class="form-control-position"> 
-                                        <i class="feather icon-activity"></i>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
                           </div>
                           <br>
                           <br>

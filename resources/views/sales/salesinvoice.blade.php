@@ -81,8 +81,8 @@
         <div class="container">
             <div class="grid-item col-1">ADDRESS</div>
             <div class="grid-item col-2"><strong>{{$warehouse->address}}</strong></div>
-            <div class="grid-item col-3">TERMS</div>
-            <div class="grid-item col-3"><strong>: {{ucfirst($sales->terms)}}</strong></div>
+            <!-- <div class="grid-item col-3">TERMS</div>
+            <div class="grid-item col-3"><strong>: {{ucfirst($sales->terms)}}</strong></div> -->
         </div>
         <table>
             <tr>

@@ -13,7 +13,7 @@ class Sales extends Model
     protected $table = 'sales';
 
 	protected $fillable = [
-        'business_id', 'customer_id', 'warehouse_id', 'pricegroup_id', 'customer_first_name', 'customer_last_name', 'date', 'reference_no', 'note', 'status', 'total', 'discount', 'grand_total', 'paid', 'payment_status', 'terms', 'created_by', 'updated_by'
+        'business_id', 'customer_id', 'warehouse_id', 'customer_first_name', 'customer_last_name', 'date', 'reference_no', 'note', 'status', 'total', 'discount', 'grand_total', 'paid', 'payment_status', 'created_by', 'updated_by'
     ];
 
     public function customer(){
@@ -44,10 +44,6 @@ class Sales extends Model
 
     public function warehouse() {
         return $this->hasOne(Warehouse::class, 'id', 'warehouse_id');
-    }
-
-    public function price_group() {
-        return $this->hasOne(PriceGroup::class, 'id', 'pricegroup_id');
     }
 
 	public function items(){

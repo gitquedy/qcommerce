@@ -155,7 +155,6 @@ class SalesController extends Controller
             'status' => 'required',
             'note' => 'nullable|string|max:255',
             'paid' => 'nullable',
-            'terms' => 'required',
             'sales_item_array' => 'required|array',
             'payment_reference_no' => 'nullable',
             'payment_type' => Rule::requiredIf($request->paid > 0),
@@ -196,7 +195,6 @@ class SalesController extends Controller
             $sales->reference_no = ($request->reference_no)?$request->reference_no:$genref->getReference_so();
             $sales->note = $request->note;
             $sales->status = $request->status;
-            $sales->terms = $request->terms;
             $sales->discount = ($request->discount)?$request->discount:0;
             $sales->paid = $request->paid;
             $sales->created_by = $user->id;
@@ -344,7 +342,6 @@ class SalesController extends Controller
             // 'customer_id' => 'required',
             'status' => 'required',
             'note' => 'nullable|string|max:255',
-            'terms' => 'required',
             'sales_item_array' => 'required|array',
         ],
         [
@@ -370,7 +367,6 @@ class SalesController extends Controller
             }
             $sales->note = $request->note;
             $sales->status = $request->status;
-            $sales->terms = $request->terms;
             $sales->discount = ($request->discount)?$request->discount:0;
             $sales->updated_by = $user->id;
 
