@@ -3,7 +3,6 @@
         <title>{{$sales->reference_no}}</title>
         <style type="text/css" rel="stylesheet">
             * {
-                /* border: 1px solid black; */
                 font-size: 15px;
             }
             .container {
@@ -34,9 +33,14 @@
             table, th, td {
                 border: 1px solid black;
             }
+            .blank_row {
+                height: 15px;
+            }
             img {
                 vertical-align: middle;
-                padding-right: 10px;
+                margin-right: 10px;
+                max-height: 150px;
+                max-width: 150px;
             }
             .rep, .company {
                 display: inline-block;
@@ -54,15 +58,12 @@
             }
             .footer {
                 margin-top: 10px;
-                /* position: fixed;
-                bottom: 0;
-                width: 100%; */
             }
         </style>
     </head>
     <body>
         <div>
-            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}" height="100px">
+            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}">
             <div class="company">
                 <div>{{$company->name}}</div>
                 <div>{{$company->address}}</div>
@@ -81,8 +82,6 @@
         <div class="container">
             <div class="grid-item col-1">ADDRESS</div>
             <div class="grid-item col-2"><strong>{{$warehouse->address}}</strong></div>
-            <!-- <div class="grid-item col-3">TERMS</div>
-            <div class="grid-item col-3"><strong>: {{ucfirst($sales->terms)}}</strong></div> -->
         </div>
         <table>
             <tr>
@@ -92,7 +91,7 @@
                 @if(isset($pricegroup_items))
                 <th>UNIT COST</th>
                 @endif
-                <th>SELLING PRICE</th>
+                <th>AMOUNT</th>
             </tr>
             @foreach($sales->items as $item)
             <tr>
@@ -100,11 +99,40 @@
                 <td>pc</td>
                 <td>{{$item->sku_name}}</td>
                 @if(isset($pricegroup_items))
-                <td>{{isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
+                <td>{{$unit_cost = isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
+                <td>{{$item->quantity*$unit_cost}}</td>
+                @else
+                <td>{{App\Sku::find($item->sku_id)->price * $item->quantity}}</td>
                 @endif
-                <td>{{App\Sku::find($item->sku_id)->price}}</td>
             </tr>
             @endforeach
+            <tr>
+                <td class="blank_row"></td>
+                <td></td>
+                <td></td>
+                @if(isset($pricegroup_items))
+                <td></td>
+                @endif
+                <td></td>
+            </tr>
+            <tr>
+                <td class="blank_row"></td>
+                <td></td>
+                <td></td>
+                @if(isset($pricegroup_items))
+                <td></td>
+                @endif
+                <td></td>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th>TOTAL AMOUNT DUE: </th>
+                @if(isset($pricegroup_items))
+                <th></th>
+                @endif
+                <th>{{$total_amount}}</th>
+            </tr>
         </table>
         <br><br>
         <div class="footer">

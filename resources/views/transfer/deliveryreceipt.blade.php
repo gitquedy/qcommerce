@@ -3,7 +3,6 @@
         <title>{{$transfer->reference_no}}</title>
         <style type="text/css" rel="stylesheet">
             * {
-                /* border: 1px solid black; */
                 font-size: 15px;
             }
             .container {
@@ -36,7 +35,9 @@
             }
             img {
                 vertical-align: middle;
-                padding-right: 10px;
+                margin-right: 10px;
+                max-height: 150px;
+                max-width: 150px;
             }
             .rep, .company {
                 display: inline-block;
@@ -54,15 +55,12 @@
             }
             .footer {
                 margin-top: 10px;
-                /* position: fixed;
-                bottom: 0;
-                width: 100%; */
             }
         </style>
     </head>
     <body>
         <div>
-            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}" height="100px">
+            <img src="{{public_path('images/profile/company-logo/'.$company->logo)}}">
             <div class="company">
                 <div>{{$company->name}}</div>
                 <div>{{$company->address}}</div>

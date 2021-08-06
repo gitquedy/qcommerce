@@ -500,11 +500,24 @@ class SalesController extends Controller
         $pricegroup_items = ($customer->price_group != 0)?$customer->price_group_data->items:null;
         $warehouse = $sales->warehouse;
         $company = $request->user()->business->company;
+        $total_amount = 0;
+        if (isset($pricegroup_items)) { 
+            foreach($sales->items as $item) {
+                $unit_cost = isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0;
+                $total_amount += $item->quantity * $unit_cost;
+            }
+        }
+        else {
+            foreach($sales->items as $item) {
+                $total_amount += $item->quantity * Sku::find($item->sku_id)->price;
+            }
+        }
         return PDF::loadview('sales.salesinvoice', [
             'sales' => $sales,
             'pricegroup_items' => $pricegroup_items,
             'warehouse' => $warehouse,
-            'company' => $company
+            'company' => $company,
+            'total_amount' => $total_amount
         ])->stream();
     }
 }
