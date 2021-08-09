@@ -88,9 +88,7 @@
                 <th>QTY</th>
                 <th>UNIT</th>
                 <th>PARTICULARS</th>
-                @if(isset($pricegroup_items))
                 <th>UNIT COST</th>
-                @endif
                 <th>AMOUNT</th>
             </tr>
             @foreach($sales->items as $item)
@@ -98,40 +96,30 @@
                 <td>{{$item->quantity}}</td>
                 <td>pc</td>
                 <td>{{$item->sku_name}}</td>
-                @if(isset($pricegroup_items))
-                <td>{{$unit_cost = isset($pricegroup_items->where('sku_id', $item->sku_id)->first()->price) ? $pricegroup_items->where('sku_id', $item->sku_id)->first()->price : 0}}</td>
-                <td>{{$item->quantity*$unit_cost}}</td>
-                @else
-                <td>{{App\Sku::find($item->sku_id)->price * $item->quantity}}</td>
-                @endif
+                <td>{{$item->unit_price}}</td>
+                <td>{{$item->subtotal}}</td>
             </tr>
             @endforeach
             <tr>
                 <td class="blank_row"></td>
                 <td></td>
                 <td></td>
-                @if(isset($pricegroup_items))
                 <td></td>
-                @endif
                 <td></td>
             </tr>
             <tr>
                 <td class="blank_row"></td>
                 <td></td>
                 <td></td>
-                @if(isset($pricegroup_items))
                 <td></td>
-                @endif
                 <td></td>
             </tr>
             <tr>
                 <th></th>
                 <th></th>
                 <th>TOTAL AMOUNT DUE: </th>
-                @if(isset($pricegroup_items))
                 <th></th>
-                @endif
-                <th>{{$total_amount}}</th>
+                <th>{{$sales->total}}</th>
             </tr>
         </table>
         <br><br>
