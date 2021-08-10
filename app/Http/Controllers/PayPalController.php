@@ -22,10 +22,18 @@ class PayPalController extends Controller
     public function payment(Plan $plan, Request $request)
     {
         try {
-            $invoice_no = Billing::getNextInvoiceNumber();
-	        $data = [];
-            $billing_period = $request->billing;
-            $promocode_id = isset($request->promocode)?$request->promocode:null;
+            if ($request->has('billing_id')) {
+                $billing = Billing::find($request->billing_id);
+                $invoice_no = $billing->invoice_no;
+                $billing_period = $billing->billing_period;
+                $promocode_id = isset($billing->promocode)?$billing->promocode:null;
+                
+            } else {
+                $invoice_no = Billing::getNextInvoiceNumber();
+                $billing_period = $request->billing;
+                $promocode_id = isset($request->promocode)?$request->promocode:null;
+            }
+            $data = [];
             $total_discount = 0;
             if($billing_period == 'Month') {
                 if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost) {
@@ -74,19 +82,21 @@ class PayPalController extends Controller
 	            ]
 	        ];
 
-	        $billing = Billing::create([
-	        	'business_id' => $request->user()->business_id,
-	        	'plan_id' => $plan->id,
-                'billing_period' => $billing_period,
-                'promocode' => $promocode_id,
-                'amount' => $billing_price,
-	        	'invoice_no' => $invoice_no
-	        ]);
+            if (!$request->has('billing_id')) {
+                $billing = Billing::create([
+                    'business_id' => $request->user()->business_id,
+                    'plan_id' => $plan->id,
+                    'billing_period' => $billing_period,
+                    'promocode' => $promocode_id,
+                    'amount' => $billing_price,
+                    'invoice_no' => $invoice_no
+                ]);
+            }
 
 	        $data['invoice_id'] = $invoice_no;
 	        $data['invoice_description'] = $desc;
 	        $data['return_url'] = action('PlanController@confirm', $billing->id);
-	        $data['cancel_url'] = action('PayPalController@cancel', $billing->id);
+	        $data['cancel_url'] = (!$request->has('billing_id')) ? action('PayPalController@cancel', $billing->id) : action('BillingController@index');
 	        $data['total'] = $paypal_price;
 	  
 	        $provider = new ExpressCheckout;

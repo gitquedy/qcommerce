@@ -17,6 +17,7 @@
      <div class="card user-form">
         <div class="card-header">
           <h4 class="card-title">Billing</h4>
+          <a type="button" class="btn btn-primary" href="{{route('billing.index')}}">Pay Invoices</a>
         </div>
         <div class="card-body">
           <div role="tabpanel" aria-labelledby="headingCollapse1" class="collapse show mt-2">

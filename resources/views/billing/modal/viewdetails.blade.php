@@ -1,5 +1,5 @@
 <div class="modal-dialog modal-md" role="document">
-    <form id="pay_invoice" method="POST" class="form" enctype='multipart/form-data'>
+    <form id="pay_invoice" action="{{ action('PayPalController@payment', $billing->plan_id) }}" method="POST" class="form" enctype='multipart/form-data'>
         @method('POST')
         @csrf
         <div class="modal-content">
@@ -13,8 +13,8 @@
                 <div class="text-bold-600 font-medium-2">Amount: {{ $billing->amount }}</div>
                 <div class="text-bold-600 font-medium-2">Date Coverage: {{ $billing->payment_date }} - {{ $billing->next_payment_date}}</div> -->
                 <div class="d-flex justify-content-between">
-                    <div class="">Invoice Date: Month dd, yyyy</div>
-                    <div class="">Invoice Due Date: Month dd, yyyy</div>
+                    <div class="">Invoice Date: {{isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->subDays(7)->toFormattedDateString():'Month dd, yyyy'}}</div>
+                    <div class="">Invoice Due Date: {{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'Month dd, yyyy' }}</div>
                 </div>
                 <br>
                 <table class="table">
@@ -26,7 +26,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{$billing->plan->name}} Subscription Plan ({{ $billing->payment_date }}mm/dd/yy - mm/dd/yy{{ $billing->next_payment_date}})</td>
+                            <td>{{$billing->plan->name}} Subscription Plan ({{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'mm/dd/yy' }} - {{ isset($billing->next_payment_date)?Carbon\Carbon::parse($billing->next_payment_date)->toFormattedDateString():'mm/dd/yy'}})</td>
                             <td>Php{{$billing->amount}}</td>
                         </tr>
                     </tbody>
@@ -40,3 +40,27 @@
         </div>
     </form>
 </div>
+
+<script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
+<script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
+<script type="text/javascript">
+  $('.btn_save').click(function(){
+   let timerInterval
+    Swal.fire({
+      title: 'Please Wait',
+      html: 'while we process your paypal link',
+      timer: 5000,
+      timerProgressBar: true,
+      showCancelButton: false,
+      showConfirmButton: false,
+      onClose: () => {
+        clearInterval(timerInterval)
+      }
+    }).then((result) => {
+      /* Read more about handling dismissals below */
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log('I was closed by the timer')
+      }
+    })
+  });
+</script>
