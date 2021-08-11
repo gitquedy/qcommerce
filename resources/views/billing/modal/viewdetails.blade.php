@@ -13,7 +13,7 @@
                 <div class="text-bold-600 font-medium-2">Amount: {{ $billing->amount }}</div>
                 <div class="text-bold-600 font-medium-2">Date Coverage: {{ $billing->payment_date }} - {{ $billing->next_payment_date}}</div> -->
                 <div class="d-flex justify-content-between">
-                    <div class="">Invoice Date: {{isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->subDays(7)->toFormattedDateString():'Month dd, yyyy'}}</div>
+                    <div class="">Invoice Date: {{isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->subDays(1)->toFormattedDateString():'Month dd, yyyy'}}</div>
                     <div class="">Invoice Due Date: {{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'Month dd, yyyy' }}</div>
                 </div>
                 <br>
@@ -26,7 +26,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{$billing->plan->name}} Subscription Plan ({{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'mm/dd/yy' }} - {{ isset($billing->next_payment_date)?Carbon\Carbon::parse($billing->next_payment_date)->toFormattedDateString():'mm/dd/yy'}})</td>
+                            <td>{{$billing->plan->name}} Subscription Plan ({{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'mm/dd/yy' }} - {{ isset($billing->next_payment_date)?Carbon\Carbon::parse($billing->next_payment_date)->subDays(1)->toFormattedDateString():'mm/dd/yy'}})</td>
                             <td>Php{{$billing->amount}}</td>
                         </tr>
                     </tbody>

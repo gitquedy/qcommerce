@@ -55,6 +55,7 @@ class SubscriptionInvoice extends Mailable
         $invoice->plan_id = $this->business->subscription()->plan_id;
         $invoice->billing_period = $this->business->subscription()->billing_period;
         $invoice->amount = $this->business->subscription()->amount;
+        $invoice->payment_date = $this->business->subscription()->next_payment_date;
         $invoice->paid_status = 0;
         $invoice->save();
 

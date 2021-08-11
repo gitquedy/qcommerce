@@ -58,9 +58,9 @@ class PlanController extends Controller
         $billing->payer_email = $response['EMAIL'];
         $billing->country_code = $response['COUNTRYCODE'];
         $billing->save();
-        $request->user->updateUserStatus();
-        $request->user->business->warehouse()->first()->updateWarehouseStatus();
-        $request->user->business->shops()->first()->updateShopStatus();
+        $request->user()->updateUserStatus();
+        $request->user()->business->warehouse()->first()->updateWarehouseStatus();
+        $request->user()->business->shops()->first()->updateShopStatus();
         return view('plan.confirm', compact('breadcrumbs', 'response', 'billing'));
     }
 

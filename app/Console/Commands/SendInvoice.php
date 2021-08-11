@@ -44,7 +44,7 @@ class SendInvoice extends Command
         $businesses = Business::all();
         foreach ($businesses as $business) {
             if ($business->subscription()) {
-                $notice_date = Carbon::parse($business->subscription()->next_payment_date)->subDays(7)->toDateString();
+                $notice_date = Carbon::parse($business->subscription()->next_payment_date)->subDays(1)->toDateString();
                 $date_now = Carbon::now()->toDateString();
                 if ($date_now == $notice_date) {
                     Mail::to($business->users()->where('role', 'Owner')->first()->email)->send(new SubscriptionInvoice($business));

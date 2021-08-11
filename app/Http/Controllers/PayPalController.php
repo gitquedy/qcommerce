@@ -180,8 +180,10 @@ class PayPalController extends Controller
             $billing->payment_date = date("Y-m-d H:i:s");
             $billing->next_payment_date = date("Y-m-d H:i:s", strtotime('+ 1'.$billing->billing_period,strtotime('+1day')));
             $billing->payment_transaction_id = $response['PAYMENTINFO_0_TRANSACTIONID'];
-            $billing->promocode_details->uses += 1;
-            $billing->promocode_details->save();
+            if (isset($billing->promocode)) {
+                $billing->promocode_details->uses += 1;
+                $billing->promocode_details->save();
+            }
             $startdate = Carbon::now()->toAtomString();
             $data = [
                 'PROFILESTARTDATE' => $startdate,

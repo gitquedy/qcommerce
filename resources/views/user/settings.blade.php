@@ -35,13 +35,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link d-flex py-75" id="account-pill-billing" data-toggle="pill"
-              href="#account-vertical-billing" aria-expanded="false">
-              <i class="feather icon-file-text mr-50 font-medium-3"></i>
-              Billing / Invoices
-            </a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link d-flex py-75" id="account-pill-company" data-toggle="pill"
               href="#account-vertical-company" aria-expanded="false">
               <i class="feather icon-user mr-50 font-medium-3"></i>
@@ -63,10 +56,6 @@
                 <div class="tab-pane fade " id="account-vertical-password" role="tabpanel"
                   aria-labelledby="account-pill-password" aria-expanded="false">
                   @include('user.partials.password')
-                </div>
-                <div class="tab-pane fade " id="account-vertical-billing" role="tabpanel"
-                  aria-labelledby="account-pill-billing" aria-expanded="false">
-                  @include('user.partials.billing')
                 </div>
                 <div class="tab-pane fade " id="account-vertical-company" role="tabpanel"
                   aria-labelledby="account-pill-company" aria-expanded="false">

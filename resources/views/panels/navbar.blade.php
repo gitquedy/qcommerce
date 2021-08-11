@@ -110,6 +110,7 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{{ action('UserController@settings') }}"><i class="feather icon-settings"></i>Account Settings</a>
+                            <a class="dropdown-item" href="{{ action('BillingController@index') }}"><i class="feather icon-file-text"></i>Billing/Invoices</a>
                             <a class="dropdown-item" href="{{ action('PlanController@index') }}"><i class="feather icon-command"></i>Upgrade Plan</a>
                             @can('user.manage')
                                     <a class="dropdown-item"  href="{{url('/user')}}"><i class="feather icon-users"></i><span class="menu-title" data-i18n="">User Management</span></a>
