@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Validator;
+use PDF;
 use App\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ class WarehouseController extends Controller
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="'. action('WarehouseController@show', $warehouse->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
+                        <a class="dropdown-item" href="'. action('WarehouseController@printInventoryReport', $warehouse->id) .'"><i class="fa fa-print aria-hidden="true""></i> Print Delivery Receipt</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@edit', $warehouse->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                         <a class="dropdown-item modal_button " href="#" data-href="'. action('WarehouseController@delete', $warehouse->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
                     </div></div>';
@@ -271,5 +273,14 @@ class WarehouseController extends Controller
              DB::rollBack();
         }
         return response()->json($output);
+    }
+
+    public function printInventoryReport($warehouse_id, Request $request) {
+        $warehouse = Warehouse::findOrFail($warehouse_id);
+        $company = $request->user()->business->company;
+        return PDF::loadview('warehouse.inventoryreport', [
+            'warehouse' => $warehouse,
+            'company' => $company
+        ])->stream();
     }
 }

@@ -166,6 +166,7 @@ Route::group(['middleware' => 'auth'], function()
 		Route::get('/warehouse/delete/{warehouse}', 'WarehouseController@delete');
 		Route::post('/warehouse/addWarehouseModal', 'WarehouseController@addWarehouseModal')->name('warehouse.addWarehouseModal');
 		Route::post('/warehouse/addWarehouseAjax', 'WarehouseController@addWarehouseAjax')->name('warehouse.addWarehouseAjax');
+		Route::get('/warehouse/printInventoryReport/{id}', 'WarehouseController@printInventoryReport')->name('warehouse.printInventoryReport');
 	});
 
 	Route::group(['middleware' => 'permission:adjustment.manage'], function()
