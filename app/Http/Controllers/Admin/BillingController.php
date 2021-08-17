@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Billing;
 use App\Business;
 use App\Bank;
+use App\ProofOfPayment;
 use Validator;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
@@ -40,10 +41,13 @@ class BillingController extends Controller {
                                     $status = '<span class="badge badge-pill badge-danger">Failed</span>';
                                     break;
                                 case 3:
-                                    $status = '<span class="badge badge-pill badge-warning">Canceled</span>';
+                                    $status = '<span class="badge badge-pill badge-dark">Canceled</span>';
                                     break;
                                 case 4:
                                     $status = '<span class="badge badge-pill badge-dark">Suspended</span>';
+                                    break;
+                                case 5:
+                                    $status = '<span class="badge badge-pill badge-warning">Pending</span>';
                                     break;
                                 default:
                                     $status = '<span class="badge badge-pill badge-secondary">Unknown</span>';
@@ -51,7 +55,15 @@ class BillingController extends Controller {
                             }
                             return '<p>'.$status.'</p><input type="number" class="form-control" data-defval="'.$billing->paid_status.'" data-name="paid_status" value="'.$billing->paid_status.'" data-billing_id="'.$billing->id.'" style="display:none;">';
                         })
-            ->rawColumns(['paid_status'])
+            ->addColumn('action', function (Billing $billing) {
+                            if ($billing->proof) {
+                                return '<a class="btn btn-primary no-print" href="'.route('billing.viewProofOfPayment', ['billing_id' => $billing->id]).'"> View Proof of Payment</a>';
+                            }
+                            else {
+                                return '';
+                            }
+                        })
+            ->rawColumns(['paid_status', 'action'])
             ->make(true);
         }
 
@@ -62,13 +74,44 @@ class BillingController extends Controller {
 
     public function quickUpdate(Request $request){
         $request->validate([
-            'status' => 'required|numeric|min:0|max:4'
+            'status' => 'required|numeric|min:0|max:5'
         ]);
         $column = $request->name;
         $billing = Billing::find($request->billing_id);
         $billing->$column = $request->status;
         $result = $billing->save();
         echo json_encode($result);
+    }
+
+    public function viewProofOfPayment($billing_id) {
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('Admin\BillingController@index'), 'name'=>"Billing"], ['name'=>"Proof of Payment"]
+        ];
+
+        $billing = Billing::find($billing_id);
+        $proof = $billing->proof;
+        $bank = $proof->bank;
+
+        return view('admin.billing.viewProofOfPayment', [
+            'breadcrumbs' => $breadcrumbs,
+            'billing' => $billing,
+            'bank' => $bank,
+            'proof' => $proof
+        ]);
+    }
+
+    public function approvePayment(Request $request) {
+        $billing = Billing::find($request->billing_id);
+        $billing->paid_status = 1;
+
+        if($billing->save()) {
+            $request->session()->flash('flash_success', 'Payment Approved');
+        }
+        else {
+            $request->session()->flash('flash_error',"Something went wrong !");
+        }
+
+        return redirect()->action('Admin\BillingController@index');
     }
 
     public function overdue() {
@@ -98,10 +141,13 @@ class BillingController extends Controller {
                                     return '<span class="badge badge-pill badge-danger">Failed</span>';
                                     break;
                                 case 3:
-                                    return '<span class="badge badge-pill badge-warning">Canceled</span>';
+                                    return '<span class="badge badge-pill badge-dark">Canceled</span>';
                                     break;
                                 case 4:
                                     return '<span class="badge badge-pill badge-dark">Suspended</span>';
+                                    break;
+                                case 5:
+                                    return '<span class="badge badge-pill badge-warning">Pending</span>';
                                     break;
                                 default:
                                     return '<span class="badge badge-pill badge-secondary">Unknown</span>';

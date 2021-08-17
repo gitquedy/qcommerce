@@ -42,4 +42,8 @@ class Billing extends Model
     public function promocode_details(){
     	return $this->hasOne(Promocode::class, 'id', 'promocode');
     }
+
+	public function proof() {
+		return $this->hasOne(ProofOfPayment::class, 'billing_id', 'id');
+	}
 }

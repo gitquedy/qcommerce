@@ -9,9 +9,6 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="billing_id" name="billing_id" value="{{$billing->id}}">
-                <!-- <div class="text-bold-600 font-medium-2">Plan Name: {{ $billing->plan->name }}</div>
-                <div class="text-bold-600 font-medium-2">Amount: {{ $billing->amount }}</div>
-                <div class="text-bold-600 font-medium-2">Date Coverage: {{ $billing->payment_date }} - {{ $billing->next_payment_date}}</div> -->
                 <div class="d-flex justify-content-between">
                     <div class="">Invoice Date: {{isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->subDays(1)->toFormattedDateString():'Month dd, yyyy'}}</div>
                     <div class="">Invoice Due Date: {{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'Month dd, yyyy' }}</div>
@@ -31,10 +28,11 @@
                         </tr>
                     </tbody>
                 </table>
-                
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary no-print btn_save"><i class="fa fa-dollar"></i> Pay Now</button>
+                <a class="btn btn-primary no-print" href="{{ route('billing.viewProofOfPayment', ['billing_id' => $billing->id]) }}" {{($billing->proof)?'':'hidden'}}> View Proof of Payment</a>
+                <a class="btn btn-primary no-print" href="{{ route('billing.pay', ['billing_id' => $billing->id]) }}" {{($billing->paid_status!=0)?'hidden':''}}><i class="fa fa-dollar"></i> Pay Through Bank</a>
+                <button type="submit" class="btn btn-primary no-print btn_save" {{($billing->paid_status!=0)?'hidden':''}}><i class="fa fa-dollar"></i> Pay With PayPal</button>
                 <button type="button" class="btn btn-danger no-print" data-dismiss="modal">Cancel</button>
             </div>
         </div>

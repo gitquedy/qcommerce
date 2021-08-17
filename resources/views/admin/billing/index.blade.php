@@ -40,6 +40,7 @@
             <th>Status</th>
             <th>Payment Date</th>
             <th>Next Payment Date</th>
+            <th>Action</th>
             <th>Created At</th>
           </tr>
         </thead>
@@ -82,13 +83,14 @@
             { data: 'paid_status', name: 'paid_status', className: 'quick_update_box'},
             { data: 'payment_date', name: 'payment_date'},
             { data: 'next_payment_date', name: 'next_payment_date'},
+            { data: 'action', name: 'action'},
             { data: 'created_at', name: 'created_at', searchable: false, visible: false }
         ];
     var table_route = {
-            url: '{{ route('billing.index') }}'
+            url: '{{ action('Admin\BillingController@index') }}'
             };
     var buttons = [];
-    var order = [10, 'desc'];
+    var order = [11, 'desc'];
     var BInfo = true;
     var bFilter = true;
     function created_row_function(row, data, dataIndex){
@@ -152,10 +154,13 @@
                                                 return '<span class="badge badge-pill badge-danger">Failed</span>';
                                             }
                                             else if (td.find("input").val() == 3) {
-                                                return '<span class="badge badge-pill badge-warning">Canceled</span>';
+                                                return '<span class="badge badge-pill badge-dark">Canceled</span>';
                                             }
                                             else if (td.find("input").val() == 4) {
                                                 return '<span class="badge badge-pill badge-dark">Suspended</span>';
+                                            }
+                                            else if (td.find("input").val() == 5) {
+                                                return '<span class="badge badge-pill badge-warning">Pending</span>';
                                             }
                                             else {
                                                 return '<span class="badge badge-pill badge-secondary">Unknown</span>';

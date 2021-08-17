@@ -20,8 +20,6 @@
 
 <section id="data-list-view" class="data-list-view-header">
 
-    <div id="errors"></div>
-
     {{-- DataTable starts --}}
     <div class="table-responsive">
         

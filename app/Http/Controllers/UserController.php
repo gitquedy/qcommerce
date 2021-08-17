@@ -494,38 +494,6 @@ class UserController extends Controller
     }
 
     public function settings(Request $request){
-      // if (request()->ajax()) {
-      //   $billing = Billing::where('business_id', $request->user()->business_id);
-
-      //   return Datatables::eloquent($billing)
-      //   ->editColumn('plan_id', function(Billing $billing) {
-      //                   return $billing->plan->name;
-      //               })
-      //   ->editColumn('paid_status', function(Billing $billing) {
-      //                   switch ($billing->paid_status) {
-      //                     case 0:
-      //                         return '<span class="badge badge-pill badge-primary">Unpaid</span>';
-      //                         break;
-      //                     case 1:
-      //                         return '<span class="badge badge-pill badge-success">Paid</span>';
-      //                         break;
-      //                     case 2:
-      //                         return '<span class="badge badge-pill badge-danger">Failed</span>';
-      //                         break;
-      //                     case 3:
-      //                         return '<span class="badge badge-pill badge-warning">Canceled</span>';
-      //                         break;
-      //                     case 4:
-      //                         return '<span class="badge badge-pill badge-dark">Suspended</span>';
-      //                         break;
-      //                     default:
-      //                         return '<span class="badge badge-pill badge-secondary">Unknown</span>';
-      //                         break;
-      //                   }
-      //               })
-      //   ->rawColumns(['paid_status'])
-      //   ->make(true);
-      // }
-      // return view('user.settings');
+      //
     }
 }
