@@ -92,7 +92,7 @@ class BillingController extends Controller {
         $proof = $billing->proof;
         $bank = $proof->bank;
 
-        return view('admin.billing.viewProofOfPayment', [
+        return view('admin.billing.viewproofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
             'bank' => $bank,

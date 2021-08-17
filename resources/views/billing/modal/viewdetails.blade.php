@@ -30,7 +30,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-primary no-print" href="{{ route('billing.viewProofOfPayment', ['billing_id' => $billing->id]) }}" {{($billing->proof)?'':'hidden'}}> View Proof of Payment</a>
+                <a class="btn btn-primary no-print" href="{{ route('billing.viewProof', ['billing_id' => $billing->id]) }}" {{($billing->proof)?'':'hidden'}}> View Proof of Payment</a>
                 <a class="btn btn-primary no-print" href="{{ route('billing.pay', ['billing_id' => $billing->id]) }}" {{($billing->paid_status!=0)?'hidden':''}}><i class="fa fa-dollar"></i> Pay Through Bank</a>
                 <button type="submit" class="btn btn-primary no-print btn_save" {{($billing->paid_status!=0)?'hidden':''}}><i class="fa fa-dollar"></i> Pay With PayPal</button>
                 <button type="button" class="btn btn-danger no-print" data-dismiss="modal">Cancel</button>

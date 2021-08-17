@@ -30,10 +30,10 @@ Route::group(['middleware' => 'auth'], function()
 		Route::post('/subscription/update', 'Admin\SubscriptionController@update')->name('subscription.update');
 		Route::resource('/billing', 'Admin\BillingController')->only(['index']);
 		Route::post('/billing/quickupdate', 'Admin\BillingController@quickUpdate')->name('billing.quickUpdate');
-		Route::get('/billing/{billing_id}', 'Admin\BillingController@viewProofOfPayment')->name('billing.viewProofOfPayment');
-		Route::post('/billing/approve_payment', 'Admin\BillingController@approvePayment')->name('billing.approvePayment');
 		Route::get('/billing/overdue', 'Admin\BillingController@overdue')->name('billing.overdue');
 		Route::get('/billing/details', 'Admin\BillingController@details')->name('billing.details');
+		Route::get('/billing/{billing_id}', 'Admin\BillingController@viewProofOfPayment')->name('billing.viewProofOfPayment');
+		Route::post('/billing/approve_payment', 'Admin\BillingController@approvePayment')->name('billing.approvePayment');
 		Route::get('/billing/details/create', 'Admin\BillingController@create')->name('billing.details.create');
 		Route::post('/billing/details/add', 'Admin\BillingController@add')->name('billing.details.add');
 		Route::get('/billing/details/edit/{id}', 'Admin\BillingController@edit')->name('billing.details.edit');
@@ -66,7 +66,7 @@ Route::group(['middleware' => 'auth'], function()
 	Route::get('/billing/pay/{billing_id}', 'BillingController@selectBank')->name('billing.pay');
 	Route::get('/billing/proof/{billing_id}/{bank_id}', 'BillingController@proofOfPayment')->name('billing.proofOfPayment');
 	Route::post('/billing/proof/store', 'BillingController@storeProof')->name('billing.storeProof');
-	Route::get('/billing/proof/{billing_id}', 'BillingController@viewProofOfPayment')->name('billing.viewProofOfPayment');
+	Route::get('/billing/proof/{billing_id}', 'BillingController@viewProofOfPayment')->name('billing.viewProof');
 
 	
 

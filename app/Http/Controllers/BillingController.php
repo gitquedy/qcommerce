@@ -92,7 +92,7 @@ class BillingController extends Controller
         $billing = Billing::find($billing_id);
         $bank = Bank::find($bank_id);
 
-        return view('billing.proofOfPayment', [
+        return view('billing.proofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
             'bank' => $bank
@@ -147,7 +147,7 @@ class BillingController extends Controller
         $proof = $billing->proof;
         $bank = $proof->bank;
 
-        return view('billing.viewProofOfPayment', [
+        return view('billing.viewproofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
             'bank' => $bank,
