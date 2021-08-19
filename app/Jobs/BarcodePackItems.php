@@ -21,15 +21,17 @@ class BarcodePackItems implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $request;
+    protected $business_id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($request)
+    public function __construct($request, $business_id)
     {
         $this->request = $request;
+        $this->business_id = $business_id;
     }
 
     /**
@@ -104,7 +106,7 @@ class BarcodePackItems implements ShouldQueue
 
                             //sku child
                             foreach ($sku->set_items as $set_item) {
-                                $sku = Sku::where('id', $set_item->sku_single_id)->where('business_id', Auth::user()->business_id)->first();
+                                $sku = Sku::where('id', $set_item->sku_single_id)->where('business_id', $this->business_id)->first();
                                 $set_quantity = $set_item->set_quantity;
                                 $sku->quantity -= ($qty*$set_quantity);
 

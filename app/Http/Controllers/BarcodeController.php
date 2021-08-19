@@ -185,7 +185,7 @@ class BarcodeController extends Controller
     }
 
     public function packedItems(Request $request) {
-        $packItems = new BarcodePackItems($request->all());
+        $packItems = new BarcodePackItems($request->all(), Auth::user()->business_id);
         dispatch($packItems)->onConnection('database');
         return 'true';
     }
