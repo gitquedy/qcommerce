@@ -188,8 +188,11 @@ class AdjustmentController extends Controller
         if($adjustment->business_id != Auth::user()->business_id){
           abort(401, 'You don\'t have access to edit this adjustment');
         }
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('AdjustmentController@index'), 'name'=>"Adjustment List"], ['name'=>"Edit Adjustment"]
+        ];
         $warehouses = $request->user()->business->warehouse->where('status', 1);
-        return view('adjustment.edit', compact('adjustment', 'warehouses'));
+        return view('adjustment.edit', compact('breadcrumbs', 'adjustment', 'warehouses'));
     }
 
     /**
@@ -263,7 +266,6 @@ class AdjustmentController extends Controller
             foreach($adj->items as $item) {
                 $item->new_quantity = WarehouseItems::where('warehouse_id', $item->warehouse_id)->where('sku_id', $item->sku_id)->first()->quantity;
                 $item->save();
-                error_log($item->new_quantity);
             }
 
             if (!$request->reference_no) {
