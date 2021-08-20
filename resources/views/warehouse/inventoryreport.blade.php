@@ -92,7 +92,7 @@
                 <th>SELLING PRICE</th>
             </tr>
             @foreach($warehouse->items as $item)
-                @if($item->transfer_item)
+                @if(($item->transfer_item) && $item->quantity != 0)
                 <tr>
                     <td>{{$item->quantity}}</td>
                     <td></td>
