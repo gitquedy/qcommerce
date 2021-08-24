@@ -55,8 +55,11 @@ class BillingController extends Controller
 
     public function viewInvoice(Request $request) {
         $billing = Billing::find($request->data);
+        $previous_billing = Billing::where('business_id', $billing->business_id)->where('created_at', '<', $billing->created_at)->orderBy('created_at', 'desc')->first();
+
         return view('billing.modal.viewdetails',[
-            'billing' => $billing
+            'billing' => $billing,
+            'previous_billing' => $previous_billing
         ]);
     }
 
@@ -77,10 +80,12 @@ class BillingController extends Controller
         }
 
         $billing = Billing::find($billing_id);
+        $previous_billing = Billing::where('business_id', $billing->business_id)->where('created_at', '<', $billing->created_at)->orderBy('created_at', 'desc')->first();
 
         return view('billing.selectbank', [
             'breadcrumbs' => $breadcrumbs,
-            'billing' => $billing
+            'billing' => $billing,
+            'previous_billing' => $previous_billing
         ]);
     }
 
@@ -90,11 +95,13 @@ class BillingController extends Controller
         ];
 
         $billing = Billing::find($billing_id);
+        $previous_billing = Billing::where('business_id', $billing->business_id)->where('created_at', '<', $billing->created_at)->orderBy('created_at', 'desc')->first();
         $bank = Bank::find($bank_id);
 
         return view('billing.proofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
+            'previous_billing' => $previous_billing,
             'bank' => $bank
         ]);
     }
@@ -144,12 +151,14 @@ class BillingController extends Controller
         ];
 
         $billing = Billing::find($billing_id);
+        $previous_billing = Billing::where('business_id', $billing->business_id)->where('created_at', '<', $billing->created_at)->orderBy('created_at', 'desc')->first();
         $proof = $billing->proof;
         $bank = $proof->bank;
 
         return view('billing.viewproofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
+            'previous_billing' => $previous_billing,
             'bank' => $bank,
             'proof' => $proof
         ]);

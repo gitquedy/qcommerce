@@ -47,7 +47,7 @@ class SubscriptionInvoice extends Mailable
     public function build()
     {
         $name = $this->business->name;
-        $date = $this->business->subscription()->next_payment_date;
+        $date = Carbon::parse($this->business->subscription()->next_payment_date)->toFormattedDateString();
         
         $invoice = new Billing;
         $invoice->invoice_no = Billing::getNextInvoiceNumber();
@@ -55,7 +55,6 @@ class SubscriptionInvoice extends Mailable
         $invoice->plan_id = $this->business->subscription()->plan_id;
         $invoice->billing_period = $this->business->subscription()->billing_period;
         $invoice->amount = $this->business->subscription()->amount;
-        $invoice->payment_date = $this->business->subscription()->next_payment_date;
         $invoice->paid_status = 0;
         $invoice->save();
 

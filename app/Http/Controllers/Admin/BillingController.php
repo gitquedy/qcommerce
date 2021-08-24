@@ -89,12 +89,14 @@ class BillingController extends Controller {
         ];
 
         $billing = Billing::find($billing_id);
+        $previous_billing = Billing::where('business_id', $billing->business_id)->where('created_at', '<', $billing->created_at)->orderBy('created_at', 'desc')->first();
         $proof = $billing->proof;
         $bank = $proof->bank;
 
         return view('admin.billing.viewproofofpayment', [
             'breadcrumbs' => $breadcrumbs,
             'billing' => $billing,
+            'previous_billing' => $previous_billing,
             'bank' => $bank,
             'proof' => $proof
         ]);
@@ -103,6 +105,8 @@ class BillingController extends Controller {
     public function approvePayment(Request $request) {
         $billing = Billing::find($request->billing_id);
         $billing->paid_status = 1;
+        $billing->payment_date = date("Y-m-d H:i:s", strtotime($request->date));
+        $billing->next_payment_date = date("Y-m-d H:i:s", strtotime('+ 1'.$billing->billing_period,strtotime('+1day')));
 
         if($billing->save()) {
             $request->session()->flash('flash_success', 'Payment Approved');

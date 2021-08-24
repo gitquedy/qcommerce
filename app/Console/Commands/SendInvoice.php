@@ -48,6 +48,7 @@ class SendInvoice extends Command
                 $date_now = Carbon::now()->toDateString();
                 if ($date_now == $notice_date) {
                     Mail::to($business->users()->where('role', 'Owner')->first()->email)->send(new SubscriptionInvoice($business));
+                    echo json_encode('Invoice sent to '.$business->users()->where('role', 'Owner')->first()->email);
                 }
             }
         }

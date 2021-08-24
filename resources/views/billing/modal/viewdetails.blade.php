@@ -10,8 +10,24 @@
             <div class="modal-body">
                 <input type="hidden" id="billing_id" name="billing_id" value="{{$billing->id}}">
                 <div class="d-flex justify-content-between">
-                    <div class="">Invoice Date: {{isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->subDays(1)->toFormattedDateString():'Month dd, yyyy'}}</div>
-                    <div class="">Invoice Due Date: {{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'Month dd, yyyy' }}</div>
+                    <div class="">Invoice Date: {{ isset($billing->payment_date)
+                                                    ?
+                                                        Carbon\Carbon::parse($billing->payment_date)->subDays(1)->toFormattedDateString()
+                                                        :
+                                                        (isset($previous_billing->next_payment_date)
+                                                            ?
+                                                                Carbon\Carbon::parse($previous_billing->next_payment_date)->subDays(1)->toFormattedDateString()
+                                                                :
+                                                                null) }}</div>
+                    <div class="">Invoice Due Date: {{ isset($billing->payment_date)
+                                                        ?
+                                                            Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString()
+                                                            :
+                                                            (isset($previous_billing->next_payment_date)
+                                                                ?
+                                                                    Carbon\Carbon::parse($previous_billing->next_payment_date)->toFormattedDateString()
+                                                                    :
+                                                                    null) }}</div>
                 </div>
                 <br>
                 <table class="table">
@@ -23,7 +39,24 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{{$billing->plan->name}} Subscription Plan ({{ isset($billing->payment_date)?Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString():'mm/dd/yy' }} - {{ isset($billing->next_payment_date)?Carbon\Carbon::parse($billing->next_payment_date)->subDays(1)->toFormattedDateString():'mm/dd/yy'}})</td>
+                            <td>{{$billing->plan->name}} Subscription Plan ({{ isset($billing->payment_date)
+                                                                                ?
+                                                                                    Carbon\Carbon::parse($billing->payment_date)->toFormattedDateString()
+                                                                                    :
+                                                                                    (isset($previous_billing->next_payment_date)
+                                                                                        ?
+                                                                                            Carbon\Carbon::parse($previous_billing->next_payment_date)->toFormattedDateString()
+                                                                                            :
+                                                                                            null) }} - 
+                                                                            {{ isset($billing->next_payment_date)
+                                                                                ?
+                                                                                    Carbon\Carbon::parse($billing->next_payment_date)->subDays(1)->toFormattedDateString()
+                                                                                    :
+                                                                                    (isset($previous_billing->next_payment_date)
+                                                                                        ?
+                                                                                            Carbon\Carbon::parse($previous_billing->next_payment_date)->addMonth(1)->toFormattedDateString()
+                                                                                            :
+                                                                                            null) }})</td>
                             <td>Php{{$billing->amount}}</td>
                         </tr>
                     </tbody>
