@@ -286,7 +286,6 @@ class WarehouseController extends Controller
     }
 
     public function viewInventory(Warehouse $warehouse) {
-        error_log($warehouse->business_id);
         if($warehouse->business_id != Auth::user()->business_id){
             abort(401, 'You don\'t have access to view this warehouse');
         }

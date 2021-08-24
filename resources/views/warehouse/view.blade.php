@@ -45,14 +45,7 @@
                               @forelse($warehouse->items as $wsku) 
                                 <tr>
                                   <td>{{$wsku->sku->code}}</td>
-                                  <td>
-                                    @if($wsku->sku->image)
-                                      <img src="{{$wsku->sku->image}}" class="product_image">
-                                    @else
-                                      <img src="{{asset('images/pages/no-img.jpg')}}" class="product_image">
-                                    @endif
-                                    
-                                  </td>
+                                  <td><img src="{{$wsku->sku->SkuImage()}}" class="product_image"></td>
                                   <td>{{$wsku->sku->name}}</td>
                                   <td>{{$wsku->quantity}}</td>
                                 </tr>

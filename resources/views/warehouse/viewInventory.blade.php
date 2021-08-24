@@ -25,10 +25,17 @@
               <hr>
               <div class="card-content">
                   <div class="card-body">
-                      <h1>{{$warehouse->name}} <small>({{$warehouse->code}})</small> </h1>
-                      <h4 class="text-default">{{$warehouse->phone}}</h4>
-                      <h4 class="text-primary">{{$warehouse->email}}</h4>
-                      <h4 class="text-secondary">{{$warehouse->address}}</h4>
+                      <div class="row">
+                        <div class="col">
+                          <h1>{{$warehouse->name}} <small>({{$warehouse->code}})</small> </h1>
+                          <h4 class="text-default">{{$warehouse->phone}}</h4>
+                          <h4 class="text-primary">{{$warehouse->email}}</h4>
+                          <h4 class="text-secondary">{{$warehouse->address}}</h4>
+                        </div>
+                        <div class="col text-right">
+                        <a class="btn btn-primary no-print" href="{{ route('warehouse.printInventoryReport', ['id' => $warehouse->id]) }}">Print Inventory Report</a>
+                        </div>
+                      </div>
                       <hr>
                       <div class="row text-center">
                         <div class="table-responsive">
@@ -46,14 +53,7 @@
                                 @if($wsku->quantity != 0)
                                 <tr>
                                   <td>{{$wsku->sku->code}}</td>
-                                  <td>
-                                    @if($wsku->sku->image)
-                                      <img src="{{$wsku->sku->image}}" class="product_image">
-                                    @else
-                                      <img src="{{asset('images/pages/no-img.jpg')}}" class="product_image">
-                                    @endif
-                                    
-                                  </td>
+                                  <td><img src="{{$wsku->sku->SkuImage()}}" class="product_image"></td>
                                   <td>{{$wsku->sku->name}}</td>
                                   <td>{{$wsku->quantity}}</td>
                                 </tr>
