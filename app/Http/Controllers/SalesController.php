@@ -28,14 +28,25 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('is_included_in_plan', 'add_sales');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('SalesController@index'), 'name'=>"Sales"], ['name'=>"Sales List"]
         ];
+
         if ( request()->ajax()) {
-           $sales = Sales::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+            $sales = Sales::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $sales->whereDate('date', [$daterange[0]]);
+                } else {
+                    $sales->whereDate('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
+                }
+            }
+
             return Datatables($sales)   
             ->addColumn('customer_name', function(Sales $sales) {
                 if($sales->customer_id) {

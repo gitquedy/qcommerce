@@ -18,30 +18,31 @@
 
 @section('content')
 <section id="data-list-view" class="data-list-view-header">
-
-    {{-- DataTable starts --}}
-    <div class="table-responsive">
-      <table class="table data-list-view">
-        <thead>
-          <tr>
-            <th>For Checkbox</th>
-            <th>Date</th>
-            <th>Reference No</th>
-            <th>Customer</th>
-            <th>Sales Status</th>
-            <th>Grand Total</th>
-            <th>Paid</th>
-            <th>Balance</th>
-            <th>Payment Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-    {{-- DataTable ends --}}
-  </section>
-  {{-- Data list view end --}}
-  
+  <div class="filter-date">
+    @include('reports.components.dateFilter')
+  </div>
+  {{-- DataTable starts --}}
+  <div class="table-responsive">
+    <table class="table data-list-view">
+      <thead>
+        <tr>
+          <th>For Checkbox</th>
+          <th>Date</th>
+          <th>Reference No</th>
+          <th>Customer</th>
+          <th>Sales Status</th>
+          <th>Grand Total</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Payment Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  {{-- DataTable ends --}}
+</section>
+{{-- Data list view end --}}
 @endsection
 @section('vendor-script')
 {{-- vednor js files --}}
@@ -54,26 +55,11 @@
   <script src="{{ asset(mix('vendors/js/forms/select/select2.full.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/sweetalert2.all.min.js')) }}"></script>
   <script src="{{ asset(mix('vendors/js/extensions/polyfill.min.js')) }}"></script>
+  <script src="{{ asset('vendors/js/daterangepicker/daterangepicker.min.js') }}"></script>
+  <script src="{{ asset('js/scripts/reports/daterange.js') }}"></script>
 @endsection
 @section('myscript')
   {{-- Page js files --}}
-  <script type="text/javascript">
-    function getParams(){
-            var $params = "?site={{ $request->get('site') }}" + "&daterange=" + $("#daterange").val();
-            return $params;
-          }
-    function getHeaders(){
-        $.ajax({
-        method: "GET",
-        url: "{{ action('OrderController@headers')  }}" + getParams(),
-        success: function success(result) {     
-            $.each(result.data, function (i, item) {
-              $('#badge_' + i).html(item);
-            });
-          },
-        });     
-      }
-  </script>
   <!-- datatables -->
   <script type="text/javascript">
   var id = "{{ $request->get('site') == 'shopee' ?  'ordersn' : 'id'  }}";
@@ -93,7 +79,8 @@
   var table_route = {
           url: '{{ route('sales.index') }}',
           data: function (data) {
-            }
+            data.daterange = $("#daterange").val();
+          }
         };
   var buttons = [
           { text: "<i class='feather icon-plus'></i> Add New",
@@ -111,21 +98,28 @@
   var pageLength = 20;
 
 </script>
-<script type="text/javascript">
-    $(document).on('click', '.toggle_view_modal', function(e) {
-        e.preventDefault();
-        $.ajax({
-            url: $(this).data('action'),
-            method: "POST",
-            data: {},
-            success:function(result)
-            {
-                $('.view_modal').html(result).modal();
-            }
-        });
-    });
-</script> 
 <script src="{{ asset(mix('js/scripts/ui/data-list-view.js')) }}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      var filterDate = $(".filter-date");
+      filterDate.insertAfter($(".top .actions .dt-buttons"));
+
+      $(".filter-date .btn-group").removeClass("mb-1");
+      
+      $(document).on('click', '.toggle_view_modal', function(e) {
+          e.preventDefault();
+          $.ajax({
+              url: $(this).data('action'),
+              method: "POST",
+              data: {},
+              success:function(result)
+              {
+                  $('.view_modal').html(result).modal();
+              }
+          });
+      });
+  });
+</script>
 <script type="text/javascript">
   $(document).ready(function() {
     table.order( [ 1, 'desc' ] ).draw();

@@ -26,14 +26,25 @@ class TransferController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('is_included_in_plan', 'stock_transfer');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('TransferController@index'), 'name'=>"Transfer"], ['name'=>"Transfer List"]
         ];
+        
         if ( request()->ajax()) {
-           $transfer = Transfer::orderBy('updated_at', 'desc');
+            $transfer = Transfer::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $transfer->whereDate('date', [$daterange[0]]);
+                } else {
+                    $transfer->whereDate('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
+                }
+            }
+
             return Datatables($transfer)
             ->editColumn('status', function(Transfer $transfer) {
                 switch ($transfer->status) {

@@ -29,13 +29,24 @@ class AdjustmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('AdjustmentController@index'), 'name'=>"Adjustment"], ['name'=>"Adjustment List"]
         ];
+        
         if ( request()->ajax()) {
-           $adjustment = Adjustment::orderBy('updated_at', 'desc');
+            $adjustment = Adjustment::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+            
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $adjustment->whereDate('date', [$daterange[0]]);
+                } else {
+                    $adjustment->whereDate('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
+                }
+            }
+
             return Datatables($adjustment)
             ->addColumn('warehouse_name', function(Adjustment $adjustment) {
                 return $adjustment->warehouse->name;

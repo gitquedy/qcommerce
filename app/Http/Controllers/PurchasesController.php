@@ -26,14 +26,25 @@ class PurchasesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('is_included_in_plan', 'purchase_orders');
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('PurchasesController@index'), 'name'=>"Purchases"], ['name'=>"Purchases List"]
         ];
+
         if ( request()->ajax()) {
-           $purchases = Purchases::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+            $purchases = Purchases::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
+
+            $daterange = explode('/', $request->get('daterange'));
+            if(count($daterange) == 2){
+                if($daterange[0] == $daterange[1]){
+                    $purchases->whereDate('date', [$daterange[0]]);
+                } else {
+                    $purchases->whereDate('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
+                }
+            }
+
             return Datatables($purchases)   
             ->addColumn('balance', function(Purchases $purchase) {
                 return number_format($purchase->grand_total - $purchase->paid, 2);
