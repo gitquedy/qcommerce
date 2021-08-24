@@ -1,7 +1,7 @@
 @inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'View Warehouse')
+@section('title', 'View Inventory')
 
 @section('content')
 <style>
@@ -20,7 +20,7 @@
       <div class="col-md-12 col-12">
           <div class="card">
               <div class="card-header">
-                  <h4 class="card-title">Warehouse Details</h4>
+                  <h4 class="card-title">Warehouse Inventory</h4>
               </div>
               <hr>
               <div class="card-content">
@@ -42,7 +42,8 @@
                               </tr>
                             </thead>
                             <tbody>
-                              @forelse($warehouse->items as $wsku) 
+                              @foreach($warehouse->items as $wsku)
+                                @if($wsku->quantity != 0)
                                 <tr>
                                   <td>{{$wsku->sku->code}}</td>
                                   <td>
@@ -56,11 +57,8 @@
                                   <td>{{$wsku->sku->name}}</td>
                                   <td>{{$wsku->quantity}}</td>
                                 </tr>
-                              @empty
-                              <tr>
-                                <td colspan="4">Empty.</td>
-                              </tr>
-                              @endforelse
+                               @endif
+                              @endforeach
                             </tbody>
                           </table>
                         </div>

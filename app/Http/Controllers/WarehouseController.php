@@ -34,6 +34,7 @@ class WarehouseController extends Controller
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="'. action('WarehouseController@show', $warehouse->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
+                        <a class="dropdown-item" href="'. action('WarehouseController@viewInventory', $warehouse->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View Inventory</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@printInventoryReport', $warehouse->id) .'"><i class="fa fa-print aria-hidden="true""></i> Print Inventory Report</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@edit', $warehouse->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>
                         <a class="dropdown-item modal_button " href="#" data-href="'. action('WarehouseController@delete', $warehouse->id).'" ><i class="fa fa-trash aria-hidden="true""></i> Delete</a>
@@ -282,5 +283,17 @@ class WarehouseController extends Controller
             'warehouse' => $warehouse,
             'company' => $company
         ])->stream();
+    }
+
+    public function viewInventory(Warehouse $warehouse) {
+        error_log($warehouse->business_id);
+        if($warehouse->business_id != Auth::user()->business_id){
+            abort(401, 'You don\'t have access to view this warehouse');
+        }
+        $this->authorize('show', $warehouse);
+        $breadcrumbs = [
+            ['link'=>"/",'name'=>"Home"],['link'=> action('WarehouseController@index'), 'name'=>"Warehouses List"], ['name'=>"View Inventory"]
+        ];
+        return view('warehouse.viewInventory', compact('breadcrumbs', 'warehouse'));
     }
 }
