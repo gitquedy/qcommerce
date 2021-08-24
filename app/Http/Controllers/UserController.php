@@ -494,6 +494,6 @@ class UserController extends Controller
     }
 
     public function settings(Request $request){
-      //
+      return view('user.settings');
     }
 }
