@@ -95,7 +95,13 @@
               <li class="list-inline-item">
                 <div class="label mx-2">
                   <label>Start Date:</label>
-                  <h4 id="start_date">{{(isset($billing->created_at))?date("F d, Y", strtotime($billing->created_at)):'--'}}</h4>
+                  <h4 id="start_date">{{(isset($billing->payment_date))?date("F d, Y", strtotime($billing->payment_date)):'--'}}</h4>
+                </div>
+              </li>
+              <li class="list-inline-item">
+                <div class="label mx-2">
+                  <label>Next Due Date:</label>
+                  <h4 id="start_date">{{(isset($billing->next_payment_date))?date("F d, Y", strtotime($billing->next_payment_date)):'--'}}</h4>
                 </div>
               </li>
             </ul>
@@ -142,7 +148,7 @@
                 <tr>
                   <td class="title_column border-bottom-0 border-top-0"><span class="billing_text">Monthly</span> Cost</td>
                   @forelse($plans as $plan)
-                    <th class="text-center border-0 align-bottom">
+                    <th class="text-center border-0 align-middle">
                       <div class="billling_type Monthly">
                         @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost)
                           <span class="text-secondary">{!!count_or_free($plan->monthly_cost, true)!!}</span>
@@ -162,7 +168,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan</a>
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn {{ $plan->id <= $billing->plan_id ? 'hidden':'' }}">Select Plan</a>
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
@@ -386,7 +392,7 @@
                 <tr>
                   <td class="title_column border-bottom-0 border-top-0"><span class="billing_text">Monthly</span> Cost</td>
                   @forelse($plans as $plan)
-                    <th class="text-center border-0 align-bottom">
+                    <th class="text-center border-0 align-middle">
                       <div class="billling_type Monthly">
                         @if($plan->promo_start <= date("Y-m-d") && $plan->promo_end >= date("Y-m-d") && $plan->monthly_cost != $plan->promo_monthly_cost)
                           <span class="text-secondary">{!!count_or_free($plan->monthly_cost, true)!!}</span>
@@ -406,7 +412,7 @@
                         @endif
                       </div>
                       <p><b>Billed <span class="billing_text">Monthly</span></b></p>
-                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn">Select Plan
+                      <a href="{{ action('PlanController@subscribe', $plan->id) }}/Month" data-href="{{ action('PlanController@subscribe', $plan->id) }}" class="btn btn-primary my-2 Subscribe_Btn {{ $plan->id <= $billing->plan_id ? 'hidden':'' }}">Select Plan
                     </th>
                   @empty
                     <th class=" border-0">No Plan</th>
