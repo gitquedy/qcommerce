@@ -279,9 +279,12 @@ class WarehouseController extends Controller
     public function printInventoryReport($warehouse_id, Request $request) {
         $warehouse = Warehouse::findOrFail($warehouse_id);
         $company = $request->user()->business->company;
+        $settings = Auth::user()->business->settings;
+        $inv_num = $settings->inventory_prefix.preg_replace('/[^0-9]/', '', $warehouse->code);
         return PDF::loadview('warehouse.inventoryreport', [
             'warehouse' => $warehouse,
-            'company' => $company
+            'company' => $company,
+            'inv_num' => $inv_num
         ])->stream();
     }
 

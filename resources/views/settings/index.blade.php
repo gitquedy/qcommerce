@@ -121,6 +121,17 @@
                       </div>
                   </div>
               </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label>Inventory</label>
+                      <div class="position-relative has-icon-left">
+                        <input type="text" class="form-control" name="inventory_prefix" placeholder="IR" value="{{$settings->inventory_prefix}}">
+                        <div class="form-control-position"> 
+                          <i class="feather icon-hash"></i>
+                        </div>
+                      </div>
+                  </div>
+              </div>
             </div>
             <hr>
             <h3>Customer Settings</h3>

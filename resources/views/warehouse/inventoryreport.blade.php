@@ -69,7 +69,7 @@
             </div>
         </div>
         <br><br>
-        <div><strong>INVENTORY REPORT #{{$warehouse->code}}</strong></div>
+        <div><strong>INVENTORY REPORT #{{$inv_num}}</strong></div>
         <div class="container">
             <div class="grid-item col-1">DELIVERED TO</div>
             <div class="grid-item col-2"><strong>{{$warehouse->name}}</strong></div>

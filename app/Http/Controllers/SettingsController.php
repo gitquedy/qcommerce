@@ -89,6 +89,7 @@ class SettingsController extends Controller
             'payment_prefix' => 'required|string|max:191',
             'return_prefix' => 'required|string|max:191',
             'adjustment_prefix' => 'required|string|max:191',
+            'inventory_prefix' => 'required|string|max:191',
             'customer_name_format' => 'required|string|max:191',
         ]);
 
