@@ -75,13 +75,13 @@
         <div><strong>SALES INVOICE #{{$sales->reference_no}}</strong></div>
         <div class="container">
             <div class="grid-item col-1">DELIVERED TO</div>
-            <div class="grid-item col-2"><strong>{{$warehouse->name}}</strong></div>
+            <div class="grid-item col-2"><strong>{{$sales->customer_first_name.' '.$sales->customer_last_name}}</strong></div>
             <div class="grid-item col-3">DATE</div>
             <div class="grid-item col-3"><strong>: {{$sales->date}}</strong></div>
         </div>
         <div class="container">
             <div class="grid-item col-1">ADDRESS</div>
-            <div class="grid-item col-2"><strong>{{$warehouse->address}}</strong></div>
+            <div class="grid-item col-2"><strong>{{$sales->customer->address}}</strong></div>
         </div>
         <table>
             <tr>
