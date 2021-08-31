@@ -6,6 +6,7 @@ use Auth;
 use Validator;
 use PDF;
 use App\Warehouse;
+use App\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -72,7 +73,7 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
          $validator = Validator::make($request->all(),[
-            'code' => 'required|string|max:255',
+            'code' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
             'address' => 'nullable',
             'phone' => 'nullable',
@@ -87,6 +88,8 @@ class WarehouseController extends Controller
             $data = $request->all();
             DB::beginTransaction();
             $data['business_id'] = $user->business_id;
+            $genref = Settings::where('business_id', Auth::user()->business_id)->first();
+            $data['code'] = ($data['code'])?$data['code']:$genref->getReference_ir();
 
             $warehouse = Warehouse::create($data);
 

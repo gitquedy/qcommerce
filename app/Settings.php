@@ -56,6 +56,10 @@ class Settings extends Model
         return $this->adjustment_prefix.sprintf('%04d', $this->order_ref->adj);
     }
 
+    public function getReference_ir() {
+        return $this->inventory_prefix.sprintf('%04d', $this->order_ref->ir);
+    }
+
     public function getReference_exp() {
         return $this->expense_prefix.sprintf('%04d', $this->order_ref->ex);
     }

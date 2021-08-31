@@ -13,6 +13,6 @@ class OrderRef extends Model
      * @var array
      */
     protected $fillable = [
-        'settings_id', 'so', 'qu', 'po', 'tr', 'do', 'pay', 're', 'ex'
+        'settings_id', 'so', 'qu', 'po', 'tr', 'do', 'pay', 're', 'adj', 'ir', 'ex'
     ];
 }
