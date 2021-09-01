@@ -15,7 +15,7 @@ use App\ShopPermission;
 use Auth;
 use App\Notifications\MailResetPassword;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     // use HasApiTokens, Notifiable;
 use Notifiable, HasRoles;

@@ -11,6 +11,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class RegisterController extends Controller
@@ -95,6 +98,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'role' => 'Owner',
         ]);
+        // event(new Registered($user));
         $user->giveOwnerPermissions();
         return $user;
     }
@@ -109,5 +113,21 @@ class RegisterController extends Controller
       return view('/auth/register', [
           'pageConfigs' => $pageConfigs
       ]);
+    }
+
+    public function showEmailVerificationNotice() {
+        return view('auth.verify-email');
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request) {
+        $request->fulfill();
+    
+        return redirect('/');
+    }
+
+    public function resendVerificationEmail(Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+    
+        return back()->with('message', 'Verification link sent!');
     }
 }

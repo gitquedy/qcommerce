@@ -257,6 +257,7 @@ class UserController extends Controller
             $data['password'] = Hash::make($data['password']);
             $data['role'] = 'Staff';
             $user = User::create($data);
+            $user->markEmailAsVerified();
 
             $permissions = $request->permissions;
 

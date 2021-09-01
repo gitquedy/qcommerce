@@ -13,8 +13,7 @@
 
 
 // Route url
-
-Route::group(['middleware' => 'auth'], function()
+Route::group(['middleware' => ['auth', 'verified']], function()
 {
 	Route::group(['prefix' => 'admin'], function(){ //, 'middleware' => 'admin'
 		Route::get('/', 'Admin\DashboardController@index')->name('admin.dashboard');
@@ -529,7 +528,10 @@ Route::group(['middleware' => 'auth'], function()
 // Route::get('/auth-forgot-password', 'AuthenticationController@forgot_password');
 // Route::get('/auth-reset-password', 'AuthenticationController@reset_password');
 // Route::get('/auth-lock-screen', 'AuthenticationController@lock_screen');
-Auth::routes();
+Route::get('/email/verify', 'Auth\RegisterController@showEmailVerificationNotice')->middleware('auth')->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', 'Auth\RegisterController@verifyEmail')->middleware(['auth', 'signed'])->name('verification.verify');
+Route::post('/email/verification-notification', 'Auth\RegisterController@resendVerificationEmail')->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+Auth::routes(['verify' => true]);
 
 Route::get('/ipn/test', 'Api\IpnController@test')->name('ipn.test');
 Route::post('ipn/notify','Api\IpnController@postNotify');

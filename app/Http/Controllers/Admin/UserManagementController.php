@@ -112,6 +112,7 @@ class UserManagementController extends Controller
             $data['password'] = Hash::make($data['password']);
             $data['role'] = 'Staff';
             $user = User::create($data);
+            $user->markEmailAsVerified();
            
              if($request->has('permissions')){
                 $permissions = Permission::whereIn('name', $request->permissions)->get();
