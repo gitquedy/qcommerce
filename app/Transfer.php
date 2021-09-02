@@ -54,21 +54,6 @@ class Transfer extends Model
                     ['quantity' => $new_quantity]
                 );
 
-                // $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
-                // if ($set_of_item) {
-                //     foreach ($set_of_item as $set) {
-                //         $sku = Sku::find($set->sku_set_id);
-                //         $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($item->to_warehouse_id);
-                //         $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //             ['warehouse_id' => $item->to_warehouse_id,
-                //             'sku_id' => $sku->id],
-                //             ['quantity' => $warehouse_set_quantity]
-                //         );
-                //         $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
-
                 $addItems = new TransferAddItems($item->toJson());
                 dispatch($addItems)->onConnection('database');
             }
@@ -80,21 +65,6 @@ class Transfer extends Model
                      'sku_id' => $item->sku->id],
                     ['quantity' => $new_quantity]
                 );
-
-                // $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
-                // if ($set_of_item) {
-                //     foreach ($set_of_item as $set) {
-                //         $sku = Sku::find($set->sku_set_id);
-                //         $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($item->from_warehouse_id);
-                //         $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //             ['warehouse_id' => $item->from_warehouse_id,
-                //             'sku_id' => $sku->id],
-                //             ['quantity' => $warehouse_set_quantity]
-                //         );
-                //         $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
 
                 $addItems = new TransferAddItems($item->toJson());
                 dispatch($addItems)->onConnection('database');
@@ -118,21 +88,6 @@ class Transfer extends Model
                     ['quantity' => $new_quantity]
                 );
 
-                // $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
-                // if ($set_of_item) {
-                //     foreach ($set_of_item as $set) {
-                //         $sku = Sku::find($set->sku_set_id);
-                //         $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($item->from_warehouse_id);
-                //         $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //             ['warehouse_id' => $item->from_warehouse_id,
-                //             'sku_id' => $sku->id],
-                //             ['quantity' => $warehouse_set_quantity]
-                //         );
-                //         $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
-
                 $subtractItems = new TransferSubtractItems($item);
                 dispatch($subtractItems)->onConnection('database');
             }
@@ -144,21 +99,6 @@ class Transfer extends Model
                      'sku_id' => $item->sku->id],
                     ['quantity' => $new_quantity]
                 );
-
-                // $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
-                // if ($set_of_item) {
-                //     foreach ($set_of_item as $set) {
-                //         $sku = Sku::find($set->sku_set_id);
-                //         $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($item->to_warehouse_id);
-                //         $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //             ['warehouse_id' => $item->to_warehouse_id,
-                //             'sku_id' => $sku->id],
-                //             ['quantity' => $warehouse_set_quantity]
-                //         );
-                //         $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
 
                 $subtractItems = new TransferSubtractItems($item);
                 dispatch($subtractItems)->onConnection('database');

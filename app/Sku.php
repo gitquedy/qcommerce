@@ -91,42 +91,6 @@ class Sku extends Model
                 $sku->save();
                 $sku->updateProductsandPlatforms();
 
-                // if ($sku->type == 'set') {
-                //     foreach ($sku->set_items as $set_item) {
-                //         $sku = Sku::where('business_id','=', Auth::user()->business_id)->where('id','=', $set_item->sku_single_id)->first();
-                //         $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $set_item->sku_single_id)->first();
-
-                //         $sku->quantity -= $item['quantity']*$set_item->set_quantity;
-                //         if($warehouse_item == null){
-                //             $warehouse_item = WarehouseItems::create(
-                //                 ['warehouse_id' => $warehouse_id,
-                //                 'sku_id' => $set_item->sku_single_id,
-                //                 'quantity' => 0]
-                //             );
-                //         }
-                //         $warehouse_item->quantity -= $item['quantity']*$set_item->set_quantity;
-                //         $warehouse_item->save();
-                //         $sku->save();
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
-                // else if ($sku->type == 'single') {
-                //     $set_of_item = SetItem::where('sku_single_id', $item['sku_id'])->get();
-                //     if ($set_of_item) {
-                //         foreach ($set_of_item as $set) {
-                //             $sku = Sku::find($set->sku_set_id);
-                //             $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($warehouse_id);
-                //             $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //                 ['warehouse_id' => $warehouse_id,
-                //                 'sku_id' => $sku->id],
-                //                 ['quantity' => $warehouse_set_quantity]
-                //             );
-                //             $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //             $sku->updateProductsandPlatforms();
-                //         }
-                //     }
-                // }
-
                 $syncStocks = new SkuSyncStocks($item, $sku, $warehouse_id, Auth::user()->business_id);
                 dispatch($syncStocks)->onConnection('database');
             }
@@ -151,42 +115,6 @@ class Sku extends Model
                 $warehouse_item->save();
                 $sku->save();
                 $sku->updateProductsandPlatforms();
-
-                // if ($sku->type == 'set') {
-                //     foreach ($sku->set_items as $set_item) {
-                //         $sku = Sku::where('business_id','=', Auth::user()->business_id)->where('id','=', $set_item->sku_single_id)->first();
-                //         $warehouse_item = WarehouseItems::where('warehouse_id', $warehouse_id)->where('sku_id', $set_item->sku_single_id)->first();
-
-                //         $sku->quantity += $item['quantity']*$set_item->set_quantity;
-                //         if($warehouse_item == null){
-                //             $warehouse_item = WarehouseItems::create(
-                //                 ['warehouse_id' => $warehouse_id,
-                //                 'sku_id' => $set_item->sku_single_id,
-                //                 'quantity' => 0]
-                //             );
-                //         }
-                //         $warehouse_item->quantity += $item['quantity']*$set_item->set_quantity;
-                //         $warehouse_item->save();
-                //         $sku->save();
-                //         $sku->updateProductsandPlatforms();
-                //     }
-                // }
-                // else if ($sku->type == 'single') {
-                //     $set_of_item = SetItem::where('sku_single_id', $item->sku_id)->get();
-                //     if ($set_of_item) {
-                //         foreach ($set_of_item as $set) {
-                //             $sku = Sku::find($set->sku_set_id);
-                //             $warehouse_set_quantity = $sku->computeSetWarehouseQuantity($warehouse_id);
-                //             $warehouse_item = $sku->warehouse_items()->updateOrCreate(
-                //                 ['warehouse_id' => $warehouse_id,
-                //                 'sku_id' => $sku->id],
-                //                 ['quantity' => $warehouse_set_quantity]
-                //             );
-                //             $sku->update(['quantity' => $sku->computeSetSkuQuantity()]);
-                //             $sku->updateProductsandPlatforms();
-                //         }
-                //     } 
-                // }
 
                 $returnStocks = new SkuReturnStocks($item->toJson(), $sku, $warehouse_id, Auth::user()->business_id);
                 dispatch($returnStocks)->onConnection('database');
