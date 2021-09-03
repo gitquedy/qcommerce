@@ -34,7 +34,6 @@ class WarehouseController extends Controller
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"aria-haspopup="true" aria-expanded="false">
                     Action<span class="sr-only">Toggle Dropdown</span></button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="'. action('WarehouseController@show', $warehouse->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@viewInventory', $warehouse->id) .'"><i class="fa fa-eye aria-hidden="true""></i> View Inventory</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@printInventoryReport', $warehouse->id) .'"><i class="fa fa-print aria-hidden="true""></i> Print Inventory Report</a>
                         <a class="dropdown-item" href="'. action('WarehouseController@edit', $warehouse->id) .'"><i class="fa fa-edit aria-hidden="true""></i> Edit</a>

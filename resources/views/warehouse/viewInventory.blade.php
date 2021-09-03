@@ -32,8 +32,8 @@
                           <h4 class="text-primary">{{$warehouse->email}}</h4>
                           <h4 class="text-secondary">{{$warehouse->address}}</h4>
                         </div>
-                        <div class="col text-right">
-                        <a class="btn btn-primary no-print" href="{{ route('warehouse.printInventoryReport', ['id' => $warehouse->id]) }}">Print Inventory Report</a>
+                        <div class="col d-flex justify-content-end align-items-center">
+                          <a class="btn btn-primary no-print" href="{{ route('warehouse.printInventoryReport', ['id' => $warehouse->id]) }}">Print Inventory Report</a>
                         </div>
                       </div>
                       <hr>
@@ -49,7 +49,7 @@
                               </tr>
                             </thead>
                             <tbody>
-                              @foreach($warehouse->items as $wsku)
+                              @forelse($warehouse->items as $wsku)
                                 @if($wsku->quantity != 0)
                                 <tr>
                                   <td>{{$wsku->sku->code}}</td>
@@ -58,7 +58,11 @@
                                   <td>{{$wsku->quantity}}</td>
                                 </tr>
                                @endif
-                              @endforeach
+                              @empty
+                              <tr>
+                                <td colspan="4">Empty.</td>
+                              </tr>
+                              @endforelse
                             </tbody>
                           </table>
                         </div>
