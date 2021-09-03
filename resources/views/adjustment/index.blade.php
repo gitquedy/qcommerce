@@ -20,6 +20,9 @@
 <section id="data-list-view" class="data-list-view-header">
   <div class="filter-date">
     @include('reports.components.dateFilter')
+    @include('order.components.warehouseFilter')
+    <div class="btn-group" id="chip_area_warehouse"></div>
+    <div class="btn-group" id="chip_area_timings"></div>
   </div>
   {{-- DataTable starts --}}
   <div class="table-responsive">
@@ -76,6 +79,7 @@
           url: '{{ route('adjustment.index') }}',
           data: function (data) {
             data.daterange = $("#daterange").val();
+            data.warehouse = $("#warehouse").val();
           }
         };
   var buttons = [

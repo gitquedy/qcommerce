@@ -34,6 +34,8 @@ class AdjustmentController extends Controller
         $breadcrumbs = [
             ['link'=>"/",'name'=>"Home"],['link'=> action('AdjustmentController@index'), 'name'=>"Adjustment"], ['name'=>"Adjustment List"]
         ];
+
+        $all_warehouses = $request->user()->business->warehouse;
         
         if ( request()->ajax()) {
             $adjustment = Adjustment::where('business_id', Auth::user()->business_id)->orderBy('updated_at', 'desc');
@@ -45,6 +47,12 @@ class AdjustmentController extends Controller
                 } else {
                     $adjustment->whereDate('date', '>=', $daterange[0])->whereDate('date', '<=', $daterange[1]);
                 }
+            }
+
+            if($request->get('warehouse') != ''){
+                $warehouses = $all_warehouses->whereIn('id', explode(",", $request->get('warehouse')));
+                $warehouse_ids = $warehouses->pluck('id')->toArray();
+                $adjustment->whereIn('warehouse_id', $warehouse_ids);
             }
 
             return Datatables($adjustment)
@@ -77,6 +85,7 @@ class AdjustmentController extends Controller
         }
         return view('adjustment.index', [
             'breadcrumbs' => $breadcrumbs,
+            'all_warehouses' => $all_warehouses
         ]);
     }
 
