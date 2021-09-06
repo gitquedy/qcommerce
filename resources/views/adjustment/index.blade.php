@@ -22,8 +22,8 @@
     @include('reports.components.dateFilter')
     @include('order.components.warehouseFilter')
     <div class="btn-group" id="chip_area_warehouse"></div>
-    <div class="btn-group" id="chip_area_timings"></div>
   </div>
+
   {{-- DataTable starts --}}
   <div class="table-responsive">
     <table class="table data-list-view">
@@ -87,7 +87,7 @@
             action: function() {
                 window.location = '{{ route('adjustment.create') }}';
             },
-            className: "btn-outline-primary margin-r-10"}
+            className: "btn-outline-primary margin-r-10 mb-1"}
             ];
   var BInfo = true;
   var bFilter = true;
@@ -102,8 +102,6 @@
   $(document).ready(function() {
       var filterDate = $(".filter-date");
       filterDate.insertAfter($(".top .actions .dt-buttons"));
-
-      $(".filter-date .btn-group").removeClass("mb-1");
 
       $(document).on('click', '.toggle_view_modal', function(e) {
           e.preventDefault();
