@@ -150,7 +150,7 @@ class ReportsController extends Controller
 
                 $days = $request->get('days');
 
-                $Sku = Sku::where('business_id','=',$business_id)->where('updated_at', '<', Carbon::now()->subDays($days)->format('Y-m-d'))->where('quantity', '!=', '0');
+                $Sku = Sku::where('business_id','=',$business_id)->where('updated_at', '<', Carbon::now()->subDays($days)->format('Y-m-d'))->where('quantity', '>', '0');
 
                 return Datatables::eloquent($Sku)
                 ->addColumn('image', function(Sku $SKSU) {
