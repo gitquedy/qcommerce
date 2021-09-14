@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
           toastr.error('Sorry, Something went wrong. Please try again later.');
         }
       });
-      // eventToUpdate.remove();
+      eventToUpdate.remove();
       // removeEvent(eventToUpdate.id);
       sidebar.modal('hide');
       $('.event-sidebar').removeClass('show');
