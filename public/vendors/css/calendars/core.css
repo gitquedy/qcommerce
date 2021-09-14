@@ -1,0 +1,303 @@
+.custom-control-danger .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-danger .custom-control-input:active ~ .custom-control-label::before {
+  border-color: #ea5455;
+  background-color: #ea5455;
+}
+.custom-control-danger.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-danger.custom-checkbox .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-danger.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before, .custom-control-danger.custom-radio .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-danger.custom-radio .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-danger.custom-radio .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 2px 4px 0 rgba(234, 84, 85, 0.4) !important;
+}
+.custom-control-danger .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  background-color: rgba(234, 84, 85, 0.65) !important;
+  border: none;
+  box-shadow: none !important;
+}
+.custom-control-danger .custom-control-input:focus ~ .custom-control-label::before {
+  border-color: #ea5455 !important;
+}
+
+.custom-control-primary .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-primary .custom-control-input:active ~ .custom-control-label::before {
+  border-color: #7367f0;
+  background-color: #7367f0;
+}
+.custom-control-primary.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-primary.custom-checkbox .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-primary.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before, .custom-control-primary.custom-radio .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-primary.custom-radio .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-primary.custom-radio .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 2px 4px 0 rgba(115, 103, 240, 0.4) !important;
+}
+.custom-control-primary .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  background-color: rgba(115, 103, 240, 0.65) !important;
+  border: none;
+  box-shadow: none !important;
+}
+.custom-control-primary .custom-control-input:focus ~ .custom-control-label::before {
+  border-color: #7367f0 !important;
+}
+
+.custom-control-warning .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-warning .custom-control-input:active ~ .custom-control-label::before {
+  border-color: #ff9f43;
+  background-color: #ff9f43;
+}
+.custom-control-warning.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-warning.custom-checkbox .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-warning.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before, .custom-control-warning.custom-radio .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-warning.custom-radio .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-warning.custom-radio .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 2px 4px 0 rgba(255, 159, 67, 0.4) !important;
+}
+.custom-control-warning .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  background-color: rgba(255, 159, 67, 0.65) !important;
+  border: none;
+  box-shadow: none !important;
+}
+.custom-control-warning .custom-control-input:focus ~ .custom-control-label::before {
+  border-color: #ff9f43 !important;
+}
+
+.custom-control-success .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-success .custom-control-input:active ~ .custom-control-label::before {
+  border-color: #28c76f;
+  background-color: #28c76f;
+}
+.custom-control-success.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-success.custom-checkbox .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-success.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before, .custom-control-success.custom-radio .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-success.custom-radio .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-success.custom-radio .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 2px 4px 0 rgba(40, 199, 111, 0.4) !important;
+}
+.custom-control-success .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  background-color: rgba(40, 199, 111, 0.65) !important;
+  border: none;
+  box-shadow: none !important;
+}
+.custom-control-success .custom-control-input:focus ~ .custom-control-label::before {
+  border-color: #28c76f !important;
+}
+
+.custom-control-info .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-info .custom-control-input:active ~ .custom-control-label::before {
+  border-color: #00cfe8;
+  background-color: #00cfe8;
+}
+.custom-control-info.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-info.custom-checkbox .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-info.custom-checkbox .custom-control-input:focus ~ .custom-control-label::before, .custom-control-info.custom-radio .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-info.custom-radio .custom-control-input:active ~ .custom-control-label::before,
+.custom-control-info.custom-radio .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 2px 4px 0 rgba(0, 207, 232, 0.4) !important;
+}
+.custom-control-info .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  background-color: rgba(0, 207, 232, 0.65) !important;
+  border: none;
+  box-shadow: none !important;
+}
+.custom-control-info .custom-control-input:focus ~ .custom-control-label::before {
+  border-color: #00cfe8 !important;
+}
+
+.bg-light-primary {
+  background: rgba(115, 103, 240, 0.12) !important;
+  color: #7367f0 !important;
+}
+.bg-light-primary.fc-h-event, .bg-light-primary.fc-v-event {
+  border-color: rgba(115, 103, 240, 0.1);
+}
+.bg-light-primary .fc-list-event-dot,
+.bg-light-primary .fc-daygrid-event-dot {
+  border-color: #7367f0 !important;
+}
+.bg-light-primary.fc-list-event:hover td {
+  background: rgba(115, 103, 240, 0.1) !important;
+}
+.bg-light-primary.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-primary {
+  color: #7367f0 !important;
+}
+
+.bg-light-secondary {
+  background: rgba(130, 134, 139, 0.12) !important;
+  color: #82868b !important;
+}
+.bg-light-secondary.fc-h-event, .bg-light-secondary.fc-v-event {
+  border-color: rgba(130, 134, 139, 0.1);
+}
+.bg-light-secondary .fc-list-event-dot,
+.bg-light-secondary .fc-daygrid-event-dot {
+  border-color: #82868b !important;
+}
+.bg-light-secondary.fc-list-event:hover td {
+  background: rgba(130, 134, 139, 0.1) !important;
+}
+.bg-light-secondary.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-secondary {
+  color: #82868b !important;
+}
+
+.bg-light-success {
+  background: rgba(40, 199, 111, 0.12) !important;
+  color: #28c76f !important;
+}
+.bg-light-success.fc-h-event, .bg-light-success.fc-v-event {
+  border-color: rgba(40, 199, 111, 0.1);
+}
+.bg-light-success .fc-list-event-dot,
+.bg-light-success .fc-daygrid-event-dot {
+  border-color: #28c76f !important;
+}
+.bg-light-success.fc-list-event:hover td {
+  background: rgba(40, 199, 111, 0.1) !important;
+}
+.bg-light-success.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-success {
+  color: #28c76f !important;
+}
+
+.bg-light-info {
+  background: rgba(0, 207, 232, 0.12) !important;
+  color: #00cfe8 !important;
+}
+.bg-light-info.fc-h-event, .bg-light-info.fc-v-event {
+  border-color: rgba(0, 207, 232, 0.1);
+}
+.bg-light-info .fc-list-event-dot,
+.bg-light-info .fc-daygrid-event-dot {
+  border-color: #00cfe8 !important;
+}
+.bg-light-info.fc-list-event:hover td {
+  background: rgba(0, 207, 232, 0.1) !important;
+}
+.bg-light-info.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-info {
+  color: #00cfe8 !important;
+}
+
+.bg-light-warning {
+  background: rgba(255, 159, 67, 0.12) !important;
+  color: #ff9f43 !important;
+}
+.bg-light-warning.fc-h-event, .bg-light-warning.fc-v-event {
+  border-color: rgba(255, 159, 67, 0.1);
+}
+.bg-light-warning .fc-list-event-dot,
+.bg-light-warning .fc-daygrid-event-dot {
+  border-color: #ff9f43 !important;
+}
+.bg-light-warning.fc-list-event:hover td {
+  background: rgba(255, 159, 67, 0.1) !important;
+}
+.bg-light-warning.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-warning {
+  color: #ff9f43 !important;
+}
+
+.bg-light-danger {
+  background: rgba(234, 84, 85, 0.12) !important;
+  color: #ea5455 !important;
+}
+.bg-light-danger.fc-h-event, .bg-light-danger.fc-v-event {
+  border-color: rgba(234, 84, 85, 0.1);
+}
+.bg-light-danger .fc-list-event-dot,
+.bg-light-danger .fc-daygrid-event-dot {
+  border-color: #ea5455 !important;
+}
+.bg-light-danger.fc-list-event:hover td {
+  background: rgba(234, 84, 85, 0.1) !important;
+}
+.bg-light-danger.fc-list-event .fc-list-event-title {
+  color: #6e6b7b;
+}
+
+.avatar.bg-light-danger {
+  color: #ea5455 !important;
+}
+
+.modal-slide-in,
+.modal-slide-in .modal {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.modal-slide-in .modal-dialog {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  margin: 0;
+  max-width: none;
+  width: 20rem;
+}
+.modal-slide-in .modal-dialog .modal-content {
+  padding-bottom: 3.7rem;
+  padding-top: 3.7rem;
+  overflow: auto;
+  border-radius: 0;
+  height: 100%;
+}
+.modal-slide-in .modal-dialog .modal-body {
+  padding-bottom: 0;
+  padding-top: 0;
+  margin: auto 0;
+  flex-grow: 0;
+}
+@media (min-width: 576px) {
+  .modal-slide-in .modal-dialog {
+    width: 28rem;
+  }
+}
+.modal-slide-in .modal-dialog.sidebar-sm {
+  width: 25rem;
+}
+@media (min-width: 576px) {
+  .modal-slide-in .modal-dialog.sidebar-lg {
+    width: 30rem;
+  }
+}
+.modal-slide-in .close {
+  top: 0.4rem;
+  z-index: 10;
+  transform: none;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.4rem;
+  margin: 0;
+  padding: 0 !important;
+  line-height: 0.5;
+  transform: translate(0, -50%);
+}
+
+.modal-slide-in.fade .modal-dialog,
+.modal-slide-in .modal.fade .modal-dialog {
+  transform: translateX(100%);
+  transition: transform 0.1s ease-out;
+}
+
+.modal-slide-in.show .modal-dialog,
+.modal-slide-in .modal.show .modal-dialog {
+  transform: translateX(0) !important;
+  transition: transform 0.1s ease-out;
+}

@@ -406,7 +406,11 @@ Route::group(['middleware' => ['auth', 'verified']], function()
 	Route::get('/app-email', 'EmailAppController@emailApp');
 	Route::get('/app-chat', 'ChatAppController@chatApp');
 	Route::get('/app-todo', 'ToDoAppController@todoApp');
-	Route::get('/app-calender', 'CalenderAppController@calenderApp');
+	Route::get('/calendar', 'CalenderAppController@calendarApp');	//calendar starts
+	Route::get('/calendar/events', 'EventController@index');
+	Route::post('/calendar/add', 'EventController@store');
+	Route::post('/calendar/update', 'EventController@update');
+	Route::post('/calendar/delete', 'EventController@destroy');		//calendar ends
 	Route::get('/app-user-stats', 'UserStatsAppController@user_stats');
 	Route::get('/app-ecommerce-shop', 'EcommerceAppController@ecommerce_shop');
 	Route::get('/app-ecommerce-wishlist', 'EcommerceAppController@ecommerce_wishlist');

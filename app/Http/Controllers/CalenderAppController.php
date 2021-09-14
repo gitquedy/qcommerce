@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 class CalenderAppController extends Controller
 {
     // Calender App
-    public function calenderApp(){
+    public function calendarApp(){
       $pageConfigs = [
           'pageHeader' => false
       ];

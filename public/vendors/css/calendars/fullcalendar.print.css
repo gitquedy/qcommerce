@@ -1,10 +1,10 @@
 /*!
- * FullCalendar v3.9.0
+ * FullCalendar v4.0.0-alpha
  * Docs & License: https://fullcalendar.io/
  * (c) 2018 Adam Shaw
  */
 /*!
- * FullCalendar v3.9.0 Print Stylesheet
+ * FullCalendar v4.0.0-alpha Print Stylesheet
  * Docs & License: https://fullcalendar.io/
  * (c) 2018 Adam Shaw
  */
@@ -13,7 +13,7 @@
  * When including this stylesheet, use the media='print' attribute of the <link> tag.
  * Make sure to include this stylesheet IN ADDITION to the regular fullcalendar.css.
  */
-.fc {
+ .fc {
   max-width: 100% !important; }
 
 /* Global Event Restyling
