@@ -92,14 +92,22 @@
                 <th>SELLING PRICE</th>
             </tr>
             @forelse($warehouse->items as $item)
-                @if($item->quantity != 0)
+                @if($item->quantity > 0)
                 <tr>
                     <td>{{$item->quantity}}</td>
                     <td></td>
                     <td>{{($item->transfer_item)?$item->transfer_item->transfer->reference_no:''}}</td>
                     <td>{{$item->sku->name}}</td>
                     @if($item->transfer_item)
-                    <td>{{($item->transfer_item->transfer->price_group) ? $item->transfer_item->transfer->price_group->items()->where('sku_id', $item->sku_id)->first()->price : ''}}</td>
+                    <td>{{($item->transfer_item->transfer->price_group)
+                            ?
+                            ($price_group_item = $item->transfer_item->transfer->price_group->items()->where('sku_id', $item->sku_id)->first())
+                                ?
+                                $price_group_item->price
+                                :
+                                ''
+                            :
+                            ''}}</td>
                     @else
                     <td></td>
                     @endif
