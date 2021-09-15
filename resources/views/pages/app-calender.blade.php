@@ -204,9 +204,9 @@
   <script type="text/javascript">
     var filter = {
       {{ucfirst($filter[0])}}: 'primary',
-      {{ucfirst($filter[1])}}: 'success',
-      {{ucfirst($filter[2])}}: 'danger',
-      {{ucfirst($filter[3])}}: 'warning',
+      {{ucfirst($filter[1])}}: 'danger',
+      {{ucfirst($filter[2])}}: 'warning',
+      {{ucfirst($filter[3])}}: 'success',
       Others: 'info'
     };
   </script>
