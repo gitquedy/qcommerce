@@ -91,11 +91,17 @@
 @section('myscript')
   {{-- Page js files --}}
   <script type="text/javascript">
-    $('.select2').select2();
-    $('.datatables').DataTable({
-      dom: '<"top"><"clear">rt<"bottom"<"actions">p>',
+    $(document).ready(function() {
+      $('.select2').select2();
+      $('.datatables').DataTable({
+        dom: '<"top"><"clear">rt<"bottom"<"actions">p>',
+      });
+      $('.pagination').addClass('justify-content-center');
+
+      $('#DataTables_Table_0_paginate').click(function(){
+        $('.pagination').addClass('justify-content-center');
+      });
     });
-    $('.pagination').addClass('justify-content-center');
   </script>
 <script src="{{ asset('js/scripts/forms-validation/form-normal.js') }}"></script>
 @endsection
