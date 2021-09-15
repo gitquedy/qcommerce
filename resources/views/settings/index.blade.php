@@ -147,6 +147,55 @@
               </div>
             </div>
             <hr>
+            <h3>Calendar Filters</h3>
+            <hr>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Filter 1</label>
+                  <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" name="filter1" placeholder="" value="{{$filter[0]}}">
+                    <div class="form-control-position"> 
+                      <i class="feather icon-calendar"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Filter 2</label>
+                  <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" name="filter2" placeholder="" value="{{$filter[1]}}">
+                    <div class="form-control-position"> 
+                      <i class="feather icon-calendar"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Filter 3</label>
+                  <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" name="filter3" placeholder="" value="{{$filter[2]}}">
+                    <div class="form-control-position"> 
+                      <i class="feather icon-calendar"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label>Filter 4</label>
+                  <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" name="filter4" placeholder="" value="{{$filter[3]}}">
+                    <div class="form-control-position"> 
+                      <i class="feather icon-calendar"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr>
             <div class="row">
               <div class="col-6">
                 <input type="submit" name="save" class="btn btn-primary mr-1 mb-1 btn_save" value="Save">

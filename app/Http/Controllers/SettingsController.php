@@ -22,9 +22,12 @@ class SettingsController extends Controller
         ];
        
         $s = Settings::where('business_id', Auth::user()->business_id)->first();
+        $filter = explode(',', $s->calendar_filter);
+
         return view('settings.index', [
             'breadcrumbs' => $breadcrumbs,
             'settings' => $s,
+            'filter' => $filter
         ]);
     }
 
@@ -91,6 +94,10 @@ class SettingsController extends Controller
             'adjustment_prefix' => 'required|string|max:191',
             'inventory_prefix' => 'required|string|max:191',
             'customer_name_format' => 'required|string|max:191',
+            'filter1' => 'required|string|max:191',
+            'filter2' => 'required|string|max:191',
+            'filter3' => 'required|string|max:191',
+            'filter4' => 'required|string|max:191',
         ]);
 
         if ($validator->fails()) {
@@ -99,10 +106,15 @@ class SettingsController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $data = $request->except(['_token', '_method']);
+            $data = $request->except(['_token', '_method', 'filter1', 'filter2', 'filter3', 'filter4']);
 
             foreach ($data as $col => $val) {
                 $setting->$col = $val;
+            }
+            $setting->calendar_filter = '';
+            for ($i = 1; $i <= 4; $i++) {
+                $filter = 'filter'.$i;
+                $setting->calendar_filter .= strtolower($request->$filter).',';
             }
             $setting->save();
  

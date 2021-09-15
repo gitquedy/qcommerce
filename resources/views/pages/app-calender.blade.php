@@ -1,3 +1,4 @@
+@inject('request', 'Illuminate\Http\Request')
 @extends('layouts/contentLayoutMaster')
 
 @section('title', 'App Calendar')
@@ -42,49 +43,49 @@
               <label class="custom-control-label" for="select-all">View All</label>
             </div>
             <div class="calendar-events-filter">
-              <div class="custom-control custom-control-danger custom-checkbox mb-1">
-                <input
-                  type="checkbox"
-                  class="custom-control-input input-filter"
-                  id="personal"
-                  data-value="personal"
-                  checked
-                />
-                <label class="custom-control-label" for="personal">Personal</label>
-              </div>
               <div class="custom-control custom-control-primary custom-checkbox mb-1">
                 <input
                   type="checkbox"
                   class="custom-control-input input-filter"
-                  id="business"
-                  data-value="business"
+                  id="{{$filter[0]}}"
+                  data-value="{{$filter[0]}}"
                   checked
                 />
-                <label class="custom-control-label" for="business">Business</label>
+                <label class="custom-control-label" for="{{$filter[0]}}">{{ucfirst($filter[0])}}</label>
+              </div>
+              <div class="custom-control custom-control-danger custom-checkbox mb-1">
+                <input
+                  type="checkbox"
+                  class="custom-control-input input-filter"
+                  id="{{$filter[1]}}"
+                  data-value="{{$filter[1]}}"
+                  checked
+                />
+                <label class="custom-control-label" for="{{$filter[1]}}">{{ucfirst($filter[1])}}</label>
               </div>
               <div class="custom-control custom-control-warning custom-checkbox mb-1">
                 <input
                   type="checkbox"
                   class="custom-control-input input-filter"
-                  id="family"
-                  data-value="family"
+                  id="{{$filter[2]}}"
+                  data-value="{{$filter[2]}}"
                   checked
                 />
-                <label class="custom-control-label" for="family">Family</label>
+                <label class="custom-control-label" for="{{$filter[2]}}">{{ucfirst($filter[2])}}</label>
               </div>
               <div class="custom-control custom-control-success custom-checkbox mb-1">
                 <input
                   type="checkbox"
                   class="custom-control-input input-filter"
-                  id="holiday"
-                  data-value="holiday"
+                  id="{{$filter[3]}}"
+                  data-value="{{$filter[3]}}"
                   checked
                 />
-                <label class="custom-control-label" for="holiday">Holiday</label>
+                <label class="custom-control-label" for="{{$filter[3]}}">{{ucfirst($filter[3])}}</label>
               </div>
               <div class="custom-control custom-control-info custom-checkbox">
-                <input type="checkbox" class="custom-control-input input-filter" id="etc" data-value="etc" checked />
-                <label class="custom-control-label" for="etc">ETC</label>
+                <input type="checkbox" class="custom-control-input input-filter" id="others" data-value="others" checked />
+                <label class="custom-control-label" for="others">Others</label>
               </div>
             </div>
           </div>
@@ -130,11 +131,11 @@
             <div class="form-group">
               <label for="select-label" class="form-label">Label</label>
               <select class="select2 select-label form-control w-100" id="select-label" name="select-label">
-                <option data-label="primary" value="Business" selected>Business</option>
-                <option data-label="danger" value="Personal">Personal</option>
-                <option data-label="warning" value="Family">Family</option>
-                <option data-label="success" value="Holiday">Holiday</option>
-                <option data-label="info" value="ETC">ETC</option>
+                <option data-label="primary" value="{{ucfirst($filter[0])}}" selected>{{ucfirst($filter[0])}}</option>
+                <option data-label="danger" value="{{ucfirst($filter[1])}}">{{ucfirst($filter[1])}}</option>
+                <option data-label="warning" value="{{ucfirst($filter[2])}}">{{ucfirst($filter[2])}}</option>
+                <option data-label="success" value="{{ucfirst($filter[3])}}">{{ucfirst($filter[3])}}</option>
+                <option data-label="info" value="Others">Others</option>
               </select>
             </div>
             <div class="form-group position-relative">
@@ -200,6 +201,15 @@
 @endsection
 @section('myscript')
   <!-- Page js files -->
-  <script src="{{ asset('js/scripts/pages/app-calendar-events.js') }}"></script>
+  <script type="text/javascript">
+    var filter = {
+      {{ucfirst($filter[0])}}: 'primary',
+      {{ucfirst($filter[1])}}: 'success',
+      {{ucfirst($filter[2])}}: 'danger',
+      {{ucfirst($filter[3])}}: 'warning',
+      Others: 'info'
+    };
+  </script>
+  <!-- <script src="{{ asset('js/scripts/pages/app-calendar-events.js') }}"></script> -->
   <script src="{{ asset('js/scripts/pages/app-calendar.js') }}"></script>
 @endsection

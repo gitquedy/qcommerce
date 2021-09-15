@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Event;
+use App\Settings;
 use Auth;
 use Validator;
 use DB;
@@ -18,9 +19,14 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $events = Event::where('business_id', Auth::user()->business_id)->get();
+        $setting = Settings::where('business_id', Auth::user()->business_id)->first();
+        $filter = explode(',', $setting->calendar_filter);
         foreach ($events as $event) {
-            if(!isset($event->url)) {
+            if (!isset($event->url)) {
                 $event->url = '';
+            }
+            if (!in_array(strtolower($event->label), $filter)) {
+                $event->label = 'Others';
             }
         }
         return $events;

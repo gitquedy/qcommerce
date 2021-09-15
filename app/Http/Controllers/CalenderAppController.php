@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Settings;
+use Auth;
 
 use Illuminate\Http\Request;
 
@@ -12,8 +14,12 @@ class CalenderAppController extends Controller
           'pageHeader' => false
       ];
 
+      $setting = Settings::where('business_id', Auth::user()->business_id)->first();
+      $filter = explode(',', $setting->calendar_filter);
+
       return view('/pages/app-calender', [
-          'pageConfigs' => $pageConfigs
+          'pageConfigs' => $pageConfigs,
+          'filter' => $filter
       ]);
     }
 }

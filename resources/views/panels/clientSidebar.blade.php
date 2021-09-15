@@ -118,6 +118,14 @@
                     </ul>
                 </li>
             @endif
+            
+            <li class="nav-item {{ $request->segment(1) == 'calendar' && $request->segment(2) == '' ? 'active' : '' }}">
+                <a href="{{action('CalenderAppController@calendarApp')}}">
+                    <i class="feather icon-calendar"></i>
+                    <span class="menu-title" data-i18n="">Calendar</span>
+                </a>
+            </li>
+            
             <hr>
             
 
