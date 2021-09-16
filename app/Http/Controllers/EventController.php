@@ -28,6 +28,9 @@ class EventController extends Controller
             if (!in_array(strtolower($event->label), $filter)) {
                 $event->label = 'Others';
             }
+            if (isset($event->guests)) {
+                $event->guests = explode(',', $event->guests);
+            }
         }
         return $events;
     }
@@ -56,6 +59,7 @@ class EventController extends Controller
             'start-date' => 'required|date',
             'end-date' => 'required|date|after_or_equal:start_date',
             'event-url' => 'nullable|url',
+            'event-guests' => 'nullable|array',
             'event-location' => 'nullable|string',
             'event-description-editor' => 'nullable|string|max:255'
         ]);
@@ -74,6 +78,7 @@ class EventController extends Controller
             $event->start = $data['start-date'];
             $event->end = $data['end-date'];
             $event->url = $data['event-url'];
+            $event->guests = isset($data['event-guests']) ? implode(',', $data['event-guests']) : null;
             $event->location = $data['event-location'];
             $event->description = $data['event-description-editor'];
             $event->save();
@@ -131,6 +136,7 @@ class EventController extends Controller
             'start-date' => 'required|date',
             'end-date' => 'required|date|after_or_equal:start_date',
             'event-url' => 'nullable|url',
+            'event-guests' => 'nullable|array',
             'event-location' => 'nullable|string',
             'event-description-editor' => 'nullable|string|max:255'
         ]);
@@ -149,6 +155,7 @@ class EventController extends Controller
             $event->start = $data['start-date'];
             $event->end = $data['end-date'];
             $event->url = $data['event-url'];
+            $event->guests = isset($data['event-guests']) ? implode(',', $data['event-guests']) : null;
             $event->location = $data['event-location'];
             $event->description = $data['event-description-editor'];
             $event->save();

@@ -156,17 +156,14 @@
               <label for="event-url" class="form-label">Event URL</label>
               <input type="url" class="form-control" id="event-url" name="event-url" placeholder="https://www.google.com" />
             </div>
-            <!-- <div class="form-group select2-primary">
+            <div class="form-group select2-primary">
               <label for="event-guests" class="form-label">Add Guests</label>
-              <select class="select2 select-add-guests form-control w-100" id="event-guests" multiple>
-                <option data-avatar="1-small.png" value="Jane Foster">Jane Foster</option>
-                <option data-avatar="3-small.png" value="Donna Frank">Donna Frank</option>
-                <option data-avatar="5-small.png" value="Gabrielle Robertson">Gabrielle Robertson</option>
-                <option data-avatar="7-small.png" value="Lori Spears">Lori Spears</option>
-                <option data-avatar="9-small.png" value="Sandy Vega">Sandy Vega</option>
-                <option data-avatar="11-small.png" value="Cheryl May">Cheryl May</option>
+              <select class="select2 select-add-guests form-control w-100" name="event-guests[]" id="event-guests" multiple>
+                @foreach ($users as $user)
+                  <option data-avatar="{{ asset('images/profile/profile-picture/'.$user->picture) }}" value="{{$user->id}}">{{$user->fullName()}}</option>
+                @endforeach
               </select>
-            </div> -->
+            </div>
             <div class="form-group">
               <label for="event-location" class="form-label">Location</label>
               <input type="text" class="form-control" id="event-location" name="event-location" placeholder="Enter Location" />

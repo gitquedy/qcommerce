@@ -102,8 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
         "<div class='avatar avatar-sm my-0 mr-50'>" +
         "<span class='avatar-content'>" +
         "<img src='" +
-        assetPath +
-        'images/avatars/' +
         $(option.element).data('avatar') +
         "' alt='avatar' />" +
         '</span>' +
@@ -189,6 +187,11 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {id: eventId.val()},
         success: function (response) {
           toastr.success(response.msg);
+          // eventToUpdate.remove();
+          // removeEvent(eventToUpdate.id);
+          sidebar.modal('hide');
+          $('.event-sidebar').removeClass('show');
+          $('.app-calendar .body-content-overlay').removeClass('show');
           calendar.refetchEvents();
         },
         error: function(jqXhr, json, errorThrown){
@@ -198,11 +201,6 @@ document.addEventListener('DOMContentLoaded', function () {
           toastr.error('Sorry, Something went wrong. Please try again later.');
         }
       });
-      eventToUpdate.remove();
-      // removeEvent(eventToUpdate.id);
-      sidebar.modal('hide');
-      $('.event-sidebar').removeClass('show');
-      $('.app-calendar .body-content-overlay').removeClass('show');
     });
   }
 
